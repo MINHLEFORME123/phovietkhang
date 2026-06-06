@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="en"><head><style>
-    .bg-pattern-light {
-        background-image: linear-gradient(rgba(211, 211, 255, 0.85), rgba(255, 255, 255, 0.85)), url('assets/pattern-light.svg') !important;
+        .bg-pattern-light {
+        background-color: #f8f6f0 !important; /* Soft warm ivory to reduce brightness */
+        background-image: url('assets/pattern-light.svg') !important;
         background-repeat: repeat;
-        background-size: 400px;
+        background-size: 80px 40px;
         background-attachment: fixed;
     }
-    .bg-pattern-dark {
-        background-image: linear-gradient(rgba(7, 24, 43, 0.85), rgba(7, 24, 43, 0.85)), url('assets/pattern-dark.svg') !important;
+        .bg-pattern-dark {
+        background-color: #0b0f19 !important;
+        background-image: url('assets/pattern-dark.svg') !important;
         background-repeat: repeat;
-        background-size: 400px;
+        background-size: 80px 40px;
         background-attachment: fixed;
     }
     /* Refined approach for dark pattern to keep content crisp: use pseudo-element or separate layer */
@@ -22,7 +24,7 @@
         inset: 0;
         background-image: url('assets/pattern-dark.svg');
         background-repeat: repeat;
-        background-size: 400px;
+        background-size: 80px 40px;
         background-attachment: fixed;
         opacity: 0.25;
         pointer-events: none;
@@ -37,7 +39,7 @@
         inset: 0;
         background-image: url('assets/pattern-dark.svg');
         background-repeat: repeat;
-        background-size: 400px;
+        background-size: 80px 40px;
         background-attachment: fixed;
         opacity: 0.25;
         pointer-events: none;
