@@ -65,7 +65,6 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 flex flex-col h-screen overflow-y-auto w-full">
         <header class="h-20 bg-surface border-b border-gray-800 flex items-center justify-between px-4 md:px-8">
             <div class="flex items-center gap-4">
                 <button onclick="toggleAdminSidebar()" class="md:hidden text-secondary hover:text-white transition-colors p-1">
@@ -73,14 +72,22 @@
                 </button>
                 <h2 class="text-xl md:text-2xl font-semibold text-white">Food Menu Management</h2>
             </div>
-            <button id="btn-clear-menu" class="bg-red-900/50 hover:bg-red-900 text-red-400 py-2 px-4 rounded-lg flex items-center gap-2 transition-colors">
-                <span class="material-symbols-outlined">delete_sweep</span>
-                <span>Clear Menu</span>
-            </button>
+            <div class="flex items-center space-x-4">
+                <button onclick="window.exportTableToExcel('food-table', 'Food_Menu.xlsx')" class="bg-teal-600 hover:bg-teal-700 text-white py-2 px-4 rounded-lg flex items-center gap-1.5 text-sm font-semibold transition-colors">
+                    <span class="material-symbols-outlined text-sm">download</span>
+                    <span>Export Excel</span>
+                </button>
+                <button id="btn-clear-menu" class="bg-red-900/50 hover:bg-red-900 text-red-400 py-2 px-4 rounded-lg flex items-center gap-2 text-sm font-semibold transition-colors">
+                    <span class="material-symbols-outlined text-sm">delete_sweep</span>
+                    <span>Clear Menu</span>
+                </button>
+                <span class="material-symbols-outlined text-secondary cursor-pointer hover:text-white">notifications</span>
+                <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold">A</div>
+            </div>
         </header>
         <div class="p-4 md:p-8 flex-1 w-full overflow-hidden">
             <div class="bg-surface rounded-xl border border-gray-800 p-6 shadow-lg overflow-x-auto w-full">
-                <table class="w-full text-left">
+                <table class="w-full text-left" id="food-table">
                     <thead>
                         <tr class="border-b border-gray-800 text-secondary">
                             <th class="py-3 px-4 font-medium">Image</th>

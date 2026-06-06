@@ -160,13 +160,18 @@
             </div>
 
             <!-- Recent Orders Table -->
-            <div class="bg-surface rounded-xl border border-gray-800 p-6 shadow-lg">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-semibold text-white">Recent Orders</h3>
-                    <a href="order-manager.html" class="text-primary hover:text-blue-400 text-sm font-medium">View All Orders &rarr;</a>
+                    <div class="flex items-center gap-3">
+                        <button onclick="window.exportTableToExcel('recent-orders-table', 'Recent_Orders.xlsx')" class="bg-teal-600 hover:bg-teal-700 text-white py-1.5 px-3 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors">
+                            <span class="material-symbols-outlined text-[16px]">download</span>
+                            <span>Export Excel</span>
+                        </button>
+                        <a href="order-manager.html" class="text-primary hover:text-blue-400 text-sm font-medium">View All Orders &rarr;</a>
+                    </div>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left">
+                    <table class="w-full text-left" id="recent-orders-table">
                         <thead>
                             <tr class="border-b border-gray-800 text-secondary text-sm">
                                 <th class="py-3 px-4 font-semibold">Order ID</th>

@@ -82,10 +82,18 @@
                 </button>
                 <h2 class="text-xl md:text-2xl font-semibold text-white">User Management</h2>
             </div>
+            <div class="flex items-center space-x-4">
+                <button onclick="window.exportTableToExcel('user-table', 'Users_List.xlsx')" class="bg-teal-600 hover:bg-teal-700 text-white py-2 px-4 rounded-lg flex items-center gap-1.5 text-sm font-semibold transition-colors">
+                    <span class="material-symbols-outlined text-sm">download</span>
+                    <span>Export Excel</span>
+                </button>
+                <span class="material-symbols-outlined text-secondary cursor-pointer hover:text-white">notifications</span>
+                <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold">A</div>
+            </div>
         </header>
         <div class="p-4 md:p-8 flex-1 w-full overflow-hidden">
             <div class="bg-surface rounded-xl border border-gray-800 p-4 md:p-6 shadow-lg overflow-x-auto w-full">
-                <table class="w-full text-left">
+                <table class="w-full text-left" id="user-table">
                     <thead>
                         <tr class="border-b border-gray-800 text-secondary">
                             <th class="py-3 px-4 font-medium">Name</th>

@@ -4045,3 +4045,37 @@ Rules:
     });
 })();
 
+// --- GLOBAL EXCEL EXPORT HELPER ---
+window.exportTableToExcel = function(tableId, filename = 'export.xlsx') {
+    const table = document.getElementById(tableId);
+    if (!table) return;
+    
+    if (typeof XLSX === 'undefined') {
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+        script.onload = () => {
+            doExport();
+        };
+        document.head.appendChild(script);
+    } else {
+        doExport();
+    }
+    
+    function doExport() {
+        // Strip images/buttons if any before exporting
+        const cleanTable = table.cloneNode(true);
+        // Remove columns or elements we don't want in Excel (like action buttons, edit/delete icons)
+        cleanTable.querySelectorAll('button, a, .flex, td img, th:last-child, td:last-child').forEach(el => {
+            // If it's the actions column, remove it
+            if (el.tagName === 'TH' || el.tagName === 'TD') {
+                el.remove();
+            } else {
+                // Otherwise clear text or remove specific button
+                el.remove();
+            }
+        });
+        const wb = XLSX.utils.table_to_book(cleanTable, { sheet: "Sheet1" });
+        XLSX.writeFile(wb, filename);
+    }
+};
+
