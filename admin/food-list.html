@@ -12,55 +12,119 @@
     <script>
     tailwind.config = {
       darkMode: "class",
-      theme: { extend: { colors: { surface: "#121824", "surface-highlight": "#1e293b", primary: "#3b82f6", secondary: "#9ca3af", "on-surface": "#f3f4f6" } } }
+      theme: {
+        extend: {
+          "colors": {
+                  "inverse-primary": "#a9c7ff",
+                  "surface-dim": "#d8dadc",
+                  "outline-variant": "#c4c6d0",
+                  "on-surface": "#191c1e",
+                  "outline": "#747780",
+                  "secondary-fixed-dim": "#c8c6c5",
+                  "on-error-container": "#93000a",
+                  "surface-container-highest": "#e0e3e5",
+                  "tertiary-fixed-dim": "#b7c8e1",
+                  "background": "#f7f9fb",
+                  "surface-tint": "#405f91",
+                  "on-secondary-fixed": "#1c1b1b",
+                  "on-primary-fixed": "#001b3d",
+                  "on-tertiary-fixed": "#0b1c30",
+                  "secondary-container": "#e2dfde",
+                  "on-secondary-container": "#636262",
+                  "surface-bright": "#f7f9fb",
+                  "on-primary-fixed-variant": "#264778",
+                  "error-container": "#ffdad6",
+                  "primary-container": "#002b5b",
+                  "on-secondary-fixed-variant": "#474746",
+                  "surface": "#f7f9fb",
+                  "on-error": "#ffffff",
+                  "tertiary-container": "#1d2d41",
+                  "inverse-on-surface": "#eff1f3",
+                  "secondary": "#5f5e5e",
+                  "tertiary-fixed": "#d3e4fe",
+                  "on-tertiary-container": "#8495ad",
+                  "primary-fixed-dim": "#a9c7ff",
+                  "surface-variant": "#e0e3e5",
+                  "on-primary-container": "#7594ca",
+                  "on-primary": "#ffffff",
+                  "surface-container-high": "#e6e8ea",
+                  "surface-container-low": "#f2f4f6",
+                  "on-surface-variant": "#43474f",
+                  "error": "#ba1a1a",
+                  "primary": "#001736",
+                  "on-tertiary-fixed-variant": "#38485d",
+                  "primary-fixed": "#d6e3ff",
+                  "on-tertiary": "#ffffff",
+                  "inverse-surface": "#2d3133",
+                  "surface-container": "#eceef0",
+                  "secondary-fixed": "#e5e2e1",
+                  "surface-container-lowest": "#ffffff",
+                  "tertiary": "#07182b",
+                  "on-background": "#191c1e",
+                  "on-secondary": "#ffffff"
+          },
+          "fontFamily": {
+                  "headline-md": ["EB Garamond"],
+                  "body-md": ["Inter"]
+          }
+        }
+      }
     }
     </script>
+    <style>
+        .bg-pattern-light {
+            background-image: linear-gradient(rgba(211, 211, 255, 0.85), rgba(255, 255, 255, 0.85)), url('https://lh3.googleusercontent.com/aida/AP1WRLu6c1eOBycoOhr8d1SXuiHHJ2p6UFS7W2aOZkBXjny6fvIs_6xymLzH0UsMR7FkOSpmq8iA3Rgj70jVG88PGuJNINDzY5gsPYOgnDgBh3IcKArWymKf-uL7T7agVDPUQUJOCSw0gvHUm-wOQkE9H9OVVAAbstEFTKz5Z8_Lg8OSzO2KJuFfVFtK3doqWktfqKKktFzNLf_TzWkD-TcfU94V1-qBjNCjlurGOnhw60gdCD9fBNRYgHzWMpMp') !important;
+            background-repeat: repeat;
+            background-size: 400px;
+            background-attachment: fixed;
+        }
+    </style>
 </head>
-<body class="bg-[#0b0f19] text-on-surface font-['Inter'] flex h-screen overflow-hidden">
+<body class="text-on-surface antialiased flex h-screen overflow-hidden bg-pattern-light">
     <!-- Sidebar -->
-    <aside class="w-64 bg-surface border-r border-gray-800 flex flex-col">
-        <div class="h-20 flex items-center justify-center border-b border-gray-800">
+    <aside class="w-64 bg-surface/90 backdrop-blur-md border-r border-outline-variant/30 flex flex-col">
+        <div class="h-20 flex items-center justify-center border-b border-outline-variant/30">
             <h1 class="text-xl font-bold text-primary tracking-wider">PHO ADMIN</h1>
         </div>
         <nav class="flex-1 p-4 space-y-2">
-            <a href="index.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+            <a href="index.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-container-high transition-colors text-secondary">
                 <span class="material-symbols-outlined">dashboard</span>
                 <span>Dashboard</span>
             </a>
-            <a href="user-manager.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+            <a href="user-manager.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-container-high transition-colors text-secondary">
                 <span class="material-symbols-outlined">group</span>
                 <span>Users</span>
             </a>
-            <a href="food-list.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors bg-primary/20 text-primary">
+            <a href="food-list.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-container-high transition-colors bg-primary-container text-on-primary-container font-semibold">
                 <span class="material-symbols-outlined">restaurant_menu</span>
                 <span>Food Menu</span>
             </a>
-            <a href="food-add.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+            <a href="food-add.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-container-high transition-colors text-secondary">
                 <span class="material-symbols-outlined">add_circle</span>
                 <span>Add Food</span>
             </a>
-            <a href="order-manager.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+            <a href="order-manager.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-container-high transition-colors text-secondary">
                 <span class="material-symbols-outlined">receipt_long</span>
                 <span>Orders</span>
             </a>
-            <a href="reservations.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+            <a href="reservations.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-container-high transition-colors text-secondary">
                 <span class="material-symbols-outlined">table_restaurant</span>
                 <span>Reservations</span>
             </a>
-            <a href="feedback.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+            <a href="feedback.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-container-high transition-colors text-secondary">
                 <span class="material-symbols-outlined">forum</span>
                 <span>Feedback</span>
             </a>
-            <a href="messages.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+            <a href="messages.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-container-high transition-colors text-secondary">
                 <span class="material-symbols-outlined">mail</span>
                 <span>Messages</span>
             </a>
-            <a href="../kitchen/index.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+            <a href="../kitchen/index.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-container-high transition-colors text-secondary">
                 <span class="material-symbols-outlined">soup_kitchen</span>
                 <span>Kitchen KDS</span>
             </a>
         </nav>
-        <div class="p-4 border-t border-gray-800">
+        <div class="p-4 border-t border-outline-variant/30">
             <button onclick="window.logoutUser()" class="flex w-full items-center space-x-3 p-3 rounded-lg hover:bg-red-900/50 text-red-400 transition-colors">
                 <span class="material-symbols-outlined">logout</span><span>Logout</span>
             </button>
@@ -69,26 +133,26 @@
 
     <!-- Main Content -->
     <main class="flex-1 flex flex-col h-screen overflow-y-auto">
-        <header class="h-20 bg-surface border-b border-gray-800 flex items-center justify-between px-8 flex-shrink-0">
-            <h2 class="text-2xl font-semibold text-white">Food Menu Management</h2>
+        <header class="h-20 bg-surface/90 backdrop-blur-md border-b border-outline-variant/30 flex items-center justify-between px-8 flex-shrink-0">
+            <h2 class="text-2xl font-semibold text-on-surface">Food Menu Management</h2>
             <div class="flex items-center space-x-4">
                 <button id="btn-clear-menu" class="bg-red-900/50 hover:bg-red-900 text-red-400 py-2 px-4 rounded-lg flex items-center gap-2 transition-colors">
                     <span class="material-symbols-outlined">delete_sweep</span>
                     <span>Clear Menu</span>
                 </button>
-                <button onclick="window.exportTableToExcel('food-table', 'food_menu.xlsx')" class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg flex items-center gap-2 transition-colors shadow">
+                <button onclick="window.exportTableToExcel('food-table', 'food_menu.xlsx')" class="bg-green-600 hover:bg-green-700 text-on-surface py-2 px-4 rounded-lg flex items-center gap-2 transition-colors shadow">
                     <span class="material-symbols-outlined">download</span>
                     <span>Xuất Excel</span>
                 </button>
-                <span class="material-symbols-outlined text-secondary cursor-pointer hover:text-white">notifications</span>
-                <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold">A</div>
+                <span class="material-symbols-outlined text-secondary cursor-pointer hover:text-on-surface">notifications</span>
+                <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-surface font-bold">A</div>
             </div>
         </header>
         <div class="p-8 flex-1">
-            <div class="bg-surface rounded-xl border border-gray-800 p-6 shadow-lg">
+            <div class="bg-surface/90 backdrop-blur-md rounded-xl border border-outline-variant/30 p-6 shadow-lg">
                 <table id="food-table" class="w-full text-left">
                     <thead>
-                        <tr class="border-b border-gray-800 text-secondary">
+                        <tr class="border-b border-outline-variant/30 text-secondary">
                             <th class="py-3 px-4 font-medium">Image</th>
                             <th class="py-3 px-4 font-medium">Name</th>
                             <th class="py-3 px-4 font-medium">Category</th>
@@ -107,12 +171,12 @@
 
     <!-- Edit Food Modal -->
     <div id="edit-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-[#121824] border border-gray-700 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div class="p-5 border-b border-gray-800 flex items-center justify-between">
-                <h3 class="text-xl font-bold text-white flex items-center gap-2">
+        <div class="bg-[#121824] border border-outline-variant/50 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-5 border-b border-outline-variant/30 flex items-center justify-between">
+                <h3 class="text-xl font-bold text-on-surface flex items-center gap-2">
                     <span class="material-symbols-outlined text-primary">edit</span> Edit Food Item
                 </h3>
-                <button onclick="window.closeEditModal()" class="text-secondary hover:text-white p-1">
+                <button onclick="window.closeEditModal()" class="text-secondary hover:text-on-surface p-1">
                     <span class="material-symbols-outlined">close</span>
                 </button>
             </div>
@@ -121,77 +185,77 @@
                 <div class="grid grid-cols-3 gap-3">
                     <div>
                         <label class="block text-xs text-secondary mb-1">Name (VI)</label>
-                        <input type="text" id="edit-name-vi" class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-2.5 text-sm">
+                        <input type="text" id="edit-name-vi" class="w-full bg-pattern-light border border-outline-variant/50 rounded-lg text-on-surface p-2.5 text-sm">
                     </div>
                     <div>
                         <label class="block text-xs text-secondary mb-1">Name (EN)</label>
-                        <input type="text" id="edit-name-en" class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-2.5 text-sm">
+                        <input type="text" id="edit-name-en" class="w-full bg-pattern-light border border-outline-variant/50 rounded-lg text-on-surface p-2.5 text-sm">
                     </div>
                     <div>
                         <label class="block text-xs text-secondary mb-1">Name (FI)</label>
-                        <input type="text" id="edit-name-fi" class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-2.5 text-sm">
+                        <input type="text" id="edit-name-fi" class="w-full bg-pattern-light border border-outline-variant/50 rounded-lg text-on-surface p-2.5 text-sm">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-3">
                     <div>
                         <label class="block text-xs text-secondary mb-1">Category (VI)</label>
-                        <input type="text" id="edit-category-vi" list="edit-category-datalist" class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-2.5 text-sm">
+                        <input type="text" id="edit-category-vi" list="edit-category-datalist" class="w-full bg-pattern-light border border-outline-variant/50 rounded-lg text-on-surface p-2.5 text-sm">
                         <datalist id="edit-category-datalist"></datalist>
                     </div>
                     <div>
                         <label class="block text-xs text-secondary mb-1">Category (EN)</label>
-                        <input type="text" id="edit-category-en" class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-2.5 text-sm">
+                        <input type="text" id="edit-category-en" class="w-full bg-pattern-light border border-outline-variant/50 rounded-lg text-on-surface p-2.5 text-sm">
                     </div>
                     <div>
                         <label class="block text-xs text-secondary mb-1">Category (FI)</label>
-                        <input type="text" id="edit-category-fi" class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-2.5 text-sm">
+                        <input type="text" id="edit-category-fi" class="w-full bg-pattern-light border border-outline-variant/50 rounded-lg text-on-surface p-2.5 text-sm">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-3">
                     <div>
                         <label class="block text-xs text-secondary mb-1">Desc (VI)</label>
-                        <textarea id="edit-desc-vi" class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-2.5 text-sm h-20"></textarea>
+                        <textarea id="edit-desc-vi" class="w-full bg-pattern-light border border-outline-variant/50 rounded-lg text-on-surface p-2.5 text-sm h-20"></textarea>
                     </div>
                     <div>
                         <label class="block text-xs text-secondary mb-1">Desc (EN)</label>
-                        <textarea id="edit-desc-en" class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-2.5 text-sm h-20"></textarea>
+                        <textarea id="edit-desc-en" class="w-full bg-pattern-light border border-outline-variant/50 rounded-lg text-on-surface p-2.5 text-sm h-20"></textarea>
                     </div>
                     <div>
                         <label class="block text-xs text-secondary mb-1">Desc (FI)</label>
-                        <textarea id="edit-desc-fi" class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-2.5 text-sm h-20"></textarea>
+                        <textarea id="edit-desc-fi" class="w-full bg-pattern-light border border-outline-variant/50 rounded-lg text-on-surface p-2.5 text-sm h-20"></textarea>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs text-secondary mb-1">Price (€)</label>
-                        <input type="number" step="0.01" id="edit-price" class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-2.5 text-sm">
+                        <input type="number" step="0.01" id="edit-price" class="w-full bg-pattern-light border border-outline-variant/50 rounded-lg text-on-surface p-2.5 text-sm">
                     </div>
                     <div>
                         <label class="block text-xs text-secondary mb-1">Image</label>
-                        <input type="file" id="edit-image-file" accept="image/*" class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-1.5 text-sm file:mr-2 file:py-1 file:px-3 file:rounded file:border-0 file:bg-gray-700 file:text-white file:text-xs">
+                        <input type="file" id="edit-image-file" accept="image/*" class="w-full bg-pattern-light border border-outline-variant/50 rounded-lg text-on-surface p-1.5 text-sm file:mr-2 file:py-1 file:px-3 file:rounded file:border-0 file:bg-gray-700 file:text-on-surface file:text-xs">
                     </div>
                 </div>
                 <!-- Rich Options Editor -->
                 <div>
                     <label class="block text-xs text-secondary mb-1">Options</label>
                     <div id="edit-options-list" class="space-y-2 mb-2"></div>
-                    <div class="bg-[#0b0f19] p-3 rounded-lg border border-gray-700 space-y-2">
+                    <div class="bg-pattern-light p-3 rounded-lg border border-outline-variant/50 space-y-2">
                         <div class="grid grid-cols-1 gap-2">
                             <div>
                                 <label class="block text-[10px] text-secondary mb-0.5">Option Group Name (VI)</label>
-                                <input type="text" id="edit-new-opt-name-vi" placeholder="e.g. Cấp độ cay" class="w-full bg-[#121824] border border-gray-600 rounded-lg text-white p-2 text-xs">
+                                <input type="text" id="edit-new-opt-name-vi" placeholder="e.g. Cấp độ cay" class="w-full bg-[#121824] border border-gray-600 rounded-lg text-on-surface p-2 text-xs">
                             </div>
                             <div>
                                 <label class="block text-[10px] text-secondary mb-0.5">Option Group Name (EN)</label>
-                                <input type="text" id="edit-new-opt-name-en" placeholder="e.g. Spicy Level" class="w-full bg-[#121824] border border-gray-600 rounded-lg text-white p-2 text-xs">
+                                <input type="text" id="edit-new-opt-name-en" placeholder="e.g. Spicy Level" class="w-full bg-[#121824] border border-gray-600 rounded-lg text-on-surface p-2 text-xs">
                             </div>
                             <div>
                                 <label class="block text-[10px] text-secondary mb-0.5">Option Group Name (FI)</label>
-                                <input type="text" id="edit-new-opt-name-fi" placeholder="e.g. Tulisuusaste" class="w-full bg-[#121824] border border-gray-600 rounded-lg text-white p-2 text-xs">
+                                <input type="text" id="edit-new-opt-name-fi" placeholder="e.g. Tulisuusaste" class="w-full bg-[#121824] border border-gray-600 rounded-lg text-on-surface p-2 text-xs">
                             </div>
                             <div class="mt-1">
                                 <label class="block text-[10px] text-secondary mb-0.5">Type</label>
-                                <select id="edit-new-opt-type" class="w-full bg-[#121824] border border-gray-600 rounded-lg text-white p-2 text-xs">
+                                <select id="edit-new-opt-type" class="w-full bg-[#121824] border border-gray-600 rounded-lg text-on-surface p-2 text-xs">
                                     <option value="toggle">Toggle</option>
                                     <option value="single-select">Multi-choice</option>
                                 </select>
@@ -199,21 +263,21 @@
                         </div>
                         <div id="edit-new-opt-choices" class="space-y-1"></div>
                         <div class="grid grid-cols-3 gap-2">
-                            <input type="text" id="edit-new-choice-label-vi" placeholder="Label (VI)..." class="bg-[#121824] border border-gray-600 rounded-lg text-white p-1.5 text-xs">
-                            <input type="text" id="edit-new-choice-label-en" placeholder="Label (EN)..." class="bg-[#121824] border border-gray-600 rounded-lg text-white p-1.5 text-xs">
-                            <input type="text" id="edit-new-choice-label-fi" placeholder="Label (FI)..." class="bg-[#121824] border border-gray-600 rounded-lg text-white p-1.5 text-xs">
+                            <input type="text" id="edit-new-choice-label-vi" placeholder="Label (VI)..." class="bg-[#121824] border border-gray-600 rounded-lg text-on-surface p-1.5 text-xs">
+                            <input type="text" id="edit-new-choice-label-en" placeholder="Label (EN)..." class="bg-[#121824] border border-gray-600 rounded-lg text-on-surface p-1.5 text-xs">
+                            <input type="text" id="edit-new-choice-label-fi" placeholder="Label (FI)..." class="bg-[#121824] border border-gray-600 rounded-lg text-on-surface p-1.5 text-xs">
                         </div>
                         <div class="flex gap-2">
-                            <input type="number" step="0.01" id="edit-new-choice-price" placeholder="Price" class="flex-1 bg-[#121824] border border-gray-600 rounded-lg text-white p-1.5 text-xs">
-                            <button type="button" id="btn-edit-add-choice" class="bg-gray-600 text-white px-3 py-1.5 rounded text-xs">+</button>
+                            <input type="number" step="0.01" id="edit-new-choice-price" placeholder="Price" class="flex-1 bg-[#121824] border border-gray-600 rounded-lg text-on-surface p-1.5 text-xs">
+                            <button type="button" id="btn-edit-add-choice" class="bg-gray-600 text-on-surface px-3 py-1.5 rounded text-xs">+</button>
                         </div>
-                        <button type="button" id="btn-edit-add-option" class="w-full bg-teal-600 hover:bg-teal-500 text-white py-1.5 rounded text-xs font-bold transition-colors">Add Option</button>
+                        <button type="button" id="btn-edit-add-option" class="w-full bg-teal-600 hover:bg-teal-500 text-on-surface py-1.5 rounded text-xs font-bold transition-colors">Add Option</button>
                     </div>
                 </div>
                 <div id="edit-loading" class="hidden text-center text-yellow-400 text-sm py-2">
                     <span class="material-symbols-outlined animate-spin align-middle mr-1 text-sm">sync</span> Saving...
                 </div>
-                <button type="submit" class="w-full bg-primary hover:bg-blue-600 text-white font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
+                <button type="submit" class="w-full bg-primary hover:bg-blue-600 text-on-surface font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
                     <span class="material-symbols-outlined text-sm">save</span> Save Changes
                 </button>
             </form>

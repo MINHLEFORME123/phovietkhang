@@ -14,23 +14,87 @@
     <script>
     tailwind.config = {
       darkMode: "class",
-      theme: { extend: { colors: { surface: "#121824", "surface-highlight": "#1e293b", primary: "#3b82f6", secondary: "#9ca3af", "on-surface": "#f3f4f6" } } }
+      theme: {
+        extend: {
+          "colors": {
+                  "inverse-primary": "#a9c7ff",
+                  "surface-dim": "#d8dadc",
+                  "outline-variant": "#c4c6d0",
+                  "on-surface": "#191c1e",
+                  "outline": "#747780",
+                  "secondary-fixed-dim": "#c8c6c5",
+                  "on-error-container": "#93000a",
+                  "surface-container-highest": "#e0e3e5",
+                  "tertiary-fixed-dim": "#b7c8e1",
+                  "background": "#f7f9fb",
+                  "surface-tint": "#405f91",
+                  "on-secondary-fixed": "#1c1b1b",
+                  "on-primary-fixed": "#001b3d",
+                  "on-tertiary-fixed": "#0b1c30",
+                  "secondary-container": "#e2dfde",
+                  "on-secondary-container": "#636262",
+                  "surface-bright": "#f7f9fb",
+                  "on-primary-fixed-variant": "#264778",
+                  "error-container": "#ffdad6",
+                  "primary-container": "#002b5b",
+                  "on-secondary-fixed-variant": "#474746",
+                  "surface": "#f7f9fb",
+                  "on-error": "#ffffff",
+                  "tertiary-container": "#1d2d41",
+                  "inverse-on-surface": "#eff1f3",
+                  "secondary": "#5f5e5e",
+                  "tertiary-fixed": "#d3e4fe",
+                  "on-tertiary-container": "#8495ad",
+                  "primary-fixed-dim": "#a9c7ff",
+                  "surface-variant": "#e0e3e5",
+                  "on-primary-container": "#7594ca",
+                  "on-primary": "#ffffff",
+                  "surface-container-high": "#e6e8ea",
+                  "surface-container-low": "#f2f4f6",
+                  "on-surface-variant": "#43474f",
+                  "error": "#ba1a1a",
+                  "primary": "#001736",
+                  "on-tertiary-fixed-variant": "#38485d",
+                  "primary-fixed": "#d6e3ff",
+                  "on-tertiary": "#ffffff",
+                  "inverse-surface": "#2d3133",
+                  "surface-container": "#eceef0",
+                  "secondary-fixed": "#e5e2e1",
+                  "surface-container-lowest": "#ffffff",
+                  "tertiary": "#07182b",
+                  "on-background": "#191c1e",
+                  "on-secondary": "#ffffff"
+          },
+          "fontFamily": {
+                  "headline-md": ["EB Garamond"],
+                  "body-md": ["Inter"]
+          }
+        }
+      }
     }
     </script>
+    <style>
+        .bg-pattern-light {
+            background-image: linear-gradient(rgba(211, 211, 255, 0.85), rgba(255, 255, 255, 0.85)), url('https://lh3.googleusercontent.com/aida/AP1WRLu6c1eOBycoOhr8d1SXuiHHJ2p6UFS7W2aOZkBXjny6fvIs_6xymLzH0UsMR7FkOSpmq8iA3Rgj70jVG88PGuJNINDzY5gsPYOgnDgBh3IcKArWymKf-uL7T7agVDPUQUJOCSw0gvHUm-wOQkE9H9OVVAAbstEFTKz5Z8_Lg8OSzO2KJuFfVFtK3doqWktfqKKktFzNLf_TzWkD-TcfU94V1-qBjNCjlurGOnhw60gdCD9fBNRYgHzWMpMp') !important;
+            background-repeat: repeat;
+            background-size: 400px;
+            background-attachment: fixed;
+        }
+    </style>
 </head>
-<body class="bg-[#0b0f19] text-on-surface font-['Inter'] flex h-screen overflow-hidden">
+<body class="text-on-surface antialiased flex h-screen overflow-hidden bg-pattern-light">
     <!-- Sidebar -->
-    <aside class="w-64 bg-surface border-r border-gray-800 flex flex-col">
-        <div class="h-20 flex items-center justify-center border-b border-gray-800">
+    <aside class="w-64 bg-surface/90 backdrop-blur-md border-r border-outline-variant/30 flex flex-col">
+        <div class="h-20 flex items-center justify-center border-b border-outline-variant/30">
             <h1 class="text-xl font-bold text-primary tracking-wider">PHO KITCHEN</h1>
         </div>
         <nav class="flex-1 p-4 space-y-2">
-            <a href="index.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors bg-primary/20 text-primary">
+            <a href="index.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-container-high transition-colors bg-primary-container text-on-primary-container font-semibold">
                 <span class="material-symbols-outlined">soup_kitchen</span>
                 <span>KDS Board</span>
             </a>
         </nav>
-        <div class="p-4 border-t border-gray-800">
+        <div class="p-4 border-t border-outline-variant/30">
             <button onclick="window.logoutUser()" class="flex w-full items-center space-x-3 p-3 rounded-lg hover:bg-red-900/50 text-red-400 transition-colors">
                 <span class="material-symbols-outlined">logout</span>
                 <span>Logout</span>
@@ -40,18 +104,18 @@
 
     <!-- Main Content -->
     <main class="flex-1 flex flex-col h-screen overflow-y-auto">
-        <header class="h-20 bg-surface border-b border-gray-800 flex items-center justify-between px-8 flex-shrink-0">
-            <h2 class="text-2xl font-semibold text-white">Kitchen Display System</h2>
+        <header class="h-20 bg-surface/90 backdrop-blur-md border-b border-outline-variant/30 flex items-center justify-between px-8 flex-shrink-0">
+            <h2 class="text-2xl font-semibold text-on-surface">Kitchen Display System</h2>
             <div class="flex items-center space-x-4">
-                <span class="material-symbols-outlined text-secondary cursor-pointer hover:text-white">notifications</span>
-                <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold" id="user-avatar-icon">K</div>
+                <span class="material-symbols-outlined text-secondary cursor-pointer hover:text-on-surface">notifications</span>
+                <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-surface font-bold" id="user-avatar-icon">K</div>
             </div>
         </header>
         
         <div class="p-8 flex-1 flex flex-col gap-6">
             <!-- Stat Cards -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 flex-shrink-0">
-                <div class="bg-surface rounded-xl border border-gray-800 p-6 flex items-center justify-between shadow-lg">
+                <div class="bg-surface/90 backdrop-blur-md rounded-xl border border-outline-variant/30 p-6 flex items-center justify-between shadow-lg">
                     <div>
                         <p class="text-sm text-secondary font-medium uppercase tracking-wider">Pending Orders</p>
                         <h3 id="pending-count" class="text-3xl font-bold text-red-500 mt-1">0</h3>
@@ -60,7 +124,7 @@
                         <span class="material-symbols-outlined text-3xl">receipt_long</span>
                     </div>
                 </div>
-                <div class="bg-surface rounded-xl border border-gray-800 p-6 flex items-center justify-between shadow-lg">
+                <div class="bg-surface/90 backdrop-blur-md rounded-xl border border-outline-variant/30 p-6 flex items-center justify-between shadow-lg">
                     <div>
                         <p class="text-sm text-secondary font-medium uppercase tracking-wider">Cooking</p>
                         <h3 id="cooking-count" class="text-3xl font-bold text-yellow-500 mt-1">0</h3>
@@ -69,7 +133,7 @@
                         <span class="material-symbols-outlined text-3xl">skillet</span>
                     </div>
                 </div>
-                <div class="bg-surface rounded-xl border border-gray-800 p-6 flex items-center justify-between shadow-lg">
+                <div class="bg-surface/90 backdrop-blur-md rounded-xl border border-outline-variant/30 p-6 flex items-center justify-between shadow-lg">
                     <div>
                         <p class="text-sm text-secondary font-medium uppercase tracking-wider">Ready</p>
                         <h3 id="ready-count" class="text-3xl font-bold text-green-500 mt-1">0</h3>

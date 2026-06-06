@@ -14,55 +14,119 @@
     <script>
     tailwind.config = {
       darkMode: "class",
-      theme: { extend: { colors: { surface: "#121824", "surface-highlight": "#1e293b", primary: "#3b82f6", secondary: "#9ca3af", "on-surface": "#f3f4f6" } } }
+      theme: {
+        extend: {
+          "colors": {
+                  "inverse-primary": "#a9c7ff",
+                  "surface-dim": "#d8dadc",
+                  "outline-variant": "#c4c6d0",
+                  "on-surface": "#191c1e",
+                  "outline": "#747780",
+                  "secondary-fixed-dim": "#c8c6c5",
+                  "on-error-container": "#93000a",
+                  "surface-container-highest": "#e0e3e5",
+                  "tertiary-fixed-dim": "#b7c8e1",
+                  "background": "#f7f9fb",
+                  "surface-tint": "#405f91",
+                  "on-secondary-fixed": "#1c1b1b",
+                  "on-primary-fixed": "#001b3d",
+                  "on-tertiary-fixed": "#0b1c30",
+                  "secondary-container": "#e2dfde",
+                  "on-secondary-container": "#636262",
+                  "surface-bright": "#f7f9fb",
+                  "on-primary-fixed-variant": "#264778",
+                  "error-container": "#ffdad6",
+                  "primary-container": "#002b5b",
+                  "on-secondary-fixed-variant": "#474746",
+                  "surface": "#f7f9fb",
+                  "on-error": "#ffffff",
+                  "tertiary-container": "#1d2d41",
+                  "inverse-on-surface": "#eff1f3",
+                  "secondary": "#5f5e5e",
+                  "tertiary-fixed": "#d3e4fe",
+                  "on-tertiary-container": "#8495ad",
+                  "primary-fixed-dim": "#a9c7ff",
+                  "surface-variant": "#e0e3e5",
+                  "on-primary-container": "#7594ca",
+                  "on-primary": "#ffffff",
+                  "surface-container-high": "#e6e8ea",
+                  "surface-container-low": "#f2f4f6",
+                  "on-surface-variant": "#43474f",
+                  "error": "#ba1a1a",
+                  "primary": "#001736",
+                  "on-tertiary-fixed-variant": "#38485d",
+                  "primary-fixed": "#d6e3ff",
+                  "on-tertiary": "#ffffff",
+                  "inverse-surface": "#2d3133",
+                  "surface-container": "#eceef0",
+                  "secondary-fixed": "#e5e2e1",
+                  "surface-container-lowest": "#ffffff",
+                  "tertiary": "#07182b",
+                  "on-background": "#191c1e",
+                  "on-secondary": "#ffffff"
+          },
+          "fontFamily": {
+                  "headline-md": ["EB Garamond"],
+                  "body-md": ["Inter"]
+          }
+        }
+      }
     }
     </script>
+    <style>
+        .bg-pattern-light {
+            background-image: linear-gradient(rgba(211, 211, 255, 0.85), rgba(255, 255, 255, 0.85)), url('https://lh3.googleusercontent.com/aida/AP1WRLu6c1eOBycoOhr8d1SXuiHHJ2p6UFS7W2aOZkBXjny6fvIs_6xymLzH0UsMR7FkOSpmq8iA3Rgj70jVG88PGuJNINDzY5gsPYOgnDgBh3IcKArWymKf-uL7T7agVDPUQUJOCSw0gvHUm-wOQkE9H9OVVAAbstEFTKz5Z8_Lg8OSzO2KJuFfVFtK3doqWktfqKKktFzNLf_TzWkD-TcfU94V1-qBjNCjlurGOnhw60gdCD9fBNRYgHzWMpMp') !important;
+            background-repeat: repeat;
+            background-size: 400px;
+            background-attachment: fixed;
+        }
+    </style>
 </head>
-<body class="bg-[#0b0f19] text-on-surface font-['Inter'] flex h-screen overflow-hidden">
+<body class="text-on-surface antialiased flex h-screen overflow-hidden bg-pattern-light">
     <!-- Sidebar -->
-    <aside class="w-64 bg-surface border-r border-gray-800 flex flex-col">
-        <div class="h-20 flex items-center justify-center border-b border-gray-800">
+    <aside class="w-64 bg-surface/90 backdrop-blur-md border-r border-outline-variant/30 flex flex-col">
+        <div class="h-20 flex items-center justify-center border-b border-outline-variant/30">
             <h1 class="text-xl font-bold text-primary tracking-wider">PHO ADMIN</h1>
         </div>
         <nav class="flex-1 p-4 space-y-2">
-            <a href="index.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+            <a href="index.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-container-high transition-colors text-secondary">
                 <span class="material-symbols-outlined">dashboard</span>
                 <span>Dashboard</span>
             </a>
-            <a href="user-manager.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+            <a href="user-manager.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-container-high transition-colors text-secondary">
                 <span class="material-symbols-outlined">group</span>
                 <span>Users</span>
             </a>
-            <a href="food-list.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+            <a href="food-list.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-container-high transition-colors text-secondary">
                 <span class="material-symbols-outlined">restaurant_menu</span>
                 <span>Food Menu</span>
             </a>
-            <a href="food-add.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+            <a href="food-add.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-container-high transition-colors text-secondary">
                 <span class="material-symbols-outlined">add_circle</span>
                 <span>Add Food</span>
             </a>
-            <a href="order-manager.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+            <a href="order-manager.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-container-high transition-colors text-secondary">
                 <span class="material-symbols-outlined">receipt_long</span>
                 <span>Orders</span>
             </a>
-            <a href="reservations.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+            <a href="reservations.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-container-high transition-colors text-secondary">
                 <span class="material-symbols-outlined">table_restaurant</span>
                 <span>Reservations</span>
             </a>
-            <a href="feedback.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+            <a href="feedback.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-container-high transition-colors text-secondary">
                 <span class="material-symbols-outlined">forum</span>
                 <span>Feedback</span>
             </a>
-            <a href="messages.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors bg-primary/20 text-primary">
+            <a href="messages.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-container-high transition-colors bg-primary-container text-on-primary-container font-semibold">
                 <span class="material-symbols-outlined">mail</span>
                 <span>Messages</span>
             </a>
-            <a href="../kitchen/index.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+            <a href="../kitchen/index.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-container-high transition-colors text-secondary">
                 <span class="material-symbols-outlined">soup_kitchen</span>
                 <span>Kitchen KDS</span>
             </a>
         </nav>
-        <div class="p-4 border-t border-gray-800">
+        <div class="p-4 border-t border-outline-variant/30">
             <button onclick="window.logoutUser()" class="flex w-full items-center space-x-3 p-3 rounded-lg hover:bg-red-900/50 text-red-400 transition-colors">
                 <span class="material-symbols-outlined">logout</span>
                 <span>Logout</span>
@@ -72,22 +136,22 @@
 
     <!-- Main Content -->
     <main class="flex-1 flex flex-col h-screen overflow-y-auto">
-        <header class="h-20 bg-surface border-b border-gray-800 flex items-center justify-between px-8 flex-shrink-0">
-            <h2 class="text-2xl font-semibold text-white font-['Inter']">Gửi tin nhắn & Khuyến mãi</h2>
+        <header class="h-20 bg-surface/90 backdrop-blur-md border-b border-outline-variant/30 flex items-center justify-between px-8 flex-shrink-0">
+            <h2 class="text-2xl font-semibold text-on-surface font-['Inter']">Gửi tin nhắn & Khuyến mãi</h2>
             <div class="flex items-center space-x-4">
-                <button onclick="window.exportTableToExcel('messages-table', 'messages_history.xlsx')" class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg flex items-center gap-2 transition-colors shadow">
+                <button onclick="window.exportTableToExcel('messages-table', 'messages_history.xlsx')" class="bg-green-600 hover:bg-green-700 text-on-surface py-2 px-4 rounded-lg flex items-center gap-2 transition-colors shadow">
                     <span class="material-symbols-outlined">download</span>
                     <span>Xuất Excel</span>
                 </button>
-                <span class="material-symbols-outlined text-secondary cursor-pointer hover:text-white">notifications</span>
-                <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold">A</div>
+                <span class="material-symbols-outlined text-secondary cursor-pointer hover:text-on-surface">notifications</span>
+                <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-surface font-bold">A</div>
             </div>
         </header>
         
         <div class="p-8 space-y-8">
             <!-- Composer Card -->
-            <div class="bg-surface rounded-xl border border-gray-800 p-6 shadow-lg">
-                <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
+            <div class="bg-surface/90 backdrop-blur-md rounded-xl border border-outline-variant/30 p-6 shadow-lg">
+                <h3 class="text-lg font-bold text-on-surface mb-6 flex items-center gap-2">
                     <span class="material-symbols-outlined text-primary">edit_document</span> Soạn tin nhắn mới
                 </h3>
                 <form id="message-compose-form" class="space-y-6">
@@ -96,18 +160,18 @@
                         <div class="space-y-4">
                             <div>
                                 <label for="msg-recipient" class="block text-sm font-medium text-secondary mb-2">Người nhận</label>
-                                <select id="msg-recipient" required class="w-full bg-[#18202d] border border-gray-800 rounded-lg text-white p-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                                <select id="msg-recipient" required class="w-full bg-[#18202d] border border-outline-variant/30 rounded-lg text-on-surface p-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none">
                                     <option value="all">Tất cả khách hàng (Broadcast)</option>
                                     <!-- User list populated here -->
                                 </select>
                             </div>
                             <div>
                                 <label for="msg-title" class="block text-sm font-medium text-secondary mb-2">Tiêu đề tin nhắn</label>
-                                <input type="text" id="msg-title" required class="w-full bg-[#18202d] border border-gray-800 rounded-lg text-white p-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="Nhập tiêu đề...">
+                                <input type="text" id="msg-title" required class="w-full bg-[#18202d] border border-outline-variant/30 rounded-lg text-on-surface p-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="Nhập tiêu đề...">
                             </div>
                             <div>
                                 <label for="msg-text" class="block text-sm font-medium text-secondary mb-2">Nội dung tin nhắn</label>
-                                <textarea id="msg-text" required class="w-full bg-[#18202d] border border-gray-800 rounded-lg text-white p-3 h-32 focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="Nhập nội dung tin nhắn chi tiết..."></textarea>
+                                <textarea id="msg-text" required class="w-full bg-[#18202d] border border-outline-variant/30 rounded-lg text-on-surface p-3 h-32 focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="Nhập nội dung tin nhắn chi tiết..."></textarea>
                             </div>
                         </div>
 
@@ -115,21 +179,21 @@
                         <div class="space-y-4">
                             <div>
                                 <label for="msg-image-url" class="block text-sm font-medium text-secondary mb-2">URL Hình ảnh (Tùy chọn)</label>
-                                <input type="url" id="msg-image-url" class="w-full bg-[#18202d] border border-gray-800 rounded-lg text-white p-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="https://images.unsplash.com/photo-...">
+                                <input type="url" id="msg-image-url" class="w-full bg-[#18202d] border border-outline-variant/30 rounded-lg text-on-surface p-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="https://images.unsplash.com/photo-...">
                             </div>
                             
                             <!-- Voucher Option -->
-                            <div class="p-4 bg-[#18202d] rounded-xl border border-gray-800 space-y-4">
+                            <div class="p-4 bg-[#18202d] rounded-xl border border-outline-variant/30 space-y-4">
                                 <label class="flex items-center gap-2.5 cursor-pointer">
-                                    <input type="checkbox" id="attach-voucher-check" class="rounded border-gray-800 bg-[#0b0f19] text-primary focus:ring-primary focus:ring-offset-[#18202d]">
-                                    <span class="text-sm font-medium text-white select-none">Tạo & đính kèm Mã giảm giá (Voucher)</span>
+                                    <input type="checkbox" id="attach-voucher-check" class="rounded border-outline-variant/30 bg-pattern-light text-primary focus:ring-primary focus:ring-offset-[#18202d]">
+                                    <span class="text-sm font-medium text-on-surface select-none">Tạo & đính kèm Mã giảm giá (Voucher)</span>
                                 </label>
                                 
-                                <div id="voucher-config-section" class="hidden space-y-4 pt-2 border-t border-gray-800">
+                                <div id="voucher-config-section" class="hidden space-y-4 pt-2 border-t border-outline-variant/30">
                                     <div class="grid grid-cols-2 gap-3">
                                         <div>
                                             <label for="voucher-percent" class="block text-xs text-secondary mb-1">Mức giảm giá (%)</label>
-                                            <select id="voucher-percent" class="w-full bg-[#0b0f19] border border-gray-800 rounded-lg text-white p-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                                            <select id="voucher-percent" class="w-full bg-pattern-light border border-outline-variant/30 rounded-lg text-on-surface p-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none">
                                                 <option value="5">Giảm 5%</option>
                                                 <option value="10">Giảm 10%</option>
                                                 <option value="15">Giảm 15%</option>
@@ -138,7 +202,7 @@
                                         </div>
                                         <div>
                                             <label for="voucher-duration" class="block text-xs text-secondary mb-1">Thời hạn sử dụng</label>
-                                            <select id="voucher-duration" class="w-full bg-[#0b0f19] border border-gray-800 rounded-lg text-white p-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                                            <select id="voucher-duration" class="w-full bg-pattern-light border border-outline-variant/30 rounded-lg text-on-surface p-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none">
                                                 <option value="7">7 ngày</option>
                                                 <option value="30" selected>30 ngày (1 tháng)</option>
                                                 <option value="90">90 ngày</option>
@@ -149,17 +213,17 @@
                                     </div>
                                     <div>
                                         <label class="block text-xs text-secondary mb-1.5 font-medium">Hình thức đặt hàng áp dụng</label>
-                                        <div class="flex flex-wrap gap-4 bg-[#0b0f19] p-3 rounded-lg border border-gray-800">
-                                            <label class="flex items-center gap-1.5 cursor-pointer text-xs text-white">
-                                                <input type="checkbox" id="voucher-type-dine-in" class="rounded border-gray-800 bg-[#18202d] text-primary focus:ring-primary">
+                                        <div class="flex flex-wrap gap-4 bg-pattern-light p-3 rounded-lg border border-outline-variant/30">
+                                            <label class="flex items-center gap-1.5 cursor-pointer text-xs text-on-surface">
+                                                <input type="checkbox" id="voucher-type-dine-in" class="rounded border-outline-variant/30 bg-[#18202d] text-primary focus:ring-primary">
                                                 <span>Ăn tại bàn</span>
                                             </label>
-                                            <label class="flex items-center gap-1.5 cursor-pointer text-xs text-white">
-                                                <input type="checkbox" id="voucher-type-takeaway" checked class="rounded border-gray-800 bg-[#18202d] text-primary focus:ring-primary">
+                                            <label class="flex items-center gap-1.5 cursor-pointer text-xs text-on-surface">
+                                                <input type="checkbox" id="voucher-type-takeaway" checked class="rounded border-outline-variant/30 bg-[#18202d] text-primary focus:ring-primary">
                                                 <span>Mang về</span>
                                             </label>
-                                            <label class="flex items-center gap-1.5 cursor-pointer text-xs text-white">
-                                                <input type="checkbox" id="voucher-type-delivery" checked class="rounded border-gray-800 bg-[#18202d] text-primary focus:ring-primary">
+                                            <label class="flex items-center gap-1.5 cursor-pointer text-xs text-on-surface">
+                                                <input type="checkbox" id="voucher-type-delivery" checked class="rounded border-outline-variant/30 bg-[#18202d] text-primary focus:ring-primary">
                                                 <span>Giao hàng</span>
                                             </label>
                                         </div>
@@ -169,17 +233,17 @@
                             </div>
 
                             <!-- Lucky Wheel Spin Option -->
-                            <div class="p-4 bg-[#18202d] rounded-xl border border-gray-800 space-y-4">
+                            <div class="p-4 bg-[#18202d] rounded-xl border border-outline-variant/30 space-y-4">
                                 <label class="flex items-center gap-2.5 cursor-pointer">
-                                    <input type="checkbox" id="attach-spin-check" class="rounded border-gray-800 bg-[#0b0f19] text-primary focus:ring-primary focus:ring-offset-[#18202d]">
-                                    <span class="text-sm font-medium text-white select-none">Tặng lượt quay Lucky Wheel</span>
+                                    <input type="checkbox" id="attach-spin-check" class="rounded border-outline-variant/30 bg-pattern-light text-primary focus:ring-primary focus:ring-offset-[#18202d]">
+                                    <span class="text-sm font-medium text-on-surface select-none">Tặng lượt quay Lucky Wheel</span>
                                 </label>
                                 
-                                <div id="spin-config-section" class="hidden space-y-4 pt-2 border-t border-gray-800">
+                                <div id="spin-config-section" class="hidden space-y-4 pt-2 border-t border-outline-variant/30">
                                     <div class="grid grid-cols-2 gap-3">
                                         <div>
                                             <label for="spin-type-select" class="block text-xs text-secondary mb-1">Loại lượt quay</label>
-                                            <select id="spin-type-select" class="w-full bg-[#0b0f19] border border-gray-800 rounded-lg text-white p-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                                            <select id="spin-type-select" class="w-full bg-pattern-light border border-outline-variant/30 rounded-lg text-on-surface p-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none">
                                                 <option value="deu">Thường (deu)</option>
                                                 <option value="xin">Xịn (xin)</option>
                                                 <option value="vip">VIP (vip)</option>
@@ -187,7 +251,7 @@
                                         </div>
                                         <div>
                                             <label for="spin-count-input" class="block text-xs text-secondary mb-1">Số lượng lượt tặng</label>
-                                            <input type="number" id="spin-count-input" min="1" value="1" class="w-full bg-[#0b0f19] border border-gray-800 rounded-lg text-white p-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                                            <input type="number" id="spin-count-input" min="1" value="1" class="w-full bg-pattern-light border border-outline-variant/30 rounded-lg text-on-surface p-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none">
                                         </div>
                                     </div>
                                 </div>
@@ -195,8 +259,8 @@
                         </div>
                     </div>
 
-                    <div class="flex justify-end gap-3 pt-4 border-t border-gray-800">
-                        <button type="submit" id="btn-send-msg" class="bg-primary hover:bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition-all active:scale-95 flex items-center gap-1.5">
+                    <div class="flex justify-end gap-3 pt-4 border-t border-outline-variant/30">
+                        <button type="submit" id="btn-send-msg" class="bg-primary hover:bg-blue-600 text-on-surface font-semibold px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition-all active:scale-95 flex items-center gap-1.5">
                             <span class="material-symbols-outlined text-lg">send</span> Gửi tin nhắn
                         </button>
                     </div>
@@ -204,14 +268,14 @@
             </div>
 
             <!-- Sent History Card -->
-            <div class="bg-surface rounded-xl border border-gray-800 p-6 shadow-lg">
-                <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
+            <div class="bg-surface/90 backdrop-blur-md rounded-xl border border-outline-variant/30 p-6 shadow-lg">
+                <h3 class="text-lg font-bold text-on-surface mb-6 flex items-center gap-2">
                     <span class="material-symbols-outlined text-primary">history</span> Nhật ký tin nhắn đã gửi
                 </h3>
                 <div class="overflow-x-auto">
                     <table id="messages-table" class="w-full text-left">
                         <thead>
-                            <tr class="border-b border-gray-800 text-secondary text-sm">
+                            <tr class="border-b border-outline-variant/30 text-secondary text-sm">
                                 <th class="py-3 px-4 font-medium">Tiêu đề</th>
                                 <th class="py-3 px-4 font-medium">Người nhận</th>
                                 <th class="py-3 px-4 font-medium">Hình ảnh</th>
