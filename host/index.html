@@ -5,16 +5,25 @@
     <link rel="stylesheet" href="../css/client.css">
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Host Dashboard | Reservations</title>
+    <title>Admin Dashboard | Dashboard</title>
     <!-- Google Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
     <script>
     tailwind.config = {
       darkMode: "class",
-      theme: { extend: { colors: { surface: "#121824", "surface-highlight": "#1e293b", primary: "#3b82f6", secondary: "#9ca3af", "on-surface": "#f3f4f6" } } }
+      theme: {
+        extend: {
+          colors: {
+            surface: "#121824", "surface-highlight": "#1e293b",
+            primary: "#3b82f6", secondary: "#9ca3af", "on-surface": "#f3f4f6"
+          }
+        }
+      }
     }
     </script>
 </head>
@@ -25,9 +34,33 @@
             <h1 class="text-xl font-bold text-primary tracking-wider">PHO HOST</h1>
         </div>
         <nav class="flex-1 p-4 space-y-2">
-            <a href="index.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors bg-primary/20 text-primary">
+            <a href="index.html" id="nav-dashboard" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors bg-primary/20 text-primary">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="food-list.html" id="nav-food" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+                <span class="material-symbols-outlined">restaurant_menu</span>
+                <span>Food Menu</span>
+            </a>
+            <a href="order-manager.html" id="nav-orders" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+                <span class="material-symbols-outlined">receipt_long</span>
+                <span>Orders</span>
+            </a>
+            <a href="reservations.html" id="nav-reservations" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
                 <span class="material-symbols-outlined">table_restaurant</span>
                 <span>Reservations</span>
+            </a>
+            <a href="feedback.html" id="nav-feedback" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+                <span class="material-symbols-outlined">forum</span>
+                <span>Feedback</span>
+            </a>
+            <a href="messages.html" id="nav-messages" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+                <span class="material-symbols-outlined">mail</span>
+                <span>Messages</span>
+            </a>
+            <a href="../kitchen/index.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+                <span class="material-symbols-outlined">soup_kitchen</span>
+                <span>Kitchen KDS</span>
             </a>
         </nav>
         <div class="p-4 border-t border-gray-800">
@@ -39,140 +72,112 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 flex flex-col h-screen overflow-y-auto">
+    <main id="dashboard-container" class="flex-1 flex flex-col h-screen overflow-y-auto">
         <header class="h-20 bg-surface border-b border-gray-800 flex items-center justify-between px-8 flex-shrink-0">
-            <h2 class="text-2xl font-semibold text-white">Table Reservations</h2>
+            <h2 class="text-2xl font-semibold text-white">Dashboard</h2>
             <div class="flex items-center space-x-4">
-                <button onclick="window.exportTableToExcel('reservations-table', 'reservations.xlsx')" class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg flex items-center gap-2 transition-colors shadow">
-                    <span class="material-symbols-outlined">download</span>
-                    <span>Xuất Excel</span>
-                </button>
                 <span class="material-symbols-outlined text-secondary cursor-pointer hover:text-white">notifications</span>
                 <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold" id="user-avatar-icon">H</div>
             </div>
         </header>
-        <div class="p-8 flex-1">
+        <div class="p-8 space-y-8 flex-1">
+            <!-- Stat Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <!-- Stat Card 1 -->
+                <div class="bg-surface rounded-xl border border-gray-800 p-6 flex items-center justify-between shadow-lg hover:scale-[1.02] transition-transform duration-300">
+                    <div>
+                        <p class="text-sm text-secondary font-medium uppercase tracking-wider">Today's Revenue</p>
+                        <h3 id="stat-revenue" class="text-3xl font-bold text-white mt-1">0.00€</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center text-green-500">
+                        <span class="material-symbols-outlined text-3xl">payments</span>
+                    </div>
+                </div>
+                <!-- Stat Card 2 -->
+                <div class="bg-surface rounded-xl border border-gray-800 p-6 flex items-center justify-between shadow-lg hover:scale-[1.02] transition-transform duration-300">
+                    <div>
+                        <p class="text-sm text-secondary font-medium uppercase tracking-wider">Active Orders</p>
+                        <h3 id="stat-active" class="text-3xl font-bold text-white mt-1">0</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-500">
+                        <span class="material-symbols-outlined text-3xl">pending_actions</span>
+                    </div>
+                </div>
+                <!-- Stat Card 3 -->
+                <div class="bg-surface rounded-xl border border-gray-800 p-6 flex items-center justify-between shadow-lg hover:scale-[1.02] transition-transform duration-300">
+                    <div>
+                        <p class="text-sm text-secondary font-medium uppercase tracking-wider">Completed Today</p>
+                        <h3 id="stat-completed" class="text-3xl font-bold text-white mt-1">0</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-purple-500/10 rounded-lg flex items-center justify-center text-purple-500">
+                        <span class="material-symbols-outlined text-3xl">check_circle</span>
+                    </div>
+                </div>
+                <!-- Stat Card 4 -->
+                <div class="bg-surface rounded-xl border border-gray-800 p-6 flex items-center justify-between shadow-lg hover:scale-[1.02] transition-transform duration-300">
+                    <div>
+                        <p class="text-sm text-secondary font-medium uppercase tracking-wider">Total Products</p>
+                        <h3 id="stat-products" class="text-3xl font-bold text-white mt-1">0</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-yellow-500/10 rounded-lg flex items-center justify-center text-yellow-500">
+                        <span class="material-symbols-outlined text-3xl">restaurant_menu</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Line Chart: Revenue Trend -->
+                <div class="bg-surface rounded-xl border border-gray-800 p-6 shadow-lg lg:col-span-2">
+                    <h3 class="text-lg font-semibold text-white mb-4">Revenue Trend (Last 7 Days)</h3>
+                    <div class="h-64">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+                <!-- Doughnut Chart: Order Types -->
+                <div class="bg-surface rounded-xl border border-gray-800 p-6 shadow-lg">
+                    <h3 class="text-lg font-semibold text-white mb-4">Order Types</h3>
+                    <div class="h-64 flex items-center justify-center">
+                        <canvas id="typeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Orders Table -->
             <div class="bg-surface rounded-xl border border-gray-800 p-6 shadow-lg">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-white">Recent Orders</h3>
+                    <div class="flex items-center gap-3">
+                        <button onclick="window.exportTableToExcel('recent-orders-table', 'recent_orders.xlsx')" class="bg-green-600 hover:bg-green-700 text-white py-1.5 px-3 rounded-lg text-sm font-semibold flex items-center gap-1.5 transition-colors shadow">
+                            <span class="material-symbols-outlined text-sm">download</span>
+                            <span>Xuất Excel</span>
+                        </button>
+                        <a href="order-manager.html" class="text-primary hover:text-blue-400 text-sm font-medium">View All Orders &rarr;</a>
+                    </div>
+                </div>
                 <div class="overflow-x-auto">
-                    <table id="reservations-table" class="w-full text-left">
+                    <table id="recent-orders-table" class="w-full text-left">
                         <thead>
-                            <tr class="border-b border-gray-800 text-secondary">
-                                <th class="py-3 px-4 font-medium">Customer</th>
-                                <th class="py-3 px-4 font-medium">Contact</th>
-                                <th class="py-3 px-4 font-medium">Date & Time</th>
-                                <th class="py-3 px-4 font-medium">Guests</th>
-                                <th class="py-3 px-4 font-medium">Location</th>
-                                <th class="py-3 px-4 font-medium">Status</th>
-                                <th class="py-3 px-4 font-medium">Actions</th>
+                            <tr class="border-b border-gray-800 text-secondary text-sm">
+                                <th class="py-3 px-4 font-semibold">Order ID</th>
+                                <th class="py-3 px-4 font-semibold">Time</th>
+                                <th class="py-3 px-4 font-semibold">Customer</th>
+                                <th class="py-3 px-4 font-semibold">Items</th>
+                                <th class="py-3 px-4 font-semibold">Total</th>
+                                <th class="py-3 px-4 font-semibold">Status</th>
                             </tr>
                         </thead>
-                        <tbody id="reservations-table-body">
-                            <tr><td colspan="7" class="p-4 text-center text-secondary">Loading reservations...</td></tr>
+                        <tbody id="recent-orders-table-body">
+                            <tr>
+                                <td colspan="6" class="p-4 text-center text-secondary">Loading recent orders...</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
     </main>
-
-    <!-- Include XLSX Library for Export -->
-    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-
+    <script type="module" src="../js/admin.js"></script>
     <script type="module" src="../js/auth.js"></script>
-    <script type="module">
-        import { db } from "../js/firebase-config.js";
-        import { collection, onSnapshot, doc, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-        import { auth } from "../js/firebase-config.js";
-
-        // Simple Excel Export logic
-        window.exportTableToExcel = function(tableId, filename = '') {
-            let tableSelect = document.getElementById(tableId);
-            if (!tableSelect) return;
-            
-            let wb = XLSX.utils.table_to_book(tableSelect, {sheet: "Sheet1"});
-            XLSX.writeFile(wb, filename ? filename : 'excel_data.xlsx');
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const tableBody = document.getElementById('reservations-table-body');
-            const q = query(collection(db, "reservations"), orderBy("createdAt", "desc"));
-            
-            onSnapshot(q, (snapshot) => {
-                tableBody.innerHTML = '';
-                if (snapshot.empty) {
-                    tableBody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-secondary">No reservations found.</td></tr>';
-                    return;
-                }
-                
-                snapshot.forEach((docSnap) => {
-                    const data = docSnap.data();
-                    const tr = document.createElement('tr');
-                    tr.className = 'border-b border-gray-800 text-sm hover:bg-surface-highlight/30 transition-colors';
-                    
-                    let statusBadge = '';
-                    if (data.status === 'pending') statusBadge = '<span class="bg-yellow-500/20 text-yellow-500 px-2 py-1 rounded text-xs font-bold uppercase">Pending</span>';
-                    else if (data.status === 'confirmed') statusBadge = '<span class="bg-green-500/20 text-green-500 px-2 py-1 rounded text-xs font-bold uppercase">Confirmed</span>';
-                    else if (data.status === 'cancelled') statusBadge = '<span class="bg-red-500/20 text-red-500 px-2 py-1 rounded text-xs font-bold uppercase">Cancelled</span>';
-                    else statusBadge = `<span class="bg-gray-500/20 text-gray-400 px-2 py-1 rounded text-xs font-bold uppercase">${data.status}</span>`;
-
-                    tr.innerHTML = `
-                        <td class="py-3 px-4 font-medium text-white">
-                            ${data.name}
-                            ${data.notes ? `<p class="text-xs text-secondary mt-1 max-w-[200px] truncate" title="${data.notes}">📝 ${data.notes}</p>` : ''}
-                        </td>
-                        <td class="py-3 px-4">
-                            <div>${data.phone}</div>
-                            <div class="text-xs text-secondary">${data.email}</div>
-                        </td>
-                        <td class="py-3 px-4 font-medium text-white">${data.date} <br> <span class="text-primary">${data.time}</span></td>
-                        <td class="py-3 px-4">${data.guests} pax</td>
-                        <td class="py-3 px-4 uppercase text-xs font-bold tracking-wider">${data.location}</td>
-                        <td class="py-3 px-4">${statusBadge}</td>
-                        <td class="py-3 px-4">
-                            <div class="flex items-center gap-2">
-                                <button onclick="updateRes('${docSnap.id}', 'confirmed')" class="text-green-400 hover:bg-green-500/20 p-1.5 rounded transition-colors" title="Confirm">
-                                    <span class="material-symbols-outlined text-sm">check</span>
-                                </button>
-                                <button onclick="updateRes('${docSnap.id}', 'cancelled')" class="text-red-400 hover:bg-red-500/20 p-1.5 rounded transition-colors" title="Cancel">
-                                    <span class="material-symbols-outlined text-sm">close</span>
-                                </button>
-                                <button onclick="deleteRes('${docSnap.id}')" class="text-secondary hover:text-white hover:bg-gray-800 p-1.5 rounded transition-colors ml-2" title="Delete">
-                                    <span class="material-symbols-outlined text-sm">delete</span>
-                                </button>
-                            </div>
-                        </td>
-                    `;
-                    tableBody.appendChild(tr);
-                });
-            });
-
-            // Set Avatar letter
-            auth.onAuthStateChanged(user => {
-                if (user) {
-                    const initial = (user.displayName || user.email || 'H').charAt(0).toUpperCase();
-                    document.getElementById('user-avatar-icon').textContent = initial;
-                }
-            });
-        });
-
-        window.updateRes = async (id, status) => {
-            try {
-                await updateDoc(doc(db, "reservations", id), { status });
-                if (window.showNotification) window.showNotification(`Reservation marked as ${status}`);
-            } catch(e) {
-                console.error(e);
-            }
-        };
-
-        window.deleteRes = async (id) => {
-            if(confirm("Are you sure you want to delete this reservation permanently?")) {
-                try {
-                    await deleteDoc(doc(db, "reservations", id));
-                } catch(e) {
-                    console.error(e);
-                }
-            }
-        };
-    </script>
 </body>
 </html>

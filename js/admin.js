@@ -1694,6 +1694,7 @@ if (foodTableBody) {
                     </td>
                     <td class="py-3 px-4">\u20AC${(item.price || 0).toFixed(2)}</td>
                     <td class="py-3 px-4">${optCount || '<span class="text-xs text-secondary/50">None</span>'}</td>
+                    ${window.location.pathname.includes('/host/') ? '' : `
                     <td class="py-3 px-4 flex gap-2">
                         <button class="btn-edit text-blue-400 hover:text-blue-300 transition-colors" data-id="${id}">
                             <span class="material-symbols-outlined">edit</span>
@@ -1702,17 +1703,20 @@ if (foodTableBody) {
                             <span class="material-symbols-outlined">delete</span>
                         </button>
                     </td>
+                    `}
                 `;
 
-                // Edit button handler
-                tr.querySelector('.btn-edit').addEventListener('click', () => {
-                    window.openEditModal(id, item);
-                });
+                if (!window.location.pathname.includes('/host/')) {
+                    // Edit button handler
+                    tr.querySelector('.btn-edit').addEventListener('click', () => {
+                        window.openEditModal(id, item);
+                    });
 
-                // Delete button handler
-                tr.querySelector('.btn-delete').addEventListener('click', () => {
-                    window.deleteFood(id);
-                });
+                    // Delete button handler
+                    tr.querySelector('.btn-delete').addEventListener('click', () => {
+                        window.deleteFood(id);
+                    });
+                }
 
                 foodTableBody.appendChild(tr);
             });
