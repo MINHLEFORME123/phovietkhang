@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/client.css">
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Admin Dashboard | Food Menu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: { extend: { colors: { surface: "#121824", "surface-highlight": "#1e293b", primary: "#3b82f6", secondary: "#9ca3af", "on-surface": "#f3f4f6" } } }
+    }
+    </script>
+</head>
+<body class="bg-[#0b0f19] text-on-surface font-['Inter'] flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-surface border-r border-gray-800 flex flex-col">
+        <div class="h-20 flex items-center justify-center border-b border-gray-800">
+            <h1 class="text-xl font-bold text-primary tracking-wider">PHO ADMIN</h1>
+        </div>
+        <nav class="flex-1 p-4 space-y-2">
+            <a href="index.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+                <span class="material-symbols-outlined">dashboard</span><span>Dashboard</span>
+            </a>
+            <a href="user-manager.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+                <span class="material-symbols-outlined">group</span><span>Users</span>
+            </a>
+            <a href="food-list.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors bg-primary/20 text-primary">
+                <span class="material-symbols-outlined">restaurant_menu</span><span>Food Menu</span>
+            </a>
+            <a href="food-add.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+                <span class="material-symbols-outlined">add_circle</span><span>Add Food</span>
+            </a>
+            <a href="order-manager.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+                <span class="material-symbols-outlined">receipt_long</span>
+                <span>Orders</span>
+            </a>
+            <a href="reservations.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+                <span class="material-symbols-outlined">table_restaurant</span>
+                <span>Reservations</span>
+            </a>
+            <a href="feedback.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+                <span class="material-symbols-outlined">forum</span>
+                <span>Feedback</span>
+            </a>
+            <a href="messages.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+                <span class="material-symbols-outlined">mail</span><span>Messages</span>
+            </a>
+            <a href="../kitchen/index.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+                <span class="material-symbols-outlined">soup_kitchen</span><span>Kitchen KDS</span>
+            </a>
+        </nav>
+        <div class="p-4 border-t border-gray-800">
+            <button onclick="window.logoutUser()" class="flex w-full items-center space-x-3 p-3 rounded-lg hover:bg-red-900/50 text-red-400 transition-colors">
+                <span class="material-symbols-outlined">logout</span><span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-screen overflow-y-auto">
+        <header class="h-20 bg-surface border-b border-gray-800 flex items-center justify-between px-8">
+            <h2 class="text-2xl font-semibold text-white">Food Menu Management</h2>
+            <button id="btn-clear-menu" class="bg-red-900/50 hover:bg-red-900 text-red-400 py-2 px-4 rounded-lg flex items-center gap-2 transition-colors">
+                <span class="material-symbols-outlined">delete_sweep</span>
+                <span>Clear Menu</span>
+            </button>
+        </header>
+        <div class="p-8 flex-1">
+            <div class="bg-surface rounded-xl border border-gray-800 p-6 shadow-lg">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="border-b border-gray-800 text-secondary">
+                            <th class="py-3 px-4 font-medium">Image</th>
+                            <th class="py-3 px-4 font-medium">Name</th>
+                            <th class="py-3 px-4 font-medium">Category</th>
+                            <th class="py-3 px-4 font-medium">Price</th>
+                            <th class="py-3 px-4 font-medium">Options</th>
+                            <th class="py-3 px-4 font-medium">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="food-table-body">
+                        <tr><td colspan="6" class="p-4 text-center text-secondary">Loading menu...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Edit Food Modal -->
+    <div id="edit-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-[#121824] border border-gray-700 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-5 border-b border-gray-800 flex items-center justify-between">
+                <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">edit</span> Edit Food Item
+                </h3>
+                <button onclick="window.closeEditModal()" class="text-secondary hover:text-white p-1">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <form id="edit-food-form" class="p-5 space-y-4">
+                <input type="hidden" id="edit-food-id">
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs text-secondary mb-1">Name (VI)</label>
+                        <input type="text" id="edit-name-vi" class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-2.5 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-secondary mb-1">Name (EN)</label>
+                        <input type="text" id="edit-name-en" class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-2.5 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-secondary mb-1">Name (FI)</label>
+                        <input type="text" id="edit-name-fi" class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-2.5 text-sm">
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs text-secondary mb-1">Category (VI)</label>
+                        <input type="text" id="edit-category-vi" list="edit-category-datalist" class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-2.5 text-sm">
+                        <datalist id="edit-category-datalist"></datalist>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-secondary mb-1">Category (EN)</label>
+                        <input type="text" id="edit-category-en" class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-2.5 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-secondary mb-1">Category (FI)</label>
+                        <input type="text" id="edit-category-fi" class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-2.5 text-sm">
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs text-secondary mb-1">Desc (VI)</label>
+                        <textarea id="edit-desc-vi" class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-2.5 text-sm h-20"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-secondary mb-1">Desc (EN)</label>
+                        <textarea id="edit-desc-en" class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-2.5 text-sm h-20"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-secondary mb-1">Desc (FI)</label>
+                        <textarea id="edit-desc-fi" class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-2.5 text-sm h-20"></textarea>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs text-secondary mb-1">Price (€)</label>
+                        <input type="number" step="0.01" id="edit-price" class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-2.5 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-secondary mb-1">Image</label>
+                        <input type="file" id="edit-image-file" accept="image/*" class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-1.5 text-sm file:mr-2 file:py-1 file:px-3 file:rounded file:border-0 file:bg-gray-700 file:text-white file:text-xs">
+                    </div>
+                </div>
+                <!-- Rich Options Editor -->
+                <div>
+                    <label class="block text-xs text-secondary mb-1">Options</label>
+                    <div id="edit-options-list" class="space-y-2 mb-2"></div>
+                    <div class="bg-[#0b0f19] p-3 rounded-lg border border-gray-700 space-y-2">
+                        <div class="grid grid-cols-1 gap-2">
+                            <div>
+                                <label class="block text-[10px] text-secondary mb-0.5">Option Group Name (VI)</label>
+                                <input type="text" id="edit-new-opt-name-vi" placeholder="e.g. Cấp độ cay" class="w-full bg-[#121824] border border-gray-600 rounded-lg text-white p-2 text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-secondary mb-0.5">Option Group Name (EN)</label>
+                                <input type="text" id="edit-new-opt-name-en" placeholder="e.g. Spicy Level" class="w-full bg-[#121824] border border-gray-600 rounded-lg text-white p-2 text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-secondary mb-0.5">Option Group Name (FI)</label>
+                                <input type="text" id="edit-new-opt-name-fi" placeholder="e.g. Tulisuusaste" class="w-full bg-[#121824] border border-gray-600 rounded-lg text-white p-2 text-xs">
+                            </div>
+                            <div class="mt-1">
+                                <label class="block text-[10px] text-secondary mb-0.5">Type</label>
+                                <select id="edit-new-opt-type" class="w-full bg-[#121824] border border-gray-600 rounded-lg text-white p-2 text-xs">
+                                    <option value="toggle">Toggle</option>
+                                    <option value="single-select">Multi-choice</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="edit-new-opt-choices" class="space-y-1"></div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <input type="text" id="edit-new-choice-label-vi" placeholder="Label (VI)..." class="bg-[#121824] border border-gray-600 rounded-lg text-white p-1.5 text-xs">
+                            <input type="text" id="edit-new-choice-label-en" placeholder="Label (EN)..." class="bg-[#121824] border border-gray-600 rounded-lg text-white p-1.5 text-xs">
+                            <input type="text" id="edit-new-choice-label-fi" placeholder="Label (FI)..." class="bg-[#121824] border border-gray-600 rounded-lg text-white p-1.5 text-xs">
+                        </div>
+                        <div class="flex gap-2">
+                            <input type="number" step="0.01" id="edit-new-choice-price" placeholder="Price" class="flex-1 bg-[#121824] border border-gray-600 rounded-lg text-white p-1.5 text-xs">
+                            <button type="button" id="btn-edit-add-choice" class="bg-gray-600 text-white px-3 py-1.5 rounded text-xs">+</button>
+                        </div>
+                        <button type="button" id="btn-edit-add-option" class="w-full bg-teal-600 hover:bg-teal-500 text-white py-1.5 rounded text-xs font-bold transition-colors">Add Option</button>
+                    </div>
+                </div>
+                <div id="edit-loading" class="hidden text-center text-yellow-400 text-sm py-2">
+                    <span class="material-symbols-outlined animate-spin align-middle mr-1 text-sm">sync</span> Saving...
+                </div>
+                <button type="submit" class="w-full bg-primary hover:bg-blue-600 text-white font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-sm">save</span> Save Changes
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="../js/auth.js"></script>
+    <script type="module" src="../js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/client.css">
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Admin Dashboard | Add Food</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: { extend: { colors: { surface: "#121824", "surface-highlight": "#1e293b", primary: "#3b82f6", secondary: "#9ca3af", "on-surface": "#f3f4f6" } } }
+    }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body class="bg-[#0b0f19] text-on-surface font-['Inter'] flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-surface border-r border-gray-800 flex flex-col">
+        <div class="h-20 flex items-center justify-center border-b border-gray-800">
+            <h1 class="text-xl font-bold text-primary tracking-wider">PHO ADMIN</h1>
+        </div>
+        <nav class="flex-1 p-4 space-y-2">
+            <a href="index.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+                <span class="material-symbols-outlined">dashboard</span><span>Dashboard</span>
+            </a>
+            <a href="user-manager.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+                <span class="material-symbols-outlined">group</span><span>Users</span>
+            </a>
+            <a href="food-list.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+                <span class="material-symbols-outlined">restaurant_menu</span><span>Food Menu</span>
+            </a>
+            <a href="food-add.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors bg-primary/20 text-primary">
+                <span class="material-symbols-outlined">add_circle</span><span>Add Food</span>
+            </a>
+            <a href="order-manager.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+                <span class="material-symbols-outlined">receipt_long</span><span>Orders</span>
+            </a>
+            <a href="reservations.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+                <span class="material-symbols-outlined">table_restaurant</span>
+                <span>Reservations</span>
+            </a>
+            <a href="feedback.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+                <span class="material-symbols-outlined">forum</span>
+                <span>Feedback</span>
+            </a>
+            <a href="messages.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+                <span class="material-symbols-outlined">mail</span><span>Messages</span>
+            </a>
+            <a href="../kitchen/index.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+                <span class="material-symbols-outlined">soup_kitchen</span><span>Kitchen KDS</span>
+            </a>
+        </nav>
+        <div class="p-4 border-t border-gray-800">
+            <button onclick="window.logoutUser()" class="flex w-full items-center space-x-3 p-3 rounded-lg hover:bg-red-900/50 text-red-400 transition-colors">
+                <span class="material-symbols-outlined">logout</span><span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-screen overflow-y-auto">
+        <header class="h-20 bg-surface border-b border-gray-800 flex items-center justify-between px-8">
+            <h2 class="text-2xl font-semibold text-white">Add New Food Item</h2>
+        </header>
+        <div class="p-8 flex-1">
+            <div class="bg-surface rounded-xl border border-gray-800 p-6 shadow-lg max-w-4xl">
+                
+                <!-- AI IMPORT SECTION: Excel + Image Scan -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                    <!-- Excel Import -->
+                    <div class="p-5 bg-purple-900/20 border-2 border-dashed border-purple-500/50 rounded-xl">
+                        <h3 class="text-base font-bold text-purple-400 mb-2 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-lg">table_view</span> Excel Import (AI)
+                        </h3>
+                        <p class="text-secondary text-xs mb-3">Upload Excel/CSV → AI extracts, translates & generates descriptions.</p>
+                        <input type="file" id="excel-upload" accept=".xlsx, .xls, .csv" class="block w-full text-sm text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-500 mb-2">
+                        <button type="button" id="btn-ai-extract" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 rounded-lg text-sm transition-colors flex items-center justify-center gap-1">
+                            <span class="material-symbols-outlined text-sm">smart_toy</span> Extract Data
+                        </button>
+                        <div id="ai-extract-loading" class="hidden text-purple-400 font-bold mt-2 text-xs">
+                            <span class="material-symbols-outlined animate-spin align-middle mr-1 text-sm">sync</span> AI is reading your file...
+                        </div>
+                    </div>
+
+                    <!-- AI Image Scan -->
+                    <div class="p-5 bg-amber-900/20 border-2 border-dashed border-amber-500/50 rounded-xl">
+                        <h3 class="text-base font-bold text-amber-400 mb-2 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-lg">photo_camera</span> Menu Image Scan (AI)
+                        </h3>
+                        <p class="text-secondary text-xs mb-3">Upload a photo of a menu → AI reads, extracts items & infers options.</p>
+                        <input type="file" id="menu-image-upload" accept="image/*" class="block w-full text-sm text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-600 file:text-white hover:file:bg-amber-500 mb-2">
+                        <button type="button" id="btn-ai-scan" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-2 rounded-lg text-sm transition-colors flex items-center justify-center gap-1">
+                            <span class="material-symbols-outlined text-sm">document_scanner</span> Scan Menu
+                        </button>
+                        <div id="ai-scan-loading" class="hidden text-amber-400 font-bold mt-2 text-xs">
+                            <span class="material-symbols-outlined animate-spin align-middle mr-1 text-sm">sync</span> AI is scanning menu image...
+                        </div>
+                    </div>
+                </div>
+
+                <form id="food-add-form" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Left Column: Vietnamese Data -->
+                        <div class="space-y-4 bg-gray-900/50 p-4 rounded-xl border border-gray-800">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="font-bold text-primary">Vietnamese (Original)</h3>
+                                <button type="button" id="btn-translate" class="bg-green-600 hover:bg-green-500 text-white px-3 py-1 rounded text-sm font-bold flex items-center gap-1 transition-colors">
+                                    <span class="material-symbols-outlined text-sm">translate</span> Auto Translate
+                                </button>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-secondary mb-1">Item Name (VI)</label>
+                                <input type="text" id="food-name-vi" required class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-3">
+                            </div>
+                            <div>
+                                <div class="flex justify-between items-center mb-1">
+                                    <label class="block text-sm font-medium text-secondary">Description (VI)</label>
+                                    <button type="button" id="btn-auto-desc" class="bg-purple-600 hover:bg-purple-500 text-white px-2 py-0.5 rounded text-xs font-bold flex items-center gap-1 transition-colors">
+                                        <span class="material-symbols-outlined text-[14px]">magic_button</span> Auto Desc
+                                    </button>
+                                </div>
+                                <textarea id="food-desc-vi" class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-3 h-24"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Metadata -->
+                        <div class="space-y-4 bg-gray-900/50 p-4 rounded-xl border border-gray-800">
+                            <h3 class="font-bold text-primary mb-2">Metadata</h3>
+                            <div>
+                                <label class="block text-sm font-medium text-secondary mb-1">Category (VI)</label>
+                                <input type="text" id="food-category-vi" list="category-datalist" required placeholder="Nhóm món ăn (VI)..." class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-3">
+                                <label class="block text-sm font-medium text-secondary mt-2 mb-1">Category (EN)</label>
+                                <input type="text" id="food-category-en" required placeholder="Category (EN)..." class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-3">
+                                <label class="block text-sm font-medium text-secondary mt-2 mb-1">Category (FI)</label>
+                                <input type="text" id="food-category-fi" required placeholder="Kategoria (FI)..." class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-3">
+                                <datalist id="category-datalist">
+                                    <!-- Populated dynamically from Firestore -->
+                                </datalist>
+                                <p class="text-xs text-secondary mt-1">Provide category in all 3 languages.</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-secondary mb-1">Price (€)</label>
+                                <input type="number" step="0.01" id="food-price" required class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-3">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-secondary mb-1">Food Image</label>
+                                <input type="file" id="food-image-file" accept="image/*" class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-2 file:mr-4 file:py-1 file:px-4 file:rounded file:border-0 file:bg-gray-700 file:text-white">
+                                <img id="image-preview" class="mt-2 hidden w-32 h-32 object-cover rounded-lg border border-gray-700">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Translations Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                        <div class="space-y-4">
+                            <h3 class="font-bold text-gray-300 border-b border-gray-800 pb-2">English Translation</h3>
+                            <div>
+                                <label class="block text-sm font-medium text-secondary mb-1">Name (EN)</label>
+                                <input type="text" id="food-name-en" required class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-3">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-secondary mb-1">Description (EN)</label>
+                                <textarea id="food-desc-en" class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-3 h-24"></textarea>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <h3 class="font-bold text-gray-300 border-b border-gray-800 pb-2">Finnish Translation</h3>
+                            <div>
+                                <label class="block text-sm font-medium text-secondary mb-1">Name (FI)</label>
+                                <input type="text" id="food-name-fi" required class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-3">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-secondary mb-1">Description (FI)</label>
+                                <textarea id="food-desc-fi" class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-3 h-24"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rich Options Builder -->
+                    <div class="mt-6 bg-gray-900/50 p-4 rounded-xl border border-gray-800">
+                        <h3 class="font-bold text-primary mb-1 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm">tune</span> Custom Options (for customers)
+                        </h3>
+                        <p class="text-secondary text-xs mb-4">Add structured options: toggles (e.g. "No eggs"), or multi-choice groups (e.g. Spicy Level). Each can be free or paid.</p>
+                        
+                        <div id="options-list" class="space-y-3 mb-4">
+                            <!-- Dynamic structured option rows -->
+                        </div>
+                        
+                        <!-- Add New Option -->
+                        <div class="bg-[#0b0f19] p-4 rounded-lg border border-gray-700 space-y-3">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div class="space-y-2">
+                                    <div>
+                                        <label class="block text-xs text-secondary mb-1">Option Group Name (VI)</label>
+                                        <input type="text" id="new-opt-name-vi" placeholder="e.g. Cấp độ cay" class="w-full bg-[#121824] border border-gray-600 rounded-lg text-white p-2 text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-secondary mb-1">Option Group Name (EN)</label>
+                                        <input type="text" id="new-opt-name-en" placeholder="e.g. Spicy Level" class="w-full bg-[#121824] border border-gray-600 rounded-lg text-white p-2 text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-secondary mb-1">Option Group Name (FI)</label>
+                                        <input type="text" id="new-opt-name-fi" placeholder="e.g. Tulisuusaste" class="w-full bg-[#121824] border border-gray-600 rounded-lg text-white p-2 text-sm">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-secondary mb-1">Type</label>
+                                    <select id="new-opt-type" class="w-full bg-[#121824] border border-gray-600 rounded-lg text-white p-2 text-sm">
+                                        <option value="toggle">Toggle (On/Off)</option>
+                                        <option value="single-select">Multi-choice (pick one)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <!-- Choices builder (shown for both types) -->
+                            <div id="new-opt-choices-area" class="space-y-2">
+                                <label class="block text-xs text-secondary">Choices</label>
+                                <div id="new-opt-choices" class="space-y-2 mb-2"></div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                                    <input type="text" id="new-choice-label-vi" placeholder="Label (VI)..." class="bg-[#121824] border border-gray-600 rounded-lg text-white p-2 text-sm">
+                                    <input type="text" id="new-choice-label-en" placeholder="Label (EN)..." class="bg-[#121824] border border-gray-600 rounded-lg text-white p-2 text-sm">
+                                    <input type="text" id="new-choice-label-fi" placeholder="Label (FI)..." class="bg-[#121824] border border-gray-600 rounded-lg text-white p-2 text-sm">
+                                </div>
+                                <div class="flex gap-2">
+                                    <input type="number" step="0.01" id="new-choice-price" placeholder="Price (0=free)" class="flex-1 bg-[#121824] border border-gray-600 rounded-lg text-white p-2 text-sm">
+                                    <button type="button" id="btn-add-choice" class="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors">+</button>
+                                </div>
+                            </div>
+                            
+                            <button type="button" id="btn-add-option" class="w-full bg-teal-600 hover:bg-teal-500 text-white py-2 rounded-lg text-sm font-bold flex items-center justify-center gap-1 transition-colors">
+                                <span class="material-symbols-outlined text-sm">add</span> Add Option Group
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="ai-loading" class="hidden text-center text-yellow-400 font-bold p-4 bg-yellow-900/20 rounded-lg border border-yellow-700">
+                        <span class="material-symbols-outlined animate-spin align-middle mr-2">sync</span> 
+                        Processing... Please wait.
+                    </div>
+
+                    <button type="submit" id="btn-save-food" class="bg-primary text-white font-semibold py-4 px-6 rounded-lg hover:bg-blue-600 transition-colors w-full text-lg mt-8 shadow-lg flex justify-center items-center gap-2">
+                        <span class="material-symbols-outlined">save</span> Save Food Item
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="../js/auth.js"></script>
+    <script type="module" src="../js/admin.js"></script>
+</body>
+</html>
