@@ -19,11 +19,8 @@
     </script>
 </head>
 <body class="bg-[#0b0f19] text-on-surface font-['Inter'] flex h-screen overflow-hidden">
-    <!-- Mobile Sidebar Overlay -->
-    <div id="mobile-sidebar-overlay" class="fixed inset-0 bg-black/60 z-40 hidden md:hidden transition-opacity" onclick="toggleAdminSidebar()"></div>
-
     <!-- Sidebar -->
-    <aside id="admin-sidebar" class="fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 z-50 w-64 bg-surface border-r border-gray-800 flex flex-col">
+    <aside class="w-64 bg-surface border-r border-gray-800 flex flex-col">
         <div class="h-20 flex items-center justify-center border-b border-gray-800">
             <h1 class="text-xl font-bold text-primary tracking-wider">PHO ADMIN</h1>
         </div>
@@ -74,25 +71,21 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 flex flex-col h-screen overflow-y-auto w-full">
-        <header class="h-20 bg-surface border-b border-gray-800 flex items-center justify-between px-4 md:px-8">
-            <div class="flex items-center gap-4">
-                <button onclick="toggleAdminSidebar()" class="md:hidden text-secondary hover:text-white transition-colors p-1">
-                    <span class="material-symbols-outlined text-3xl">menu</span>
-                </button>
-                <h2 class="text-xl md:text-2xl font-semibold text-white">Message Broadcast</h2>
-            </div>
+    <main class="flex-1 flex flex-col h-screen overflow-y-auto">
+        <header class="h-20 bg-surface border-b border-gray-800 flex items-center justify-between px-8 flex-shrink-0">
+            <h2 class="text-2xl font-semibold text-white font-['Inter']">Gửi tin nhắn & Khuyến mãi</h2>
             <div class="flex items-center space-x-4">
-                <button onclick="window.exportTableToExcel('messages-table', 'Sent_Messages.xlsx')" class="bg-teal-600 hover:bg-teal-700 text-white py-2 px-4 rounded-lg flex items-center gap-1.5 text-sm font-semibold transition-colors">
-                    <span class="material-symbols-outlined text-sm">download</span>
-                    <span>Export Excel</span>
+                <button onclick="window.exportTableToExcel('messages-table', 'messages_history.xlsx')" class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg flex items-center gap-2 transition-colors shadow">
+                    <span class="material-symbols-outlined">download</span>
+                    <span>Xuất Excel</span>
                 </button>
                 <span class="material-symbols-outlined text-secondary cursor-pointer hover:text-white">notifications</span>
                 <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold">A</div>
             </div>
         </header>
-        <div class="p-4 md:p-8 flex-1 w-full overflow-hidden">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full">
+        
+        <div class="p-8 space-y-8">
+            <!-- Composer Card -->
             <div class="bg-surface rounded-xl border border-gray-800 p-6 shadow-lg">
                 <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
                     <span class="material-symbols-outlined text-primary">edit_document</span> Soạn tin nhắn mới
@@ -216,7 +209,7 @@
                     <span class="material-symbols-outlined text-primary">history</span> Nhật ký tin nhắn đã gửi
                 </h3>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left" id="messages-table">
+                    <table id="messages-table" class="w-full text-left">
                         <thead>
                             <tr class="border-b border-gray-800 text-secondary text-sm">
                                 <th class="py-3 px-4 font-medium">Tiêu đề</th>

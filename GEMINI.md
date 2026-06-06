@@ -2,6 +2,11 @@
 
 ## Modifications
 
+### [2026-06-06] Standardized Admin Headers & Export Excel Buttons
+- **Standardized Admin Headers**: Aligned all administrative pages' headers (`admin/index.html`, `admin/food-list.html`, `admin/food-add.html`, `admin/user-manager.html`, `admin/order-manager.html`, `admin/reservations.html`, `admin/feedback.html`) to have a consistent design layout containing notifications icons, the avatar label "A", and aligned button styles.
+- **Export to Excel Functionality**: Added an Export Excel button next to data list tables. Users can export raw spreadsheet files for the Recent Orders list (`admin/index.html`), Food Menu list (`admin/food-list.html`), User list (`admin/user-manager.html`), Order list (`admin/order-manager.html`), Reservations list (`admin/reservations.html`), and Messages log list (`admin/messages.html`).
+- **Dynamic XLSX Lazy-loader & DOM Cleaner**: Added `window.exportTableToExcel` in `js/admin.js` that dynamically inserts the SheetJS library (`xlsx.full.min.js`) via CDN if not present, clones the target table, and cleans up elements like buttons, input fields, images, and action columns to produce tidy spreadsheet exports.
+
 ### [2026-06-06] Standardized Navigation, Inbox Redirect & Lucky Wheel
 - **Unified Navigation Rendering**: Modified `js/client.js` to compile and render a standardized header layout dynamically on all user pages, ensuring correct language switches, links, and buttons (including a persistent Inbox link).
 - **Guest Inbox Redirect**: Added a global click listener in `js/auth.js` to prevent unregistered guests from opening `inbox.html`, automatically redirecting them to `login.html`.

@@ -16,3 +16,11 @@ body.page-exit {
     from { opacity: 1; transform: translateY(0); }
     to { opacity: 0; transform: translateY(-8px); }
 }
+
+/* Admin dark theme background pattern */
+body.bg-\[\#0b0f19\] {
+    background-image: linear-gradient(rgba(7, 24, 43, 0.9), rgba(7, 24, 43, 0.9)), url('https://lh3.googleusercontent.com/aida/AP1WRLu_foWMwnMlqlxq-jsEwNaqub3k215L_EAy1g9btiAZtZ-vC6ctgnJDoX8wnoedlLjZLvxGBbofAjGnMf_dRJvEe1l5avwp0Eo5waH3l_00K1ufBPSmlJVaGf7Cct4WRPY63LuqnSJ6HUc0hkcppk5dzmsmrPaiapy336v6Yh3lNvvAXDOcQtNm0p5hZVT5IuPV1iLZpy57dRptdN6lHBnOX9SlAwnVO4c48uoRoPg_s27yUgpT632cGXFn') !important;
+    background-repeat: repeat;
+    background-size: 400px;
+    background-attachment: fixed;
+}

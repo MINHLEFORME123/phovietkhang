@@ -220,7 +220,7 @@ function initUnifiedNavbar() {
                 Reservations
             </a>
             <!-- Cart Icon -->
-            <a href="cart.html" class="nav-cart-btn relative text-black dark:text-white" title="View Cart">
+            <a href="cart.html" class="nav-cart-btn relative" title="View Cart">
                 <span class="material-symbols-outlined text-[24px]">shopping_cart</span>
                 <span id="cart-count" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
             </a>

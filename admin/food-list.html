@@ -17,26 +17,27 @@
     </script>
 </head>
 <body class="bg-[#0b0f19] text-on-surface font-['Inter'] flex h-screen overflow-hidden">
-    <!-- Mobile Sidebar Overlay -->
-    <div id="mobile-sidebar-overlay" class="fixed inset-0 bg-black/60 z-40 hidden md:hidden transition-opacity" onclick="toggleAdminSidebar()"></div>
-
     <!-- Sidebar -->
-    <aside id="admin-sidebar" class="fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 z-50 w-64 bg-surface border-r border-gray-800 flex flex-col">
+    <aside class="w-64 bg-surface border-r border-gray-800 flex flex-col">
         <div class="h-20 flex items-center justify-center border-b border-gray-800">
             <h1 class="text-xl font-bold text-primary tracking-wider">PHO ADMIN</h1>
         </div>
         <nav class="flex-1 p-4 space-y-2">
             <a href="index.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
-                <span class="material-symbols-outlined">dashboard</span><span>Dashboard</span>
+                <span class="material-symbols-outlined">dashboard</span>
+                <span>Dashboard</span>
             </a>
             <a href="user-manager.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
-                <span class="material-symbols-outlined">group</span><span>Users</span>
+                <span class="material-symbols-outlined">group</span>
+                <span>Users</span>
             </a>
             <a href="food-list.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors bg-primary/20 text-primary">
-                <span class="material-symbols-outlined">restaurant_menu</span><span>Food Menu</span>
+                <span class="material-symbols-outlined">restaurant_menu</span>
+                <span>Food Menu</span>
             </a>
             <a href="food-add.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
-                <span class="material-symbols-outlined">add_circle</span><span>Add Food</span>
+                <span class="material-symbols-outlined">add_circle</span>
+                <span>Add Food</span>
             </a>
             <a href="order-manager.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
                 <span class="material-symbols-outlined">receipt_long</span>
@@ -51,10 +52,12 @@
                 <span>Feedback</span>
             </a>
             <a href="messages.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
-                <span class="material-symbols-outlined">mail</span><span>Messages</span>
+                <span class="material-symbols-outlined">mail</span>
+                <span>Messages</span>
             </a>
             <a href="../kitchen/index.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
-                <span class="material-symbols-outlined">soup_kitchen</span><span>Kitchen KDS</span>
+                <span class="material-symbols-outlined">soup_kitchen</span>
+                <span>Kitchen KDS</span>
             </a>
         </nav>
         <div class="p-4 border-t border-gray-800">
@@ -65,29 +68,25 @@
     </aside>
 
     <!-- Main Content -->
-        <header class="h-20 bg-surface border-b border-gray-800 flex items-center justify-between px-4 md:px-8">
-            <div class="flex items-center gap-4">
-                <button onclick="toggleAdminSidebar()" class="md:hidden text-secondary hover:text-white transition-colors p-1">
-                    <span class="material-symbols-outlined text-3xl">menu</span>
-                </button>
-                <h2 class="text-xl md:text-2xl font-semibold text-white">Food Menu Management</h2>
-            </div>
+    <main class="flex-1 flex flex-col h-screen overflow-y-auto">
+        <header class="h-20 bg-surface border-b border-gray-800 flex items-center justify-between px-8 flex-shrink-0">
+            <h2 class="text-2xl font-semibold text-white">Food Menu Management</h2>
             <div class="flex items-center space-x-4">
-                <button onclick="window.exportTableToExcel('food-table', 'Food_Menu.xlsx')" class="bg-teal-600 hover:bg-teal-700 text-white py-2 px-4 rounded-lg flex items-center gap-1.5 text-sm font-semibold transition-colors">
-                    <span class="material-symbols-outlined text-sm">download</span>
-                    <span>Export Excel</span>
-                </button>
-                <button id="btn-clear-menu" class="bg-red-900/50 hover:bg-red-900 text-red-400 py-2 px-4 rounded-lg flex items-center gap-2 text-sm font-semibold transition-colors">
-                    <span class="material-symbols-outlined text-sm">delete_sweep</span>
+                <button id="btn-clear-menu" class="bg-red-900/50 hover:bg-red-900 text-red-400 py-2 px-4 rounded-lg flex items-center gap-2 transition-colors">
+                    <span class="material-symbols-outlined">delete_sweep</span>
                     <span>Clear Menu</span>
+                </button>
+                <button onclick="window.exportTableToExcel('food-table', 'food_menu.xlsx')" class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg flex items-center gap-2 transition-colors shadow">
+                    <span class="material-symbols-outlined">download</span>
+                    <span>Xuất Excel</span>
                 </button>
                 <span class="material-symbols-outlined text-secondary cursor-pointer hover:text-white">notifications</span>
                 <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold">A</div>
             </div>
         </header>
-        <div class="p-4 md:p-8 flex-1 w-full overflow-hidden">
-            <div class="bg-surface rounded-xl border border-gray-800 p-6 shadow-lg overflow-x-auto w-full">
-                <table class="w-full text-left" id="food-table">
+        <div class="p-8 flex-1">
+            <div class="bg-surface rounded-xl border border-gray-800 p-6 shadow-lg">
+                <table id="food-table" class="w-full text-left">
                     <thead>
                         <tr class="border-b border-gray-800 text-secondary">
                             <th class="py-3 px-4 font-medium">Image</th>
