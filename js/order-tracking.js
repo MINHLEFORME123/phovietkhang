@@ -15,92 +15,19 @@ function formatTime(dateObj) {
     return `${hours}:${minutes} - ${day}/${month}/${year}`;
 }
 
-const trackingTranslations = {
-    vi: {
-        trackFailed: "THEO DÕI THẤT BẠI",
-        backToMenu: "Quay lại thực đơn",
-        noOrderId: "Không tìm thấy mã đơn hàng cần theo dõi trong liên kết.",
-        notFound: (id) => `Đơn hàng #${id} không tồn tại hoặc đã bị xóa.`,
-        systemError: "Lỗi hệ thống khi tải thông tin đơn hàng.",
-        dineIn: (table) => `Ăn tại bàn (Bàn ${table})`,
-        delivery: "Giao hàng",
-        takeaway: "Mang về",
-        trackTitle: (id) => `Theo dõi đơn hàng: #${id}`,
-        itemsTitle: "Danh sách món ăn",
-        notesTitle: "Ghi chú đơn hàng:",
-        cancelledTitle: "ĐƠN HÀNG ĐÃ HỦY",
-        cancelledDesc: "Đơn hàng này đã bị hủy bỏ. Vui lòng liên hệ nhà hàng để biết thêm chi tiết.",
-        steps: {
-            'pending': 'Đã nhận đơn',
-            'cooking': 'Đang chuẩn bị',
-            'ready': 'Sẵn sàng giao',
-            'completed': 'Hoàn tất'
-        }
-    },
-    en: {
-        trackFailed: "TRACKING FAILED",
-        backToMenu: "Back to Menu",
-        noOrderId: "Order ID not found in the link.",
-        notFound: (id) => `Order #${id} does not exist or has been deleted.`,
-        systemError: "System error while loading order details.",
-        dineIn: (table) => `Dine-in (Table ${table})`,
-        delivery: "Delivery",
-        takeaway: "Takeaway",
-        trackTitle: (id) => `Track Order: #${id}`,
-        itemsTitle: "Items Ordered",
-        notesTitle: "Order Notes:",
-        cancelledTitle: "ORDER CANCELLED",
-        cancelledDesc: "This order has been cancelled. Please contact the restaurant for details.",
-        steps: {
-            'pending': 'Order Received',
-            'cooking': 'Preparing',
-            'ready': 'Ready',
-            'completed': 'Completed'
-        }
-    },
-    fi: {
-        trackFailed: "SEURANTA EPÄONNISTUI",
-        backToMenu: "Takaisin ruokalistaan",
-        noOrderId: "Tilaustunnusta ei löytynyt linkistä.",
-        notFound: (id) => `Tilausta #${id} ei ole olemassa tai se on poistettu.`,
-        systemError: "Järjestelmävirhe tilaustietoja ladattaessa.",
-        dineIn: (table) => `Syö paikan päällä (Pöytä ${table})`,
-        delivery: "Kotiinkuljetus",
-        takeaway: "Mukaan",
-        trackTitle: (id) => `Seuraa tilausta: #${id}`,
-        itemsTitle: "Tilatut tuotteet",
-        notesTitle: "Tilauksen lisätiedot:",
-        cancelledTitle: "TILAUS PERUUTETTU",
-        cancelledDesc: "Tämä tilaus on peruutettu. Ota yhteyttä ravintolaan lisätietoja varten.",
-        steps: {
-            'pending': 'Tilaus vastaanotettu',
-            'cooking': 'Valmistellaan',
-            'ready': 'Valmis',
-            'completed': 'Valmis'
-        }
-    }
-};
-
-let currentOrderUnsubscribe = null;
-
 function initTracking() {
     const urlParams = new URLSearchParams(window.location.search);
     const orderId = urlParams.get('orderId');
-    const lang = localStorage.getItem('selectedLanguage') || 'en';
-    const t = trackingTranslations[lang] || trackingTranslations.en;
 
     if (!orderId) {
-        showError(t.noOrderId);
+        showError("Không tìm thấy mã đơn hàng cần theo dõi trong liên kết.");
         return;
     }
 
-    if (currentOrderUnsubscribe) {
-        currentOrderUnsubscribe();
-    }
-
-    currentOrderUnsubscribe = onSnapshot(doc(db, "orders", orderId), (docSnap) => {
+    // Set up real-time listener for the single order
+    onSnapshot(doc(db, "orders", orderId), (docSnap) => {
         if (!docSnap.exists()) {
-            showError(t.notFound(orderId.toUpperCase()));
+            showError(`Đơn hàng #${orderId.toUpperCase()} không tồn tại hoặc đã bị xóa.`);
             return;
         }
 
@@ -108,7 +35,7 @@ function initTracking() {
         renderOrderProgress(docSnap.id, order);
     }, (error) => {
         console.error("Error loading order:", error);
-        showError(t.systemError);
+        showError("Lỗi hệ thống khi tải thông tin đơn hàng.");
     });
 }
 
@@ -119,9 +46,6 @@ if (document.readyState === 'loading') {
 }
 
 function showError(message) {
-    const lang = localStorage.getItem('selectedLanguage') || 'en';
-    const t = trackingTranslations[lang] || trackingTranslations.en;
-
     if (loadingEl) loadingEl.classList.add('hidden');
     if (contentEl) {
         contentEl.classList.remove('hidden');
@@ -130,9 +54,9 @@ function showError(message) {
                 <div class="mx-auto w-16 h-16 bg-red-500/10 border border-red-500/30 rounded-full flex items-center justify-center text-red-400">
                     <span class="material-symbols-outlined text-4xl">error</span>
                 </div>
-                <h3 class="text-xl font-bold text-white">${t.trackFailed}</h3>
+                <h3 class="text-xl font-bold text-white">THEO DÕI THẤT BẠI</h3>
                 <p class="text-secondary text-sm">${message}</p>
-                <a href="menu.html" class="inline-block mt-4 px-6 py-2 bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors">${t.backToMenu}</a>
+                <a href="menu.html" class="inline-block mt-4 px-6 py-2 bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors">Quay lại thực đơn</a>
             </div>
         `;
     }
@@ -142,9 +66,6 @@ function renderOrderProgress(id, order) {
     if (loadingEl) loadingEl.classList.add('hidden');
     if (!contentEl) return;
 
-    const lang = localStorage.getItem('selectedLanguage') || 'en';
-    const t = trackingTranslations[lang] || trackingTranslations.en;
-
     contentEl.classList.remove('hidden');
 
     const orderDate = order.createdAt?.toDate ? order.createdAt.toDate() : new Date(order.createdAt || 0);
@@ -152,20 +73,29 @@ function renderOrderProgress(id, order) {
 
     // Status steps configuration
     const statusSteps = ['pending', 'cooking', 'ready', 'completed'];
+    const stepLabelsVi = {
+        'pending': 'Đã nhận đơn',
+        'cooking': 'Đang chuẩn bị',
+        'ready': 'Sẵn sàng giao',
+        'completed': 'Hoàn tất'
+    };
+    const stepLabelsEn = {
+        'pending': 'Order Received',
+        'cooking': 'Preparing',
+        'ready': 'Ready',
+        'completed': 'Completed'
+    };
+
     const currentIdx = statusSteps.indexOf(order.status);
     const isCancelled = order.status === 'cancelled';
 
     // Items list HTML
-    const itemsHtml = (order.items || []).map(i => {
-        const itemDisplayName = lang === 'vi' ? i.nameVi : (lang === 'fi' ? i.nameFi : i.nameEn);
-        const nameToShow = itemDisplayName || i.name || 'Unknown';
-        return `
-            <div class="flex justify-between items-center text-sm py-1.5">
-                <span class="text-white/80"><span class="font-semibold text-primary mr-1">${i.qty}x</span> ${nameToShow}</span>
-                <span class="text-secondary font-semibold">€${(i.price * i.qty).toFixed(2)}</span>
-            </div>
-        `;
-    }).join('');
+    const itemsHtml = (order.items || []).map(i => `
+        <div class="flex justify-between items-center text-sm py-1.5">
+            <span class="text-white/80"><span class="font-semibold text-primary mr-1">${i.qty}x</span> ${i.name}</span>
+            <span class="text-secondary font-semibold">€${(i.price * i.qty).toFixed(2)}</span>
+        </div>
+    `).join('');
 
     // Timeline component builder
     let timelineHtml = '';
@@ -174,8 +104,8 @@ function renderOrderProgress(id, order) {
             <div class="bg-red-500/10 border border-red-500/20 text-red-400 p-5 rounded-2xl flex items-center gap-4 text-sm">
                 <span class="material-symbols-outlined text-3xl">cancel</span>
                 <div>
-                    <p class="font-bold">${t.cancelledTitle}</p>
-                    <p class="text-xs text-red-300/80">${t.cancelledDesc}</p>
+                    <p class="font-bold">ĐƠN HÀNG ĐÃ HỦY / ORDER CANCELLED</p>
+                    <p class="text-xs text-red-300/80">Đơn hàng này đã bị hủy bỏ. Vui lòng liên hệ nhà hàng để biết thêm chi tiết.</p>
                 </div>
             </div>
         `;
@@ -194,13 +124,15 @@ function renderOrderProgress(id, order) {
             }
 
             const icon = isPassed && !isCurrent ? '<span class="material-symbols-outlined text-sm">check</span>' : idx + 1;
-            const labelText = t.steps[step];
+            const labelVi = stepLabelsVi[step];
+            const labelEn = stepLabelsEn[step];
 
             return `
                 <div class="flex flex-col items-center flex-1 text-center min-w-[70px] relative z-10">
                     <div class="${dotClass}">${icon}</div>
                     <div class="mt-3">
-                        <p class="font-bold text-xs md:text-sm ${isCurrent ? 'text-primary' : isPassed ? 'text-green-400' : 'text-secondary'}">${labelText}</p>
+                        <p class="font-bold text-xs md:text-sm ${isCurrent ? 'text-primary' : isPassed ? 'text-green-400' : 'text-secondary'}">${labelVi}</p>
+                        <p class="text-[9px] text-secondary/60 mt-0.5">${labelEn}</p>
                     </div>
                 </div>
             `;
@@ -223,23 +155,19 @@ function renderOrderProgress(id, order) {
         `;
     }
 
-    const orderTypeLabel = order.orderType === 'dine-in' 
-        ? t.dineIn(order.tableNumber) 
-        : (order.orderType === 'delivery' ? t.delivery : t.takeaway);
-
     contentEl.innerHTML = `
         <!-- Card Header -->
         <div class="flex flex-col md:flex-row md:justify-between md:items-center border-b border-white/10 pb-6 gap-4">
             <div>
                 <h2 class="text-2xl font-bold text-white flex items-center gap-2 font-['EB_Garamond']">
                     <span class="material-symbols-outlined text-primary text-2xl">receipt_long</span>
-                    <span>${t.trackTitle(id.substring(0, 8).toUpperCase())}</span>
+                    <span>Theo dõi đơn hàng: #${id.substring(0, 8).toUpperCase()}</span>
                 </h2>
                 <p class="text-xs text-secondary mt-1">${dateStr}</p>
             </div>
             <div class="flex items-center gap-3">
                 <span class="capitalize text-xs px-3 py-1.5 rounded-full bg-white/5 border border-white/10 font-semibold text-white/90">
-                    ${orderTypeLabel}
+                    ${order.orderType === 'dine-in' ? `Ăn tại bàn (Bàn ${order.tableNumber})` : order.orderType === 'delivery' ? 'Giao hàng' : 'Mang về'}
                 </span>
                 <span class="text-2xl font-bold text-primary">€${order.totalPrice.toFixed(2)}</span>
             </div>
@@ -252,7 +180,7 @@ function renderOrderProgress(id, order) {
 
         <!-- Items Summary -->
         <div class="space-y-3 pt-4 border-t border-white/10">
-            <h4 class="text-sm font-semibold text-white uppercase tracking-wider">${t.itemsTitle}</h4>
+            <h4 class="text-sm font-semibold text-white uppercase tracking-wider">Danh sách món ăn</h4>
             <div class="bg-black/20 rounded-xl p-4 divide-y divide-white/5 border border-white/5">
                 ${itemsHtml}
             </div>
@@ -261,7 +189,7 @@ function renderOrderProgress(id, order) {
         <!-- Notes -->
         ${order.notes ? `
             <div class="bg-yellow-500/5 border border-yellow-500/20 text-yellow-200/90 text-xs rounded-xl p-4 italic">
-                <strong>${t.notesTitle}</strong> ${order.notes}
+                <strong>Ghi chú đơn hàng:</strong> ${order.notes}
             </div>
         ` : ''}
 
@@ -269,12 +197,8 @@ function renderOrderProgress(id, order) {
         <div class="pt-6 text-center">
             <a href="menu.html" class="inline-flex items-center gap-2 text-primary hover:text-white transition-colors text-sm font-semibold">
                 <span class="material-symbols-outlined text-sm">arrow_back</span>
-                <span>${t.backToMenu}</span>
+                <span>Quay lại Thực đơn</span>
             </a>
         </div>
     `;
 }
-
-window.addEventListener('languageChanged', () => {
-    initTracking();
-});

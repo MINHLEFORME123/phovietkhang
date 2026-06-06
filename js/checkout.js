@@ -19,29 +19,6 @@ async function autoCalculateDistance() {
         if (statusEl) statusEl.classList.add('hidden');
         return;
     }
-
-    const currentLang = localStorage.getItem('selectedLanguage') || 'en';
-    const distanceTranslations = {
-        vi: {
-            loading: "⏳ Đang tính toán phí ship...",
-            invalidAddress: "⚠️ Vui lòng nhập địa chỉ đầy đủ (bao gồm tên đường, số nhà, thành phố).",
-            failed: "⚠️ Tính toán thất bại. Vui lòng kiểm tra lại địa chỉ hoặc nhập tay khoảng cách.",
-            success: "✅ Khoảng cách: "
-        },
-        en: {
-            loading: "⏳ Calculating shipping fee...",
-            invalidAddress: "⚠️ Please enter a complete address (including street name, house number, city).",
-            failed: "⚠️ Calculation failed. Please check your address or enter distance manually.",
-            success: "✅ Distance: "
-        },
-        fi: {
-            loading: "⏳ Lasketaan toimitusmaksua...",
-            invalidAddress: "⚠️ Anna täydellinen osoite (mukaan lukien kadun nimi, talon numero, kaupunki).",
-            failed: "⚠️ Laskenta epäonnistui. Tarkista osoite tai syötä etäisyys manuaalisesti.",
-            success: "✅ Etäisyys: "
-        }
-    };
-    const dLang = distanceTranslations[currentLang] || distanceTranslations['en'];
     
     // Address must contain at least one number (representing house number or postcode) and have a minimum length
     const hasNumber = /\d/.test(address);
@@ -49,14 +26,14 @@ async function autoCalculateDistance() {
     if (!hasNumber || address.length < 5) {
         if (statusEl) {
             statusEl.classList.remove('hidden');
-            statusEl.innerHTML = `<span class="text-yellow-400">${dLang.invalidAddress}</span>`;
+            statusEl.innerHTML = `<span class="text-yellow-400">⚠️ Vui lòng nhập địa chỉ đầy đủ (bao gồm tên đường, số nhà, thành phố).</span>`;
         }
         return;
     }
     
     if (statusEl) {
         statusEl.classList.remove('hidden');
-        statusEl.innerHTML = `<span class="text-teal-400 font-semibold animate-pulse">${dLang.loading}</span>`;
+        statusEl.innerHTML = `<span class="text-teal-400 font-semibold animate-pulse">⏳ Đang tính toán phí ship...</span>`;
     }
     
     try {
@@ -104,7 +81,7 @@ Example response: {"distance": 5.4, "reason": "Driving route via Route 170"}`
                     distanceInput.value = km.toFixed(1);
                 }
                 if (statusEl) {
-                    statusEl.innerHTML = `<span class="text-green-400">${dLang.success} ${km.toFixed(1)} km (${parsed.reason})</span>`;
+                    statusEl.innerHTML = `<span class="text-green-400">✅ Distance: ${km.toFixed(1)} km (${parsed.reason})</span>`;
                 }
                 if (window.renderCartPage) window.renderCartPage();
                 return;
@@ -114,7 +91,7 @@ Example response: {"distance": 5.4, "reason": "Driving route via Route 170"}`
     } catch(err) {
         console.error("Cerebras calculation error:", err);
         if (statusEl) {
-            statusEl.innerHTML = `<span class="text-red-400">${dLang.failed}</span>`;
+            statusEl.innerHTML = `<span class="text-red-400">⚠️ Tính toán thất bại. Vui lòng kiểm tra lại địa chỉ hoặc nhập tay khoảng cách.</span>`;
         }
     }
 }
@@ -156,16 +133,12 @@ window.renderCartPage = function() {
         const itemTotal = item.price * item.qty;
         subtotal += itemTotal;
 
-        const currentLang = localStorage.getItem('selectedLanguage') || 'en';
-        const displayName = currentLang === 'vi' ? item.nameVi : (currentLang === 'fi' ? item.nameFi : item.nameEn);
-        const nameToShow = displayName || item.name || 'Unknown';
-
         const el = document.createElement('div');
         el.className = "flex items-center gap-4 bg-surface p-4 rounded-xl border border-white/5";
         el.innerHTML = `
             <img src="${item.image}" class="w-20 h-20 object-cover rounded-lg" onerror="this.src='https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=500'">
             <div class="flex-1">
-                <h4 class="font-bold text-white text-lg">${nameToShow}</h4>
+                <h4 class="font-bold text-white text-lg">${item.name}</h4>
                 ${item.options && item.options.length > 0 ? `<div class="flex flex-wrap gap-1 mt-1">${item.options.map(o => `<span class="text-xs bg-teal-600/20 text-teal-400 px-2 py-0.5 rounded-full border border-teal-600/30">${o}</span>`).join('')}</div>` : ''}
                 <p class="text-primary font-semibold">\u20AC${item.price.toFixed(2)}</p>
             </div>
@@ -230,11 +203,6 @@ window.renderCartPage = function() {
     document.getElementById('cart-vat-amount').textContent = `\u20AC${vatAmount.toFixed(2)}`;
     cartTotal.textContent = `\u20AC${total.toFixed(2)}`;
 };
-
-// Re-render cart on language changes
-window.addEventListener('languageChanged', () => {
-    if (window.renderCartPage) window.renderCartPage();
-});
 
 // Initial render
 document.addEventListener('DOMContentLoaded', () => {
@@ -649,40 +617,6 @@ if (checkoutForm) {
             myOrders.push(docRef.id);
             localStorage.setItem('my_orders', JSON.stringify(myOrders));
 
-            const successTranslations = {
-                vi: {
-                    title: "ĐANG CHỜ XÁC NHẬN",
-                    desc: "Một email xác nhận đơn hàng đã được gửi tới địa chỉ của bạn:",
-                    hint: "💡 Nhắc nhở: Vui lòng click vào liên kết \"Xác nhận đơn hàng\" trong email để chuẩn bị món ăn.",
-                    devLink: "🛠️ Link xác nhận nhanh (Môi trường Dev):",
-                    btn: "Tôi đã xác nhận trong email",
-                    checking: "Đang kiểm tra...",
-                    error: "⚠️ Hệ thống chưa nhận được xác nhận từ email của bạn. Vui lòng bấm liên kết trong thư trước.",
-                    errorSystem: "⚠️ Lỗi hệ thống khi kiểm tra xác nhận. Vui lòng thử lại."
-                },
-                en: {
-                    title: "AWAITING CONFIRMATION",
-                    desc: "A confirmation email has been sent to your email address:",
-                    hint: "💡 Reminder: Please click the \"Confirm Order\" link in the email to start preparing the dishes.",
-                    devLink: "🛠️ Quick confirmation link (Dev environment):",
-                    btn: "I have confirmed via email",
-                    checking: "Checking...",
-                    error: "⚠️ We haven't received confirmation from your email yet. Please click the link in the email first.",
-                    errorSystem: "⚠️ System error while checking confirmation. Please try again."
-                },
-                fi: {
-                    title: "ODOTTAA VAHVISTUSTA",
-                    desc: "Tilausvahvistussähköposti on lähetetty sähköpostiosoitteeseesi:",
-                    hint: "💡 Huomautus: Klikkaa sähköpostissa olevaa \"Vahvista tilaus\" -linkkiä aloittaaksesi ruoan valmistuksen.",
-                    devLink: "🛠️ Pika-vahvistuslinkki (Dev-ympäristö):",
-                    btn: "Olen vahvistanut sähköpostitse",
-                    checking: "Tarkistetaan...",
-                    error: "⚠️ Emme ole vielä saaneet vahvistusta sähköpostistasi. Klikkaa ensin sähköpostissa olevaa linkkiä.",
-                    errorSystem: "⚠️ Järjestelmävirhe vahvistusta tarkistettaessa. Yritä uudelleen."
-                }
-            };
-            const sLang = successTranslations[currentLang] || successTranslations['en'];
-
             // Create and show success modal
             const modalHtml = `
                 <div id="success-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
@@ -694,20 +628,20 @@ if (checkoutForm) {
                         
                         <!-- Content -->
                         <div class="space-y-3">
-                            <h3 class="text-2xl font-bold text-white font-['EB_Garamond']">${sLang.title}</h3>
+                            <h3 class="text-2xl font-bold text-white font-['EB_Garamond']">ĐANG CHỜ XÁC NHẬN</h3>
                             <p class="text-secondary text-sm">
-                                ${sLang.desc}
+                                Một email xác nhận đơn hàng đã được gửi tới địa chỉ của bạn:
                             </p>
                             <p class="text-primary font-mono text-sm break-all bg-primary/10 py-1.5 px-3 rounded-lg border border-primary/20 select-all font-semibold">
                                 ${customerEmail}
                             </p>
                             <p class="text-yellow-400/90 text-xs mt-2 font-medium">
-                                ${sLang.hint}
+                                💡 Nhắc nhở: Vui lòng click vào liên kết "Xác nhận đơn hàng" trong email để chuẩn bị món ăn.
                             </p>
                             
                             <!-- Development Quick Confirmation Link -->
                             <div class="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl text-left">
-                                <p class="text-[11px] text-blue-400 font-bold uppercase mb-1">${sLang.devLink}</p>
+                                <p class="text-[11px] text-blue-400 font-bold uppercase mb-1">🛠️ Link xác nhận nhanh (Môi trường Dev):</p>
                                 <a href="${confirmLink}" target="_blank" class="text-[11px] text-primary hover:underline break-all block font-mono">${confirmLink}</a>
                             </div>
                         </div>
@@ -715,9 +649,9 @@ if (checkoutForm) {
                         <!-- Button -->
                         <div class="pt-2 space-y-3">
                             <button id="btn-go-to-history" class="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition-all duration-300">
-                                ${sLang.btn}
+                                Tôi đã xác nhận trong email
                             </button>
-                            <p id="error-feedback" class="text-red-400 text-xs hidden font-medium">${sLang.error}</p>
+                            <p id="error-feedback" class="text-red-400 text-xs hidden font-medium">⚠️ Hệ thống chưa nhận được xác nhận từ email của bạn. Vui lòng bấm liên kết trong thư trước.</p>
                         </div>
                     </div>
                 </div>
@@ -744,7 +678,7 @@ if (checkoutForm) {
                 
                 feedbackEl.classList.add('hidden');
                 btnEl.disabled = true;
-                btnEl.textContent = sLang.checking;
+                btnEl.textContent = "Đang kiểm tra...";
 
                 try {
                     const docSnap = await getDoc(doc(db, "orders", docRef.id));
@@ -760,14 +694,14 @@ if (checkoutForm) {
                     } else {
                         feedbackEl.classList.remove('hidden');
                         btnEl.disabled = false;
-                        btnEl.textContent = sLang.btn;
+                        btnEl.textContent = "Tôi đã xác nhận trong email";
                     }
                 } catch(err) {
                     console.error("Check confirmation failed", err);
-                    feedbackEl.textContent = sLang.errorSystem;
+                    feedbackEl.textContent = "⚠️ Lỗi hệ thống khi kiểm tra xác nhận. Vui lòng thử lại.";
                     feedbackEl.classList.remove('hidden');
                     btnEl.disabled = false;
-                    btnEl.textContent = sLang.btn;
+                    btnEl.textContent = "Tôi đã xác nhận trong email";
                 }
             });
 
