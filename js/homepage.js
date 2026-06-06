@@ -109,7 +109,7 @@ async function loadHomepage() {
                     if (index === 0) {
                         // Large Card
                         html += `
-                        <div class="md:col-span-2 md:row-span-2 bg-surface/90 backdrop-blur-sm rounded-DEFAULT border border-outline-variant overflow-hidden group">
+                        <div class="md:col-span-2 md:row-span-2 bg-surface/90 backdrop-blur-sm rounded-DEFAULT border-2 border-primary shadow-md shadow-primary/10 overflow-hidden group">
                             <div class="relative h-full overflow-hidden">
                                 <img alt="${name}" class="w-full h-[300px] md:h-full object-cover group-hover:scale-105 transition-transform duration-700" src="${img}"/>
                                 <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
@@ -122,7 +122,7 @@ async function loadHomepage() {
                     } else {
                         // Small Card
                         html += `
-                        <div class="md:col-span-1 bg-surface/90 backdrop-blur-sm rounded-DEFAULT border border-outline-variant overflow-hidden group flex flex-col h-full">
+                        <div class="md:col-span-1 bg-surface/90 backdrop-blur-sm rounded-DEFAULT border-2 border-primary shadow-md shadow-primary/10 overflow-hidden group flex flex-col h-full">
                             <div class="relative h-48 overflow-hidden shrink-0">
                                 <img alt="${name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="${img}"/>
                             </div>
