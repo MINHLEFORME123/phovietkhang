@@ -18,6 +18,64 @@ function formatTime(dateObj) {
 // Global list of order IDs we are tracking
 let trackedOrderIds = new Set();
 let unsubscribers = [];
+let lastLoadedOrders = [];
+
+const historyTranslations = {
+    vi: {
+        emptyTitle: "Chưa có đơn hàng nào được đặt.",
+        orderNow: "Đặt hàng ngay",
+        noTracking: "Chưa có đơn hàng nào cần theo dõi.",
+        orderId: (id) => `Mã đơn: #${id}`,
+        dineIn: (table) => `Ăn tại bàn (Bàn ${table})`,
+        delivery: "Giao hàng",
+        takeaway: "Mang về",
+        notesTitle: "Ghi chú:",
+        cancelledTitle: "ĐƠN HÀNG ĐÃ HỦY",
+        cancelledDesc: "Đơn hàng này đã bị hủy bỏ bởi nhà hàng hoặc khách hàng.",
+        steps: {
+            'pending': 'Đã nhận đơn',
+            'cooking': 'Đang chuẩn bị',
+            'ready': 'Sẵn sàng giao',
+            'completed': 'Hoàn tất'
+        }
+    },
+    en: {
+        emptyTitle: "No orders have been placed yet.",
+        orderNow: "Order Now",
+        noTracking: "No orders to track.",
+        orderId: (id) => `Order ID: #${id}`,
+        dineIn: (table) => `Dine-in (Table ${table})`,
+        delivery: "Delivery",
+        takeaway: "Takeaway",
+        notesTitle: "Notes:",
+        cancelledTitle: "ORDER CANCELLED",
+        cancelledDesc: "This order has been cancelled by the restaurant or customer.",
+        steps: {
+            'pending': 'Order Received',
+            'cooking': 'Preparing',
+            'ready': 'Ready',
+            'completed': 'Completed'
+        }
+    },
+    fi: {
+        emptyTitle: "Tilauksia ei ole vielä tehty.",
+        orderNow: "Tilaa Nyt",
+        noTracking: "Ei seurattavia tilauksia.",
+        orderId: (id) => `Tilaustunnus: #${id}`,
+        dineIn: (table) => `Syö paikan päällä (Pöytä ${table})`,
+        delivery: "Kotiinkuljetus",
+        takeaway: "Mukaan",
+        notesTitle: "Lisätiedot:",
+        cancelledTitle: "TILAUS PERUUTETTU",
+        cancelledDesc: "Ravintola tai asiakas on peruuttanut tämän tilauksen.",
+        steps: {
+            'pending': 'Tilaus vastaanotettu',
+            'cooking': 'Valmistellaan',
+            'ready': 'Valmis',
+            'completed': 'Valmis'
+        }
+    }
+};
 
 // Load orders from localStorage
 const localOrders = JSON.parse(localStorage.getItem('my_orders') || '[]');
@@ -49,18 +107,22 @@ onAuthStateChanged(auth, (user) => {
                 }
             });
 
+            lastLoadedOrders = userOrders;
             renderTrackingCards(userOrders);
         });
         unsubscribers.push(unsub);
     } else {
+        const lang = localStorage.getItem('selectedLanguage') || 'en';
+        const t = historyTranslations[lang] || historyTranslations.en;
+
         // Guest users: track orders stored in localStorage
         if (trackedOrderIds.size === 0) {
             if (container) {
                 container.innerHTML = `
                     <div class="text-center py-12 text-secondary">
                         <span class="material-symbols-outlined text-6xl mb-4 opacity-40">receipt_long</span>
-                        <p class="text-lg">Chưa có đơn hàng nào được đặt.</p>
-                        <a href="menu.html" class="inline-block mt-4 px-6 py-2 bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors">Đặt hàng ngay</a>
+                        <p class="text-lg">${t.emptyTitle}</p>
+                        <a href="menu.html" class="inline-block mt-4 px-6 py-2 bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors">${t.orderNow}</a>
                     </div>
                 `;
             }
@@ -75,6 +137,7 @@ onAuthStateChanged(auth, (user) => {
                     activeLocalOrders.push({ id: docSnap.id, ...docSnap.data() });
                 }
             });
+            lastLoadedOrders = activeLocalOrders;
             renderTrackingCards(activeLocalOrders);
         });
         unsubscribers.push(unsub);
@@ -84,9 +147,12 @@ onAuthStateChanged(auth, (user) => {
 function renderTrackingCards(orders) {
     if (!container) return;
 
+    const lang = localStorage.getItem('selectedLanguage') || 'en';
+    const t = historyTranslations[lang] || historyTranslations.en;
+
     if (orders.length === 0) {
         container.innerHTML = `
-            <p class="text-secondary text-center py-12">Chưa có đơn hàng nào cần theo dõi.</p>
+            <p class="text-secondary text-center py-12">${t.noTracking}</p>
         `;
         return;
     }
@@ -125,12 +191,16 @@ function renderTrackingCards(orders) {
         const isCancelled = order.status === 'cancelled';
 
         // Items summary list
-        const itemsHtml = (order.items || []).map(i => `
-            <div class="flex justify-between items-center text-sm py-1">
-                <span class="text-white/80"><span class="font-semibold text-primary mr-1">${i.qty}x</span> ${i.name}</span>
-                <span class="text-secondary font-medium">€${(i.price * i.qty).toFixed(2)}</span>
-            </div>
-        `).join('');
+        const itemsHtml = (order.items || []).map(i => {
+            const itemDisplayName = lang === 'vi' ? i.nameVi : (lang === 'fi' ? i.nameFi : i.nameEn);
+            const nameToShow = itemDisplayName || i.name || 'Unknown';
+            return `
+                <div class="flex justify-between items-center text-sm py-1">
+                    <span class="text-white/80"><span class="font-semibold text-primary mr-1">${i.qty}x</span> ${nameToShow}</span>
+                    <span class="text-secondary font-medium">€${(i.price * i.qty).toFixed(2)}</span>
+                </div>
+            `;
+        }).join('');
 
         // Progress timeline builder
         let timelineHtml = '';
@@ -139,8 +209,8 @@ function renderTrackingCards(orders) {
                 <div class="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-xl flex items-center gap-3 text-sm">
                     <span class="material-symbols-outlined">cancel</span>
                     <div>
-                        <p class="font-bold">ĐƠN HÀNG ĐÃ HỦY / ORDER CANCELLED</p>
-                        <p class="text-xs text-red-300/80">Đơn hàng này đã bị hủy bỏ bởi nhà hàng hoặc khách hàng.</p>
+                        <p class="font-bold">${t.cancelledTitle}</p>
+                        <p class="text-xs text-red-300/80">${t.cancelledDesc}</p>
                     </div>
                 </div>
             `;
@@ -159,15 +229,13 @@ function renderTrackingCards(orders) {
                 }
 
                 const icon = isPassed && !isCurrent ? '<span class="material-symbols-outlined text-sm">check</span>' : idx + 1;
-                const labelVi = stepLabelsVi[step];
-                const labelEn = stepLabelsEn[step];
+                const labelText = t.steps[step];
 
                 return `
                     <div class="flex flex-col items-center flex-1 text-center min-w-[70px] relative z-10">
                         <div class="${dotClass}">${icon}</div>
                         <div class="mt-3">
-                            <p class="font-bold text-xs md:text-sm ${isCurrent ? 'text-primary' : isPassed ? 'text-green-400' : 'text-secondary'}">${labelVi}</p>
-                            <p class="text-[10px] text-secondary/60 mt-0.5">${labelEn}</p>
+                            <p class="font-bold text-xs md:text-sm ${isCurrent ? 'text-primary' : isPassed ? 'text-green-400' : 'text-secondary'}">${labelText}</p>
                         </div>
                     </div>
                 `;
@@ -191,19 +259,23 @@ function renderTrackingCards(orders) {
             `;
         }
 
+        const orderTypeLabel = order.orderType === 'dine-in' 
+            ? t.dineIn(order.tableNumber) 
+            : (order.orderType === 'delivery' ? t.delivery : t.takeaway);
+
         card.innerHTML = `
             <!-- Card Header -->
             <div class="flex flex-col md:flex-row md:justify-between md:items-center border-b border-white/5 pb-4 gap-3">
                 <div>
                     <h3 class="text-lg font-bold text-white flex items-center gap-2">
                         <span class="material-symbols-outlined text-primary">receipt_long</span>
-                        <span>Mã đơn: #${order.id.substring(0, 8).toUpperCase()}</span>
+                        <span>${t.orderId(order.id.substring(0, 8).toUpperCase())}</span>
                     </h3>
                     <p class="text-xs text-secondary mt-1">${dateStr}</p>
                 </div>
                 <div class="flex items-center gap-3">
                     <span class="capitalize text-xs px-3 py-1 rounded-full bg-white/5 border border-white/10 font-semibold text-white/90">
-                        ${order.orderType === 'dine-in' ? `Ăn tại bàn (Bàn ${order.tableNumber})` : order.orderType === 'delivery' ? 'Giao hàng' : 'Mang về'}
+                        ${orderTypeLabel}
                     </span>
                     <span class="text-xl font-bold text-primary">€${order.totalPrice.toFixed(2)}</span>
                 </div>
@@ -220,10 +292,15 @@ function renderTrackingCards(orders) {
             <!-- Notes -->
             ${order.notes ? `
                 <div class="bg-yellow-500/5 border border-yellow-500/20 text-yellow-200/90 text-xs rounded-xl p-4 italic">
-                    <strong>Ghi chú:</strong> ${order.notes}
+                    <strong>${t.notesTitle}</strong> ${order.notes}
                 </div>
             ` : ''}
         `;
         container.appendChild(card);
     });
 }
+
+// Refresh when language changes
+window.addEventListener('languageChanged', () => {
+    renderTrackingCards(lastLoadedOrders);
+});

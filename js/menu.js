@@ -219,7 +219,7 @@ function showOptionsPopup(item, lang) {
             window.flyToCart(popupModal);
         }
         
-        window.addToCart(item.id, safeName, finalPrice, item.image || '', selectedStrings);
+        window.addToCart(item.id, safeName, finalPrice, item.image || '', selectedStrings, item.nameVi, item.nameEn, item.nameFi);
         document.removeEventListener('keydown', handleEsc);
         overlay.remove();
         document.body.style.overflow = '';
@@ -393,7 +393,7 @@ async function loadMenu() {
                         // Fly entire card to cart
                         window.flyToCart(card);
                         const safeName = (item.nameEn || item.nameVi || 'Unknown');
-                        window.addToCart(item.id, safeName, item.price || 0, item.image || '', []);
+                        window.addToCart(item.id, safeName, item.price || 0, item.image || '', [], item.nameVi, item.nameEn, item.nameFi);
                     }
                 });
 

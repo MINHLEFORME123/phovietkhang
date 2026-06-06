@@ -17,8 +17,11 @@
     </script>
 </head>
 <body class="bg-[#0b0f19] text-on-surface font-['Inter'] flex h-screen overflow-hidden">
+    <!-- Mobile Sidebar Overlay -->
+    <div id="mobile-sidebar-overlay" class="fixed inset-0 bg-black/60 z-40 hidden md:hidden transition-opacity" onclick="toggleAdminSidebar()"></div>
+
     <!-- Sidebar -->
-    <aside class="w-64 bg-surface border-r border-gray-800 flex flex-col">
+    <aside id="admin-sidebar" class="fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 z-50 w-64 bg-surface border-r border-gray-800 flex flex-col">
         <div class="h-20 flex items-center justify-center border-b border-gray-800">
             <h1 class="text-xl font-bold text-primary tracking-wider">PHO ADMIN</h1>
         </div>
@@ -62,16 +65,21 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 flex flex-col h-screen overflow-y-auto">
-        <header class="h-20 bg-surface border-b border-gray-800 flex items-center justify-between px-8">
-            <h2 class="text-2xl font-semibold text-white">Food Menu Management</h2>
+    <main class="flex-1 flex flex-col h-screen overflow-y-auto w-full">
+        <header class="h-20 bg-surface border-b border-gray-800 flex items-center justify-between px-4 md:px-8">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleAdminSidebar()" class="md:hidden text-secondary hover:text-white transition-colors p-1">
+                    <span class="material-symbols-outlined text-3xl">menu</span>
+                </button>
+                <h2 class="text-xl md:text-2xl font-semibold text-white">Food Menu Management</h2>
+            </div>
             <button id="btn-clear-menu" class="bg-red-900/50 hover:bg-red-900 text-red-400 py-2 px-4 rounded-lg flex items-center gap-2 transition-colors">
                 <span class="material-symbols-outlined">delete_sweep</span>
                 <span>Clear Menu</span>
             </button>
         </header>
-        <div class="p-8 flex-1">
-            <div class="bg-surface rounded-xl border border-gray-800 p-6 shadow-lg">
+        <div class="p-4 md:p-8 flex-1 w-full overflow-hidden">
+            <div class="bg-surface rounded-xl border border-gray-800 p-6 shadow-lg overflow-x-auto w-full">
                 <table class="w-full text-left">
                     <thead>
                         <tr class="border-b border-gray-800 text-secondary">

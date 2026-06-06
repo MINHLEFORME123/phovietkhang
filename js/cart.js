@@ -128,7 +128,7 @@ cartAnimStyle.textContent = `
 document.head.appendChild(cartAnimStyle);
 
 
-window.addToCart = function(id, name, price, image, selectedOptions) {
+window.addToCart = function(id, name, price, image, selectedOptions, nameVi, nameEn, nameFi) {
     const optKey = selectedOptions && selectedOptions.length > 0 ? selectedOptions.sort().join('|') : '';
     const uniqueId = optKey ? `${id}__${optKey}` : id;
 
@@ -136,7 +136,18 @@ window.addToCart = function(id, name, price, image, selectedOptions) {
     if (existing) {
         existing.qty += 1;
     } else {
-        cart.push({ id: uniqueId, rawId: id, name, price, image, qty: 1, options: selectedOptions || [] });
+        cart.push({ 
+            id: uniqueId, 
+            rawId: id, 
+            name, 
+            nameVi: nameVi || name,
+            nameEn: nameEn || name,
+            nameFi: nameFi || name,
+            price, 
+            image, 
+            qty: 1, 
+            options: selectedOptions || [] 
+        });
     }
     saveCart();
 };

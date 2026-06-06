@@ -18,6 +18,34 @@ const inboxBadgeNav = document.getElementById('inbox-badge-nav');
 
 let activeUser = null;
 let currentMessages = [];
+let selectedMessage = null;
+
+const inboxTranslations = {
+    vi: {
+        emptyTitle: "Hộp thư của bạn trống.",
+        copy: "Sao chép",
+        copied: "Đã chép",
+        attachedVoucher: "Voucher Đính Kèm",
+        hint: "💡 Nhập mã trên tại trang thanh toán của bạn để được áp dụng giảm giá.",
+        orderNow: "Đặt món ngay"
+    },
+    en: {
+        emptyTitle: "Your mailbox is empty.",
+        copy: "Copy",
+        copied: "Copied",
+        attachedVoucher: "Attached Voucher",
+        hint: "💡 Enter the above code at checkout to apply discount.",
+        orderNow: "Order now"
+    },
+    fi: {
+        emptyTitle: "Postilaatikkosi on tyhjä.",
+        copy: "Kopioi",
+        copied: "Kopioitu",
+        attachedVoucher: "Liitetty etukuponki",
+        hint: "💡 Syötä yllä oleva koodi kassalla saadaksesi alennuksen.",
+        orderNow: "Tilaa heti"
+    }
+};
 
 // Format Date Utility
 function formatMsgDate(timestamp) {
@@ -59,11 +87,14 @@ async function markAsRead(msg) {
 
 // Render Left Panel Message List
 function renderMessageList(uid) {
+    const lang = localStorage.getItem('selectedLanguage') || 'en';
+    const t = inboxTranslations[lang] || inboxTranslations.en;
+
     if (currentMessages.length === 0) {
         messagesList.innerHTML = `
             <div class="text-center py-12 text-secondary">
                 <span class="material-symbols-outlined text-4xl mb-2">inbox</span>
-                <p class="text-sm">Hộp thư của bạn trống.</p>
+                <p class="text-sm">${t.emptyTitle}</p>
             </div>
         `;
         unreadCountBadge.classList.add('hidden');
@@ -91,6 +122,7 @@ function renderMessageList(uid) {
         `;
 
         card.addEventListener('click', () => {
+            selectedMessage = msg;
             renderMessageDetails(msg);
             markAsRead(msg);
         });
@@ -111,6 +143,9 @@ function renderMessageList(uid) {
 
 // Render Right Panel Message Details
 function renderMessageDetails(msg) {
+    const lang = localStorage.getItem('selectedLanguage') || 'en';
+    const t = inboxTranslations[lang] || inboxTranslations.en;
+
     let mediaHtml = '';
     if (msg.imageUrl) {
         mediaHtml = `
@@ -122,13 +157,12 @@ function renderMessageDetails(msg) {
 
     let voucherHtml = '';
     if (msg.voucherCode) {
-        // Support multiple comma separated voucher codes
         const codes = msg.voucherCode.split(',').map(c => c.trim()).filter(Boolean);
         const codesListHtml = codes.map(code => `
             <div class="flex items-center justify-between gap-4 bg-background border border-primary/20 p-3 rounded-xl select-all font-mono text-primary font-bold text-lg">
                 <span>${code}</span>
                 <button onclick="window.copyVoucherToClipboard('${code}', this)" class="bg-primary/20 hover:bg-primary/30 border border-primary/30 text-xs px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 text-primary">
-                    <span class="material-symbols-outlined text-[14px]">content_copy</span>Sao chép
+                    <span class="material-symbols-outlined text-[14px]">content_copy</span>${t.copy}
                 </button>
             </div>
         `).join('');
@@ -137,12 +171,12 @@ function renderMessageDetails(msg) {
             <div class="bg-primary/5 border border-primary/10 rounded-2xl p-4 mt-6">
                 <h4 class="text-xs font-bold text-primary uppercase tracking-wider mb-3 flex items-center gap-1.5">
                     <span class="material-symbols-outlined text-sm">local_activity</span>
-                    Voucher Đính Kèm
+                    ${t.attachedVoucher}
                 </h4>
                 <div class="space-y-2">
                     ${codesListHtml}
                 </div>
-                <p class="text-[11px] text-secondary mt-3 italic text-center">💡 Nhập mã trên tại trang thanh toán của bạn để được áp dụng giảm giá.</p>
+                <p class="text-[11px] text-secondary mt-3 italic text-center">${t.hint}</p>
             </div>
         `;
     }
@@ -169,7 +203,7 @@ function renderMessageDetails(msg) {
             <!-- Action -->
             <div class="border-t border-white/10 pt-4 mt-6 flex justify-end">
                 <a href="menu.html" class="px-6 py-2.5 bg-primary hover:bg-blue-600 text-white font-semibold rounded-xl text-sm transition-all flex items-center gap-1">
-                    <span class="material-symbols-outlined text-sm">restaurant</span> Đặt món ngay
+                    <span class="material-symbols-outlined text-sm">restaurant</span> ${t.orderNow}
                 </a>
             </div>
         </div>
@@ -178,9 +212,12 @@ function renderMessageDetails(msg) {
 
 // Global Clipboard Copy Action Helper
 window.copyVoucherToClipboard = function(code, btn) {
+    const lang = localStorage.getItem('selectedLanguage') || 'en';
+    const t = inboxTranslations[lang] || inboxTranslations.en;
+
     navigator.clipboard.writeText(code).then(() => {
         const originalText = btn.innerHTML;
-        btn.innerHTML = `<span class="material-symbols-outlined text-[14px]">done</span>Đã chép`;
+        btn.innerHTML = `<span class="material-symbols-outlined text-[14px]">done</span>${t.copied}`;
         btn.classList.replace('bg-primary/20', 'bg-green-500/20');
         btn.classList.replace('text-primary', 'text-green-400');
         btn.classList.replace('border-primary/30', 'border-green-500/30');
@@ -195,6 +232,16 @@ window.copyVoucherToClipboard = function(code, btn) {
         console.error("Clipboard copy failed:", err);
     });
 };
+
+// Language listener to refresh UI
+window.addEventListener('languageChanged', () => {
+    if (activeUser) {
+        renderMessageList(activeUser.uid);
+        if (selectedMessage) {
+            renderMessageDetails(selectedMessage);
+        }
+    }
+});
 
 // Listen to Auth state and load real-time database query snapshots
 onAuthStateChanged(auth, user => {

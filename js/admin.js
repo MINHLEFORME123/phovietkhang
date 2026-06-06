@@ -352,6 +352,22 @@ async function callOpenRouterWithFallback(payload, apiKeys = OPENROUTER_API_KEYS
 
 
 
+// --- MOBILE UI: SIDEBAR TOGGLE ---
+window.toggleAdminSidebar = function() {
+    const sidebar = document.getElementById('admin-sidebar');
+    const overlay = document.getElementById('mobile-sidebar-overlay');
+    
+    if (sidebar && overlay) {
+        if (sidebar.classList.contains('-translate-x-full')) {
+            sidebar.classList.remove('-translate-x-full');
+            overlay.classList.remove('hidden');
+        } else {
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('hidden');
+        }
+    }
+};
+
 // --- USER MANAGER LOGIC ---
 const userTableBody = document.getElementById('user-table-body');
 if (userTableBody) {
@@ -2062,25 +2078,6 @@ if (foodTableBody) {
                     <span class="material-symbols-outlined text-[20px]">close</span>
                 </button>
             </div>
-
-            <!-- Quick Actions (Spin Gifter Panel) -->
-            <div class="bg-[#18202d] border-b border-gray-800 p-3 text-xs space-y-2">
-                <div class="text-[10px] text-secondary font-bold uppercase tracking-wider">Tặng lượt quay (Quick Gift)</div>
-                <div class="flex gap-1.5 items-center">
-                    <input type="text" id="admin-spin-user" placeholder="Email hoặc UID..." class="flex-1 min-w-[110px] bg-[#0b0f19] border border-gray-700 rounded-lg text-white px-2 py-1.5 text-[11px] focus:outline-none focus:ring-1 focus:ring-primary">
-                    <select id="admin-spin-type" class="bg-[#0b0f19] border border-gray-700 rounded-lg text-white px-1 py-1.5 text-[11px] focus:outline-none focus:ring-1 focus:ring-primary">
-                        <option value="deu">Thường</option>
-                        <option value="xin">Xịn</option>
-                        <option value="vip">VIP</option>
-                    </select>
-                    <input type="number" id="admin-spin-count" min="1" value="1" class="w-10 bg-[#0b0f19] border border-gray-700 rounded-lg text-white px-1 py-1.5 text-[11px] text-center focus:outline-none focus:ring-1 focus:ring-primary">
-                    <button id="admin-btn-send-spins" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1 active:scale-95 text-[11px]">
-                        Gửi
-                    </button>
-                </div>
-                <div id="admin-spin-status" class="hidden text-[10px] font-semibold text-center mt-1"></div>
-            </div>
-            
             <!-- Message Area -->
             <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-3" id="admin-chat-messages">
                 <div class="admin-chat-bubble bubble-ai">
@@ -2235,43 +2232,6 @@ if (foodTableBody) {
         }
     });
 
-    // Quick Action Send Spins Handler
-    const btnSendSpins = document.getElementById('admin-btn-send-spins');
-    if (btnSendSpins) {
-        btnSendSpins.addEventListener('click', async () => {
-            const userVal = document.getElementById('admin-spin-user').value.trim();
-            const typeVal = document.getElementById('admin-spin-type').value;
-            const countVal = parseInt(document.getElementById('admin-spin-count').value, 10) || 1;
-            const statusEl = document.getElementById('admin-spin-status');
-            
-            if (!userVal) {
-                statusEl.textContent = "Vui lòng nhập Email hoặc UID!";
-                statusEl.className = "text-red-400 text-[10px] font-semibold text-center mt-1";
-                statusEl.classList.remove('hidden');
-                return;
-            }
-            
-            btnSendSpins.disabled = true;
-            btnSendSpins.textContent = "Đang gửi...";
-            statusEl.classList.add('hidden');
-            
-            const result = await sendSpinsToUser(userVal, typeVal, countVal);
-            btnSendSpins.disabled = false;
-            btnSendSpins.textContent = "Gửi";
-            
-            if (result.error) {
-                statusEl.textContent = "Lỗi: " + result.error;
-                statusEl.className = "text-red-400 text-[10px] font-semibold text-center mt-1";
-            } else {
-                statusEl.textContent = "Thành công: " + result.message;
-                statusEl.className = "text-green-400 text-[10px] font-semibold text-center mt-1";
-                document.getElementById('admin-spin-user').value = '';
-                document.getElementById('admin-spin-count').value = '1';
-            }
-            statusEl.classList.remove('hidden');
-            setTimeout(() => statusEl.classList.add('hidden'), 4000);
-        });
-    }
 
     // Toggle logic
     toggleBtn.addEventListener('click', () => {
@@ -2442,25 +2402,25 @@ Rules:
 ═══════════════════════════════════════════════
 🏠 HOMEPAGE CONFIG TOOLS
 ═══════════════════════════════════════════════
-11r. updateHomepageHero(imageUrl, titleVi, descVi)
-    Args: { "imageUrl": string, "titleVi": string, "descVi": string }
-    Updates the hero background image and text on the main index page. If the user attaches an image, use the provided ID (e.g., "ATTACHED_IMAGE_123456").
+11r. updateHomepageHero(imageUrl, titleVi, titleEn, titleFi, descVi, descEn, descFi)
+    Args: { "imageUrl": string, "titleVi": string, "titleEn": string, "titleFi": string, "descVi": string, "descEn": string, "descFi": string }
+    Updates the hero background image and text on the main index page in 3 languages. If the user attaches an image, use the provided ID (e.g., "ATTACHED_IMAGE_123456").
 
 11s. updateHomepageSignatures(dishIdArray)
     Args: { "dishIdArray": array of strings }
     Sets the featured signature dishes on the homepage using their dish IDs.
 
-11t. updateHomepageSignatureText(titleVi, descVi)
-    Args: { "titleVi": string, "descVi": string }
-    Updates the title and description text for the Signature Creations section.
+11t. updateHomepageSignatureText(titleVi, titleEn, titleFi, descVi, descEn, descFi)
+    Args: { "titleVi": string, "titleEn": string, "titleFi": string, "descVi": string, "descEn": string, "descFi": string }
+    Updates the title and description text for the Signature Creations section in 3 languages.
 
-11u. updateHomepageStory(imageUrl, labelVi, titleVi, p1Vi, p2Vi)
-    Args: { "imageUrl": string, "labelVi": string, "titleVi": string, "p1Vi": string, "p2Vi": string }
-    Updates the "Our Heritage" story section on the homepage. If the user attaches an image, use the provided ID.
+11u. updateHomepageStory(imageUrl, labelVi, labelEn, labelFi, titleVi, titleEn, titleFi, p1Vi, p1En, p1Fi, p2Vi, p2En, p2Fi)
+    Args: { "imageUrl": string, "labelVi": string, "labelEn": string, "labelFi": string, "titleVi": string, "titleEn": string, "titleFi": string, "p1Vi": string, "p1En": string, "p1Fi": string, "p2Vi": string, "p2En": string, "p2Fi": string }
+    Updates the "Our Heritage" story section on the homepage in 3 languages. If the user attaches an image, use the provided ID.
 
-11v. updateHomepageCTA(titleVi, descVi)
-    Args: { "titleVi": string, "descVi": string }
-    Updates the "Experience the Full Journey" Call to Action section on the homepage.
+11v. updateHomepageCTA(titleVi, titleEn, titleFi, descVi, descEn, descFi)
+    Args: { "titleVi": string, "titleEn": string, "titleFi": string, "descVi": string, "descEn": string, "descFi": string }
+    Updates the "Experience the Full Journey" Call to Action section on the homepage in 3 languages.
 
 ═══════════════════════════════════════════════
 👥 USER / FIRESTORE TOOLS
@@ -2575,12 +2535,16 @@ Rules:
     ];
 
     // Tool Implementations
-    async function updateHomepageHero(imageUrl, titleVi, descVi) {
+    async function updateHomepageHero(imageUrl, titleVi, titleEn, titleFi, descVi, descEn, descFi) {
         try {
             await setDoc(doc(db, "config", "homepage"), {
                 heroBgUrl: imageUrl || null,
                 heroTitleVi: titleVi || null,
-                heroDescVi: descVi || null
+                heroTitleEn: titleEn || null,
+                heroTitleFi: titleFi || null,
+                heroDescVi: descVi || null,
+                heroDescEn: descEn || null,
+                heroDescFi: descFi || null
             }, { merge: true });
             return { success: true, message: "Homepage hero updated successfully." };
         } catch (e) {
@@ -2602,11 +2566,15 @@ Rules:
         }
     }
 
-    async function updateHomepageSignatureText(titleVi, descVi) {
+    async function updateHomepageSignatureText(titleVi, titleEn, titleFi, descVi, descEn, descFi) {
         try {
             await setDoc(doc(db, "config", "homepage"), {
                 signatureTitleVi: titleVi || null,
-                signatureDescVi: descVi || null
+                signatureTitleEn: titleEn || null,
+                signatureTitleFi: titleFi || null,
+                signatureDescVi: descVi || null,
+                signatureDescEn: descEn || null,
+                signatureDescFi: descFi || null
             }, { merge: true });
             return { success: true, message: "Homepage signature text updated successfully. Reload to see." };
         } catch (e) {
@@ -2615,14 +2583,22 @@ Rules:
         }
     }
 
-    async function updateHomepageStory(imageUrl, labelVi, titleVi, p1Vi, p2Vi) {
+    async function updateHomepageStory(imageUrl, labelVi, labelEn, labelFi, titleVi, titleEn, titleFi, p1Vi, p1En, p1Fi, p2Vi, p2En, p2Fi) {
         try {
             await setDoc(doc(db, "config", "homepage"), {
                 storyImg: imageUrl || null,
                 storyLabelVi: labelVi || null,
+                storyLabelEn: labelEn || null,
+                storyLabelFi: labelFi || null,
                 storyTitleVi: titleVi || null,
+                storyTitleEn: titleEn || null,
+                storyTitleFi: titleFi || null,
                 storyP1Vi: p1Vi || null,
-                storyP2Vi: p2Vi || null
+                storyP1En: p1En || null,
+                storyP1Fi: p1Fi || null,
+                storyP2Vi: p2Vi || null,
+                storyP2En: p2En || null,
+                storyP2Fi: p2Fi || null
             }, { merge: true });
             return { success: true, message: "Homepage story section updated successfully. Reload to see." };
         } catch (e) {
@@ -2631,11 +2607,15 @@ Rules:
         }
     }
 
-    async function updateHomepageCTA(titleVi, descVi) {
+    async function updateHomepageCTA(titleVi, titleEn, titleFi, descVi, descEn, descFi) {
         try {
             await setDoc(doc(db, "config", "homepage"), {
                 ctaTitleVi: titleVi || null,
-                ctaDescVi: descVi || null
+                ctaTitleEn: titleEn || null,
+                ctaTitleFi: titleFi || null,
+                ctaDescVi: descVi || null,
+                ctaDescEn: descEn || null,
+                ctaDescFi: descFi || null
             }, { merge: true });
             return { success: true, message: "Homepage CTA section updated successfully. Reload to see." };
         } catch (e) {
@@ -3899,19 +3879,19 @@ Rules:
                         if (finalImageUrl && window.__uploadedImages && window.__uploadedImages[finalImageUrl]) {
                             finalImageUrl = window.__uploadedImages[finalImageUrl];
                         }
-                        result = await updateHomepageHero(finalImageUrl, args.titleVi, args.descVi);
+                        result = await updateHomepageHero(finalImageUrl, args.titleVi, args.titleEn, args.titleFi, args.descVi, args.descEn, args.descFi);
                     } else if (tool === 'updateHomepageSignatures') {
                         result = await updateHomepageSignatures(args.dishIdArray);
                     } else if (tool === 'updateHomepageSignatureText') {
-                        result = await updateHomepageSignatureText(args.titleVi, args.descVi);
+                        result = await updateHomepageSignatureText(args.titleVi, args.titleEn, args.titleFi, args.descVi, args.descEn, args.descFi);
                     } else if (tool === 'updateHomepageStory') {
                         let finalImageUrl = args.imageUrl;
                         if (finalImageUrl && window.__uploadedImages && window.__uploadedImages[finalImageUrl]) {
                             finalImageUrl = window.__uploadedImages[finalImageUrl];
                         }
-                        result = await updateHomepageStory(finalImageUrl, args.labelVi, args.titleVi, args.p1Vi, args.p2Vi);
+                        result = await updateHomepageStory(finalImageUrl, args.labelVi, args.labelEn, args.labelFi, args.titleVi, args.titleEn, args.titleFi, args.p1Vi, args.p1En, args.p1Fi, args.p2Vi, args.p2En, args.p2Fi);
                     } else if (tool === 'updateHomepageCTA') {
-                        result = await updateHomepageCTA(args.titleVi, args.descVi);
+                        result = await updateHomepageCTA(args.titleVi, args.titleEn, args.titleFi, args.descVi, args.descEn, args.descFi);
                     } else {
                         result = { error: `Tool "${tool}" không tồn tại. Các tools hợp lệ: getOrdersSoldToday, listAllFoodItems, setOptionChoicePrice, updateMenuPrice, createMenuItem, addMenuOptionGroup, removeMenuOptionGroup, addChoiceToOptionGroup, removeChoiceFromOptionGroup, updateMenuOptionGroup, updateChoiceInOptionGroup, updateMenuName, updateMenuDescription, updateMenuCategory, updateMenuAvailability, uploadMenuImage, removeMenuImage, updateMenuPreparationTime, updateMenuNutritionInfo, addMenuTag, removeMenuTag, reorderMenuItems, duplicateMenuItem, deleteMenuItem, updateMenuCustomFields, listAllUsers, changeUserRole, deleteUserAccount, createUserAccount, sendPasswordReset, sendSpinsToUser, sendGlobalAnnouncement, createCustomVoucher, updateOrderStatus, deleteOrder, getOrdersByStatus, changeCurrentAdminPassword, updateCurrentAdminEmail, updateCurrentAdminProfile, adminListAuthUsers, adminDeleteAuthUser, adminDisableUser, adminEnableUser, adminChangeUserPassword, adminChangeUserEmail, adminVerifyUserEmail, adminSetCustomClaims, adminGetUserInfo, adminRevokeUserTokens, adminUpdateDisplayName, adminGenerateCustomToken, webSearch, browseWebUrl, updateHomepageHero, updateHomepageSignatures, updateHomepageSignatureText, updateHomepageStory, updateHomepageCTA.` };
                     }
