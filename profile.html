@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/client.css">
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>PHO VIET KHANG | Profile</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "primary-container": "#3b82f6",
+            "on-surface": "#f3f4f6",
+            "secondary": "#9ca3af",
+            "surface": "#121824",
+            "outline-variant": "rgba(255, 255, 255, 0.1)",
+            "surface-container-low": "#18202d",
+          },
+          "fontFamily": {
+            "body-sm": ["Inter"], "display-lg-mobile": ["EB Garamond"], "title-lg": ["Inter"],
+            "label-caps": ["Inter"], "display-lg": ["EB Garamond"], "headline-sm": ["EB Garamond"],
+            "body-lg": ["Inter"], "headline-md": ["EB Garamond"], "body-md": ["Inter"]
+          }
+        }
+      }
+    }
+    </script>
+    <style>
+        .profile-avatar {
+            width: 96px; height: 96px; border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 40px; font-weight: 700; font-family: 'Inter', sans-serif;
+            box-shadow: 0 4px 20px rgba(59,130,246,0.4);
+        }
+        .profile-field { transition: all 0.2s ease; }
+        .profile-field.readonly { background: rgba(255,255,255,0.03); }
+        .save-btn { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+        .save-btn:hover { box-shadow: 0 4px 16px rgba(59,130,246,0.4); }
+    </style>
+</head>
+<body class="text-on-surface antialiased flex flex-col min-h-screen bg-pattern-dark">
+    <!-- TopNavBar Component -->
+    <nav class="fixed top-0 w-full z-50 bg-surface/95 backdrop-blur-md border-b border-outline-variant/30">
+        <div class="flex justify-between items-center max-w-7xl mx-auto px-4 md:px-16 h-20">
+            <a class="font-headline-sm text-2xl font-bold text-black tracking-tighter flex items-center gap-2" href="index.html">
+                <span class="material-symbols-outlined text-3xl text-black">ramen_dining</span>
+                PHO VIET KHANG
+            </a>
+            <div class="hidden md:flex items-center space-x-8 font-body-md text-base font-semibold tracking-wide">
+                <a class="text-secondary hover:text-white transition-colors" href="index.html" data-i18n="nav-home">Home</a>
+                <a class="text-secondary hover:text-white transition-colors" href="menu.html" data-i18n="nav-menu">Menu</a>
+                <a class="text-secondary hover:text-white transition-colors" href="locations.html" data-i18n="nav-locations">Locations</a>
+                <a class="text-secondary hover:text-white transition-colors" href="contact.html" data-i18n="nav-contact">Contact</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <!-- Cart Icon -->
+                <a href="cart.html" class="nav-cart-btn relative" title="View Cart">
+                    <span class="material-symbols-outlined text-[20px]">shopping_cart</span>
+                    <span id="cart-count" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold rounded-full h-4.5 w-4.5 flex items-center justify-center">0</span>
+                </a>
+                <!-- User Icon -->
+                <a href="login.html" class="text-white hover:text-primary-container">
+                    <span class="material-symbols-outlined">account_circle</span>
+                </a>
+                <button class="md:hidden text-white p-2">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow pt-32 pb-20">
+        <div class="max-w-3xl mx-auto px-4 md:px-16">
+            <!-- Profile Header Card -->
+            <div class="bg-surface/90 backdrop-blur-sm rounded-2xl border border-outline-variant p-8 shadow-lg mb-6">
+                <div class="flex flex-col items-center text-center mb-6">
+                    <div class="profile-avatar mb-4" id="profile-avatar-display">U</div>
+                    <h1 class="font-headline-md text-3xl text-white" id="profile-display-name">Loading...</h1>
+                    <p class="text-secondary text-sm mt-1" id="profile-display-email"></p>
+                </div>
+                <div class="flex justify-center gap-3">
+                    <a href="order-history.html" class="inline-flex items-center gap-2 bg-surface-container-low border border-outline-variant text-white font-semibold py-2.5 px-5 rounded-xl hover:bg-white/5 transition-all text-sm">
+                        <span class="material-symbols-outlined text-[20px]">receipt_long</span>
+                        Order History
+                    </a>
+                    <a href="inbox.html" class="inline-flex items-center gap-2 bg-surface-container-low border border-outline-variant text-white font-semibold py-2.5 px-5 rounded-xl hover:bg-white/5 transition-all text-sm">
+                        <span class="material-symbols-outlined text-[20px]">inbox</span>
+                        Inbox
+                    </a>
+                </div>
+            </div>
+
+            <!-- Profile Form Card -->
+            <div class="bg-surface/90 backdrop-blur-sm rounded-2xl border border-outline-variant p-8 shadow-lg">
+                <div class="flex items-center justify-between mb-6 border-b border-outline-variant pb-4">
+                    <h2 class="font-headline-md text-2xl text-white">Personal Information</h2>
+                    <button id="btn-edit-profile" onclick="toggleEdit()" class="inline-flex items-center gap-1.5 text-primary-container hover:text-white font-semibold text-sm transition-colors">
+                        <span class="material-symbols-outlined text-[18px]">edit</span>
+                        Edit
+                    </button>
+                </div>
+
+                <form id="profile-form" class="space-y-5" onsubmit="return false;">
+                    <!-- Name -->
+                    <div>
+                        <label class="block text-xs text-secondary mb-1.5 font-semibold uppercase tracking-wider">Full Name</label>
+                        <input type="text" id="prof-name" disabled readonly
+                            class="profile-field readonly w-full bg-surface border border-outline-variant rounded-xl text-white px-4 py-3 focus:border-primary-container focus:ring-1 focus:ring-primary-container outline-none transition-all disabled:opacity-60">
+                    </div>
+
+                    <!-- Email (readonly) -->
+                    <div>
+                        <label class="block text-xs text-secondary mb-1.5 font-semibold uppercase tracking-wider">Email</label>
+                        <input type="email" id="prof-email" disabled readonly
+                            class="profile-field readonly w-full bg-surface border border-outline-variant rounded-xl text-secondary px-4 py-3 outline-none cursor-not-allowed">
+                    </div>
+
+                    <!-- Phone -->
+                    <div>
+                        <label class="block text-xs text-secondary mb-1.5 font-semibold uppercase tracking-wider">Phone Number</label>
+                        <input type="tel" id="prof-phone" disabled readonly placeholder="Enter your phone number"
+                            class="profile-field readonly w-full bg-surface border border-outline-variant rounded-xl text-white px-4 py-3 focus:border-primary-container focus:ring-1 focus:ring-primary-container outline-none transition-all disabled:opacity-60">
+                    </div>
+
+                    <!-- Address -->
+                    <div>
+                        <label class="block text-xs text-secondary mb-1.5 font-semibold uppercase tracking-wider">Address</label>
+                        <input type="text" id="prof-address" disabled readonly placeholder="Enter your delivery address"
+                            class="profile-field readonly w-full bg-surface border border-outline-variant rounded-xl text-white px-4 py-3 focus:border-primary-container focus:ring-1 focus:ring-primary-container outline-none transition-all disabled:opacity-60">
+                    </div>
+
+                    <!-- Save Button (hidden by default) -->
+                    <div id="save-section" class="hidden pt-2">
+                        <div class="flex gap-3">
+                            <button type="button" onclick="saveProfile()" id="btn-save-profile"
+                                class="save-btn flex-1 text-white font-semibold py-3 rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2">
+                                <span class="material-symbols-outlined text-[20px]">save</span>
+                                Save Changes
+                            </button>
+                            <button type="button" onclick="cancelEdit()"
+                                class="px-6 py-3 border border-outline-variant text-secondary rounded-xl hover:bg-white/5 transition-all font-semibold">
+                                Cancel
+                            </button>
+                        </div>
+                        <div id="save-status" class="text-center text-sm mt-2 hidden"></div>
+                    </div>
+                </form>
+
+                <!-- Danger Zone -->
+                <div class="mt-8 pt-6 border-t border-outline-variant/50">
+                    <button onclick="window.logoutUser()"
+                        class="w-full bg-red-900/30 text-red-400 border border-red-500/30 hover:bg-red-500 hover:text-white transition-all font-semibold py-3 px-8 rounded-xl flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-[20px]">logout</span>
+                        Log Out
+                    </button>
+                </div>
+            </div>
+
+            <!-- Lucky Wheel Card -->
+            <div class="bg-surface/90 backdrop-blur-sm rounded-2xl border border-outline-variant p-8 shadow-lg mt-6 text-center space-y-6">
+                <h2 class="font-headline-md text-2xl text-white flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-[28px] text-amber-400">toys_fan</span>
+                    VÒNG QUAY MAY MẮN
+                </h2>
+                <p class="text-secondary text-sm">
+                    Quay thưởng để nhận mã giảm giá cực đỉnh (5%, 10%, 15%, 20%). Nhận ngay 1 lượt quay miễn phí khi đăng ký!
+                </p>
+
+                <!-- Spin Stats -->
+                <div class="bg-[#18202d] py-3.5 px-6 rounded-xl border border-outline-variant max-w-xs mx-auto flex justify-between items-center">
+                    <div class="text-sm text-secondary font-semibold uppercase tracking-wider">Lượt quay còn lại</div>
+                    <div class="text-2xl font-black text-amber-400" id="total-spins-count">0</div>
+                </div>
+
+                <!-- The Wheel Visual -->
+                <div class="relative w-72 h-72 mx-auto flex items-center justify-center">
+                    <!-- Pointer pointing down at the top center of the wheel -->
+                    <div id="wheel-pointer" class="absolute -top-3.5 z-20 w-8 h-10 flex flex-col items-center" style="transform: rotate(0deg); transform-origin: top center; will-change: transform;">
+                        <div class="w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[20px] border-t-red-500 filter drop-shadow-md"></div>
+                        <div class="w-1 h-2 bg-red-600 rounded-b"></div>
+                    </div>
+                    
+                    <!-- Wheel Outer Frame -->
+                    <div class="absolute inset-0 rounded-full border-4 border-amber-400 shadow-[0_0_25px_rgba(245,158,11,0.25)] pointer-events-none z-10"></div>
+                    
+                    <!-- SVG Wheel Container -->
+                    <div id="lucky-wheel-canvas-container" class="w-full h-full rounded-full overflow-hidden bg-[#0e1420]" style="transform: rotate(0deg); will-change: transform;">
+                        <!-- SVGs dynamically drawn in JS -->
+                    </div>
+                    
+                    <!-- Central Button -->
+                    <div class="absolute w-12 h-12 rounded-full bg-gradient-to-tr from-amber-600 to-amber-300 border-2 border-white shadow-xl flex items-center justify-center z-15 cursor-pointer active:scale-95 hover:brightness-110 transition-all" onclick="triggerSpin()">
+                        <span class="material-symbols-outlined text-white text-[24px]">play_arrow</span>
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <button id="btn-spin-now" onclick="triggerSpin()" class="w-full max-w-xs bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-amber-500/20 active:scale-95 transition-all text-sm tracking-wide uppercase">
+                        Quay Ngay
+                    </button>
+                </div>
+            </div>
+
+            <!-- Danger Zone -->
+            <div class="bg-surface/90 backdrop-blur-sm rounded-2xl border border-outline-variant p-8 shadow-lg mt-6">
+                <button onclick="window.logoutUser()"
+                    class="w-full bg-red-900/30 text-red-400 border border-red-500/30 hover:bg-red-500 hover:text-white transition-all font-semibold py-3 px-8 rounded-xl flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-[20px]">logout</span>
+                    Log Out
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Language Switcher Script -->
+    <script src="js/client.js"></script>
+    <script src="js/cart.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    <script type="module">
+        import { auth, db } from "./js/firebase-config.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { doc, getDoc, updateDoc, setDoc, addDoc, collection, query, where, getDocs, limit, orderBy } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        let currentUser = null;
+        let originalData = {};
+        let isSpinning = false;
+        let currentRotation = 0;
+        let selectedSpinType = 'deu';
+        let userSpins = { deu: 0, xin: 0, vip: 0 };
+
+        const segments = [
+            { text: "20%", value: 20, color: "#eab308" }, // Gold
+            { text: "5%",  value: 5,  color: "#3b82f6" }, // Blue
+            { text: "15%", value: 15, color: "#6b7280" }, // Silver
+            { text: "10%", value: 10, color: "#10b981" }, // Green
+            { text: "20%", value: 20, color: "#eab308" },
+            { text: "5%",  value: 5,  color: "#3b82f6" },
+            { text: "15%", value: 15, color: "#6b7280" },
+            { text: "10%", value: 10, color: "#10b981" },
+            { text: "20%", value: 20, color: "#eab308" },
+            { text: "5%",  value: 5,  color: "#3b82f6" },
+            { text: "15%", value: 15, color: "#6b7280" },
+            { text: "10%", value: 10, color: "#10b981" }
+        ];
+
+        function renderWheelSvg() {
+            const container = document.getElementById('lucky-wheel-canvas-container');
+            if (!container) return;
+            
+            let svgHtml = `<svg viewBox="0 0 200 200" class="w-full h-full">`;
+            
+            segments.forEach((seg, i) => {
+                const angle1 = i * 30;
+                const angle2 = (i + 1) * 30;
+                const r = 95;
+                const x1 = 100 + r * Math.cos(angle1 * Math.PI / 180);
+                const y1 = 100 + r * Math.sin(angle1 * Math.PI / 180);
+                const x2 = 100 + r * Math.cos(angle2 * Math.PI / 180);
+                const y2 = 100 + r * Math.sin(angle2 * Math.PI / 180);
+                
+                svgHtml += `<path d="M 100 100 L ${x1} ${y1} A ${r} ${r} 0 0 1 ${x2} ${y2} Z" fill="${seg.color}" stroke="rgba(0,0,0,0.15)" stroke-width="1"></path>`;
+                svgHtml += `<text x="100" y="32" transform="rotate(${i * 30 + 105}, 100, 100)" text-anchor="middle" fill="#ffffff" font-weight="bold" font-size="9" font-family="Inter, sans-serif">${seg.text}</text>`;
+            });
+            
+            svgHtml += `<circle cx="100" cy="100" r="14" fill="#0f172a" stroke="#fff" stroke-width="2"></circle>`;
+            svgHtml += `</svg>`;
+            container.innerHTML = svgHtml;
+        }
+
+        function updateSpinsUI() {
+            const deu = userSpins.deu || 0;
+            const xin = userSpins.xin || 0;
+            const vip = userSpins.vip || 0;
+            const total = deu + xin + vip;
+            document.getElementById('total-spins-count').textContent = total;
+        }
+
+        async function triggerSpin() {
+            if (isSpinning || !currentUser) return;
+            
+            const deuCount = userSpins.deu || 0;
+            const xinCount = userSpins.xin || 0;
+            const vipCount = userSpins.vip || 0;
+            const totalCount = deuCount + xinCount + vipCount;
+            
+            if (totalCount <= 0) {
+                alert("Bạn không còn lượt quay!");
+                return;
+            }
+            
+            // Behind the scenes selection
+            let chosenType = 'deu';
+            if (vipCount > 0) chosenType = 'vip';
+            else if (xinCount > 0) chosenType = 'xin';
+            else if (deuCount > 0) chosenType = 'deu';
+            
+            isSpinning = true;
+            userSpins[chosenType]--;
+            updateSpinsUI();
+            
+            try {
+                await updateDoc(doc(db, "users", currentUser.uid), {
+                    spins: userSpins
+                });
+            } catch (err) {
+                console.error("Deduct spin error:", err);
+                alert("Lỗi kết nối máy chủ. Vui lòng thử lại.");
+                userSpins[chosenType]++;
+                updateSpinsUI();
+                isSpinning = false;
+                return;
+            }
+            
+            let outcomePercent = 5;
+            const rand = Math.random();
+            if (chosenType === 'deu') {
+                outcomePercent = (rand < 0.5) ? 5 : 10;
+            } else if (chosenType === 'xin') {
+                if (rand < 0.2) outcomePercent = 5;
+                else if (rand < 0.8) outcomePercent = 10;
+                else outcomePercent = 15;
+            } else if (chosenType === 'vip') {
+                outcomePercent = 20;
+            }
+            
+            const matchingIndices = [];
+            segments.forEach((seg, index) => {
+                if (seg.value === outcomePercent) {
+                    matchingIndices.push(index);
+                }
+            });
+            const targetSegmentIndex = matchingIndices[Math.floor(Math.random() * matchingIndices.length)];
+            
+            // Pointer points down at top center (0 deg).
+            // Spin counter-clockwise (increasing negative values).
+            // Land S -> targetRotationOffset = -(S * 30 + 15)
+            let useInertiaSlip = (outcomePercent === 5 || outcomePercent === 10);
+            
+            const startAngle = currentRotation;
+            const fullSpins = 6;
+            
+            const baseAngle = 270 - (targetSegmentIndex * 30 + 15);
+            const currentSpins = Math.ceil(currentRotation / 360);
+            const finalTargetAngle = baseAngle + (currentSpins - fullSpins - 1) * 360;
+            
+            let almostStopAngle = finalTargetAngle;
+            if (useInertiaSlip) {
+                const prevIndex = (targetSegmentIndex - 1 + 12) % 12;
+                almostStopAngle = finalTargetAngle + 30;
+            }
+            
+            const duration = 6500; 
+            const startTime = performance.now();
+            const wheelContainer = document.getElementById('lucky-wheel-canvas-container');
+            
+            function hermite(t, p0, p1, m0, m1) {
+                const t2 = t * t;
+                const t3 = t2 * t;
+                return (2 * t3 - 3 * t2 + 1) * p0 + 
+                       (t3 - 2 * t2 + t) * m0 + 
+                       (-2 * t3 + 3 * t2) * p1 + 
+                       (t3 - t2) * m1;
+            }
+
+            let pointerDeflection = 0;
+            let lastWheelAngle = startAngle;
+            const pointerEl = document.getElementById('wheel-pointer');
+
+            function animate(now) {
+                const elapsed = now - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                let angle;
+                if (useInertiaSlip) {
+                    const pegAngle = finalTargetAngle + 15; // Exact boundary before target segment
+                    
+                    if (progress < 0.90) {
+                        // Phase 1: Natural deceleration. Looks like it will stop at the bait.
+                        // Runs out of momentum exactly as it touches the peg.
+                        const t = progress / 0.90;
+                        const m0 = -6000 * 0.90;
+                        const m1 = -20 * 0.90;  // Tiny non-zero speed at the peg (almost stopped)
+                        angle = hermite(t, startAngle, pegAngle, m0, m1);
+                    } else if (progress < 0.96) {
+                        // Phase 2: The peg pushes it. It slips down into the target segment.
+                        const t = (progress - 0.90) / 0.06;
+                        const m0 = -20 * 0.06;   // Match speed so it never stops completely
+                        const m1 = -600 * 0.06;  // Accelerate falling into the slot
+                        angle = hermite(t, pegAngle, finalTargetAngle, m0, m1);
+                    } else {
+                        // Phase 3: Wobble and vibrate/bounce to settle
+                        const t = (progress - 0.96) / 0.04;
+                        const wobble = 3 * Math.sin(t * Math.PI * 3.5) * (1 - t);
+                        angle = finalTargetAngle + wobble;
+                    }
+                } else {
+                    // Normal spin: Decelerate and settle with a slight premium bounce
+                    if (progress < 0.95) {
+                        const t = progress / 0.95;
+                        const ease = 1 - Math.pow(1 - t, 4);
+                        angle = startAngle + (finalTargetAngle - startAngle) * ease;
+                    } else {
+                        const t = (progress - 0.95) / 0.05;
+                        const wobble = 2.5 * Math.sin(t * Math.PI * 3) * (1 - t);
+                        angle = finalTargetAngle + wobble;
+                    }
+                }
+                
+                // Pointer snapping physics
+                const absAngle = Math.abs(angle);
+                const prevAbsAngle = Math.abs(lastWheelAngle);
+                const crossedPeg = Math.floor(absAngle / 30) !== Math.floor(prevAbsAngle / 30);
+                
+                if (crossedPeg) {
+                    pointerDeflection = -15; // Snap back angle in deg
+                } else {
+                    pointerDeflection += (0 - pointerDeflection) * 0.2; // Damped return
+                }
+                lastWheelAngle = angle;
+                
+                if (pointerEl) {
+                    pointerEl.style.transform = `rotate(${pointerDeflection}deg)`;
+                }
+                
+                currentRotation = angle;
+                if (wheelContainer) {
+                    wheelContainer.style.transform = `rotate(${angle}deg)`;
+                }
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    handleSpinCompletion(outcomePercent);
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+        window.triggerSpin = triggerSpin;
+
+        async function handleSpinCompletion(percent) {
+            isSpinning = false;
+            
+            const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
+            const code = `WHEEL${percent}-${rand}`;
+            const expiry = new Date();
+            expiry.setMonth(expiry.getMonth() + 1);
+            
+            try {
+                await setDoc(doc(db, "vouchers", code), {
+                    code: code,
+                    discountPercent: percent,
+                    email: currentUser.email,
+                    used: false,
+                    allowedOrderTypes: ['takeaway', 'delivery'],
+                    expiryDate: expiry,
+                    createdAt: new Date()
+                });
+                
+                const welcomeMsgLang = {
+                    vi: {
+                        title: `Chúc mừng bạn đã trúng mã giảm giá ${percent}% từ Vòng quay may mắn! 🎁`,
+                        text: `Chúc mừng bạn! Bạn đã may mắn trúng giải giảm giá ${percent}% (Hạn sử dụng: 1 tháng, áp dụng cho Mang về hoặc Giao hàng). Hãy sao chép mã voucher bên dưới và sử dụng khi đặt hàng nhé.`,
+                    },
+                    en: {
+                        title: `Congratulations! You won a ${percent}% OFF voucher! 🎁`,
+                        text: `Well done! You won a ${percent}% discount voucher (Expiry: 1 month, valid for Takeaway or Delivery). Copy the voucher code below and apply it on your next checkout.`,
+                    },
+                    fi: {
+                        title: `Onnittelut! Voitit ${percent}% alennuskupongin! 🎁`,
+                        text: `Hienoa! Voitit ${percent}% alennuskupongin (Voimassaolo: 1 kuukausi, koskee Mukaan tai Kotiinkuljetus). Kopioi alennuskoodi alta ja käytä sitä seuraavassa tilauksessasi.`,
+                    }
+                };
+                const currentLang = localStorage.getItem('selectedLanguage') || 'vi';
+                const langMsg = welcomeMsgLang[currentLang] || welcomeMsgLang['vi'];
+                
+                await addDoc(collection(db, "messages"), {
+                    title: langMsg.title,
+                    text: langMsg.text,
+                    imageUrl: "https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&q=80&w=600",
+                    voucherCode: code,
+                    recipientId: currentUser.uid,
+                    createdAt: new Date(),
+                    read: false
+                });
+                
+                showRewardModal(percent, code);
+                
+            } catch (err) {
+                console.error("Voucher creation error:", err);
+                alert(`Chúc mừng bạn đã trúng mã giảm giá ${percent}%. Tuy nhiên hệ thống gặp lỗi khi tạo mã voucher. Vui lòng chụp màn hình thông báo này và liên hệ hỗ trợ!`);
+            }
+        }
+
+        function showRewardModal(percent, code) {
+            const rewardHtml = `
+                <div id="lucky-reward-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+                    <div class="bg-[#121824] p-8 rounded-2xl border border-white/10 max-w-md w-full text-center space-y-6 shadow-2xl transform scale-95 transition-all duration-300 opacity-0" id="reward-modal-content">
+                        <div class="mx-auto w-20 h-20 bg-amber-500/10 border border-amber-500/30 rounded-full flex items-center justify-center text-amber-400">
+                            <span class="material-symbols-outlined text-5xl animate-bounce">emoji_events</span>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <h3 class="text-2xl font-bold text-white font-['EB_Garamond']">CHÚC MỪNG CHIẾN THẮNG!</h3>
+                            <p class="text-secondary text-sm">
+                                Bạn đã trúng một mã giảm giá <strong>giảm ${percent}%</strong>! Mã giảm giá đã được thêm vào hộp thư của bạn.
+                            </p>
+                        </div>
+                        
+                        <div class="bg-white/5 border border-amber-500/30 text-amber-400 font-mono text-2xl font-bold py-3 px-4 rounded-lg select-all my-4 tracking-wider">
+                            ${code}
+                        </div>
+                        
+                        <button onclick="closeRewardModal()" class="w-full bg-amber-500 hover:bg-amber-400 text-white font-semibold py-3 rounded-xl transition-all font-semibold">
+                            Tuyệt vời!
+                        </button>
+                    </div>
+                </div>
+            `;
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = rewardHtml;
+            document.body.appendChild(wrapper.firstElementChild);
+            
+            setTimeout(() => {
+                const content = document.getElementById('reward-modal-content');
+                if (content) {
+                    content.classList.remove('scale-95', 'opacity-0');
+                    content.classList.add('scale-100', 'opacity-100');
+                }
+            }, 50);
+        }
+
+        window.closeRewardModal = function() {
+            const modal = document.getElementById('lucky-reward-modal');
+            if (modal) {
+                modal.remove();
+            }
+        };
+
+        // Load profile data from Firestore
+        async function loadProfile(user) {
+            currentUser = user;
+            if (!user) return;
+
+            document.getElementById('prof-email').value = user.email || '';
+            document.getElementById('profile-display-email').textContent = user.email || '';
+
+            const initial = (user.displayName || user.email || 'U').charAt(0).toUpperCase();
+            document.getElementById('profile-avatar-display').textContent = initial;
+
+            try {
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if (userDoc.exists()) {
+                    const data = userDoc.data();
+                    const name = data.name || user.displayName || '';
+                    const phone = data.phone || '';
+                    const address = data.address || '';
+
+                    document.getElementById('prof-name').value = name;
+                    document.getElementById('prof-phone').value = phone;
+                    document.getElementById('prof-address').value = address;
+                    document.getElementById('profile-display-name').textContent = name || 'Member';
+
+                    originalData = { name, phone, address };
+                    
+                    // Spins data loading
+                    userSpins = data.spins || { deu: 0, xin: 0, vip: 0 };
+                    updateSpinsUI();
+
+                    if (!address) {
+                        try {
+                            const ordersQuery = query(
+                                collection(db, "orders"),
+                                where("userId", "==", user.uid),
+                                orderBy("createdAt", "desc"),
+                                limit(1)
+                            );
+                            const ordersSnap = await getDocs(ordersQuery);
+                            if (!ordersSnap.empty) {
+                                const lastOrder = ordersSnap.docs[0].data();
+                                if (lastOrder.address && !document.getElementById('prof-address').value) {
+                                    document.getElementById('prof-address').value = lastOrder.address;
+                                    originalData.address = lastOrder.address;
+                                }
+                                if (lastOrder.customerPhone && !document.getElementById('prof-phone').value) {
+                                    document.getElementById('prof-phone').value = lastOrder.customerPhone;
+                                    originalData.phone = lastOrder.customerPhone;
+                                }
+                            }
+                        } catch (e) {
+                            console.log("Could not fetch order history for address:", e);
+                        }
+                    }
+                } else {
+                    const name = user.displayName || '';
+                    document.getElementById('prof-name').value = name;
+                    document.getElementById('profile-display-name').textContent = name || 'Member';
+                    originalData = { name: name, phone: '', address: '' };
+                    userSpins = { deu: 0, xin: 0, vip: 0 };
+                    updateSpinsUI();
+                }
+            } catch (error) {
+                console.error("Error loading profile:", error);
+            }
+        }
+
+        window.toggleEdit = function() {
+            const fields = ['prof-name', 'prof-phone', 'prof-address'];
+            fields.forEach(id => {
+                const el = document.getElementById(id);
+                el.disabled = false;
+                el.removeAttribute('readonly');
+                el.classList.remove('readonly');
+            });
+            document.getElementById('save-section').classList.remove('hidden');
+            document.getElementById('btn-edit-profile').classList.add('hidden');
+        };
+
+        window.cancelEdit = function() {
+            const fields = ['prof-name', 'prof-phone', 'prof-address'];
+            fields.forEach(id => {
+                const el = document.getElementById(id);
+                el.disabled = true;
+                el.setAttribute('readonly', true);
+                el.classList.add('readonly');
+            });
+            document.getElementById('prof-name').value = originalData.name || '';
+            document.getElementById('prof-phone').value = originalData.phone || '';
+            document.getElementById('prof-address').value = originalData.address || '';
+            document.getElementById('save-section').classList.add('hidden');
+            document.getElementById('btn-edit-profile').classList.remove('hidden');
+            document.getElementById('save-status').classList.add('hidden');
+        };
+
+        window.saveProfile = async function() {
+            if (!currentUser) return;
+
+            const saveBtn = document.getElementById('btn-save-profile');
+            const statusEl = document.getElementById('save-status');
+            const name = document.getElementById('prof-name').value.trim();
+            const phone = document.getElementById('prof-phone').value.trim();
+            const address = document.getElementById('prof-address').value.trim();
+
+            if (!name) {
+                statusEl.textContent = 'Name is required.';
+                statusEl.className = 'text-center text-sm mt-2 text-red-400';
+                statusEl.classList.remove('hidden');
+                return;
+            }
+
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[20px]">sync</span> Saving...';
+
+            try {
+                await updateDoc(doc(db, "users", currentUser.uid), {
+                    name: name,
+                    phone: phone,
+                    address: address
+                });
+
+                originalData = { name, phone, address };
+                document.getElementById('profile-display-name').textContent = name;
+
+                statusEl.textContent = 'Profile updated successfully!';
+                statusEl.className = 'text-center text-sm mt-2 text-green-400';
+                statusEl.classList.remove('hidden');
+
+                setTimeout(() => {
+                    window.cancelEdit();
+                }, 1200);
+            } catch (error) {
+                console.error("Error saving profile:", error);
+                statusEl.textContent = 'Failed to save. Please try again.';
+                statusEl.className = 'text-center text-sm mt-2 text-red-400';
+                statusEl.classList.remove('hidden');
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<span class="material-symbols-outlined text-[20px]">save</span> Save Changes';
+            }
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                loadProfile(user);
+            }
+        });
+
+        // Initialize SVG elements drawing
+        renderWheelSvg();
+    </script>
+</body>
+</html>

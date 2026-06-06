@@ -1,0 +1,42 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/client.css">
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Host Dashboard | Reservations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: { extend: { colors: { surface: "#121824", "surface-highlight": "#1e293b", primary: "#3b82f6", secondary: "#9ca3af", "on-surface": "#f3f4f6" } } }
+    }
+    </script>
+</head>
+<body class="bg-[#0b0f19] text-on-surface font-['Inter'] flex flex-col h-screen overflow-hidden">
+    <!-- Header -->
+    <header class="h-20 bg-surface border-b border-gray-800 flex items-center justify-between px-8">
+        <h1 class="text-xl font-bold text-primary tracking-wider">HOST DASHBOARD</h1>
+        <div class="flex items-center space-x-4">
+            <button onclick="window.logoutUser()" class="flex items-center space-x-2 text-red-400 hover:text-red-300">
+                <span class="material-symbols-outlined">logout</span><span>Logout</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-8 overflow-y-auto">
+        <div class="bg-surface rounded-xl border border-gray-800 p-6 shadow-lg">
+            <h2 class="text-2xl font-semibold text-white mb-6">Today's Reservations</h2>
+            <div id="reservation-list" class="space-y-4">
+                <p class="text-secondary">Loading reservations...</p>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="../js/auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/client.css">
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>PHO VIET KHANG | About</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "primary-container": "#3b82f6",
+            "on-surface": "#f3f4f6",
+            "secondary": "#9ca3af",
+            "surface": "#121824",
+            "outline-variant": "rgba(255, 255, 255, 0.1)",
+          },
+          "fontFamily": {
+            "body-sm": ["Inter"], "display-lg-mobile": ["EB Garamond"], "title-lg": ["Inter"],
+            "label-caps": ["Inter"], "display-lg": ["EB Garamond"], "headline-sm": ["EB Garamond"],
+            "body-lg": ["Inter"], "headline-md": ["EB Garamond"], "body-md": ["Inter"]
+          }
+        }
+      }
+    }
+    </script>
+</head>
+<body class="text-on-surface antialiased flex flex-col min-h-screen bg-pattern-dark">
+    <!-- TopNavBar Component -->
+    <nav class="fixed top-0 w-full z-50 bg-surface/95 backdrop-blur-md border-b border-outline-variant/30">
+        <div class="flex justify-between items-center max-w-7xl mx-auto px-4 md:px-16 h-20">
+            <a class="font-headline-sm text-2xl font-bold text-black tracking-tighter flex items-center gap-2" href="index.html">
+                <span class="material-symbols-outlined text-3xl text-black">ramen_dining</span>
+                PHO VIET KHANG
+            </a>
+            <div class="hidden md:flex items-center space-x-8 font-body-md text-base font-semibold tracking-wide">
+                <a class="text-secondary hover:text-white transition-colors" href="index.html" data-i18n="nav-home">Home</a>
+                <a class="text-secondary hover:text-white transition-colors" href="menu.html" data-i18n="nav-menu">Menu</a>
+                <a class="text-secondary hover:text-white transition-colors" href="locations.html" data-i18n="nav-locations">Locations</a>
+                <a class="text-secondary hover:text-white transition-colors" href="contact.html" data-i18n="nav-contact">Contact</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <!-- Cart Icon -->
+                <a href="cart.html" class="nav-cart-btn relative" title="View Cart">
+                    <span class="material-symbols-outlined text-[20px]">shopping_cart</span>
+                    <span id="cart-count" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold rounded-full h-4.5 w-4.5 flex items-center justify-center">0</span>
+                </a>
+                <!-- User Icon -->
+                <a href="login.html" class="text-white hover:text-primary-container">
+                    <span class="material-symbols-outlined">account_circle</span>
+                </a>
+                <button class="md:hidden text-white p-2">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow pt-32 pb-20">
+        <div class="max-w-7xl mx-auto px-4 md:px-16">
+            <div class="bg-surface/90 backdrop-blur-sm rounded-lg border border-outline-variant p-8 shadow-lg">
+                <h1 class="font-headline-md text-4xl text-white mb-6 border-b border-outline-variant pb-4">About</h1>
+                <div class="content-area">
+                    <!-- CONTENT GOES HERE -->
+                    <p class="text-secondary">Under construction...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Language Switcher Script -->
+    <script src="js/client.js"></script>
+<script type="module" src="js/auth.js"></script>
+</body>
+</html>

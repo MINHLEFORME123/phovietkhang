@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/client.css">
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>PHO VIET KHANG | Track Order</title>
+    <!-- Google Fonts & Material Symbols -->
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "primary-container": "#3b82f6",
+            "on-surface": "#f3f4f6",
+            "secondary": "#9ca3af",
+            "surface": "#121824",
+            "outline-variant": "rgba(255, 255, 255, 0.1)",
+          },
+          "fontFamily": {
+            "body-sm": ["Inter"], "display-lg-mobile": ["EB Garamond"], "title-lg": ["Inter"],
+            "label-caps": ["Inter"], "display-lg": ["EB Garamond"], "headline-sm": ["EB Garamond"],
+            "body-lg": ["Inter"], "headline-md": ["EB Garamond"], "body-md": ["Inter"]
+          }
+        }
+      }
+    }
+    </script>
+    <style>
+        @keyframes pageFadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        main { animation: pageFadeIn 0.4s ease-out forwards; }
+    </style>
+</head>
+<body class="text-on-surface antialiased flex flex-col min-h-screen bg-pattern-dark">
+    <!-- TopNavBar Component -->
+    <nav class="fixed top-0 w-full z-50 bg-surface/95 backdrop-blur-md border-b border-outline-variant/30">
+        <div class="flex justify-between items-center max-w-7xl mx-auto px-4 md:px-16 h-20">
+            <a class="font-headline-sm text-2xl font-bold text-black tracking-tighter flex items-center gap-2" href="index.html">
+                <span class="material-symbols-outlined text-3xl text-black">ramen_dining</span>
+                PHO VIET KHANG
+            </a>
+            <div class="hidden md:flex items-center space-x-8 font-body-md text-base font-semibold tracking-wide">
+                <a class="text-secondary hover:text-white transition-colors" href="index.html" data-i18n="nav-home">Home</a>
+                <a class="text-secondary hover:text-white transition-colors" href="menu.html" data-i18n="nav-menu">Menu</a>
+                <a class="text-secondary hover:text-white transition-colors" href="locations.html" data-i18n="nav-locations">Locations</a>
+                <a class="text-secondary hover:text-white transition-colors" href="contact.html" data-i18n="nav-contact">Contact</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <!-- User Icon -->
+                <a href="login.html" class="text-white hover:text-primary-container">
+                    <span class="material-symbols-outlined">account_circle</span>
+                </a>
+                <button class="md:hidden text-white p-2">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow pt-32 pb-20">
+        <div class="max-w-3xl mx-auto px-4">
+            <!-- Tracking Card -->
+            <div id="order-tracking-card" class="bg-surface/90 backdrop-blur-sm rounded-2xl border border-outline-variant p-8 shadow-2xl space-y-8">
+                <!-- Loading State -->
+                <div id="tracking-loading" class="text-center py-12 space-y-4">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+                    <p class="text-secondary text-sm">Đang tải thông tin đơn hàng...</p>
+                </div>
+                
+                <!-- Content injected by JS -->
+                <div id="tracking-content" class="hidden space-y-6"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Language Switcher Script -->
+    <script src="js/client.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/order-tracking.js"></script>
+</body>
+</html>

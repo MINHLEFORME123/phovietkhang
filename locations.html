@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en"><head><style>
+    .bg-pattern-dark {
+        background-image: linear-gradient(rgba(7, 24, 43, 0.85), rgba(7, 24, 43, 0.85)), url('https://lh3.googleusercontent.com/aida/AP1WRLu_foWMwnMlqlxq-jsEwNaqub3k215L_EAy1g9btiAZtZ-vC6ctgnJDoX8wnoedlLjZLvxGBbofAjGnMf_dRJvEe1l5avwp0Eo5waH3l_00K1ufBPSmlJVaGf7Cct4WRPY63LuqnSJ6HUc0hkcppk5dzmsmrPaiapy336v6Yh3lNvvAXDOcQtNm0p5hZVT5IuPV1iLZpy57dRptdN6lHBnOX9SlAwnVO4c48uoRoPg_s27yUgpT632cGXFn') !important;
+        background-repeat: repeat;
+        background-size: 400px;
+        background-attachment: fixed;
+        background-color: #07182b !important;
+    }
+    .footer-pattern {
+        position: relative;
+    }
+    .footer-pattern::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: url('https://lh3.googleusercontent.com/aida/AP1WRLu_foWMwnMlqlxq-jsEwNaqub3k215L_EAy1g9btiAZtZ-vC6ctgnJDoX8wnoedlLjZLvxGBbofAjGnMf_dRJvEe1l5avwp0Eo5waH3l_00K1ufBPSmlJVaGf7Cct4WRPY63LuqnSJ6HUc0hkcppk5dzmsmrPaiapy336v6Yh3lNvvAXDOcQtNm0p5hZVT5IuPV1iLZpy57dRptdN6lHBnOX9SlAwnVO4c48uoRoPg_s27yUgpT632cGXFn');
+        background-repeat: repeat;
+        background-size: 400px;
+        background-attachment: fixed;
+        opacity: 0.25;
+        pointer-events: none;
+        z-index: 0;
+    }
+    
+    /* White Navigation Bar styling overrides */
+    nav.fixed {
+        background-color: rgba(255, 255, 255, 0.95) !important;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+    }
+    nav.fixed a.text-primary {
+        color: #001736 !important;
+    }
+    nav.fixed a.text-primary.border-primary {
+        border-color: #001736 !important;
+    }
+    nav.fixed a.text-secondary {
+        color: #5f5e5e !important;
+    }
+    nav.fixed a.text-secondary:hover {
+        color: #001736 !important;
+    }
+    nav.fixed button.text-primary, nav.fixed button {
+        color: #001736 !important;
+    }
+    
+    /* White Buttons styling overrides */
+    .bg-primary-container, 
+    button[type="submit"],
+    a[href="reservations.html"].hidden,
+    a[href="reservations.html"].md\:inline-flex {
+        background-image: none !important;
+        background-color: #ffffff !important;
+        color: #001736 !important;
+        border: 1px solid rgba(0, 0, 0, 0.15) !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+    }
+    .bg-primary-container:hover, 
+    button[type="submit"]:hover,
+    a[href="reservations.html"].hidden:hover,
+    a[href="reservations.html"].md\:inline-flex:hover {
+        background-color: #f9fafb !important;
+        opacity: 0.95 !important;
+    }
+</style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PHO VIET KHANG | Locations</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+                  "inverse-primary": "#a9c7ff",
+                  "surface-dim": "#111318",
+                  "outline-variant": "rgba(255, 255, 255, 0.1)",
+                  "on-surface": "#f3f4f6",
+                  "outline": "#8d9199",
+                  "secondary-fixed-dim": "#c8c6c5",
+                  "on-error-container": "#ffdad6",
+                  "surface-container-highest": "#1c2434",
+                  "tertiary-fixed-dim": "#b7c8e1",
+                  "background": "#07182b",
+                  "surface-tint": "#a9c7ff",
+                  "on-secondary-fixed": "#1c1b1b",
+                  "on-primary-fixed": "#003062",
+                  "on-tertiary-fixed": "#0b1c30",
+                  "secondary-container": "#1f2937",
+                  "on-secondary-container": "#c8c6c5",
+                  "surface-bright": "#222a3a",
+                  "on-primary-fixed-variant": "#264778",
+                  "error-container": "#8c1d18",
+                  "primary-container": "#3b82f6",
+                  "on-secondary-fixed-variant": "#474746",
+                  "surface": "#121824",
+                  "on-error": "#601410",
+                  "tertiary-container": "#1d2d41",
+                  "inverse-on-surface": "#111318",
+                  "secondary": "#9ca3af",
+                  "tertiary-fixed": "#d3e4fe",
+                  "on-tertiary-container": "#8495ad",
+                  "primary-fixed-dim": "#a9c7ff",
+                  "surface-variant": "#43474e",
+                  "on-primary-container": "#ffffff",
+                  "on-primary": "#003062",
+                  "surface-container-high": "#1b2333",
+                  "surface-container-low": "#18202d",
+                  "on-surface-variant": "#c3c6cf",
+                  "error": "#ffb4ab",
+                  "primary": "#ffffff",
+                  "on-tertiary-fixed-variant": "#38485d",
+                  "primary-fixed": "#d6e3ff",
+                  "on-tertiary": "#ffffff",
+                  "inverse-surface": "#e2e2e9",
+                  "surface-container": "#172030",
+                  "secondary-fixed": "#e5e2e1",
+                  "surface-container-lowest": "#070a10",
+                  "tertiary": "#090d16",
+                  "on-background": "#f3f4f6",
+                  "on-secondary": "#ffffff"
+          },
+          "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          "spacing": {"gutter": "24px", "max-width": "1280px", "margin-mobile": "16px", "margin-desktop": "64px", "unit": "8px"},
+          "fontFamily": {
+                  "body-sm": ["Inter"], "display-lg-mobile": ["EB Garamond"], "title-lg": ["Inter"],
+                  "label-caps": ["Inter"], "display-lg": ["EB Garamond"], "headline-sm": ["EB Garamond"],
+                  "body-lg": ["Inter"], "headline-md": ["EB Garamond"], "body-md": ["Inter"]
+           },
+           "fontSize": {
+                   "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                   "display-lg-mobile": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                   "title-lg": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                   "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "700"}],
+                   "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                   "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                   "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                   "headline-md": ["32px", {"lineHeight": "40px", "fontWeight": "500"}],
+                   "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+           }
+       },
+           },
+         }
+</script>
+<style>
+    body { font-family: 'Inter', sans-serif; opacity: 0; animation: pageFadeIn 0.4s ease-out forwards; }
+    h1, h2, h3, h4, h5, h6 { font-family: 'EB Garamond', serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    @keyframes pageFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    body.page-exit { animation: pageFadeOut 0.3s ease-in forwards; }
+    @keyframes pageFadeOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-8px); } }
+</style>
+</head>
+<body class="text-on-surface antialiased flex flex-col min-h-screen bg-pattern-dark">
+<!-- TopNavBar -->
+<!-- TopNavBar Component -->
+    <nav class="fixed top-0 w-full z-50 bg-surface/95 backdrop-blur-md border-b border-outline-variant/30">
+        <div class="flex justify-between items-center max-w-7xl mx-auto px-4 md:px-16 h-20">
+            <a class="font-headline-sm text-2xl font-bold text-black tracking-wider flex items-center gap-2" href="index.html">
+                <span class="material-symbols-outlined text-3xl text-black">ramen_dining</span>
+                <span class="text-black">PHỞ VIỆT KHANG</span>
+            </a>
+            <div class="hidden md:flex items-center space-x-8 font-body-md text-base font-semibold tracking-wide">
+                <a class="text-secondary hover:text-white transition-colors" href="index.html" data-i18n="nav-home">Home</a>
+                <a class="text-secondary hover:text-white transition-colors" href="menu.html" data-i18n="nav-menu">Menu</a>
+                <a class="text-secondary hover:text-white transition-colors" href="locations.html" data-i18n="nav-locations">Locations</a>
+                <a class="text-secondary hover:text-white transition-colors" href="contact.html" data-i18n="nav-contact">Contact</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="hidden md:flex items-center space-x-2 mr-2">
+                    <img id="lang-vi" src="https://hatscripts.github.io/circle-flags/flags/vn.svg" alt="VN" class="w-8 h-8 cursor-pointer hover:opacity-80 transition-all duration-300 ring-2 ring-transparent" style="border-radius: 50% !important;" title="Tiếng Việt" onclick="changeLanguage('vi')">
+                    <img id="lang-en" src="https://hatscripts.github.io/circle-flags/flags/gb.svg" alt="UK" class="w-8 h-8 cursor-pointer hover:opacity-80 transition-all duration-300 ring-2 ring-transparent" style="border-radius: 50% !important;" title="English" onclick="changeLanguage('en')">
+                    <img id="lang-fi" src="https://hatscripts.github.io/circle-flags/flags/fi.svg" alt="FI" class="w-8 h-8 cursor-pointer hover:opacity-80 transition-all duration-300 ring-2 ring-transparent" style="border-radius: 50% !important;" title="Suomi" onclick="changeLanguage('fi')">
+                </div>
+                <a class="hidden md:inline-flex border-2 border-primary-container text-primary-container font-body-sm text-sm font-semibold px-5 py-2 rounded-xl hover:bg-primary-container hover:text-white transition-all duration-300 shadow-sm" href="register.html" data-i18n="nav-register">
+                    Register
+                </a>
+                <a class="hidden md:inline-flex bg-primary-container text-on-primary-container font-body-sm text-sm font-semibold px-6 py-2 rounded-xl hover:opacity-90 transition-all duration-300 bg-gradient-to-tr from-primary-container to-[#003d82]" href="reservations.html" data-i18n="nav-reservations">
+                    Reservations
+                </a>
+                <!-- Cart Icon -->
+                <a href="cart.html" class="nav-cart-btn relative" title="View Cart">
+                    <span class="material-symbols-outlined text-[24px]">shopping_cart</span>
+                    <span id="cart-count" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </a>
+                <!-- User Icon -->
+                <a href="login.html" class="text-white hover:text-primary-container">
+                    <span class="material-symbols-outlined text-[24px]">account_circle</span>
+                </a>
+                <button class="md:hidden text-white p-2">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+<!-- Main Content -->
+<main class="flex-grow pt-20">
+<!-- Page Hero -->
+<section class="py-20 bg-transparent text-center">
+<div class="max-w-max-width mx-auto px-margin-mobile md:px-margin-desktop">
+<span class="font-label-caps text-label-caps text-primary-container uppercase tracking-widest" data-i18n="loc-label">Find Us</span>
+<h1 class="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-on-surface mt-4 mb-6" data-i18n="loc-title">Our Locations</h1>
+<p class="font-body-lg text-body-lg text-secondary max-w-2xl mx-auto" data-i18n="loc-desc">Visit us at one of our carefully designed spaces, each reflecting our dedication to culinary artistry and warm hospitality.</p>
+</div>
+</section>
+
+<!-- Location Cards -->
+<section class="pb-24 bg-transparent">
+<div class="max-w-max-width mx-auto px-margin-mobile md:px-margin-desktop">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+<!-- Location 1: Pengerkatu -->
+<div class="bg-surface/90 backdrop-blur-sm rounded-DEFAULT border border-outline-variant overflow-hidden group hover:shadow-lg transition-shadow duration-300">
+<div class="h-48 overflow-hidden">
+<iframe src="https://maps.google.com/maps?q=Pho+Viet+Khang+Pengerkatu+29+Helsinki&t=&z=16&ie=UTF8&iwloc=&output=embed" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+</div>
+<div class="p-6 space-y-4">
+<h3 class="font-title-lg text-title-lg text-primary-container" data-i18n="loc1-name">Pengerkatu</h3>
+<div class="space-y-3">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary text-xl mt-0.5">location_on</span>
+<p class="font-body-sm text-body-sm text-secondary" data-i18n="loc1-address">Pengerkatu 29, 00500 Helsinki</p>
+</div>
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary text-xl mt-0.5">schedule</span>
+<div>
+<p class="font-body-sm text-body-sm text-secondary" data-i18n="loc1-hours1">Mon: Closed</p>
+<p class="font-body-sm text-body-sm text-secondary" data-i18n="loc1-hours2">Tue–Fri: 11:00 – 20:00</p>
+<p class="font-body-sm text-body-sm text-secondary" data-i18n="loc1-hours3">Sat–Sun: 12:00 – 20:30</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary text-xl mt-0.5">call</span>
+<p class="font-body-sm text-body-sm text-secondary">+358 44 978 9995</p>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Location 2: Easton (Kauppakartanonkatu) -->
+<div class="bg-surface/90 backdrop-blur-sm rounded-DEFAULT border border-outline-variant overflow-hidden group hover:shadow-lg transition-shadow duration-300">
+<div class="h-48 overflow-hidden">
+<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1984.5!2d25.0855055!3d60.2097936!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x46920f003644bd6f%3A0xaccd09151305f477!2sPho%20Viet%20Khang%202!5e0!3m2!1sen!2sfi!4v1" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+</div>
+<div class="p-6 space-y-4">
+<h3 class="font-title-lg text-title-lg text-primary-container" data-i18n="loc2-name">Easton Helsinki</h3>
+<div class="space-y-3">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary text-xl mt-0.5">location_on</span>
+<p class="font-body-sm text-body-sm text-secondary" data-i18n="loc2-address">Kauppakartanonkatu 3, 00930 Helsinki</p>
+</div>
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary text-xl mt-0.5">schedule</span>
+<div>
+<p class="font-body-sm text-body-sm text-secondary" data-i18n="loc2-hours1">Mon–Fri: 11:00 – 21:00</p>
+<p class="font-body-sm text-body-sm text-secondary" data-i18n="loc2-hours2">Sat–Sun: 12:00 – 21:00</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary text-xl mt-0.5">call</span>
+<p class="font-body-sm text-body-sm text-secondary">+358 44 978 9995</p>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full pt-20 pb-10 bg-tertiary/90 footer-pattern">
+<div class="relative z-10 max-w-max-width mx-auto px-margin-desktop grid grid-cols-1 md:grid-cols-4 gap-gutter">
+<div class="md:col-span-1 mb-10 md:mb-0">
+<a class="font-headline-md text-headline-md text-white flex items-center gap-2 mb-4 drop-shadow-md" href="index.html">
+    <span class="material-symbols-outlined text-3xl">ramen_dining</span>
+    <span>PHO VIET KHANG</span>
+</a>
+<p class="font-body-sm text-body-sm text-tertiary-fixed-dim drop-shadow-sm" data-i18n="footer-desc">The Art of Asian Gastronomy.</p>
+</div>
+<div class="md:col-span-3 flex flex-wrap gap-8 md:justify-end items-start font-body-sm text-body-sm">
+<a class="text-tertiary-fixed-dim hover:text-on-tertiary transition-colors hover:underline decoration-1 underline-offset-4 duration-300 ease-in-out drop-shadow-sm" href="#" data-i18n="footer-privacy">Privacy Policy</a>
+<a class="text-tertiary-fixed-dim hover:text-on-tertiary transition-colors hover:underline decoration-1 underline-offset-4 duration-300 ease-in-out drop-shadow-sm" href="#" data-i18n="footer-terms">Terms of Service</a>
+<a class="text-tertiary-fixed-dim hover:text-on-tertiary transition-colors hover:underline decoration-1 underline-offset-4 duration-300 ease-in-out drop-shadow-sm" href="#" data-i18n="footer-careers">Careers</a>
+<a class="text-tertiary-fixed-dim hover:text-on-tertiary transition-colors hover:underline decoration-1 underline-offset-4 duration-300 ease-in-out drop-shadow-sm" href="#" data-i18n="footer-press">Press Kit</a>
+</div>
+</div>
+<div class="relative z-10 max-w-max-width mx-auto px-margin-desktop mt-16 pt-8 border-t border-outline-variant/20">
+<p class="font-body-sm text-body-sm text-tertiary-fixed-dim text-center md:text-left drop-shadow-sm">© 2026 PHO VIET KHANG. ALL RIGHTS RESERVED.</p>
+</div>
+</footer>
+
+
+
+<!-- Core Scripts -->
+<script src="js/client.js"></script>
+<script type="module" src="js/auth.js"></script>
+<script src="js/cart.js"></script>
+</body></html>

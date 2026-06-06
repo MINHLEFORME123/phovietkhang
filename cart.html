@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/client.css">
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>PHO VIET KHANG | Cart & Checkout</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Tailwind Config -->
+    <script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                "inverse-primary": "#a9c7ff",
+                "surface-dim": "#111318",
+                "on-surface": "#f3f4f6",
+                "background": "#07182b",
+                "surface": "#121824",
+                "primary": "#3b82f6",
+                "secondary": "#9ca3af",
+                "surface-container-low": "#18202d",
+                "outline-variant": "rgba(255, 255, 255, 0.1)",
+                "primary-container": "#3b82f6",
+                "on-primary-container": "#ffffff",
+              },
+              "spacing": {
+                "gutter": "24px",
+                "max-width": "1280px",
+                "margin-mobile": "16px",
+                "margin-desktop": "64px",
+                "unit": "8px"
+              }
+            }
+          }
+        }
+    </script>
+    <style>
+        @keyframes pageFadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        main { animation: pageFadeIn 0.4s ease-out forwards; }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-['Inter'] min-h-screen flex flex-col antialiased">
+
+<!-- Navigation -->
+<nav class="fixed top-0 w-full z-50 bg-surface/95 backdrop-blur-md border-b border-outline-variant/30">
+    <div class="flex justify-between items-center max-w-max-width mx-auto px-margin-mobile md:px-margin-desktop h-20">
+        <a class="font-headline-sm text-lg font-bold text-black tracking-wider flex items-center gap-2" href="index.html">
+            <span class="material-symbols-outlined text-black text-[24px]">ramen_dining</span>
+            PHỞ VIỆT KHANG
+        </a>
+        <div class="hidden md:flex items-center space-x-8 font-body-md text-body-md font-semibold tracking-wide">
+            <a class="text-secondary hover:text-primary transition-colors hover:opacity-80" href="index.html" data-i18n="nav-home">Home</a>
+            <a class="text-secondary hover:text-primary transition-colors hover:opacity-80" href="menu.html" data-i18n="nav-menu">Menu</a>
+            <a class="text-secondary hover:text-primary transition-colors hover:opacity-80" href="locations.html" data-i18n="nav-locations">Locations</a>
+            <a class="text-secondary hover:text-primary transition-colors hover:opacity-80" href="contact.html" data-i18n="nav-contact">Contact</a>
+        </div>
+        <div class="flex items-center space-x-4">
+            <div class="hidden md:flex items-center space-x-2 mr-2">
+                <img id="lang-vi" src="https://hatscripts.github.io/circle-flags/flags/vn.svg" alt="VN" class="w-8 h-8 cursor-pointer hover:opacity-80 transition-all duration-300 ring-2 ring-transparent" style="border-radius: 50% !important;" onclick="changeLanguage('vi')">
+                <img id="lang-en" src="https://hatscripts.github.io/circle-flags/flags/gb.svg" alt="UK" class="w-8 h-8 cursor-pointer hover:opacity-80 transition-all duration-300 ring-2 ring-transparent" style="border-radius: 50% !important;" onclick="changeLanguage('en')">
+                <img id="lang-fi" src="https://hatscripts.github.io/circle-flags/flags/fi.svg" alt="FI" class="w-8 h-8 cursor-pointer hover:opacity-80 transition-all duration-300 ring-2 ring-transparent" style="border-radius: 50% !important;" onclick="changeLanguage('fi')">
+            </div>
+            <a class="hidden md:inline-flex border-2 border-primary text-primary font-body-sm text-body-sm font-semibold px-5 py-2 rounded-xl hover:bg-primary hover:text-on-primary transition-all duration-300 shadow-sm" href="register.html" data-i18n="nav-register">
+                Register
+            </a>
+            <a class="hidden md:inline-flex bg-primary text-white font-body-sm text-body-sm font-semibold px-6 py-2 rounded-xl hover:opacity-90 shadow-sm hover:shadow-md transition-all duration-300 bg-gradient-to-tr from-primary to-[#003d82]" href="reservations.html" data-i18n="nav-reservations">
+                Reservations
+            </a>
+            <!-- Cart Icon -->
+            <a href="cart.html" class="nav-cart-btn relative" title="View Cart">
+                <span class="material-symbols-outlined text-[24px]">shopping_cart</span>
+                <span id="cart-count" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
+            </a>
+            <button class="md:hidden text-primary p-2">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<main class="flex-1 max-w-7xl mx-auto w-full px-6 py-12 pt-24">
+    <h1 class="text-4xl font-bold font-['EB_Garamond'] text-primary mb-8 text-center"><span data-i18n="cart-title">Your Cart & Checkout</span></h1>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        <!-- Cart Items -->
+        <div class="lg:col-span-2 space-y-6">
+            <div class="bg-surface-container-low p-6 rounded-2xl border border-white/10">
+                <h2 class="text-2xl font-bold font-['EB_Garamond'] text-white mb-6 border-b border-white/10 pb-4"><span data-i18n="order-items">Order Items</span></h2>
+                
+                <div id="cart-items-container" class="space-y-4">
+                    <!-- Cart items injected here -->
+                </div>
+
+                <div id="empty-cart-msg" class="hidden text-center py-12 text-secondary">
+                    <span class="material-symbols-outlined text-6xl mb-4 opacity-50">remove_shopping_cart</span>
+                    <p class="text-xl"><span data-i18n="empty-cart">Your cart is empty.</span></p>
+                    <a href="menu.html" class="inline-block mt-6 px-6 py-2 bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors"><span data-i18n="browse-menu">Browse Menu</span></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Checkout Form -->
+        <div class="lg:col-span-1">
+            <div class="bg-surface-container-low p-6 rounded-2xl border border-white/10 sticky top-24">
+                <h2 class="text-2xl font-bold font-['EB_Garamond'] text-white mb-6 border-b border-white/10 pb-4"><span data-i18n="order-summary">Order Summary</span></h2>
+                
+                <div class="space-y-2 border-b border-white/10 pb-4 mb-4">
+                    <div class="flex justify-between items-center text-sm text-secondary">
+                        <span>Subtotal:</span>
+                        <span id="cart-subtotal" class="font-semibold text-white">€0.00</span>
+                    </div>
+                    <div id="delivery-fee-container" class="flex justify-between items-center text-sm text-secondary hidden">
+                        <span>Delivery Fee:</span>
+                        <span id="cart-delivery-fee" class="font-semibold text-white">€0.00</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-secondary">
+                        <span>Of which VAT (13.5%):</span>
+                        <span id="cart-vat-amount" class="font-semibold text-white">€0.00</span>
+                    </div>
+                    <div id="discount-container" class="flex justify-between items-center text-sm text-green-400 hidden">
+                        <span>Discount:</span>
+                        <span id="cart-discount" class="font-semibold">-€0.00</span>
+                    </div>
+                </div>
+
+                <!-- Promo Code Entry -->
+                <div class="mb-4 pb-4 border-b border-white/10">
+                    <label class="block text-xs text-secondary mb-1.5 font-semibold uppercase tracking-wider">Mã giảm giá / Promo Code</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="promo-code-input" class="flex-1 bg-surface border border-white/10 rounded-lg text-white px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="WELCOME10-XXXX">
+                        <button type="button" id="btn-apply-promo" class="bg-primary hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg text-sm transition-all active:scale-95">Áp dụng</button>
+                    </div>
+                    <div id="promo-status-msg" class="text-xs mt-1.5 hidden font-medium"></div>
+                </div>
+
+                <div class="flex justify-between items-center mb-1 text-xl">
+                    <span class="text-secondary"><span data-i18n="total-label">Total:</span></span>
+                    <span class="font-bold text-primary text-3xl" id="cart-total">€0.00</span>
+                </div>
+                <div class="text-right text-xs text-secondary/70 mb-6 italic">
+                    (Includes 13.5% VAT / Đã bao gồm 13.5% VAT / Sisältää 13.5% ALV)
+                </div>
+
+                <form id="checkout-form" class="space-y-5">
+                    <div>
+                        <label class="block text-sm text-secondary mb-1"><span data-i18n="your-name">Your Name</span></label>
+                        <input type="text" id="cust-name" required class="w-full bg-surface border border-white/10 rounded-lg text-white p-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-secondary mb-1"><span data-i18n="phone-number">Phone Number</span></label>
+                        <input type="tel" id="cust-phone" required class="w-full bg-surface border border-white/10 rounded-lg text-white p-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-secondary mb-1">Email / Gmail</label>
+                        <input type="email" id="cust-email" required class="w-full bg-surface border border-white/10 rounded-lg text-white p-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="name@gmail.com">
+                    </div>
+                    
+                    <div class="grid grid-cols-3 gap-2">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="orderType" value="dine-in" checked class="peer sr-only">
+                            <div class="p-3 text-center rounded-lg border border-white/10 text-secondary peer-checked:bg-primary/20 peer-checked:text-primary peer-checked:border-primary transition-all text-xs md:text-sm">
+                                <span class="material-symbols-outlined block mb-1">restaurant</span><span data-i18n="dine-in">Dine In</span></div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="orderType" value="takeaway" class="peer sr-only">
+                            <div class="p-3 text-center rounded-lg border border-white/10 text-secondary peer-checked:bg-primary/20 peer-checked:text-primary peer-checked:border-primary transition-all text-xs md:text-sm">
+                                <span class="material-symbols-outlined block mb-1">takeout_dining</span><span data-i18n="takeaway">Takeaway</span></div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="orderType" value="delivery" class="peer sr-only">
+                            <div class="p-3 text-center rounded-lg border border-white/10 text-secondary peer-checked:bg-primary/20 peer-checked:text-primary peer-checked:border-primary transition-all text-xs md:text-sm">
+                                <span class="material-symbols-outlined block mb-1">delivery_dining</span><span data-i18n="delivery">Delivery</span></div>
+                        </label>
+                    </div>
+
+                    <div id="table-number-div">
+                        <label class="block text-sm text-secondary mb-1"><span data-i18n="table-number">Table Number</span></label>
+                        <input type="number" id="cust-table" class="w-full bg-surface border border-white/10 rounded-lg text-white p-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+                    </div>
+
+                    <div id="address-div" class="hidden">
+                        <label class="block text-sm text-secondary mb-1"><span data-i18n="delivery-address">Delivery Address</span></label>
+                        <input type="text" id="cust-address" class="w-full bg-surface border border-white/10 rounded-lg text-white p-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="Enter delivery address (e.g. Mannerheimintie 10, Helsinki)...">
+                        <div id="distance-calc-status" class="text-xs text-secondary mt-1 hidden"></div>
+                    </div>
+                    
+                    <div id="distance-div" class="hidden">
+                        <label class="block text-sm text-secondary mb-1">Distance from Restaurant (km)</label>
+                        <input type="number" id="cust-distance" readonly min="0" step="0.1" value="0" class="w-full bg-surface/50 border border-white/10 rounded-lg text-secondary p-3 outline-none cursor-not-allowed">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm text-secondary mb-1"><span data-i18n="notes">Notes for Kitchen (Optional)</span></label>
+                        <textarea id="cust-notes" class="w-full bg-surface border border-white/10 rounded-lg text-white p-3 h-20 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"></textarea>
+                    </div>
+
+                    <button type="submit" id="btn-submit-order" class="w-full py-4 bg-primary hover:bg-blue-600 text-white font-bold rounded-xl shadow-lg shadow-primary/30 transition-all active:scale-95 flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined">send</span><span data-i18n="place-order">Place Order Now</span></button>
+                    
+                    <div id="checkout-loading" class="hidden text-center text-primary mt-2">
+                        <span class="material-symbols-outlined animate-spin align-middle mr-1">sync</span> Processing...
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="js/client.js"></script>
+<script src="js/cart.js"></script>
+<script type="module" src="js/checkout.js"></script>
+<script>
+    // Toggle address/table based on order type
+    document.querySelectorAll('input[name="orderType"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            const val = e.target.value;
+            if(val === 'dine-in') {
+                document.getElementById('table-number-div').classList.remove('hidden');
+                document.getElementById('address-div').classList.add('hidden');
+                document.getElementById('distance-div').classList.add('hidden');
+                document.getElementById('cust-table').setAttribute('required', 'required');
+                document.getElementById('cust-address').removeAttribute('required');
+                document.getElementById('cust-distance').removeAttribute('required');
+            } else if(val === 'delivery') {
+                document.getElementById('table-number-div').classList.add('hidden');
+                document.getElementById('address-div').classList.remove('hidden');
+                document.getElementById('distance-div').classList.remove('hidden');
+                document.getElementById('cust-table').removeAttribute('required');
+                document.getElementById('cust-address').setAttribute('required', 'required');
+                document.getElementById('cust-distance').setAttribute('required', 'required');
+            } else {
+                document.getElementById('table-number-div').classList.add('hidden');
+                document.getElementById('address-div').classList.add('hidden');
+                document.getElementById('distance-div').classList.add('hidden');
+                document.getElementById('cust-table').removeAttribute('required');
+                document.getElementById('cust-address').removeAttribute('required');
+                document.getElementById('cust-distance').removeAttribute('required');
+            }
+            if(window.renderCartPage) window.renderCartPage();
+        });
+    });
+</script>
+</body>
+</html>
+

@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en"><head><style>
+    .bg-pattern-light {
+        background-image: linear-gradient(rgba(211, 211, 255, 0.85), rgba(255, 255, 255, 0.85)), url('https://lh3.googleusercontent.com/aida/AP1WRLu6c1eOBycoOhr8d1SXuiHHJ2p6UFS7W2aOZkBXjny6fvIs_6xymLzH0UsMR7FkOSpmq8iA3Rgj70jVG88PGuJNINDzY5gsPYOgnDgBh3IcKArWymKf-uL7T7agVDPUQUJOCSw0gvHUm-wOQkE9H9OVVAAbstEFTKz5Z8_Lg8OSzO2KJuFfVFtK3doqWktfqKKktFzNLf_TzWkD-TcfU94V1-qBjNCjlurGOnhw60gdCD9fBNRYgHzWMpMp') !important;
+        background-repeat: repeat;
+        background-size: 400px;
+        background-attachment: fixed;
+    }
+    .bg-pattern-dark {
+        background-image: linear-gradient(rgba(7, 24, 43, 0.85), rgba(7, 24, 43, 0.85)), url('https://lh3.googleusercontent.com/aida/AP1WRLu_foWMwnMlqlxq-jsEwNaqub3k215L_EAy1g9btiAZtZ-vC6ctgnJDoX8wnoedlLjZLvxGBbofAjGnMf_dRJvEe1l5avwp0Eo5waH3l_00K1ufBPSmlJVaGf7Cct4WRPY63LuqnSJ6HUc0hkcppk5dzmsmrPaiapy336v6Yh3lNvvAXDOcQtNm0p5hZVT5IuPV1iLZpy57dRptdN6lHBnOX9SlAwnVO4c48uoRoPg_s27yUgpT632cGXFn') !important;
+        background-repeat: repeat;
+        background-size: 400px;
+        background-attachment: fixed;
+    }
+    /* Refined approach for dark pattern to keep content crisp: use pseudo-element or separate layer */
+    .hero-pattern {
+        position: relative;
+    }
+    .hero-pattern::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: url('https://lh3.googleusercontent.com/aida/AP1WRLu_foWMwnMlqlxq-jsEwNaqub3k215L_EAy1g9btiAZtZ-vC6ctgnJDoX8wnoedlLjZLvxGBbofAjGnMf_dRJvEe1l5avwp0Eo5waH3l_00K1ufBPSmlJVaGf7Cct4WRPY63LuqnSJ6HUc0hkcppk5dzmsmrPaiapy336v6Yh3lNvvAXDOcQtNm0p5hZVT5IuPV1iLZpy57dRptdN6lHBnOX9SlAwnVO4c48uoRoPg_s27yUgpT632cGXFn');
+        background-repeat: repeat;
+        background-size: 400px;
+        background-attachment: fixed;
+        opacity: 0.25;
+        pointer-events: none;
+        z-index: 1;
+    }
+    .footer-pattern {
+        position: relative;
+    }
+    .footer-pattern::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: url('https://lh3.googleusercontent.com/aida/AP1WRLu_foWMwnMlqlxq-jsEwNaqub3k215L_EAy1g9btiAZtZ-vC6ctgnJDoX8wnoedlLjZLvxGBbofAjGnMf_dRJvEe1l5avwp0Eo5waH3l_00K1ufBPSmlJVaGf7Cct4WRPY63LuqnSJ6HUc0hkcppk5dzmsmrPaiapy336v6Yh3lNvvAXDOcQtNm0p5hZVT5IuPV1iLZpy57dRptdN6lHBnOX9SlAwnVO4c48uoRoPg_s27yUgpT632cGXFn');
+        background-repeat: repeat;
+        background-size: 400px;
+        background-attachment: fixed;
+        opacity: 0.25;
+        pointer-events: none;
+        z-index: 0;
+    }
+</style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PHỞ VIỆT KHANG | The Art of Asian Gastronomy</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "inverse-primary": "#a9c7ff",
+                      "surface-dim": "#d8dadc",
+                      "outline-variant": "#c4c6d0",
+                      "on-surface": "#191c1e",
+                      "outline": "#747780",
+                      "secondary-fixed-dim": "#c8c6c5",
+                      "on-error-container": "#93000a",
+                      "surface-container-highest": "#e0e3e5",
+                      "tertiary-fixed-dim": "#b7c8e1",
+                      "background": "#f7f9fb",
+                      "surface-tint": "#405f91",
+                      "on-secondary-fixed": "#1c1b1b",
+                      "on-primary-fixed": "#001b3d",
+                      "on-tertiary-fixed": "#0b1c30",
+                      "secondary-container": "#e2dfde",
+                      "on-secondary-container": "#636262",
+                      "surface-bright": "#f7f9fb",
+                      "on-primary-fixed-variant": "#264778",
+                      "error-container": "#ffdad6",
+                      "primary-container": "#002b5b",
+                      "on-secondary-fixed-variant": "#474746",
+                      "surface": "#f7f9fb",
+                      "on-error": "#ffffff",
+                      "tertiary-container": "#1d2d41",
+                      "inverse-on-surface": "#eff1f3",
+                      "secondary": "#5f5e5e",
+                      "tertiary-fixed": "#d3e4fe",
+                      "on-tertiary-container": "#8495ad",
+                      "primary-fixed-dim": "#a9c7ff",
+                      "surface-variant": "#e0e3e5",
+                      "on-primary-container": "#7594ca",
+                      "on-primary": "#ffffff",
+                      "surface-container-high": "#e6e8ea",
+                      "surface-container-low": "#f2f4f6",
+                      "on-surface-variant": "#43474f",
+                      "error": "#ba1a1a",
+                      "primary": "#001736",
+                      "on-tertiary-fixed-variant": "#38485d",
+                      "primary-fixed": "#d6e3ff",
+                      "on-tertiary": "#ffffff",
+                      "inverse-surface": "#2d3133",
+                      "surface-container": "#eceef0",
+                      "secondary-fixed": "#e5e2e1",
+                      "surface-container-lowest": "#ffffff",
+                      "tertiary": "#07182b",
+                      "on-background": "#191c1e",
+                      "on-secondary": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "gutter": "24px",
+                      "max-width": "1280px",
+                      "margin-mobile": "16px",
+                      "margin-desktop": "64px",
+                      "unit": "8px"
+              },
+              "fontFamily": {
+                      "body-sm": [
+                               "Inter"
+                       ],
+                       "display-lg-mobile": [
+                               "EB Garamond"
+                       ],
+                       "title-lg": [
+                               "Inter"
+                       ],
+                       "label-caps": [
+                               "Inter"
+                       ],
+                       "display-lg": [
+                               "EB Garamond"
+                       ],
+                       "headline-sm": [
+                               "EB Garamond"
+                       ],
+                       "body-lg": [
+                               "Inter"
+                       ],
+                       "headline-md": [
+                               "EB Garamond"
+                       ],
+                       "body-md": [
+                               "Inter"
+                       ]
+               },
+               "fontSize": {
+                       "body-sm": [
+                               "14px",
+                               {
+                                       "lineHeight": "20px",
+                                       "fontWeight": "400"
+                               }
+                       ],
+                       "display-lg-mobile": [
+                               "36px",
+                               {
+                                       "lineHeight": "44px",
+                                       "letterSpacing": "-0.02em",
+                                       "fontWeight": "600"
+                               }
+                       ],
+                       "title-lg": [
+                               "20px",
+                               {
+                                       "lineHeight": "28px",
+                                       "fontWeight": "600"
+                               }
+                       ],
+                       "label-caps": [
+                               "12px",
+                               {
+                                       "lineHeight": "16px",
+                                       "letterSpacing": "0.08em",
+                                       "fontWeight": "700"
+                               }
+                       ],
+                       "display-lg": [
+                               "48px",
+                               {
+                                       "lineHeight": "56px",
+                                       "letterSpacing": "-0.02em",
+                                       "fontWeight": "600"
+                               }
+                       ],
+                       "headline-sm": [
+                               "24px",
+                               {
+                                       "lineHeight": "32px",
+                                       "fontWeight": "500"
+                               }
+                       ],
+                       "body-lg": [
+                               "18px",
+                               {
+                                       "lineHeight": "28px",
+                                       "fontWeight": "400"
+                               }
+                       ],
+                       "headline-md": [
+                               "32px",
+                               {
+                                       "lineHeight": "40px",
+                                       "fontWeight": "500"
+                               }
+                       ],
+                       "body-md": [
+                               "16px",
+                               {
+                                       "lineHeight": "24px",
+                                       "fontWeight": "400"
+                               }
+                       ]
+               }
+       },
+           },
+         }
+     </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            opacity: 0;
+            animation: pageFadeIn 0.4s ease-out forwards;
+        }
+        h1, h2, h3, h4, h5, h6 { font-family: 'EB Garamond', serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        @keyframes pageFadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        body.page-exit {
+            animation: pageFadeOut 0.3s ease-in forwards;
+        }
+        @keyframes pageFadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-8px); }
+        }
+    </style>
+</head>
+<body class="text-on-surface antialiased flex flex-col min-h-screen bg-pattern-light">
+<!-- TopNavBar Component -->
+<!-- TopNavBar Component -->
+    <nav class="fixed top-0 w-full z-50 bg-surface/95 backdrop-blur-md border-b border-outline-variant/30">
+        <div class="flex justify-between items-center max-w-7xl mx-auto px-4 md:px-16 h-20">
+            <a class="font-headline-sm text-2xl font-bold text-black tracking-wider flex items-center gap-2" href="index.html">
+                <span class="material-symbols-outlined text-3xl text-black">ramen_dining</span>
+                <span class="text-black">PHỞ VIỆT KHANG</span>
+            </a>
+            <div class="hidden md:flex items-center space-x-8 font-body-md text-base font-semibold tracking-wide">
+                <a class="text-secondary hover:text-white transition-colors" href="index.html" data-i18n="nav-home">Home</a>
+                <a class="text-secondary hover:text-white transition-colors" href="menu.html" data-i18n="nav-menu">Menu</a>
+                <a class="text-secondary hover:text-white transition-colors" href="locations.html" data-i18n="nav-locations">Locations</a>
+                <a class="text-secondary hover:text-white transition-colors" href="contact.html" data-i18n="nav-contact">Contact</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="hidden md:flex items-center space-x-2 mr-2">
+                    <img id="lang-vi" src="https://hatscripts.github.io/circle-flags/flags/vn.svg" alt="VN" class="w-8 h-8 cursor-pointer hover:opacity-80 transition-all duration-300 ring-2 ring-transparent" style="border-radius: 50% !important;" title="Tiếng Việt" onclick="changeLanguage('vi')">
+                    <img id="lang-en" src="https://hatscripts.github.io/circle-flags/flags/gb.svg" alt="UK" class="w-8 h-8 cursor-pointer hover:opacity-80 transition-all duration-300 ring-2 ring-transparent" style="border-radius: 50% !important;" title="English" onclick="changeLanguage('en')">
+                    <img id="lang-fi" src="https://hatscripts.github.io/circle-flags/flags/fi.svg" alt="FI" class="w-8 h-8 cursor-pointer hover:opacity-80 transition-all duration-300 ring-2 ring-transparent" style="border-radius: 50% !important;" title="Suomi" onclick="changeLanguage('fi')">
+                </div>
+                <a class="hidden md:inline-flex border-2 border-primary-container text-primary-container font-body-sm text-sm font-semibold px-5 py-2 rounded-xl hover:bg-primary-container hover:text-white transition-all duration-300 shadow-sm" href="register.html" data-i18n="nav-register">
+                    Register
+                </a>
+                <a class="hidden md:inline-flex bg-primary-container text-on-primary-container font-body-sm text-sm font-semibold px-6 py-2 rounded-xl hover:opacity-90 transition-all duration-300 bg-gradient-to-tr from-primary-container to-[#003d82]" href="reservations.html" data-i18n="nav-reservations">
+                    Reservations
+                </a>
+                <!-- Cart Icon -->
+                <a href="cart.html" class="nav-cart-btn relative" title="View Cart">
+                    <span class="material-symbols-outlined text-[24px]">shopping_cart</span>
+                    <span id="cart-count" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </a>
+                <!-- User Icon -->
+                <a href="login.html" class="text-white hover:text-primary-container">
+                    <span class="material-symbols-outlined text-[24px]">account_circle</span>
+                </a>
+                <button class="md:hidden text-white p-2">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-20">
+<!-- Hero Section -->
+<section class="relative w-full h-[80vh] min-h-[600px] flex items-center bg-inverse-surface/90 hero-pattern">
+<!-- Hero Background Image -->
+<div class="absolute inset-0 z-0">
+<img id="hero-bg" alt="Signature dish plating" class="w-full h-full object-cover opacity-50" data-alt="A top-down, high-resolution photograph of an exquisite Asian fusion dish plated on a dark, textured ceramic bowl. The scene is illuminated by soft, directional studio lighting that highlights the glossy textures of a rich soy glaze and the vibrant greens of delicate micro-herbs. The overall aesthetic perfectly captures a modern minimalist luxury dining experience, emphasizing deep blacks, warm earthy tones, and a pristine, uncluttered composition that evokes culinary mastery." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCI998STnUNgY05Fv2ZYG1KQXaNDRupZubV1zQKWf9sbVA0oQE5DROgFDBWru6Y_uLjlACxgjmnj0OvRUzjN1zgqT-JZgygHkTDqaKuiwC9--bo99Bw7VPRrWhFu6pYJdpNvGF_xWnX6LF1OG1vHMsbJRMAXHyFQehVg0Yd1WuaIlUyzZLzde1QyS39zVuzTpZJs-8ZAdKpy2ElnHpSXG6W3aMDobv9cyi2ilksg1756TcINR18Fc8cCHtb6JfqW_KygmQ1RbiRY3x0"/>
+</div>
+<div class="relative z-10 w-full max-w-max-width mx-auto px-margin-mobile md:px-margin-desktop text-on-primary text-center md:text-left">
+<h1 id="hero-title" class="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-surface-container-lowest max-w-3xl mb-6 drop-shadow-md" data-i18n="hero-title">
+                    The Art of Asian Gastronomy
+                </h1>
+<p id="hero-desc" class="font-body-lg text-body-lg text-surface-container-lowest/90 max-w-xl mb-10 md:mx-0 mx-auto drop-shadow-sm" data-i18n="hero-desc">
+                    A refined exploration of heritage flavors presented through the lens of modern culinary precision. Experience ordered serenity on every plate.
+                </p>
+<script>
+    (function(){
+        const cachedBg = localStorage.getItem('cachedHeroBg');
+        if (cachedBg) document.getElementById('hero-bg').src = cachedBg;
+        const cachedTitle = localStorage.getItem('cachedHeroTitle');
+        if (cachedTitle) document.getElementById('hero-title').textContent = cachedTitle;
+        const cachedDesc = localStorage.getItem('cachedHeroDesc');
+        if (cachedDesc) document.getElementById('hero-desc').textContent = cachedDesc;
+    })();
+</script>
+<a class="inline-flex items-center justify-center bg-surface-container-lowest text-primary font-body-sm text-body-sm font-semibold px-8 py-4 rounded-DEFAULT hover:bg-surface-container-high transition-colors rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-outline-variant/30" href="#reservations" data-i18n="hero-reserve">
+                    Reserve Now
+                </a>
+</div>
+</section>
+<!-- Story Section -->
+<section class="py-24 md:py-32 bg-transparent">
+<div class="max-w-max-width mx-auto px-margin-mobile md:px-margin-desktop">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+<div class="order-2 md:order-1">
+<img id="story-img" alt="Restaurant Interior" class="w-full h-[500px] object-cover rounded-DEFAULT" data-alt="..." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsvvT56-0DhYbN69rzrRYnss12XEUlQMnrhsihVI0RcWfzjf00pGn2r_euthM7-H2Fi8nzpZ7DbQIACK6fH4N6WvToxC1evyDZIPfCGQw8U94wfWV-60rpmIiu5Q2yCbMYCm7Ir3OWrd-LPrkVEivaZBe67N4qU7fKJ1rFo-cxeFJi0t5E4SECr7Tk9GHLvDIP1JEDRFbnXPdp-lxxAU8SuaRq_fflQdmV6zEijDzM56Ox3j29XHTo7vznRGtNpvmqBeg5zixe8eEo"/>
+</div>
+<div class="order-1 md:order-2 space-y-6">
+<span id="story-label" class="font-label-caps text-label-caps text-primary-container uppercase tracking-widest" data-i18n="story-label">Our Heritage</span>
+<h2 id="story-title" class="font-headline-md text-headline-md text-on-surface" data-i18n="story-title">
+                            Where Tradition Meets Precision
+                        </h2>
+<p id="story-p1" class="font-body-md text-body-md text-secondary" data-i18n="story-p1">At Pho Viet Khang, we strip away unnecessary ornamentation to reveal the true essence of pan-Asian ingredients. Our philosophy is rooted in the intellectual depth of traditional techniques, elevated by the strict precision of contemporary gastronomy.</p>
+<p id="story-p2" class="font-body-md text-body-md text-secondary" data-i18n="story-p2">
+                            Every element in our space and on our menu is deliberately curated to evoke a quiet sense of luxury—a harmonious balance between the enduring heritage of the East and the refined aesthetic of modern minimalism.
+                        </p>
+<script>
+    (function(){
+        const cachedStoryImg = localStorage.getItem('cachedStoryImg');
+        if (cachedStoryImg) document.getElementById('story-img').src = cachedStoryImg;
+        const cachedStoryLabel = localStorage.getItem('cachedStoryLabel');
+        if (cachedStoryLabel) document.getElementById('story-label').textContent = cachedStoryLabel;
+        const cachedStoryTitle = localStorage.getItem('cachedStoryTitle');
+        if (cachedStoryTitle) document.getElementById('story-title').textContent = cachedStoryTitle;
+        const cachedStoryP1 = localStorage.getItem('cachedStoryP1');
+        if (cachedStoryP1) document.getElementById('story-p1').textContent = cachedStoryP1;
+        const cachedStoryP2 = localStorage.getItem('cachedStoryP2');
+        if (cachedStoryP2) document.getElementById('story-p2').textContent = cachedStoryP2;
+    })();
+</script>
+</div>
+</div>
+</div>
+</section>
+<!-- Signature Dishes (Bento Grid) -->
+<section class="py-24 bg-transparent">
+<div class="max-w-max-width mx-auto px-margin-mobile md:px-margin-desktop">
+<div class="text-center mb-16">
+<h2 id="signature-title" class="font-headline-md text-headline-md text-on-surface mb-4" data-i18n="sig-title">Signature Creations</h2>
+<p id="signature-desc" class="font-body-md text-body-md text-secondary max-w-2xl mx-auto" data-i18n="sig-desc">A curated selection of our most revered dishes, demonstrating our commitment to visual and culinary excellence.</p>
+<script>
+    (function(){
+        const cachedSigTitle = localStorage.getItem('cachedSignatureTitle');
+        if (cachedSigTitle) document.getElementById('signature-title').textContent = cachedSigTitle;
+        const cachedSigDesc = localStorage.getItem('cachedSignatureDesc');
+        if (cachedSigDesc) document.getElementById('signature-desc').textContent = cachedSigDesc;
+    })();
+</script>
+</div>
+<div id="signature-container" class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <!-- Dynamic signature dishes will be rendered here by JS -->
+</div>
+</div>
+</section>
+<!-- Call to Action -->
+<section class="py-32 bg-transparent text-center">
+<div class="max-w-2xl mx-auto px-margin-mobile">
+<h2 id="cta-title" class="font-headline-md text-headline-md text-on-surface mb-6" data-i18n="cta-title">Experience the Full Journey</h2>
+<p id="cta-desc" class="font-body-lg text-body-lg text-secondary mb-10" data-i18n="cta-desc">Discover our complete seasonal tasting menu and a la carte offerings, designed to transport and delight.</p>
+<script>
+    (function(){
+        const cachedCtaTitle = localStorage.getItem('cachedCtaTitle');
+        if (cachedCtaTitle) document.getElementById('cta-title').textContent = cachedCtaTitle;
+        const cachedCtaDesc = localStorage.getItem('cachedCtaDesc');
+        if (cachedCtaDesc) document.getElementById('cta-desc').textContent = cachedCtaDesc;
+    })();
+</script>
+<div class="flex flex-col sm:flex-row justify-center gap-4">
+<a class="inline-flex justify-center items-center bg-primary-container text-on-primary-container font-body-sm text-body-sm font-semibold px-8 py-3 rounded-DEFAULT hover:opacity-90 transition-opacity rounded-xl shadow-sm hover:shadow-md transition-all duration-300 bg-gradient-to-tr from-primary-container to-[#003d82]" href="#" data-i18n="cta-btn1">
+                        View Menu
+                    </a>
+<a class="inline-flex justify-center items-center border border-on-surface text-on-surface font-body-sm text-body-sm font-semibold px-8 py-3 rounded-DEFAULT hover:bg-surface-container-low transition-colors rounded-xl shadow-sm hover:shadow-md transition-all duration-300 bg-surface/80 backdrop-blur-sm" href="#" data-i18n="cta-btn2">
+                        Find a Location
+                    </a>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer Component -->
+<footer class="w-full pt-20 pb-10 bg-tertiary/90 footer-pattern">
+<div class="relative z-10 max-w-max-width mx-auto px-margin-desktop grid grid-cols-1 md:grid-cols-4 gap-gutter">
+<!-- Brand -->
+<div class="md:col-span-1 mb-10 md:mb-0">
+<a class="font-headline-md text-headline-md text-white flex items-center gap-2 mb-4 drop-shadow-md" href="index.html">
+    <span class="material-symbols-outlined text-3xl">ramen_dining</span>
+    <span>PHO VIET KHANG</span>
+</a>
+<p class="font-body-sm text-body-sm text-tertiary-fixed-dim drop-shadow-sm" data-i18n="footer-desc">
+                    The Art of Asian Gastronomy.
+                </p>
+</div>
+<!-- Links Container (Spanning remaining cols for layout, simplified from complex structures) -->
+<div class="md:col-span-3 flex flex-wrap gap-8 md:justify-end items-start font-body-sm text-body-sm">
+<a class="text-tertiary-fixed-dim hover:text-on-tertiary transition-colors hover:underline decoration-1 underline-offset-4 duration-300 ease-in-out drop-shadow-sm" href="#" data-i18n="footer-privacy">Privacy Policy</a>
+<a class="text-tertiary-fixed-dim hover:text-on-tertiary transition-colors hover:underline decoration-1 underline-offset-4 duration-300 ease-in-out drop-shadow-sm" href="#" data-i18n="footer-terms">Terms of Service</a>
+<a class="text-tertiary-fixed-dim hover:text-on-tertiary transition-colors hover:underline decoration-1 underline-offset-4 duration-300 ease-in-out drop-shadow-sm" href="#" data-i18n="footer-careers">Careers</a>
+<a class="text-tertiary-fixed-dim hover:text-on-tertiary transition-colors hover:underline decoration-1 underline-offset-4 duration-300 ease-in-out drop-shadow-sm" href="#" data-i18n="footer-press">Press Kit</a>
+</div>
+</div>
+<!-- Copyright -->
+<div class="relative z-10 max-w-max-width mx-auto px-margin-desktop mt-16 pt-8 border-t border-outline-variant/20">
+<p class="font-body-sm text-body-sm text-tertiary-fixed-dim text-center md:text-left drop-shadow-sm">© 2026 PHO VIET KHANG. ALL RIGHTS RESERVED.</p>
+</div>
+</footer>
+
+<!-- Language Switcher Script -->
+
+
+<!-- Core Scripts -->
+<script src="js/client.js"></script>
+<script type="module" src="js/auth.js"></script>
+<script type="module" src="js/homepage.js"></script>
+<script src="js/cart.js"></script>
+</body></html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/client.css">
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>PHO VIET KHANG | Login</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "primary-container": "#3b82f6",
+            "on-surface": "#f3f4f6",
+            "secondary": "#9ca3af",
+            "surface": "#121824",
+            "outline-variant": "rgba(255, 255, 255, 0.1)",
+          },
+          "fontFamily": {
+            "body-sm": ["Inter"], "display-lg-mobile": ["EB Garamond"], "title-lg": ["Inter"],
+            "label-caps": ["Inter"], "display-lg": ["EB Garamond"], "headline-sm": ["EB Garamond"],
+            "body-lg": ["Inter"], "headline-md": ["EB Garamond"], "body-md": ["Inter"]
+          }
+        }
+      }
+    }
+    </script>
+</head>
+<body class="text-on-surface antialiased flex flex-col min-h-screen bg-pattern-dark">
+    <!-- TopNavBar Component -->
+    <nav class="fixed top-0 w-full z-50 bg-surface/95 backdrop-blur-md border-b border-outline-variant/30">
+        <div class="flex justify-between items-center max-w-7xl mx-auto px-4 md:px-16 h-20">
+            <a class="font-headline-sm text-2xl font-bold text-black tracking-tighter flex items-center gap-2" href="index.html">
+                <span class="material-symbols-outlined text-3xl text-black">ramen_dining</span>
+                PHO VIET KHANG
+            </a>
+            <div class="hidden md:flex items-center space-x-8 font-body-md text-base font-semibold tracking-wide">
+                <a class="text-secondary hover:text-white transition-colors" href="index.html" data-i18n="nav-home">Home</a>
+                <a class="text-secondary hover:text-white transition-colors" href="menu.html" data-i18n="nav-menu">Menu</a>
+                <a class="text-secondary hover:text-white transition-colors" href="locations.html" data-i18n="nav-locations">Locations</a>
+                <a class="text-secondary hover:text-white transition-colors" href="contact.html" data-i18n="nav-contact">Contact</a>
+                <a class="text-secondary hover:text-white transition-colors" href="register.html" data-i18n="nav-register">Register</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <!-- Cart Icon -->
+                <a href="cart.html" class="nav-cart-btn relative" title="View Cart">
+                    <span class="material-symbols-outlined text-[20px]">shopping_cart</span>
+                    <span id="cart-count" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold rounded-full h-4.5 w-4.5 flex items-center justify-center">0</span>
+                </a>
+                <!-- User Icon -->
+                <a href="login.html" class="text-white hover:text-primary-container">
+                    <span class="material-symbols-outlined">account_circle</span>
+                </a>
+                <button class="md:hidden text-white p-2">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow pt-32 pb-20">
+        <div class="max-w-7xl mx-auto px-4 md:px-16">
+            <div class="bg-surface/90 backdrop-blur-sm rounded-lg border border-outline-variant p-8 shadow-lg">
+                <h1 class="font-headline-md text-4xl text-white mb-6 border-b border-outline-variant pb-4">Login</h1>
+                <div class="content-area">
+                    <div class="max-w-md mx-auto">
+    <form id="login-form" class="space-y-6">
+        <div>
+            <label for="email" class="block text-sm font-medium text-secondary mb-2" data-i18n="login-email">Email Address</label>
+            <input type="email" id="email" name="email" required
+                class="w-full px-4 py-3 bg-[#18202d] border border-outline-variant rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-container transition-all">
+        </div>
+        <div>
+            <label for="password" class="block text-sm font-medium text-secondary mb-2" data-i18n="login-password">Password</label>
+            <input type="password" id="password" name="password" required
+                class="w-full px-4 py-3 bg-[#18202d] border border-outline-variant rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-container transition-all">
+        </div>
+        <div id="login-error" class="text-red-500 text-sm hidden"></div>
+        <button type="submit"
+            class="w-full bg-primary-container text-on-primary-container font-semibold py-3 rounded-lg hover:opacity-90 transition-opacity" data-i18n="login-btn">
+            Sign In
+        </button>
+
+        <div class="my-6 flex items-center">
+            <div class="flex-grow border-t border-gray-700"></div>
+            <span class="mx-4 text-sm text-secondary">OR</span>
+            <div class="flex-grow border-t border-gray-700"></div>
+        </div>
+
+        <button type="button" id="btn-google" class="w-full flex items-center justify-center gap-3 bg-white text-gray-800 font-semibold py-3 px-4 border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100 transition-colors">
+            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" class="w-5 h-5">
+            Continue with Google
+        </button>
+        <p class="text-center text-secondary text-sm mt-4">
+            <span data-i18n="login-no-account">Don't have an account?</span> 
+            <a href="register.html" class="text-primary-container hover:underline" data-i18n="login-register-link">Register here</a>
+        </p>
+    </form>
+</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Language Switcher Script -->
+    <script src="js/client.js"></script>
+<script type="module" src="js/auth.js"></script>
+</body>
+</html>
+
+
