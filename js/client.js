@@ -318,3 +318,485 @@ document.addEventListener('click', (e) => {
   document.body.classList.add('page-exit');
   setTimeout(() => { window.location.href = href; }, 300);
 });
+
+// --- FLOATING AI CUSTOMER ASSISTANT ---
+(async function() {
+    const path = window.location.pathname.toLowerCase();
+    if (path.includes('/admin/') || path.includes('/kitchen/') || path.includes('/host/')) {
+        return;
+    }
+
+    // Inject styles for client assistant
+    const style = document.createElement('style');
+    style.textContent = `
+        .client-chat-window {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: #0c1220;
+            color: #f3f4f6;
+            display: none;
+            flex-direction: column;
+            width: 380px;
+            height: 520px;
+            position: fixed;
+            bottom: 95px;
+            right: 24px;
+            z-index: 9999;
+            border-radius: 16px;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+        }
+        .client-chat-window.show {
+            display: flex;
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        .client-chat-bubble {
+            max-width: 85%;
+            padding: 10px 14px;
+            border-radius: 14px;
+            font-size: 13px;
+            line-height: 1.45;
+            word-wrap: break-word;
+            margin-bottom: 2px;
+        }
+        .bubble-user {
+            background-color: #3b82f6;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+        .bubble-ai {
+            background-color: #1a2333;
+            color: #e5e7eb;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .client-chat-toggle-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background-color: #3b82f6;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.5);
+            z-index: 9999;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease;
+        }
+        .client-chat-toggle-btn:hover {
+            transform: scale(1.06);
+            background-color: #2563eb;
+        }
+        .client-chat-toggle-btn:active {
+            transform: scale(0.94);
+        }
+        .dots-loader span {
+            width: 6px;
+            height: 6px;
+            margin: 0 2px;
+            background-color: #9ca3af;
+            border-radius: 50%;
+            display: inline-block;
+            animation: bounceDots 1.4s infinite both;
+        }
+        .dots-loader span:nth-child(2) { animation-delay: .2s; }
+        .dots-loader span:nth-child(3) { animation-delay: .4s; }
+        @keyframes bounceDots {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Create Markup
+    const chatContainer = document.createElement('div');
+    chatContainer.innerHTML = `
+        <div class="client-chat-toggle-btn animate-bounce" id="client-chat-toggle" style="animation-duration: 2.5s;">
+            <span class="material-symbols-outlined text-[28px]" id="client-chat-icon">chat</span>
+        </div>
+        <div class="client-chat-window" id="client-chat-win">
+            <!-- Header -->
+            <div class="p-4 bg-[#141b2b] border-b border-gray-800 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></span>
+                    <span class="font-bold text-white text-sm" data-chat-title>Trợ lý Phở Việt Khang</span>
+                </div>
+                <button id="client-chat-close" class="text-secondary hover:text-white transition-colors">
+                    <span class="material-symbols-outlined text-[20px]">close</span>
+                </button>
+            </div>
+            
+            <!-- Message Area -->
+            <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-3" id="client-chat-messages">
+                <div class="client-chat-bubble bubble-ai animate-fade-in" id="client-chat-welcome-msg">
+                    Xin chào! Tôi là Trợ lý ảo của Phở Việt Khang. Tôi có thể tư vấn món ăn, tìm cửa hàng gần nhất hoặc tra cứu thông tin giúp bạn. Bạn cần giúp gì?
+                </div>
+            </div>
+            
+            <!-- Input Bar -->
+            <div class="p-3 border-t border-gray-800 bg-[#0c1220] flex gap-2 relative">
+                <input type="text" id="client-chat-input" placeholder="Hỏi về món ăn, địa điểm..." class="flex-1 bg-[#141b2b] border border-gray-700 rounded-xl text-white px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary">
+                <button id="client-chat-send" class="bg-primary hover:bg-blue-600 text-white p-2 rounded-xl transition-colors flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[18px]">send</span>
+                </button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(chatContainer);
+
+    const toggleBtn = document.getElementById('client-chat-toggle');
+    const chatWin = document.getElementById('client-chat-win');
+    const closeBtn = document.getElementById('client-chat-close');
+    const chatInput = document.getElementById('client-chat-input');
+    const sendBtn = document.getElementById('client-chat-send');
+    const msgArea = document.getElementById('client-chat-messages');
+    const chatIcon = document.getElementById('client-chat-icon');
+
+    const chatTranslations = {
+        vi: {
+            title: "Trợ lý Phở Việt Khang",
+            placeholder: "Hỏi về món ăn, địa điểm...",
+            welcome: "Xin chào! Tôi là Trợ lý ảo của Phở Việt Khang. Tôi có thể tư vấn món ăn, tìm cửa hàng gần nhất hoặc tra cứu thông tin giúp bạn. Bạn cần giúp gì?"
+        },
+        en: {
+            title: "Pho Viet Khang Assistant",
+            placeholder: "Ask about dishes, locations...",
+            welcome: "Hello! I am the Phở Việt Khang Virtual Assistant. I can recommend dishes, find locations, or search for info. How can I help you?"
+        },
+        fi: {
+            title: "Pho Viet Khang Assistentti",
+            placeholder: "Kysy ruoista, toimipisteistä...",
+            welcome: "Hei! Olen Phở Việt Khangin virtuaaliassistentti. Voin suositella ruokia, etsiä toimipisteitä tai hakea tietoa. Kuinka voin auttaa?"
+        }
+    };
+
+    // Language sync helper
+    const applyLangToChat = () => {
+        const lang = localStorage.getItem('selectedLanguage') || 'en';
+        const t = chatTranslations[lang] || chatTranslations.en;
+        const titleEl = chatWin.querySelector('[data-chat-title]');
+        if (titleEl) titleEl.textContent = t.title;
+        const welcomeEl = document.getElementById('client-chat-welcome-msg');
+        if (welcomeEl) welcomeEl.textContent = t.welcome;
+        if (chatInput) chatInput.placeholder = t.placeholder;
+    };
+
+    applyLangToChat();
+    window.addEventListener('languageChanged', applyLangToChat);
+
+    // Dynamic Firebase Firestore Import
+    const { db, getApiKeys } = await import("./firebase-config.js");
+    const { collection, getDocs } = await import("https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js");
+
+    const apiKeys = await getApiKeys();
+    const CLOUDFLARE_WORKER_URL = 'https://pvk-admin.minhbeo993.workers.dev';
+    const WORKER_SECRET = apiKeys.workerSecret;
+
+    async function callWorker(action, args = {}) {
+        const resp = await fetch(CLOUDFLARE_WORKER_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Admin-Secret': WORKER_SECRET,
+            },
+            body: JSON.stringify({ action, args }),
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || `Worker error ${resp.status}`);
+        return data;
+    }
+
+    // Tools for customer AI
+    async function listAllFoodItems() {
+        try {
+            const qSnap = await getDocs(collection(db, "menu"));
+            const items = [];
+            qSnap.forEach(docSnap => {
+                const data = docSnap.data();
+                if (data.isAvailable !== false) {
+                    items.push({
+                        nameVi: data.nameVi || '',
+                        nameEn: data.nameEn || '',
+                        nameFi: data.nameFi || '',
+                        categoryVi: data.categoryVi || data.category || '',
+                        categoryEn: data.categoryEn || '',
+                        categoryFi: data.categoryFi || '',
+                        price: data.price,
+                        descriptionVi: data.descVi || '',
+                        descriptionEn: data.descEn || '',
+                        descriptionFi: data.descFi || '',
+                        preparationTime: data.preparationTime || 15,
+                        tags: data.tags || []
+                    });
+                }
+            });
+            return items;
+        } catch (e) {
+            console.error(e);
+            return { error: e.message };
+        }
+    }
+
+    async function webSearch(query) {
+        try {
+            return await callWorker('webSearch', { query });
+        } catch (e) {
+            console.error('[webSearch]', e);
+            return { error: e.message };
+        }
+    }
+
+    async function browseWebUrl(url) {
+        try {
+            return await callWorker('browseWebUrl', { url });
+        } catch (e) {
+            console.error('[browseWebUrl]', e);
+            return { error: e.message };
+        }
+    }
+
+    // Toggle window
+    toggleBtn.addEventListener('click', () => {
+        if (chatWin.classList.contains('show')) {
+            chatWin.classList.remove('show');
+            setTimeout(() => chatWin.style.display = 'none', 250);
+            chatIcon.textContent = 'chat';
+        } else {
+            chatWin.style.display = 'flex';
+            chatWin.offsetHeight; // force reflow
+            chatWin.classList.add('show');
+            chatIcon.textContent = 'keyboard_arrow_down';
+            chatInput.focus();
+        }
+    });
+
+    closeBtn.addEventListener('click', () => {
+        chatWin.classList.remove('show');
+        setTimeout(() => chatWin.style.display = 'none', 250);
+        chatIcon.textContent = 'chat';
+    });
+
+    // Chat Logic
+    const chatMessages = [
+        {
+            role: 'system',
+            content: `You are a helpful and polite virtual assistant for the Vietnamese restaurant "Phở Việt Khang" in Helsinki.
+Your goal is to consult customers on the menu, tell them about locations & hours, search the web for additional info if needed, and introduce our heritage.
+
+Locations:
+1. Pengerkatu Branch: Pengerkatu 29, 00500 Helsinki (Tue-Fri: 11:00-20:00, Sat-Sun: 12:00-20:30, Mon: Closed).
+2. Easton Helsinki Branch: Kauppakartanonkatu 3, 00930 Helsinki (Mon-Fri: 11:00-21:00, Sat-Sun: 12:00-21:00).
+Phone: +358 44 978 9995.
+
+To search the web or consult the menu, use the following tools:
+1. listAllFoodItems()
+   Args: {}
+   Returns the current menu dishes (names in Vi/En/Fi, prices, and descriptions).
+2. webSearch(query)
+   Args: { "query": string }
+   Searches the web for additional info.
+3. browseWebUrl(url)
+   Args: { "url": string }
+   Reads the content of any webpage.
+
+Rules:
+- Respond in the language requested by the customer (Vietnamese, English, or Finnish). Default to Vietnamese if unclear.
+- When outputting tool calls, output ONLY the <tool_call> JSON block.
+- You do NOT have any tools to modify orders, menu items, prices, or user accounts. You cannot take orders or process payments. If the user asks you to modify something, politely decline and state you are only a customer service assistant.
+- Format tool calls like:
+<tool_call>
+{
+  "tool": "listAllFoodItems",
+  "args": {}
+}
+</tool_call>`
+        }
+    ];
+
+    function stripThinking(str) {
+        if (!str) return "";
+        return str.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+    }
+
+    function appendBubble(text, sender) {
+        const bubble = document.createElement('div');
+        bubble.className = `client-chat-bubble bubble-${sender}`;
+        bubble.textContent = text;
+        msgArea.appendChild(bubble);
+        msgArea.scrollTop = msgArea.scrollHeight;
+        return bubble;
+    }
+
+    function appendLoadingBubble() {
+        const bubble = document.createElement('div');
+        bubble.className = `client-chat-bubble bubble-ai dots-loader`;
+        bubble.id = 'client-chat-loading-bubble';
+        bubble.innerHTML = '<span></span><span></span><span></span>';
+        msgArea.appendChild(bubble);
+        msgArea.scrollTop = msgArea.scrollHeight;
+    }
+
+    function removeLoadingBubble() {
+        const bubble = document.getElementById('client-chat-loading-bubble');
+        if (bubble) bubble.remove();
+    }
+
+    const CEREBRAS_KEYS = [
+        apiKeys.cerebrasPrimary,
+        apiKeys.cerebrasBackup
+    ];
+
+    const OPENROUTER_API_KEYS = apiKeys.openRouterKeys || [];
+
+    async function callCerebras(payload, model = 'gpt-oss-120b') {
+        let lastErr;
+        for (const key of CEREBRAS_KEYS) {
+            if (!key) continue;
+            try {
+                const response = await fetch('https://api.cerebras.ai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${key}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ model, messages: payload.messages })
+                });
+                if (!response.ok) {
+                    const errText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errText}`);
+                }
+                return await response.json();
+            } catch (e) {
+                console.warn(`[Cerebras] Key failed: ${e.message}`);
+                lastErr = e;
+            }
+        }
+        throw lastErr;
+    }
+
+    async function callOpenRouterWithFallback(payload) {
+        const models = [
+            'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free',
+            'meta-llama/llama-3-8b-instruct:free',
+            'google/gemma-2-9b-it:free'
+        ];
+        
+        for (const model of models) {
+            for (const key of OPENROUTER_API_KEYS) {
+                try {
+                    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                        method: 'POST',
+                        headers: { 
+                            'Authorization': `Bearer ${key}`, 
+                            'Content-Type': 'application/json' 
+                        },
+                        body: JSON.stringify({ ...payload, model })
+                    });
+                    if (response.ok) return await response.json();
+                } catch (err) {
+                    console.warn(`[OpenRouter] Failed: ${err.message}`);
+                }
+            }
+        }
+        throw new Error("All AI fallbacks failed.");
+    }
+
+    let toolCallCount = 0;
+
+    async function handleAgentResponse(responseText) {
+        const textClean = stripThinking(responseText);
+        const regex = /<tool_call>([\s\S]*?)<\/tool_call>/g;
+        const matches = [...textClean.matchAll(regex)];
+
+        if (matches.length > 0) {
+            toolCallCount++;
+            if (toolCallCount > 4) {
+                removeLoadingBubble();
+                appendBubble("Hệ thống: AI đã dừng lại để tránh quá tải hạn ngạch API.", 'ai');
+                return;
+            }
+
+            const results = [];
+            for (const match of matches) {
+                try {
+                    const payload = JSON.parse(match[1].trim());
+                    const { tool, args } = payload;
+                    let result;
+                    if (tool === 'listAllFoodItems') {
+                        result = await listAllFoodItems();
+                    } else if (tool === 'webSearch') {
+                        result = await webSearch(args.query);
+                    } else if (tool === 'browseWebUrl') {
+                        result = await browseWebUrl(args.url);
+                    } else {
+                        result = { error: `Tool ${tool} không được hỗ trợ.` };
+                    }
+                    results.push({ tool, success: true, result });
+                } catch (e) {
+                    results.push({ success: false, error: e.message });
+                }
+            }
+
+            const feedbackContent = results.map((r, idx) => `[Tool Result ${idx + 1} - ${r.tool}]: ${JSON.stringify(r.result || { error: r.error })}`).join('\n\n');
+            chatMessages.push({
+                role: 'user',
+                content: `Dưới đây là kết quả của các công cụ tra cứu bạn đã gọi:\n\n${feedbackContent}\n\nHãy tổng hợp kết quả này và trả lời khách hàng.`
+            });
+
+            await fetchAiResponse();
+        } else {
+            removeLoadingBubble();
+            appendBubble(textClean, 'ai');
+        }
+    }
+
+    async function fetchAiResponse() {
+        try {
+            let data;
+            try {
+                data = await callCerebras({ messages: chatMessages }, 'gpt-oss-120b');
+            } catch (primaryErr) {
+                try {
+                    data = await callCerebras({ messages: chatMessages }, 'zai-glm-4.7');
+                } catch (backupErr) {
+                    data = await callOpenRouterWithFallback({ messages: chatMessages });
+                }
+            }
+
+            const responseText = data.choices[0].message.content;
+            chatMessages.push({ role: 'assistant', content: responseText });
+            await handleAgentResponse(responseText);
+        } catch (err) {
+            removeLoadingBubble();
+            appendBubble(`Lỗi kết nối AI: ${err.message}`, 'ai');
+        }
+    }
+
+    async function sendMessage() {
+        const val = chatInput.value.trim();
+        if (!val) return;
+
+        chatInput.value = '';
+        appendBubble(val, 'user');
+        chatMessages.push({ role: 'user', content: val });
+
+        toolCallCount = 0;
+        appendLoadingBubble();
+        await fetchAiResponse();
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') sendMessage();
+    });
+})();
