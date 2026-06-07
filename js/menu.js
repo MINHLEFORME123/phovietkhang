@@ -71,12 +71,6 @@ function showOptionsPopup(item, lang) {
     const nameKey = lang === 'vi' ? 'nameVi' : (lang === 'fi' ? 'nameFi' : 'nameEn');
     const displayName = item[nameKey] || item.nameVi || item.nameEn || 'Unknown';
 
-    // Create overlay
-    const overlay = document.createElement('div');
-    overlay.id = 'options-overlay';
-    overlay.className = 'z-[2147483646]';
-    overlay.style.cssText = 'position:fixed !important;inset:0 !important;display:flex !important;align-items:center !important;justify-content:center !important;background:rgba(0,0,0,0.7) !important;backdrop-filter:blur(4px) !important;-webkit-backdrop-filter:blur(4px) !important;padding:16px !important;z-index:2147483646 !important;overflow-y:auto !important;animation:fadeIn 0.2s ease-out;margin:0 !important;box-sizing:border-box !important;';
-
     const normalizedOptions = normalizeOptions(item.options);
 
     const optionsHTML = normalizedOptions.map((group, groupIdx) => {
@@ -120,65 +114,76 @@ function showOptionsPopup(item, lang) {
     const fallbackImg = 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=500';
     const imgSrc = item.image || fallbackImg;
 
-    overlay.innerHTML = `
-        <div class="bg-surface border border-white/10 rounded-2xl shadow-2xl w-full max-w-md flex flex-col" style="animation:slideUp 0.3s ease-out;max-height:85vh;margin:0;">
-            <div class="relative h-40 shrink-0 overflow-hidden">
-                <img src="${imgSrc}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='${fallbackImg}'">
-                <div class="absolute inset-0 bg-gradient-to-t from-surface-dim to-transparent"></div>
-                <h3 class="absolute bottom-4 left-5 text-2xl font-bold font-['EB_Garamond'] text-white drop-shadow-lg">${displayName}</h3>
-                <span id="popup-price-tag" class="absolute top-3 right-3 text-lg font-bold text-primary bg-black/60 px-3 py-1 rounded-full backdrop-blur-sm">&euro;${(item.price || 0).toFixed(2)}</span>
+    // Create backdrop (sibling, no children with position:fixed)
+    const backdrop = document.createElement('div');
+    backdrop.id = 'options-backdrop';
+    backdrop.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:2147483646;animation:fadeIn 0.2s ease-out;margin:0;padding:0;';
+
+    // Create card (sibling to backdrop, positioned via transform, independent of backdrop-filter)
+    const card = document.createElement('div');
+    card.id = 'options-card';
+    card.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2147483647;max-height:85vh;width:calc(100vw - 32px);max-width:28rem;animation:slideUp 0.3s ease-out;';
+    card.className = 'bg-surface border border-white/10 rounded-2xl shadow-2xl flex flex-col overflow-hidden';
+
+    card.innerHTML = `
+        <div class="relative h-40 shrink-0 overflow-hidden">
+            <img src="${imgSrc}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='${fallbackImg}'">
+            <div class="absolute inset-0 bg-gradient-to-t from-surface-dim to-transparent"></div>
+            <h3 class="absolute bottom-4 left-5 text-2xl font-bold font-['EB_Garamond'] text-white drop-shadow-lg">${displayName}</h3>
+            <span id="popup-price-tag" class="absolute top-3 right-3 text-lg font-bold text-primary bg-black/60 px-3 py-1 rounded-full backdrop-blur-sm">&euro;${(item.price || 0).toFixed(2)}</span>
+        </div>
+        <div class="p-5 flex flex-col min-h-0 flex-1">
+            <h4 class="text-primary font-semibold mb-3 flex items-center gap-2 shrink-0">
+                <span class="material-symbols-outlined text-sm">tune</span> ${titleText}
+            </h4>
+            <div class="space-y-4 overflow-y-auto mb-5 flex-1 min-h-0">
+                ${optionsHTML}
             </div>
-            <div class="p-5 flex flex-col min-h-0 flex-1">
-                <h4 class="text-primary font-semibold mb-3 flex items-center gap-2 shrink-0">
-                    <span class="material-symbols-outlined text-sm">tune</span> ${titleText}
-                </h4>
-                <div class="space-y-4 overflow-y-auto mb-5 flex-1 min-h-0">
-                    ${optionsHTML}
-                </div>
-                <div class="flex gap-3 shrink-0">
-                    <button id="popup-cancel" class="flex-1 py-3 border border-white/20 text-secondary rounded-xl hover:bg-white/5 transition-colors font-medium">
-                        ${cancelText}
-                    </button>
-                    <button id="popup-confirm" class="flex-1 py-3 bg-white hover:bg-gray-100 text-black rounded-xl font-bold shadow-lg transition-all flex items-center justify-center gap-2 border border-gray-200">
-                        <span class="material-symbols-outlined text-sm">add_shopping_cart</span> ${addBtnText}
-                    </button>
-                </div>
+            <div class="flex gap-3 shrink-0">
+                <button id="popup-cancel" class="flex-1 py-3 border border-white/20 text-secondary rounded-xl hover:bg-white/5 transition-colors font-medium">
+                    ${cancelText}
+                </button>
+                <button id="popup-confirm" class="flex-1 py-3 bg-white hover:bg-gray-100 text-black rounded-xl font-bold shadow-lg transition-all flex items-center justify-center gap-2 border border-gray-200">
+                    <span class="material-symbols-outlined text-sm">add_shopping_cart</span> ${addBtnText}
+                </button>
             </div>
         </div>
     `;
 
-    document.body.appendChild(overlay);
+    document.body.appendChild(backdrop);
+    document.body.appendChild(card);
     document.body.style.overflow = 'hidden';
 
     // Dynamic Price Updates
     const basePrice = item.price || 0;
     function updatePopupPrice() {
         let extra = 0;
-        overlay.querySelectorAll('.opt-checkbox:checked').forEach(cb => {
+        card.querySelectorAll('.opt-checkbox:checked').forEach(cb => {
             extra += parseFloat(cb.getAttribute('data-price')) || 0;
         });
-        overlay.querySelectorAll('.opt-radio:checked').forEach(r => {
+        card.querySelectorAll('.opt-radio:checked').forEach(r => {
             extra += parseFloat(r.getAttribute('data-price')) || 0;
         });
         const total = basePrice + extra;
-        const priceTag = overlay.querySelector('#popup-price-tag');
+        const priceTag = card.querySelector('#popup-price-tag');
         if (priceTag) {
             priceTag.innerHTML = `&euro;${total.toFixed(2)}`;
         }
     }
 
     // Attach dynamic price calculations on input changes
-    overlay.querySelectorAll('.opt-checkbox, .opt-radio').forEach(input => {
+    card.querySelectorAll('.opt-checkbox, .opt-radio').forEach(input => {
         input.addEventListener('change', updatePopupPrice);
     });
 
-    // Close on cancel or overlay click
+    // Close on cancel or backdrop click
     const closePopup = () => {
-        overlay.remove();
+        backdrop.remove();
+        card.remove();
         document.body.style.overflow = '';
     };
-    overlay.querySelector('#popup-cancel').addEventListener('click', closePopup);
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) closePopup(); });
+    card.querySelector('#popup-cancel').addEventListener('click', closePopup);
+    backdrop.addEventListener('click', () => closePopup());
 
     // Close on ESC key
     const handleEsc = (e) => {
@@ -190,11 +195,11 @@ function showOptionsPopup(item, lang) {
     document.addEventListener('keydown', handleEsc);
 
     // Confirm click
-    overlay.querySelector('#popup-confirm').addEventListener('click', () => {
+    card.querySelector('#popup-confirm').addEventListener('click', () => {
         const selectedStrings = [];
         let finalPrice = basePrice;
 
-        overlay.querySelectorAll('.opt-checkbox:checked').forEach(cb => {
+        card.querySelectorAll('.opt-checkbox:checked').forEach(cb => {
             const grp = cb.getAttribute('data-group');
             const lbl = cb.value;
             const pr = parseFloat(cb.getAttribute('data-price')) || 0;
@@ -204,7 +209,7 @@ function showOptionsPopup(item, lang) {
             selectedStrings.push(displayStr);
         });
 
-        overlay.querySelectorAll('.opt-radio:checked').forEach(r => {
+        card.querySelectorAll('.opt-radio:checked').forEach(r => {
             const grp = r.getAttribute('data-group');
             const lbl = r.value;
             const pr = parseFloat(r.getAttribute('data-price')) || 0;
@@ -216,15 +221,13 @@ function showOptionsPopup(item, lang) {
 
         const safeName = (item.nameEn || item.nameVi || 'Unknown');
         
-        // Trigger fly to cart animation on the popup modal card
-        const popupModal = overlay.querySelector('div');
-        if (popupModal) {
-            window.flyToCart(popupModal);
-        }
+        // Trigger fly to cart animation on the card
+        window.flyToCart(card);
         
         window.addToCart(item.id, safeName, finalPrice, item.image || '', selectedStrings);
         document.removeEventListener('keydown', handleEsc);
-        overlay.remove();
+        backdrop.remove();
+        card.remove();
         document.body.style.overflow = '';
     });
 }
