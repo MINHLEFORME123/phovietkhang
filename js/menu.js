@@ -74,8 +74,8 @@ function showOptionsPopup(item, lang) {
     // Create overlay
     const overlay = document.createElement('div');
     overlay.id = 'options-overlay';
-    overlay.className = 'fixed inset-0 bg-black/70 backdrop-blur-sm z-[2147483646] flex items-center justify-center p-4';
-    overlay.style.animation = 'fadeIn 0.2s ease-out';
+    overlay.className = 'z-[2147483646]';
+    overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);margin:0;padding:16px;box-sizing:border-box;overflow-y:auto;z-index:2147483646;animation:fadeIn 0.2s ease-out;';
 
     const normalizedOptions = normalizeOptions(item.options);
 
@@ -121,7 +121,7 @@ function showOptionsPopup(item, lang) {
     const imgSrc = item.image || fallbackImg;
 
     overlay.innerHTML = `
-        <div class="bg-surface border border-white/10 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden flex flex-col" style="animation: slideUp 0.3s ease-out; max-height: 90vh;">
+        <div class="bg-surface border border-white/10 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden flex flex-col" style="animation:slideUp 0.3s ease-out;max-height:90vh;margin:auto;">
             <div class="relative h-40 shrink-0 overflow-hidden">
                 <img src="${imgSrc}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='${fallbackImg}'">
                 <div class="absolute inset-0 bg-gradient-to-t from-surface-dim to-transparent"></div>
