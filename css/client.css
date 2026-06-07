@@ -112,39 +112,26 @@ nav a[href="profile.html"] .material-symbols-outlined {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   WHITE NAVBAR OVERRIDE  (index.html – bg-pattern-light pages)
+   DARK NAVBAR – Consistent dark theme for all pages
    ═══════════════════════════════════════════════════════════════════ */
 nav.fixed {
-    background-color: rgba(255, 255, 255, 0.95) !important;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+    background-color: rgba(10, 16, 25, 0.95) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
 }
-nav.fixed a.text-primary { color: #001736 !important; }
-nav.fixed a.text-primary.border-primary { border-color: #001736 !important; }
-nav.fixed a.text-secondary { color: #5f5e5e !important; }
-nav.fixed a.text-secondary:hover { color: #001736 !important; }
+nav.fixed a.text-primary { color: #ffffff !important; }
+nav.fixed a.text-secondary { color: #9ca3af !important; }
+nav.fixed a.text-secondary:hover { color: #ffffff !important; }
 nav.fixed button.text-primary,
-nav.fixed button { color: #001736 !important; }
-
-/* White Buttons overrides */
-.bg-primary-container,
-button[type="submit"],
-a[href="reservations.html"].hidden,
-a[href="reservations.html"].md\:inline-flex,
-a[href="checkout.html"].bg-primary-container {
-    background-image: none !important;
-    background-color: #ffffff !important;
-    color: #001736 !important;
-    border: 1px solid rgba(0, 0, 0, 0.15) !important;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
-}
-.bg-primary-container:hover,
-button[type="submit"]:hover,
-a[href="reservations.html"].hidden:hover,
-a[href="reservations.html"].md\:inline-flex:hover,
-a[href="checkout.html"].bg-primary-container:hover {
-    background-color: #f9fafb !important;
-    opacity: 0.95 !important;
-}
+nav.fixed button { color: #ffffff !important; }
+nav.fixed a.text-gray-400 { color: #9ca3af !important; }
+nav.fixed a.text-gray-400:hover { color: #ffffff !important; }
+nav.fixed a#nav-inbox-link,
+nav.fixed a#nav-inbox-link span[data-i18n] { color: #9ca3af !important; }
+nav.fixed a#nav-inbox-link:hover,
+nav.fixed a#nav-inbox-link:hover span[data-i18n] { color: #ffffff !important; }
+nav.fixed #inbox-badge-nav { background-color: #ef4444 !important; }
 
 /* ═══════════════════════════════════════════════════════════════════
    GLOSSY BLACK CART BUTTON
