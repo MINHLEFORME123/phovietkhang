@@ -121,7 +121,7 @@ function showOptionsPopup(item, lang) {
     const imgSrc = item.image || fallbackImg;
 
     overlay.innerHTML = `
-        <div class="bg-surface border border-white/10 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col" style="animation:slideUp 0.3s ease-out;max-height:85vh;margin:0;">
+        <div class="bg-surface border border-white/10 rounded-2xl shadow-2xl w-full max-w-md flex flex-col" style="animation:slideUp 0.3s ease-out;max-height:85vh;margin:0;">
             <div class="relative h-40 shrink-0 overflow-hidden">
                 <img src="${imgSrc}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='${fallbackImg}'">
                 <div class="absolute inset-0 bg-gradient-to-t from-surface-dim to-transparent"></div>
@@ -132,7 +132,7 @@ function showOptionsPopup(item, lang) {
                 <h4 class="text-primary font-semibold mb-3 flex items-center gap-2 shrink-0">
                     <span class="material-symbols-outlined text-sm">tune</span> ${titleText}
                 </h4>
-                <div class="space-y-4 overflow-y-auto mb-5 flex-1 min-h-0" style="max-height: 45vh;">
+                <div class="space-y-4 overflow-y-auto mb-5 flex-1 min-h-0">
                     ${optionsHTML}
                 </div>
                 <div class="flex gap-3 shrink-0">
