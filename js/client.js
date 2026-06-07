@@ -38,7 +38,8 @@ const translations = {
     "cta-btn1": "Xem Thực Đơn",
     "cta-btn2": "Tìm Địa Điểm",
     "footer-desc": "Nghệ Thuật Ẩm Thực Châu Á.", "footer-privacy": "Chính sách bảo mật", "footer-terms": "Điều khoản dịch vụ", "footer-careers": "Tuyển dụng", "footer-press": "Tài liệu báo chí", "footer-copyright": "© 2026 PHỞ VIỆT KHANG. BẢN QUYỀN ĐÃ ĐƯỢC BẢO HỘ.",
-    "cart-title": "Giỏ hàng & Thanh toán", "order-items": "Món ăn đã chọn", "empty-cart": "Giỏ hàng của bạn đang trống.", "browse-menu": "Xem Thực đơn", "order-summary": "Tổng quan đơn hàng", "total-label": "Tổng cộng:", "your-name": "Tên của bạn", "phone-number": "Số điện thoại", "dine-in": "Ăn tại bàn", "takeaway": "Mang về", "delivery": "Giao hàng", "table-number": "Số bàn", "delivery-address": "Địa chỉ giao hàng", "notes": "Ghi chú cho bếp (Tùy chọn)", "place-order": "Đặt hàng ngay"
+    "cart-title": "Giỏ hàng & Thanh toán", "order-items": "Món ăn đã chọn", "empty-cart": "Giỏ hàng của bạn đang trống.", "browse-menu": "Xem Thực đơn", "order-summary": "Tổng quan đơn hàng", "total-label": "Tổng cộng:", "your-name": "Tên của bạn", "phone-number": "Số điện thoại", "dine-in": "Ăn tại bàn", "takeaway": "Mang về", "delivery": "Giao hàng", "table-number": "Số bàn", "delivery-address": "Địa chỉ giao hàng", "notes": "Ghi chú cho bếp (Tùy chọn)", "place-order": "Đặt hàng ngay",
+    "reviews-label": "Trải nghiệm thực tế", "reviews-title": "Khách hàng nói gì về chúng tôi"
   },
   en: {
     "nav-home": "Home", "nav-menu": "Menu", "nav-locations": "Locations", "nav-contact": "Contact", "nav-reservations": "Reservations", "nav-register": "Register", "nav-inbox": "Inbox", "inbox-title": "Your Mailbox",
@@ -79,7 +80,8 @@ const translations = {
     "cta-btn1": "View Menu",
     "cta-btn2": "Find a Location",
     "footer-desc": "The Art of Asian Gastronomy.", "footer-privacy": "Privacy Policy", "footer-terms": "Terms of Service", "footer-careers": "Careers", "footer-press": "Press Kit", "footer-copyright": "© 2026 PHO VIET KHANG. ALL RIGHTS RESERVED.",
-    "cart-title": "Your Cart & Checkout", "order-items": "Order Items", "empty-cart": "Your cart is empty.", "browse-menu": "Browse Menu", "order-summary": "Order Summary", "total-label": "Total:", "your-name": "Your Name", "phone-number": "Phone Number", "dine-in": "Dine In", "takeaway": "Takeaway", "delivery": "Delivery", "table-number": "Table Number", "delivery-address": "Delivery Address", "notes": "Notes for Kitchen (Optional)", "place-order": "Place Order Now"
+    "cart-title": "Your Cart & Checkout", "order-items": "Order Items", "empty-cart": "Your cart is empty.", "browse-menu": "Browse Menu", "order-summary": "Order Summary", "total-label": "Total:", "your-name": "Your Name", "phone-number": "Phone Number", "dine-in": "Dine In", "takeaway": "Takeaway", "delivery": "Delivery", "table-number": "Table Number", "delivery-address": "Delivery Address", "notes": "Notes for Kitchen (Optional)", "place-order": "Place Order Now",
+    "reviews-label": "Guest Experiences", "reviews-title": "What Our Guests Say"
   },
   fi: {
     "nav-home": "Koti", "nav-menu": "Menu", "nav-locations": "Toimipisteet", "nav-contact": "Yhteystiedot", "nav-reservations": "Varaukset", "nav-register": "Rekisteröidy", "nav-inbox": "Postilaatikko", "inbox-title": "Postilaatikkosi",
@@ -113,7 +115,15 @@ const translations = {
     "dish1-title": "Ankka-paistettu Riisi", "dish1-desc": "Rapeaa riisiä, joka on paistettu tuoksuvassa ankanrasvassa, tarjoillaan murean paahdetun ankan ja raikkaan hapanimelän pikkelssin kera.",
     "dish2-title": "Wonton-keitto", "dish2-desc": "Kirkas, makea luuliemi paperinohuilla nyyteillä, jotka on täytetty rikkaalla possulla ja katkaravulla.",
     "dish3-title": "Paistettu Harvinainen Naudan Pho", "dish3-desc": "Wokkipannulla paistettua nautaa savuisella valkosipuliaromin vivahteella, upotettuna perinteiseen rikkaaseen pho-liemeen.",
-    "dish4-title": "Katkarapu-Kevätkääryleet", "dish4-desc": "Huolella käsin kääritty tuoreilla tiikerikatkaravuilla, riisinuudeleilla ja yrteillä, tarjoillaan kermaisen maapähkinäkastikkeen kera.",
+    "dish4-title": "Katkarapu-Kevätkääryleet", "dish4-desc": "Huolella käsin kääriitty tuoreilla tiikerikatkaravuilla, riisinuudeleilla ja yrteillä, tarjoillaan kermaisen maapähkinäkastikkeen kera.",
+    "dish5-title": "Suolattu Kahvi", "dish5-desc": "Voimakas perinteinen suodatinkahvi, jonka päällä on pehmeä, suolainen kermavaahto herättämään aistisi.",
+    "cta-title": "Koe Koko Matka",
+    "cta-desc": "Tutustu koko kausiluonteiseen maistelumenuumme ja a la carte -tarjontaamme, jotka on suunniteltu ilahduttamaan.",
+    "cta-btn1": "Näytä Menu",
+    "cta-btn2": "Etsi Toimipiste",
+    "footer-desc": "Aasialaisen Gastronomian Taide.", "footer-privacy": "Tietosuojakäytäntö", "footer-terms": "Käyttöehdot", "footer-careers": "Urat", "footer-press": "Lehdistöpaketti", "footer-copyright": "© 2026 PHO VIET KHANG. KAIKKI OIKEUDET PIDÄTETÄÄN.",
+    "cart-title": "Ostoskori & Kassa", "order-items": "Tilauksen tuotteet", "empty-cart": "Ostoskoriisi on tyhjä.", "browse-menu": "Selaa ruokalistaa", "order-summary": "Yhteenveto", "total-label": "Yhteensä:", "your-name": "Nimesi", "phone-number": "Puhelinnumero", "dine-in": "Syö paikan päällä", "takeaway": "Mukaan", "delivery": "Kotiinkuljetus", "table-number": "Pöydän numero", "delivery-address": "Toimitusosoite", "notes": "Huomautukset keittiölle (valinnainen)", "place-order": "Tilaa nyt",
+    "reviews-label": "Asiakaskokemukset", "reviews-title": "Mitä asiakkaamme sanovat" maapähkinäkastikkeen kera.",
     "dish5-title": "Suolattu Kahvi", "dish5-desc": "Voimakas perinteinen suodatinkahvi, jonka päällä on pehmeä, suolainen kermavaahto herättämään aistisi.",
     "cta-title": "Koe Koko Matka",
     "cta-desc": "Tutustu koko kausiluonteiseen maistelumenuumme ja a la carte -tarjontaamme, jotka on suunniteltu ilahduttamaan.",
