@@ -225,6 +225,13 @@ function changeLanguage(lang) {
 const savedLang = localStorage.getItem('selectedLanguage') || 'en';
 changeLanguage(savedLang);
 
+// Clear body transform after page animation to fix position:fixed on popups
+document.addEventListener('animationend', function(e) {
+    if (e.animationName === 'pageFadeIn' && e.target === document.body) {
+        document.body.style.transform = 'none';
+    }
+});
+
 document.addEventListener('click', (e) => {
   const link = e.target.closest('a[href]');
   if (!link) return;
