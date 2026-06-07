@@ -245,32 +245,32 @@ document.addEventListener('click', (e) => {
     // Inject styles for client assistant
     const style = document.createElement('style');
     style.textContent = `
-        .client-chat-window {
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background-color: #0c1220;
-            color: #f3f4f6;
+        .pvk-chat-window {
+            position: fixed !important;
+            bottom: 100px !important;
+            right: 20px !important;
+            width: min(380px, calc(100vw - 40px)) !important;
+            max-height: 65vh !important;
+            z-index: 2147483647 !important;
             display: none;
             flex-direction: column;
-            width: 380px;
-            height: 520px;
-            position: fixed;
-            bottom: 95px;
-            right: 24px;
-            z-index: 9999;
             border-radius: 16px;
             overflow: hidden;
             font-family: 'Inter', sans-serif;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            background-color: #0c1220;
+            color: #f3f4f6;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+            transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             opacity: 0;
             transform: translateY(20px) scale(0.95);
         }
-        .client-chat-window.show {
-            display: flex;
+        .pvk-chat-window.show {
+            display: flex !important;
             opacity: 1;
             transform: translateY(0) scale(1);
         }
-        .client-chat-bubble {
+        .pvk-chat-bubble {
             max-width: 85%;
             padding: 10px 14px;
             border-radius: 14px;
@@ -279,42 +279,48 @@ document.addEventListener('click', (e) => {
             word-wrap: break-word;
             margin-bottom: 2px;
         }
-        .bubble-user {
+        .pvk-bubble-user {
             background-color: #3b82f6;
             color: white;
             align-self: flex-end;
             border-bottom-right-radius: 4px;
         }
-        .bubble-ai {
+        .pvk-bubble-ai {
             background-color: #1a2333;
             color: #e5e7eb;
             align-self: flex-start;
             border-bottom-left-radius: 4px;
             border: 1px solid rgba(255,255,255,0.05);
         }
-        .client-chat-toggle-btn {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background-color: #3b82f6;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .pvk-chat-toggle-btn {
+            position: fixed !important;
+            bottom: 20px !important;
+            right: 20px !important;
+            width: 56px !important;
+            height: 56px !important;
+            border-radius: 50% !important;
+            background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+            color: white !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
             cursor: pointer;
-            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.5);
-            z-index: 9999;
-            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease;
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.5), 0 0 0 0 rgba(59, 130, 246, 0.4);
+            z-index: 2147483647 !important;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s ease;
+            animation: pvk-pulse-ring 2.5s ease-out infinite;
         }
-        .client-chat-toggle-btn:hover {
-            transform: scale(1.06);
-            background-color: #2563eb;
+        .pvk-chat-toggle-btn:hover {
+            transform: scale(1.08) !important;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
         }
-        .client-chat-toggle-btn:active {
-            transform: scale(0.94);
+        .pvk-chat-toggle-btn:active {
+            transform: scale(0.94) !important;
+        }
+        @keyframes pvk-pulse-ring {
+            0% { box-shadow: 0 4px 14px rgba(59, 130, 246, 0.5), 0 0 0 0 rgba(59, 130, 246, 0.4); }
+            70% { box-shadow: 0 4px 14px rgba(59, 130, 246, 0.5), 0 0 0 12px rgba(59, 130, 246, 0); }
+            100% { box-shadow: 0 4px 14px rgba(59, 130, 246, 0.5), 0 0 0 0 rgba(59, 130, 246, 0); }
         }
         .dots-loader span {
             width: 6px;
@@ -331,16 +337,31 @@ document.addEventListener('click', (e) => {
             0%, 80%, 100% { transform: scale(0); }
             40% { transform: scale(1); }
         }
+        @media (max-width: 480px) {
+            .pvk-chat-toggle-btn {
+                width: 50px !important;
+                height: 50px !important;
+                bottom: 16px !important;
+                right: 16px !important;
+            }
+            .pvk-chat-window {
+                width: calc(100vw - 32px) !important;
+                right: 16px !important;
+                bottom: 80px !important;
+                max-height: 60vh !important;
+            }
+        }
     `;
     document.head.appendChild(style);
 
     // Create Markup
     const chatContainer = document.createElement('div');
+    chatContainer.id = 'pvk-chat-root';
     chatContainer.innerHTML = `
-        <div class="client-chat-toggle-btn animate-bounce" id="client-chat-toggle" style="animation-duration: 2.5s;">
+        <div class="pvk-chat-toggle-btn" id="client-chat-toggle">
             <span class="material-symbols-outlined text-[28px]" id="client-chat-icon">chat</span>
         </div>
-        <div class="client-chat-window" id="client-chat-win">
+        <div class="pvk-chat-window" id="client-chat-win">
             <!-- Header -->
             <div class="p-4 bg-[#141b2b] border-b border-gray-800 flex items-center justify-between">
                 <div class="flex items-center gap-2">
@@ -354,7 +375,7 @@ document.addEventListener('click', (e) => {
             
             <!-- Message Area -->
             <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-3" id="client-chat-messages">
-                <div class="client-chat-bubble bubble-ai animate-fade-in" id="client-chat-welcome-msg">
+                <div class="pvk-chat-bubble pvk-bubble-ai animate-fade-in" id="client-chat-welcome-msg">
                     Xin chào! Tôi là Trợ lý ảo của Phở Việt Khang. Tôi có thể tư vấn món ăn, tìm cửa hàng gần nhất hoặc tra cứu thông tin giúp bạn. Bạn cần giúp gì?
                 </div>
             </div>
@@ -546,7 +567,7 @@ Rules:
 
     function appendBubble(text, sender) {
         const bubble = document.createElement('div');
-        bubble.className = `client-chat-bubble bubble-${sender}`;
+        bubble.className = `pvk-chat-bubble pvk-bubble-${sender}`;
         bubble.textContent = text;
         msgArea.appendChild(bubble);
         msgArea.scrollTop = msgArea.scrollHeight;
@@ -555,7 +576,7 @@ Rules:
 
     function appendLoadingBubble() {
         const bubble = document.createElement('div');
-        bubble.className = `client-chat-bubble bubble-ai dots-loader`;
+        bubble.className = `pvk-chat-bubble pvk-bubble-ai dots-loader`;
         bubble.id = 'client-chat-loading-bubble';
         bubble.innerHTML = '<span></span><span></span><span></span>';
         msgArea.appendChild(bubble);
