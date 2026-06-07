@@ -379,6 +379,7 @@ async function loadMenu() {
                                 <h3 class="text-2xl font-bold font-['EB_Garamond'] text-white drop-shadow-md dynamic-name" 
                                     data-vi="${item.nameVi || ''}" data-en="${item.nameEn || ''}" data-fi="${item.nameFi || ''}">
                                     ${displayName}
+                                    ${item.allergenWarning ? '<span class="inline-flex items-center gap-1 bg-red-100 text-red-600 text-[10px] px-1.5 py-0.5 rounded border border-red-200 ml-1 align-middle" title="Chứa thành phần dễ gây dị ứng"><span class="material-symbols-outlined text-[12px]">warning</span></span>' : ''}
                                 </h3>
                                 ${optionsBadge}
                             </div>

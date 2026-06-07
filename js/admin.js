@@ -1623,6 +1623,8 @@ if (foodAddForm) {
                 finalImage = 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=500';
             }
 
+            const allergenWarning = document.getElementById('food-allergen')?.checked || false;
+
             await addDoc(collection(db, "menu"), {
                 nameVi, descVi, nameEn, descEn, nameFi, descFi, 
                 category: categoryVi,
@@ -1632,6 +1634,7 @@ if (foodAddForm) {
                 price, 
                 image: finalImage,
                 options: foodOptions.length > 0 ? [...foodOptions] : [],
+                allergenWarning,
                 createdAt: new Date()
             });
             
@@ -1683,7 +1686,9 @@ if (foodTableBody) {
                 tr.innerHTML = `
                     <td class="py-3 px-4"><img src="${item.image}" class="w-12 h-12 object-cover rounded" onerror="this.src='https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=100'"></td>
                     <td class="py-3 px-4">
-                        <span class="font-bold text-white">${item.nameVi || ''}</span><br>
+                        <span class="font-bold text-white">${item.nameVi || ''}</span>
+                        ${item.allergenWarning ? '<span class="inline-flex items-center gap-1 bg-red-900/30 text-red-400 text-xs px-2 py-0.5 rounded-md font-semibold border border-red-800/50 ml-2" title="Chứa thành phần dễ gây dị ứng"><span class="material-symbols-outlined text-[14px]">warning</span> Dị ứng</span>' : ''}
+                        <br>
                         <span class="text-xs text-secondary">EN: ${item.nameEn || ''}</span><br>
                         <span class="text-xs text-secondary">FI: ${item.nameFi || ''}</span>
                     </td>
@@ -1792,6 +1797,9 @@ if (foodTableBody) {
         document.getElementById('edit-category-en').value = item.categoryEn || '';
         document.getElementById('edit-category-fi').value = item.categoryFi || '';
         document.getElementById('edit-price').value = item.price || 0;
+        
+        const editAllergenCb = document.getElementById('edit-allergen');
+        if (editAllergenCb) editAllergenCb.checked = item.allergenWarning || false;
         
         editOptions = item.options ? normalizeOptions(item.options) : [];
         editAddingChoices = [];
@@ -1987,7 +1995,8 @@ if (foodTableBody) {
                     categoryEn: categoryEn || categoryVi,
                     categoryFi: categoryFi || categoryVi,
                     price: parseFloat(document.getElementById('edit-price').value) || 0,
-                    options: [...editOptions]
+                    options: [...editOptions],
+                    allergenWarning: document.getElementById('edit-allergen')?.checked || false
                 };
 
                 if (editCompressedImage) {

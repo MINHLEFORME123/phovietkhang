@@ -114,7 +114,10 @@ async function loadHomepage() {
                                 <img alt="${name}" class="w-full h-[300px] md:h-full object-cover group-hover:scale-105 transition-transform duration-700" src="${img}"/>
                                 <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
                                 <div class="absolute bottom-0 left-0 p-8">
-                                    <h3 class="font-title-lg text-3xl font-bold text-white mb-2 drop-shadow-md">${name}</h3>
+                                    <h3 class="font-title-lg text-3xl font-bold text-white mb-2 drop-shadow-md">
+                                        ${name}
+                                        ${dish.allergenWarning ? '<span class="inline-flex items-center gap-1 bg-red-900/80 text-red-100 text-xs px-2 py-0.5 rounded-md font-semibold border border-red-500/50 ml-2 align-middle" title="Chứa thành phần dễ gây dị ứng"><span class="material-symbols-outlined text-[14px]">warning</span> Dị ứng</span>' : ''}
+                                    </h3>
                                     <p class="font-body-sm text-body-sm text-gray-200 drop-shadow">${desc}</p>
                                 </div>
                             </div>
@@ -127,7 +130,10 @@ async function loadHomepage() {
                                 <img alt="${name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="${img}"/>
                             </div>
                             <div class="p-6 flex-1 flex flex-col">
-                                <h3 class="font-title-lg text-title-lg text-primary-container mb-2 line-clamp-1">${name}</h3>
+                                <h3 class="font-title-lg text-title-lg text-primary-container mb-2 line-clamp-1">
+                                    ${name}
+                                    ${dish.allergenWarning ? '<span class="inline-flex items-center gap-1 bg-red-100 text-red-600 text-[10px] px-1.5 py-0.5 rounded border border-red-200 ml-1 align-middle" title="Chứa thành phần dễ gây dị ứng"><span class="material-symbols-outlined text-[12px]">warning</span></span>' : ''}
+                                </h3>
                                 <p class="font-body-sm text-body-sm text-secondary line-clamp-2">${desc}</p>
                             </div>
                         </div>`;
