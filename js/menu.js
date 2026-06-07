@@ -75,7 +75,7 @@ function showOptionsPopup(item, lang) {
     const overlay = document.createElement('div');
     overlay.id = 'options-overlay';
     overlay.className = 'z-[2147483646]';
-    overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);margin:0;padding:16px;box-sizing:border-box;overflow-y:auto;z-index:2147483646;animation:fadeIn 0.2s ease-out;';
+    overlay.style.cssText = 'position:fixed !important;inset:0 !important;display:flex !important;align-items:center !important;justify-content:center !important;background:rgba(0,0,0,0.7) !important;backdrop-filter:blur(4px) !important;-webkit-backdrop-filter:blur(4px) !important;padding:16px !important;z-index:2147483646 !important;overflow-y:auto !important;animation:fadeIn 0.2s ease-out;margin:0 !important;box-sizing:border-box !important;';
 
     const normalizedOptions = normalizeOptions(item.options);
 
@@ -121,18 +121,18 @@ function showOptionsPopup(item, lang) {
     const imgSrc = item.image || fallbackImg;
 
     overlay.innerHTML = `
-        <div class="bg-surface border border-white/10 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden flex flex-col" style="animation:slideUp 0.3s ease-out;max-height:90vh;margin:auto;">
+        <div class="bg-surface border border-white/10 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col" style="animation:slideUp 0.3s ease-out;max-height:85vh;margin:0;">
             <div class="relative h-40 shrink-0 overflow-hidden">
                 <img src="${imgSrc}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='${fallbackImg}'">
                 <div class="absolute inset-0 bg-gradient-to-t from-surface-dim to-transparent"></div>
                 <h3 class="absolute bottom-4 left-5 text-2xl font-bold font-['EB_Garamond'] text-white drop-shadow-lg">${displayName}</h3>
                 <span id="popup-price-tag" class="absolute top-3 right-3 text-lg font-bold text-primary bg-black/60 px-3 py-1 rounded-full backdrop-blur-sm">&euro;${(item.price || 0).toFixed(2)}</span>
             </div>
-            <div class="p-5 flex flex-col min-h-0">
+            <div class="p-5 flex flex-col min-h-0 flex-1">
                 <h4 class="text-primary font-semibold mb-3 flex items-center gap-2 shrink-0">
                     <span class="material-symbols-outlined text-sm">tune</span> ${titleText}
                 </h4>
-                <div class="space-y-4 overflow-y-auto mb-5" style="max-height: 40vh;">
+                <div class="space-y-4 overflow-y-auto mb-5 flex-1 min-h-0" style="max-height: 45vh;">
                     ${optionsHTML}
                 </div>
                 <div class="flex gap-3 shrink-0">
@@ -229,39 +229,13 @@ function showOptionsPopup(item, lang) {
     });
 }
 
-// Inject popup animation styles
-const popupStyle = document.createElement('style');
-popupStyle.textContent = `
+// Inject popup animation keyframes
+const popupKeyframes = document.createElement('style');
+popupKeyframes.textContent = `
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes slideUp { from { opacity: 0; transform: translateY(30px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
-    #options-overlay {
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100vw !important;
-        height: 100vh !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        z-index: 2147483646 !important;
-        background-color: rgba(0, 0, 0, 0.7) !important;
-        backdrop-filter: blur(4px) !important;
-        -webkit-backdrop-filter: blur(4px) !important;
-        margin: 0 !important;
-        padding: 16px !important;
-        box-sizing: border-box !important;
-    }
-    #options-overlay > div {
-        max-height: 90vh !important;
-        display: flex !important;
-        flex-direction: column !important;
-        position: relative !important;
-        width: 100% !important;
-        max-width: 28rem !important; /* max-w-md equivalent */
-    }
 `;
-document.head.appendChild(popupStyle);
-
+document.head.appendChild(popupKeyframes);
 
 async function loadMenu() {
     if (!menuContainer) return;
