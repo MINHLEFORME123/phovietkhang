@@ -171,14 +171,41 @@ async function loadFeedbackMarquee() {
             ];
         }
 
+        const avatarPool = [
+            "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&h=100&q=80",
+            "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&h=100&q=80",
+            "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&h=100&q=80",
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&h=100&q=80",
+            "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=100&h=100&q=80",
+            "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=100&h=100&q=80",
+            "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=100&h=100&q=80",
+            "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=100&h=100&q=80",
+            "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=100&h=100&q=80",
+            "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=100&h=100&q=80",
+            "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=100&h=100&q=80",
+            "https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?auto=format&fit=crop&w=100&h=100&q=80",
+            "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=100&h=100&q=80",
+            "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=100&h=100&q=80",
+            "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=100&h=100&q=80"
+        ];
+
+        function getAvatarUrl(name) {
+            let hash = 0;
+            for (let i = 0; i < name.length; i++) {
+                hash = name.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            const index = Math.abs(hash) % avatarPool.length;
+            return avatarPool[index];
+        }
+
         function makeCard(r) {
-            const initial = r.name.charAt(0);
+            const avatarUrl = r.avatar || getAvatarUrl(r.name);
             const stars = "★".repeat(r.rating) + "☆".repeat(5 - r.rating);
             return `
                 <div class="w-[350px] shrink-0 bg-surface/40 backdrop-blur-md border border-white/10 p-6 rounded-2xl flex flex-col justify-between shadow-xl transition-all duration-300 hover:border-primary-container/40">
                     <div>
                         <div class="flex items-center gap-3 mb-4">
-                            <div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-white font-bold text-lg">${initial}</div>
+                            <img src="${avatarUrl}" alt="${r.name}" class="w-10 h-10 rounded-full object-cover border border-white/10" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&h=100&q=80'">
                             <div>
                                 <h4 class="font-bold text-white text-sm">${r.name}</h4>
                                 <span class="text-xs text-secondary">${r.loc}</span>
