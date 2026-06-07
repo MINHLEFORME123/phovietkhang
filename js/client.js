@@ -354,13 +354,17 @@ document.addEventListener('click', (e) => {
     `;
     document.head.appendChild(style);
 
-    // Create Markup
-    const chatContainer = document.createElement('div');
-    chatContainer.id = 'pvk-chat-root';
-    chatContainer.innerHTML = `
+    // Create Markup - append directly to body (no wrapper div to avoid fixed positioning issues)
+    const toggleDiv = document.createElement('div');
+    toggleDiv.innerHTML = `
         <div class="pvk-chat-toggle-btn" id="client-chat-toggle">
             <span class="material-symbols-outlined text-[28px]" id="client-chat-icon">chat</span>
         </div>
+    `;
+    document.body.appendChild(toggleDiv);
+
+    const winDiv = document.createElement('div');
+    winDiv.innerHTML = `
         <div class="pvk-chat-window" id="client-chat-win">
             <!-- Header -->
             <div class="p-4 bg-[#141b2b] border-b border-gray-800 flex items-center justify-between">
@@ -389,7 +393,7 @@ document.addEventListener('click', (e) => {
             </div>
         </div>
     `;
-    document.body.appendChild(chatContainer);
+    document.body.appendChild(winDiv);
 
     const toggleBtn = document.getElementById('client-chat-toggle');
     const chatWin = document.getElementById('client-chat-win');
