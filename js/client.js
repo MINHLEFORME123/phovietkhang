@@ -225,12 +225,19 @@ function changeLanguage(lang) {
 const savedLang = localStorage.getItem('selectedLanguage') || 'en';
 changeLanguage(savedLang);
 
-// Clear body transform after page animation to fix position:fixed on popups
-document.addEventListener('animationend', function(e) {
-    if (e.animationName === 'pageFadeIn' && e.target === document.body) {
-        document.body.style.transform = 'none';
-    }
-});
+// --- FIX: Ensure body never has a persistent transform that breaks position:fixed ---
+// Problem: pageFadeIn animation's `to` state can leave transform on body,
+// which creates a new containing block, breaking position:fixed on popups/chat.
+// Approach: Immediately clear any transform, and also listen for future animation ends.
+(function() {
+    const body = document.body;
+    body.style.transform = 'none';
+    body.addEventListener('animationend', function(e) {
+        if (e.animationName === 'pageFadeIn' && e.target === body) {
+            body.style.transform = 'none';
+        }
+    });
+})();
 
 document.addEventListener('click', (e) => {
   const link = e.target.closest('a[href]');
