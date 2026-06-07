@@ -117,22 +117,25 @@ function showOptionsPopup(item, lang) {
     const cancelText = lang === 'vi' ? 'Hủy' : (lang === 'fi' ? 'Peruuta' : 'Cancel');
     const titleText = lang === 'vi' ? 'Tùy chọn' : (lang === 'fi' ? 'Vaihtoehdot' : 'Customize');
 
+    const fallbackImg = 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=500';
+    const imgSrc = item.image || fallbackImg;
+
     overlay.innerHTML = `
-        <div class="bg-surface border border-white/10 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden" style="animation: slideUp 0.3s ease-out">
-            <div class="relative h-40 overflow-hidden">
-                <img src="${item.image || ''}" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=500'">
+        <div class="bg-surface border border-white/10 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden flex flex-col" style="animation: slideUp 0.3s ease-out; max-height: 90vh;">
+            <div class="relative h-40 shrink-0 overflow-hidden">
+                <img src="${imgSrc}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='${fallbackImg}'">
                 <div class="absolute inset-0 bg-gradient-to-t from-surface-dim to-transparent"></div>
                 <h3 class="absolute bottom-4 left-5 text-2xl font-bold font-['EB_Garamond'] text-white drop-shadow-lg">${displayName}</h3>
                 <span id="popup-price-tag" class="absolute top-3 right-3 text-lg font-bold text-primary bg-black/60 px-3 py-1 rounded-full backdrop-blur-sm">&euro;${(item.price || 0).toFixed(2)}</span>
             </div>
-            <div class="p-5">
-                <h4 class="text-primary font-semibold mb-3 flex items-center gap-2">
+            <div class="p-5 flex flex-col min-h-0">
+                <h4 class="text-primary font-semibold mb-3 flex items-center gap-2 shrink-0">
                     <span class="material-symbols-outlined text-sm">tune</span> ${titleText}
                 </h4>
-                <div class="space-y-4 max-h-60 overflow-y-auto mb-5">
+                <div class="space-y-4 overflow-y-auto mb-5" style="max-height: 40vh;">
                     ${optionsHTML}
                 </div>
-                <div class="flex gap-3">
+                <div class="flex gap-3 shrink-0">
                     <button id="popup-cancel" class="flex-1 py-3 border border-white/20 text-secondary rounded-xl hover:bg-white/5 transition-colors font-medium">
                         ${cancelText}
                     </button>

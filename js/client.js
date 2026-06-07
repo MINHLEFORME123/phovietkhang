@@ -355,19 +355,14 @@ document.addEventListener('click', (e) => {
     document.head.appendChild(style);
 
     // Create Markup - append directly to body (no wrapper div to avoid fixed positioning issues)
-    const toggleDiv = document.createElement('div');
-    toggleDiv.innerHTML = `
-        <div class="pvk-chat-toggle-btn" id="client-chat-toggle">
+    const chatToggleHTML = `
+        <div class="pvk-chat-toggle-btn" id="client-chat-toggle" style="position:fixed!important;bottom:20px!important;right:20px!important;z-index:2147483647!important;">
             <span class="material-symbols-outlined text-[28px]" id="client-chat-icon">chat</span>
         </div>
     `;
-    document.body.appendChild(toggleDiv);
-
-    const winDiv = document.createElement('div');
-    winDiv.innerHTML = `
-        <div class="pvk-chat-window" id="client-chat-win">
-            <!-- Header -->
-            <div class="p-4 bg-[#141b2b] border-b border-gray-800 flex items-center justify-between">
+    const chatWinHTML = `
+        <div class="pvk-chat-window" id="client-chat-win" style="position:fixed!important;bottom:100px!important;right:20px!important;z-index:2147483647!important;">
+            <div class="p-4 bg-[#141b2b] border-b border-gray-800 flex items-center justify-between shrink-0">
                 <div class="flex items-center gap-2">
                     <span class="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></span>
                     <span class="font-bold text-white text-sm" data-chat-title>Trợ lý Phở Việt Khang</span>
@@ -376,16 +371,12 @@ document.addEventListener('click', (e) => {
                     <span class="material-symbols-outlined text-[20px]">close</span>
                 </button>
             </div>
-            
-            <!-- Message Area -->
-            <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-3" id="client-chat-messages">
-                <div class="pvk-chat-bubble pvk-bubble-ai animate-fade-in" id="client-chat-welcome-msg">
+            <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 min-h-0" id="client-chat-messages">
+                <div class="pvk-chat-bubble pvk-bubble-ai" id="client-chat-welcome-msg">
                     Xin chào! Tôi là Trợ lý ảo của Phở Việt Khang. Tôi có thể tư vấn món ăn, tìm cửa hàng gần nhất hoặc tra cứu thông tin giúp bạn. Bạn cần giúp gì?
                 </div>
             </div>
-            
-            <!-- Input Bar -->
-            <div class="p-3 border-t border-gray-800 bg-[#0c1220] flex gap-2 relative">
+            <div class="p-3 border-t border-gray-800 bg-[#0c1220] flex gap-2 shrink-0">
                 <input type="text" id="client-chat-input" placeholder="Hỏi về món ăn, địa điểm..." class="flex-1 bg-[#141b2b] border border-gray-700 rounded-xl text-white px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary">
                 <button id="client-chat-send" class="bg-primary hover:bg-blue-600 text-white p-2 rounded-xl transition-colors flex items-center justify-center">
                     <span class="material-symbols-outlined text-[18px]">send</span>
@@ -393,7 +384,8 @@ document.addEventListener('click', (e) => {
             </div>
         </div>
     `;
-    document.body.appendChild(winDiv);
+    document.body.insertAdjacentHTML('beforeend', chatToggleHTML);
+    document.body.insertAdjacentHTML('beforeend', chatWinHTML);
 
     const toggleBtn = document.getElementById('client-chat-toggle');
     const chatWin = document.getElementById('client-chat-win');
