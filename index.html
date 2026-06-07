@@ -245,6 +245,27 @@
             from { opacity: 1; transform: translateY(0); }
             to { opacity: 0; transform: translateY(-8px); }
         }
+        @keyframes marquee-left {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        @keyframes marquee-right {
+            0% { transform: translateX(-50%); }
+            100% { transform: translateX(0); }
+        }
+        .animate-marquee-left {
+            display: flex;
+            width: max-content;
+            animation: marquee-left 70s linear infinite;
+        }
+        .animate-marquee-right {
+            display: flex;
+            width: max-content;
+            animation: marquee-right 75s linear infinite;
+        }
+        .animate-marquee-left:hover, .animate-marquee-right:hover {
+            animation-play-state: paused;
+        }
     </style>
 </head>
 <body class="text-on-surface antialiased flex flex-col min-h-screen bg-pattern-dark">
@@ -359,8 +380,8 @@
 <section class="py-24 bg-transparent">
 <div class="max-w-max-width mx-auto px-margin-mobile md:px-margin-desktop">
 <div class="text-center mb-16">
-<h2 id="signature-title" class="font-headline-md text-headline-md text-on-surface mb-4" data-i18n="sig-title">Signature Creations</h2>
-<p id="signature-desc" class="font-body-md text-body-md text-secondary max-w-2xl mx-auto" data-i18n="sig-desc">A curated selection of our most revered dishes, demonstrating our commitment to visual and culinary excellence.</p>
+<h2 id="signature-title" class="font-headline-md text-headline-md text-white mb-4" data-i18n="sig-title">Signature Creations</h2>
+<p id="signature-desc" class="font-body-md text-body-md text-white max-w-2xl mx-auto" data-i18n="sig-desc">A curated selection of our most revered dishes, demonstrating our commitment to visual and culinary excellence.</p>
 <script>
     (function(){
         const cachedSigTitle = localStorage.getItem('cachedSignatureTitle');
@@ -373,8 +394,26 @@
 <div id="signature-container" class="grid grid-cols-1 md:grid-cols-4 gap-6">
     <!-- Dynamic signature dishes will be rendered here by JS -->
 </div>
+</section>
+
+<!-- Customer Reviews Section -->
+<section class="py-24 bg-transparent overflow-hidden">
+<div class="max-w-max-width mx-auto px-margin-mobile md:px-margin-desktop text-center mb-12">
+<span class="font-label-caps text-label-caps text-primary-container uppercase tracking-widest" data-i18n="reviews-label">Guest Experiences</span>
+<h2 class="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-white mt-4" data-i18n="reviews-title">What Our Guests Say</h2>
+</div>
+<div class="w-full overflow-hidden flex flex-col gap-6 relative">
+    <!-- Row 1: Left -->
+    <div class="flex overflow-hidden relative w-full">
+        <div id="marquee-row-1" class="animate-marquee-left flex gap-6"></div>
+    </div>
+    <!-- Row 2: Right -->
+    <div class="flex overflow-hidden relative w-full">
+        <div id="marquee-row-2" class="animate-marquee-right flex gap-6"></div>
+    </div>
 </div>
 </section>
+
 <!-- Call to Action -->
 <section class="py-32 bg-transparent text-center">
 <div class="max-w-2xl mx-auto px-margin-mobile">

@@ -1,5 +1,5 @@
 import { db } from "./firebase-config.js";
-import { doc, getDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { doc, getDoc, collection, getDocs, query, where, limit, orderBy } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
 async function loadHomepage() {
     try {
@@ -144,6 +144,79 @@ async function loadHomepage() {
     }
 }
 
+async function loadFeedbackMarquee() {
+    const r1Container = document.getElementById('marquee-row-1');
+    const r2Container = document.getElementById('marquee-row-2');
+    if (!r1Container || !r2Container) return;
+
+    try {
+        const q = query(collection(db, "feedback"), orderBy("createdAt", "desc"), limit(100));
+        const querySnapshot = await getDocs(q);
+        
+        let feedbacks = [];
+        querySnapshot.forEach(docSnap => {
+            const data = docSnap.data();
+            feedbacks.push({
+                name: data.name || "Anonymous",
+                message: data.message || "",
+                loc: /Easton/i.test(data.message) ? "Easton Helsinki" : "Pengerkatu",
+                rating: 5
+            });
+        });
+
+        if (feedbacks.length === 0) {
+            feedbacks = [
+                { name: "Minh Anh", loc: "Pengerkatu", message: "Phở tái lăn ở đây chuẩn vị Hà Nội, nước dùng đậm đà thơm nức mũi tỏi. Ăn một lần là nghiền luôn!", rating: 5 },
+                { name: "Mikko S.", loc: "Easton Helsinki", message: "Helsingin paras pho-keitto! Pengerkadun viihtyisä tunnelma on ihana ja ystävällinen palvelu.", rating: 5 }
+            ];
+        }
+
+        function makeCard(r) {
+            const initial = r.name.charAt(0);
+            const stars = "★".repeat(r.rating) + "☆".repeat(5 - r.rating);
+            return `
+                <div class="w-[350px] shrink-0 bg-surface/40 backdrop-blur-md border border-white/10 p-6 rounded-2xl flex flex-col justify-between shadow-xl transition-all duration-300 hover:border-primary-container/40">
+                    <div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-white font-bold text-lg">${initial}</div>
+                            <div>
+                                <h4 class="font-bold text-white text-sm">${r.name}</h4>
+                                <span class="text-xs text-secondary">${r.loc}</span>
+                            </div>
+                        </div>
+                        <div class="text-yellow-400 text-sm mb-3">${stars}</div>
+                        <p class="text-gray-300 text-sm italic leading-relaxed">"${r.message}"</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        let row1HTML = "";
+        let row2HTML = "";
+        
+        const half = Math.ceil(feedbacks.length / 2);
+        const row1Source = feedbacks.slice(0, half);
+        const row2Source = feedbacks.slice(half);
+
+        // Repeat 3 times to make it long enough for seamless infinite scroll
+        for (let i = 0; i < 3; i++) {
+            row1Source.forEach(r => {
+                row1HTML += makeCard(r);
+            });
+            row2Source.forEach(r => {
+                row2HTML += makeCard(r);
+            });
+        }
+
+        r1Container.innerHTML = row1HTML;
+        r2Container.innerHTML = row2HTML;
+
+    } catch (e) {
+        console.error("Error loading feedback marquee:", e);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     loadHomepage();
+    loadFeedbackMarquee();
 });
