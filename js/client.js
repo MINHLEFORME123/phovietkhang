@@ -495,7 +495,7 @@ document.addEventListener('click', (e) => {
     window.addEventListener('languageChanged', applyLangToChat);
 
     // Dynamic Firebase Firestore Import
-    const { db, getApiKeys } = await import("./firebase-config.js");
+    const { db, getApiKeys } = await import("./js/firebase-config.js");
     const { collection, getDocs } = await import("https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js");
 
     const apiKeys = await getApiKeys();

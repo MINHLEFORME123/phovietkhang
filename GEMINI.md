@@ -2,6 +2,11 @@
 
 ## Modifications
 
+### [2026-06-07] Expanded White Container Layouts & Fixed Client AI Assistant
+- **Expanded White Frames**: Widened the white containers on the homepage (`index.html`) by replacing `max-w-[1440px] px-4 md:px-12` with `max-w-[96%] px-2 md:px-4` for the Story (Heritage), Signature Creations, and Call to Action sections. This brings the sections closer to the left and right screen borders across all desktop and mobile viewport sizes.
+- **Fixed HTML Syntax Errors**: Corrected malformed tags in both local and GitHub versions of `index.html` (the unclosed divider bar tag and the trailing `v>` syntax typo at the end of the CTA section).
+- **Fixed Client-side AI Assistant Loader**: Fixed a path resolution bug in `js/client.js` where the dynamic import statement loaded `./firebase-config.js` instead of `./js/firebase-config.js`. This was causing a silent 404 crash on guest-facing HTML pages (which reside at the root level), preventing the floating Messenger-style customer virtual assistant bubble from rendering.
+
 ### [2026-06-06] Standardized Admin Headers & Export Excel Buttons
 - **Standardized Admin Headers**: Aligned all administrative pages' headers (`admin/index.html`, `admin/food-list.html`, `admin/food-add.html`, `admin/user-manager.html`, `admin/order-manager.html`, `admin/reservations.html`, `admin/feedback.html`) to have a consistent design layout containing notifications icons, the avatar label "A", and aligned button styles.
 - **Export to Excel Functionality**: Added an Export Excel button next to data list tables. Users can export raw spreadsheet files for the Recent Orders list (`admin/index.html`), Food Menu list (`admin/food-list.html`), User list (`admin/user-manager.html`), Order list (`admin/order-manager.html`), Reservations list (`admin/reservations.html`), and Messages log list (`admin/messages.html`).
