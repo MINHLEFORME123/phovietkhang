@@ -417,15 +417,73 @@ document.addEventListener('click', (e) => {
         }
     };
 
+    const langNames = { vi: 'Vietnamese', en: 'English', fi: 'Finnish' };
+
+    function getSystemPrompt(lang) {
+        const langName = langNames[lang] || 'English';
+        return `You are a helpful and polite virtual assistant for the Vietnamese restaurant "Phở Việt Khang" in Helsinki.
+Your goal is to consult customers on the menu, tell them about locations & hours, search the web for additional info if needed, and introduce our heritage.
+
+IMPORTANT: The customer's selected language is ${langName}. You MUST respond in ${langName} unless they explicitly ask you to respond in a different language. All menu item names can be displayed in Vietnamese, English, or Finnish — use the language matching the customer's selection.
+
+Locations:
+1. Pengerkatu Branch: Pengerkatu 29, 00500 Helsinki (Tue-Fri: 11:00-20:00, Sat-Sun: 12:00-20:30, Mon: Closed).
+2. Easton Helsinki Branch: Kauppakartanonkatu 3, 00930 Helsinki (Mon-Fri: 11:00-21:00, Sat-Sun: 12:00-21:00).
+Phone: +358 44 978 9995.
+
+To search the web or consult the menu, use the following tools:
+1. listAllFoodItems()
+   Args: {}
+   Returns the current menu dishes (names in Vi/En/Fi, prices, and descriptions).
+2. webSearch(query)
+   Args: { "query": string }
+   Searches the web for additional info.
+3. browseWebUrl(url)
+   Args: { "url": string }
+   Reads the content of any webpage.
+
+Rules:
+- Always respond in ${langName}. This is the customer's chosen language.
+- When outputting tool calls, output ONLY the <tool_call> JSON block.
+- You do NOT have any tools to modify orders, menu items, prices, or user accounts. You cannot take orders or process payments. If the user asks you to modify something, politely decline and state you are only a customer service assistant.
+- Format tool calls like:
+<tool_call>
+{
+  "tool": "listAllFoodItems",
+  "args": {}
+}
+</tool_call>`;
+    }
+
+    function getCurrentLang() {
+        return localStorage.getItem('selectedLanguage') || 'en';
+    }
+
     // Language sync helper
+    let chatInitialized = false;
     const applyLangToChat = () => {
-        const lang = localStorage.getItem('selectedLanguage') || 'en';
+        const lang = getCurrentLang();
         const t = chatTranslations[lang] || chatTranslations.en;
         const titleEl = chatWin.querySelector('[data-chat-title]');
         if (titleEl) titleEl.textContent = t.title;
-        const welcomeEl = document.getElementById('client-chat-welcome-msg');
-        if (welcomeEl) welcomeEl.textContent = t.welcome;
         if (chatInput) chatInput.placeholder = t.placeholder;
+
+        // Update system prompt to match current language
+        chatMessages[0] = { role: 'system', content: getSystemPrompt(lang) };
+
+        // If chat was already opened, reset conversation on language change
+        if (chatInitialized) {
+            chatMessages.length = 1; // Keep only system prompt
+            const msgArea = document.getElementById('client-chat-messages');
+            if (msgArea) {
+                msgArea.innerHTML = '';
+                const welcomeEl = document.createElement('div');
+                welcomeEl.className = 'pvk-chat-bubble pvk-bubble-ai animate-fade-in';
+                welcomeEl.id = 'client-chat-welcome-msg';
+                welcomeEl.textContent = t.welcome;
+                msgArea.appendChild(welcomeEl);
+            }
+        }
     };
 
     applyLangToChat();
@@ -509,6 +567,7 @@ document.addEventListener('click', (e) => {
             setTimeout(() => chatWin.style.display = 'none', 250);
             chatIcon.textContent = 'chat';
         } else {
+            chatInitialized = true;
             chatWin.style.display = 'flex';
             chatWin.offsetHeight; // force reflow
             chatWin.classList.add('show');
@@ -523,41 +582,9 @@ document.addEventListener('click', (e) => {
         chatIcon.textContent = 'chat';
     });
 
-    // Chat Logic
+    // Chat Logic - system prompt is dynamically set by applyLangToChat()
     const chatMessages = [
-        {
-            role: 'system',
-            content: `You are a helpful and polite virtual assistant for the Vietnamese restaurant "Phở Việt Khang" in Helsinki.
-Your goal is to consult customers on the menu, tell them about locations & hours, search the web for additional info if needed, and introduce our heritage.
-
-Locations:
-1. Pengerkatu Branch: Pengerkatu 29, 00500 Helsinki (Tue-Fri: 11:00-20:00, Sat-Sun: 12:00-20:30, Mon: Closed).
-2. Easton Helsinki Branch: Kauppakartanonkatu 3, 00930 Helsinki (Mon-Fri: 11:00-21:00, Sat-Sun: 12:00-21:00).
-Phone: +358 44 978 9995.
-
-To search the web or consult the menu, use the following tools:
-1. listAllFoodItems()
-   Args: {}
-   Returns the current menu dishes (names in Vi/En/Fi, prices, and descriptions).
-2. webSearch(query)
-   Args: { "query": string }
-   Searches the web for additional info.
-3. browseWebUrl(url)
-   Args: { "url": string }
-   Reads the content of any webpage.
-
-Rules:
-- Respond in the language requested by the customer (Vietnamese, English, or Finnish). Default to Vietnamese if unclear.
-- When outputting tool calls, output ONLY the <tool_call> JSON block.
-- You do NOT have any tools to modify orders, menu items, prices, or user accounts. You cannot take orders or process payments. If the user asks you to modify something, politely decline and state you are only a customer service assistant.
-- Format tool calls like:
-<tool_call>
-{
-  "tool": "listAllFoodItems",
-  "args": {}
-}
-</tool_call>`
-        }
+        { role: 'system', content: getSystemPrompt(getCurrentLang()) }
     ];
 
     function stripThinking(str) {
@@ -659,7 +686,12 @@ Rules:
             toolCallCount++;
             if (toolCallCount > 4) {
                 removeLoadingBubble();
-                appendBubble("Hệ thống: AI đã dừng lại để tránh quá tải hạn ngạch API.", 'ai');
+                const limitMsgs = {
+                    vi: "Hệ thống: AI đã dừng lại để tránh quá tải hạn ngạch API.",
+                    en: "System: AI stopped to avoid API quota overload.",
+                    fi: "Järjestelmä: AI pysäytettiin API-kvotaan liiallista välttämiseksi."
+                };
+                appendBubble(limitMsgs[getCurrentLang()] || limitMsgs.en, 'ai');
                 return;
             }
 
@@ -676,7 +708,12 @@ Rules:
                     } else if (tool === 'browseWebUrl') {
                         result = await browseWebUrl(args.url);
                     } else {
-                        result = { error: `Tool ${tool} không được hỗ trợ.` };
+                        const notSupportedMsgs = {
+                            vi: `Tool ${tool} không được hỗ trợ.`,
+                            en: `Tool ${tool} is not supported.`,
+                            fi: `Työkalua ${tool} ei tueta.`
+                        };
+                        result = { error: notSupportedMsgs[getCurrentLang()] || notSupportedMsgs.en };
                     }
                     results.push({ tool, success: true, result });
                 } catch (e) {
@@ -714,8 +751,14 @@ Rules:
             chatMessages.push({ role: 'assistant', content: responseText });
             await handleAgentResponse(responseText);
         } catch (err) {
+            const errMessages = {
+                vi: 'Lỗi kết nối AI: ',
+                en: 'AI connection error: ',
+                fi: 'AI yhteysvirhe: '
+            };
+            const errMsg = errMessages[getCurrentLang()] || errMessages.en;
             removeLoadingBubble();
-            appendBubble(`Lỗi kết nối AI: ${err.message}`, 'ai');
+            appendBubble(`${errMsg}${err.message}`, 'ai');
         }
     }
 
