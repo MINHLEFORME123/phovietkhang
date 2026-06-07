@@ -128,23 +128,6 @@ const translations = {
     "reviews-label": "Asiakaskokemukset", "reviews-title": "Mitä asiakkaamme sanovat",
     "ai-assistant": "Pho Viet Khang Assistentti", "ai-placeholder": "Kysy ruoista, toimipisteistä...", "ai-welcome": "Hei! Olen Phở Việt Khangin virtuaaliassistentti. Voin suositella ruokia, etsiä toimipisteitä tai hakea tietoa. Kuinka voin auttaa?"
   }
-};llaan kermaisen maapähkinäkastikkeen kera.",
-    "dish5-title": "Suolattu Kahvi", "dish5-desc": "Voimakas perinteinen suodatinkahvi, jonka päällä on pehmeä, suolainen kermavaahto herättämään aistisi.",
-    "cta-title": "Koe Koko Matka",
-    "cta-desc": "Tutustu koko kausiluonteiseen maistelumenuumme ja a la carte -tarjontaamme, jotka on suunniteltu ilahduttamaan.",
-    "cta-btn1": "Näytä Menu",
-    "cta-btn2": "Etsi Toimipiste",
-    "footer-desc": "Aasialaisen Gastronomian Taide.", "footer-privacy": "Tietosuojakäytäntö", "footer-terms": "Käyttöehdot", "footer-careers": "Urat", "footer-press": "Lehdistöpaketti", "footer-copyright": "© 2026 PHO VIET KHANG. KAIKKI OIKEUDET PIDÄTETÄÄN.",
-    "cart-title": "Ostoskori & Kassa", "order-items": "Tilauksen tuotteet", "empty-cart": "Ostoskoriisi on tyhjä.", "browse-menu": "Selaa ruokalistaa", "order-summary": "Yhteenveto", "total-label": "Yhteensä:", "your-name": "Nimesi", "phone-number": "Puhelinnumero", "dine-in": "Syö paikan päällä", "takeaway": "Mukaan", "delivery": "Kotiinkuljetus", "table-number": "Pöydän numero", "delivery-address": "Toimitusosoite", "notes": "Huomautukset keittiölle (valinnainen)", "place-order": "Tilaa nyt",
-    "reviews-label": "Asiakaskokemukset", "reviews-title": "Mitä asiakkaamme sanovat" maapähkinäkastikkeen kera.",
-    "dish5-title": "Suolattu Kahvi", "dish5-desc": "Voimakas perinteinen suodatinkahvi, jonka päällä on pehmeä, suolainen kermavaahto herättämään aistisi.",
-    "cta-title": "Koe Koko Matka",
-    "cta-desc": "Tutustu koko kausiluonteiseen maistelumenuumme ja a la carte -tarjontaamme, jotka on suunniteltu ilahduttamaan.",
-    "cta-btn1": "Näytä Menu",
-    "cta-btn2": "Etsi Toimipiste",
-    "footer-desc": "Aasialaisen Gastronomian Taide.", "footer-privacy": "Tietosuojakäytäntö", "footer-terms": "Käyttöehdot", "footer-careers": "Urat", "footer-press": "Lehdistöpaketti", "footer-copyright": "© 2026 PHO VIET KHANG. KAIKKI OIKEUDET PIDÄTETÄÄN.",
-    "cart-title": "Ostoskori & Kassa", "order-items": "Tilauksen tuotteet", "empty-cart": "Ostoskorisi on tyhjä.", "browse-menu": "Selaa ruokalistaa", "order-summary": "Yhteenveto", "total-label": "Yhteensä:", "your-name": "Nimesi", "phone-number": "Puhelinnumero", "dine-in": "Syö paikan päällä", "takeaway": "Mukaan", "delivery": "Kotiinkuljetus", "table-number": "Pöydän numero", "delivery-address": "Toimitusosoite", "notes": "Huomautukset keittiölle (valinnainen)", "place-order": "Tilaa nyt"
-  }
 };
 
 // --- Custom Beautiful Notification System ---
@@ -204,83 +187,6 @@ window.showNotification = function(message, type = 'info') {
     }, 4000);
 };
 
-function initUnifiedNavbar() {
-  const nav = document.querySelector('nav');
-  if (!nav) return;
-  
-  const path = window.location.pathname.toLowerCase();
-  if (path.includes('/admin/') || path.includes('/kitchen/') || path.includes('/host/')) {
-    return;
-  }
-  
-  nav.className = "fixed top-0 w-full z-50 bg-surface/95 backdrop-blur-md border-b border-outline-variant/30";
-  nav.innerHTML = `
-    <div class="flex justify-between items-center max-w-7xl mx-auto px-4 md:px-16 h-20">
-        <a class="font-headline-sm text-2xl font-bold tracking-wider flex items-center gap-2 text-black dark:text-white" href="index.html">
-            <span class="material-symbols-outlined text-3xl text-black dark:text-white">ramen_dining</span>
-            <span class="text-black dark:text-white">PHỞ VIỆT KHANG</span>
-        </a>
-        <div class="hidden md:flex items-center space-x-8 font-body-md text-base font-semibold tracking-wide">
-            <a class="text-secondary hover:text-white transition-colors" href="index.html" data-i18n="nav-home">Home</a>
-            <a class="text-secondary hover:text-white transition-colors" href="menu.html" data-i18n="nav-menu">Menu</a>
-            <a class="text-secondary hover:text-white transition-colors" href="locations.html" data-i18n="nav-locations">Locations</a>
-            <a class="text-secondary hover:text-white transition-colors" href="contact.html" data-i18n="nav-contact">Contact</a>
-            <a class="text-secondary hover:text-white transition-colors relative flex items-center gap-1" href="inbox.html" id="nav-inbox-link">
-                <span data-i18n="nav-inbox">Inbox</span>
-                <span id="inbox-badge-nav" class="hidden w-2 h-2 bg-red-500 rounded-full animate-ping"></span>
-            </a>
-        </div>
-        <div class="flex items-center space-x-4">
-            <div class="hidden md:flex items-center space-x-2 mr-2">
-                <img id="lang-vi" src="https://hatscripts.github.io/circle-flags/flags/vn.svg" alt="VN" class="w-8 h-8 cursor-pointer hover:opacity-80 transition-all duration-300 ring-2 ring-transparent" style="border-radius: 50% !important;" title="Tiếng Việt" onclick="changeLanguage('vi')">
-                <img id="lang-en" src="https://hatscripts.github.io/circle-flags/flags/gb.svg" alt="UK" class="w-8 h-8 cursor-pointer hover:opacity-80 transition-all duration-300 ring-2 ring-transparent" style="border-radius: 50% !important;" title="English" onclick="changeLanguage('en')">
-                <img id="lang-fi" src="https://hatscripts.github.io/circle-flags/flags/fi.svg" alt="FI" class="w-8 h-8 cursor-pointer hover:opacity-80 transition-all duration-300 ring-2 ring-transparent" style="border-radius: 50% !important;" title="Suomi" onclick="changeLanguage('fi')">
-            </div>
-            <a id="nav-register-btn" class="hidden md:inline-flex border-2 border-primary-container text-primary-container font-body-sm text-sm font-semibold px-5 py-2 rounded-xl hover:bg-primary-container hover:text-white transition-all duration-300 shadow-sm" href="register.html" data-i18n="nav-register">
-                Register
-            </a>
-            <a class="hidden md:inline-flex bg-primary-container text-on-primary-container font-body-sm text-sm font-semibold px-6 py-2 rounded-xl hover:opacity-90 transition-all duration-300 bg-gradient-to-tr from-primary-container to-[#003d82]" href="reservations.html" data-i18n="nav-reservations">
-                Reservations
-            </a>
-            <!-- Cart Icon -->
-            <a href="cart.html" class="nav-cart-btn relative" title="View Cart">
-                <span class="material-symbols-outlined text-[24px]">shopping_cart</span>
-                <span id="cart-count" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
-            </a>
-            <!-- User Icon -->
-            <a id="nav-user-btn" href="login.html" class="text-black dark:text-white hover:text-primary-container">
-                <span class="material-symbols-outlined text-[24px]">account_circle</span>
-            </a>
-            <button class="md:hidden text-black dark:text-white p-2" onclick="toggleMobileMenu()">
-                <span class="material-symbols-outlined">menu</span>
-            </button>
-        </div>
-    </div>
-    <!-- Mobile Menu -->
-    <div id="mobile-menu" class="hidden md:hidden bg-surface/95 backdrop-blur-md border-t border-outline-variant/30 px-4 py-4 space-y-3 font-semibold text-base">
-        <a class="block text-secondary hover:text-white transition-colors" href="index.html" data-i18n="nav-home">Home</a>
-        <a class="block text-secondary hover:text-white transition-colors" href="menu.html" data-i18n="nav-menu">Menu</a>
-        <a class="block text-secondary hover:text-white transition-colors" href="locations.html" data-i18n="nav-locations">Locations</a>
-        <a class="block text-secondary hover:text-white transition-colors" href="contact.html" data-i18n="nav-contact">Contact</a>
-        <a class="block text-secondary hover:text-white transition-colors flex items-center gap-1" href="inbox.html"><span data-i18n="nav-inbox">Inbox</span><span id="inbox-badge-nav-mobile" class="hidden w-2 h-2 bg-red-500 rounded-full animate-ping"></span></a>
-        <div class="flex items-center space-x-2 pt-2 border-t border-outline-variant/20">
-            <img id="lang-vi-mobile" src="https://hatscripts.github.io/circle-flags/flags/vn.svg" alt="VN" class="w-8 h-8 cursor-pointer hover:opacity-80 transition-all duration-300 ring-2 ring-transparent" style="border-radius: 50% !important;" onclick="changeLanguage('vi')">
-            <img id="lang-en-mobile" src="https://hatscripts.github.io/circle-flags/flags/gb.svg" alt="UK" class="w-8 h-8 cursor-pointer hover:opacity-80 transition-all duration-300 ring-2 ring-transparent" style="border-radius: 50% !important;" onclick="changeLanguage('en')">
-            <img id="lang-fi-mobile" src="https://hatscripts.github.io/circle-flags/flags/fi.svg" alt="FI" class="w-8 h-8 cursor-pointer hover:opacity-80 transition-all duration-300 ring-2 ring-transparent" style="border-radius: 50% !important;" onclick="changeLanguage('fi')">
-        </div>
-        <div class="pt-2 border-t border-outline-variant/20 flex flex-col gap-2">
-            <a id="nav-register-btn-mobile" class="w-full text-center border-2 border-primary-container text-primary-container font-body-sm text-sm font-semibold px-5 py-2 rounded-xl hover:bg-primary-container hover:text-white transition-all duration-300" href="register.html" data-i18n="nav-register">Register</a>
-            <a class="w-full text-center bg-primary-container text-on-primary-container font-body-sm text-sm font-semibold px-6 py-2 rounded-xl hover:opacity-90 transition-all duration-300 bg-gradient-to-tr from-primary-container to-[#003d82]" href="reservations.html" data-i18n="nav-reservations">Reservations</a>
-        </div>
-    </div>
-  `;
-  
-  window.toggleMobileMenu = function() {
-    const mm = document.getElementById('mobile-menu');
-    if (mm) mm.classList.toggle('hidden');
-  };
-}
-
 function changeLanguage(lang) {
   localStorage.setItem('selectedLanguage', lang);
 
@@ -316,11 +222,8 @@ function changeLanguage(lang) {
   });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  initUnifiedNavbar();
-  const savedLang = localStorage.getItem('selectedLanguage') || 'en';
-  changeLanguage(savedLang);
-});
+const savedLang = localStorage.getItem('selectedLanguage') || 'en';
+changeLanguage(savedLang);
 
 document.addEventListener('click', (e) => {
   const link = e.target.closest('a[href]');
