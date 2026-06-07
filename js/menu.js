@@ -74,7 +74,7 @@ function showOptionsPopup(item, lang) {
     // Create overlay
     const overlay = document.createElement('div');
     overlay.id = 'options-overlay';
-    overlay.className = 'fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-center justify-center p-4';
+    overlay.className = 'fixed inset-0 bg-black/70 backdrop-blur-sm z-[2147483646] flex items-center justify-center p-4';
     overlay.style.animation = 'fadeIn 0.2s ease-out';
 
     const normalizedOptions = normalizeOptions(item.options);
@@ -240,7 +240,7 @@ popupStyle.textContent = `
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        z-index: 99999 !important;
+        z-index: 2147483646 !important;
         background-color: rgba(0, 0, 0, 0.7) !important;
         backdrop-filter: blur(4px) !important;
         -webkit-backdrop-filter: blur(4px) !important;
