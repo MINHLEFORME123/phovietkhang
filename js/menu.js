@@ -391,8 +391,7 @@ async function loadMenu() {
                              ${displayDesc}
                         </p>
                         
-                        <button class="btn-add-to-cart w-full py-3 text-white font-semibold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 group/btn"
-                                style="background: linear-gradient(145deg, #1a1a2e 0%, #0a0a15 50%, #1a1a2e 100%); box-shadow: 0 4px 15px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);"
+                        <button class="btn-add-to-cart w-full py-3 text-black bg-white hover:bg-gray-100 border border-gray-200 font-semibold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 group/btn shadow-md"
                                 data-item-id="${item.id}">
                             <span class="material-symbols-outlined text-[20px] group-hover/btn:scale-110 transition-transform">add_shopping_cart</span>
                             <span class="btn-text">${addText}</span>
