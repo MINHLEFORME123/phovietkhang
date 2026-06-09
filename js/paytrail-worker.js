@@ -102,9 +102,36 @@ async function handlePaytrailPayment(orderData) {
   const baseUrl = 'https://phovietkhang.onrender.com';
 
   const stamp = `${orderData.id}_${Date.now()}`;
-  const amount = Math.round(orderData.total * 100);
   const lang = orderData.language === 'fi' ? 'FI' : 'EN';
   const methodGroup = PAYTRAIL_GROUPS[orderData.paymentMethod];
+
+  const items = (orderData.items || []).map((item, i) => ({
+    unitPrice: Math.round((item.price || 0) * 100),
+    units: item.qty || 1,
+    vatPercentage: 13.5,
+    productCode: item.id || `item_${i}`,
+    description: item.name || 'Item',
+  }));
+  if (orderData.deliveryFee > 0) {
+    items.push({
+      unitPrice: Math.round(orderData.deliveryFee * 100),
+      units: 1,
+      vatPercentage: 25.5,
+      productCode: 'delivery',
+      description: 'Delivery fee',
+    });
+  }
+  if (orderData.discountAmount > 0) {
+    items.push({
+      unitPrice: -Math.round(orderData.discountAmount * 100),
+      units: 1,
+      vatPercentage: 13.5,
+      productCode: 'discount',
+      description: 'Discount',
+    });
+  }
+
+  const amount = items.reduce((sum, item) => sum + item.unitPrice * item.units, 0);
 
   const payload = {
     stamp,
@@ -127,34 +154,7 @@ async function handlePaytrailPayment(orderData) {
       success: `${baseUrl}/api/paytrail-callback`,
       cancel: `${baseUrl}/api/paytrail-callback`,
     },
-    items: (() => {
-      const items = (orderData.items || []).map((item, i) => ({
-        unitPrice: Math.round((item.price || 0) * 100),
-        units: item.qty || 1,
-        vatPercentage: 13.5,
-        productCode: item.id || `item_${i}`,
-        description: item.name || 'Item',
-      }));
-      if (orderData.deliveryFee > 0) {
-        items.push({
-          unitPrice: Math.round(orderData.deliveryFee * 100),
-          units: 1,
-          vatPercentage: 25.5,
-          productCode: 'delivery',
-          description: 'Delivery fee',
-        });
-      }
-      if (orderData.discountAmount > 0) {
-        items.push({
-          unitPrice: -Math.round(orderData.discountAmount * 100),
-          units: 1,
-          vatPercentage: 13.5,
-          productCode: 'discount',
-          description: 'Discount',
-        });
-      }
-      return items;
-    })(),
+    items,
   };
 
   const body = JSON.stringify(payload);

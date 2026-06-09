@@ -451,11 +451,14 @@ To search the web or consult the menu, use the following tools:
 3. browseWebUrl(url)
    Args: { "url": string }
    Reads the content of any webpage.
+4. createReservation(name, phone, email, date, time, guests, location, notes)
+   Args: { "name": string, "phone": string, "email": string, "date": string (YYYY-MM-DD), "time": string (e.g. "18:00"), "guests": number, "location": string ("pengerkatu" or "easton"), "notes": string (optional) }
+   Creates a table reservation at Phở Việt Khang. Use this when the customer wants to book a table. Ask for all required fields if not provided.
 
 Rules:
 - Always respond in ${langName}. This is the customer's chosen language.
 - When outputting tool calls, output ONLY the <tool_call> JSON block.
-- You do NOT have any tools to modify orders, menu items, prices, or user accounts. You cannot take orders or process payments. If the user asks you to modify something, politely decline and state you are only a customer service assistant.
+- You do NOT have any tools to modify orders, menu items, prices, or user accounts. You cannot take orders or process payments. If the user asks you to modify something, politely decline and state you are only a customer service assistant. However, you CAN create table reservations using the createReservation tool.
 - Format tool calls like:
 <tool_call>
 {
@@ -500,7 +503,7 @@ Rules:
 
     // Dynamic Firebase Firestore Import
     const { db, getApiKeys } = await import("./firebase-config.js");
-    const { collection, getDocs } = await import("https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js");
+    const { collection, getDocs, addDoc } = await import("https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js");
 
     const apiKeys = await getApiKeys();
     const CLOUDFLARE_WORKER_URL = 'https://pvk-admin.minhbeo993.workers.dev';
@@ -565,6 +568,31 @@ Rules:
             return await callWorker('browseWebUrl', { url });
         } catch (e) {
             console.error('[browseWebUrl]', e);
+            return { error: e.message };
+        }
+    }
+
+    async function createReservation(name, phone, email, date, time, guests, location, notes) {
+        try {
+            if (!name || !phone || !date || !time || !guests || !location) {
+                return { error: 'Missing required fields: name, phone, date, time, guests, location' };
+            }
+            const locLabel = location.toLowerCase() === 'easton' ? 'Easton Helsinki' : 'Pengerkatu';
+            await addDoc(collection(db, 'reservations'), {
+                name,
+                phone,
+                email: email || '',
+                date,
+                time,
+                guests: parseInt(guests, 10),
+                location: locLabel,
+                notes: notes || '',
+                status: 'pending',
+                createdAt: new Date()
+            });
+            return { success: true, message: `Reservation confirmed at ${locLabel} for ${guests} guests on ${date} at ${time}.` };
+        } catch (e) {
+            console.error('[createReservation]', e);
             return { error: e.message };
         }
     }
@@ -717,6 +745,8 @@ Rules:
                         result = await webSearch(args.query);
                     } else if (tool === 'browseWebUrl') {
                         result = await browseWebUrl(args.url);
+                    } else if (tool === 'createReservation') {
+                        result = await createReservation(args.name, args.phone, args.email, args.date, args.time, args.guests, args.location, args.notes);
                     } else {
                         const notSupportedMsgs = {
                             vi: `Tool ${tool} không được hỗ trợ.`,

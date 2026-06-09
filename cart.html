@@ -229,9 +229,9 @@
                             <div class="p-3 text-center rounded-lg border border-white/10 text-secondary peer-checked:bg-primary/20 peer-checked:text-primary peer-checked:border-primary transition-all text-xs md:text-sm">
                                 <span class="material-symbols-outlined block mb-1">takeout_dining</span><span data-i18n="takeaway">Takeaway</span></div>
                         </label>
-                        <label class="cursor-pointer">
-                            <input type="radio" name="orderType" value="delivery" class="peer sr-only">
-                            <div class="p-3 text-center rounded-lg border border-white/10 text-secondary peer-checked:bg-primary/20 peer-checked:text-primary peer-checked:border-primary transition-all text-xs md:text-sm">
+                        <label class="cursor-not-allowed">
+                            <input type="radio" name="orderType" value="delivery" class="peer sr-only" disabled>
+                            <div class="p-3 text-center rounded-lg border border-white/5 text-white/30 opacity-50 pointer-events-none transition-all text-xs md:text-sm">
                                 <span class="material-symbols-outlined block mb-1">delivery_dining</span><span data-i18n="delivery">Delivery</span></div>
                         </label>
                     </div>
@@ -334,6 +334,13 @@
 <script src="js/cart.js"></script>
 <script type="module" src="js/checkout.js"></script>
 <script>
+    document.querySelector('input[name="orderType"][value="delivery"]').closest('label').addEventListener('click', (e) => {
+        e.preventDefault();
+        if (window.showNotification) {
+            window.showNotification('Tính năng giao hàng đang được phát triển. Vui lòng chọn Dine In hoặc Takeaway.', 'info');
+        }
+    });
+
     // Toggle address/table based on order type
     document.querySelectorAll('input[name="orderType"]').forEach(radio => {
         radio.addEventListener('change', (e) => {
