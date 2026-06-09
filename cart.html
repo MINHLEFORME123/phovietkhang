@@ -232,6 +232,45 @@
                         </label>
                     </div>
 
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-sm text-secondary mb-2"><span data-i18n="payment-method">Phương thức thanh toán</span></label>
+                            <div class="grid grid-cols-1 gap-2">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="paymentMethod" value="online_banking_fi" checked class="peer sr-only">
+                                    <div class="flex items-center gap-3 rounded-xl border border-white/10 bg-surface px-4 py-3 text-secondary transition-all peer-checked:border-primary peer-checked:bg-primary/15 peer-checked:text-white">
+                                        <span class="material-symbols-outlined text-primary">account_balance</span>
+                                        <div>
+                                            <div class="font-semibold text-white" data-i18n="payment-online-banking">Online banking (Finland)</div>
+                                            <div class="text-xs text-secondary" data-i18n="payment-online-banking-desc">Thanh toán qua ngân hàng trực tuyến tại Phần Lan</div>
+                                        </div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="paymentMethod" value="mobilepay" class="peer sr-only">
+                                    <div class="flex items-center gap-3 rounded-xl border border-white/10 bg-surface px-4 py-3 text-secondary transition-all peer-checked:border-primary peer-checked:bg-primary/15 peer-checked:text-white">
+                                        <span class="material-symbols-outlined text-primary">smartphone</span>
+                                        <div>
+                                            <div class="font-semibold text-white">MobilePay</div>
+                                            <div class="text-xs text-secondary" data-i18n="payment-mobilepay-desc">Thanh toán nhanh bằng ứng dụng MobilePay</div>
+                                        </div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="paymentMethod" value="bank_card" class="peer sr-only">
+                                    <div class="flex items-center gap-3 rounded-xl border border-white/10 bg-surface px-4 py-3 text-secondary transition-all peer-checked:border-primary peer-checked:bg-primary/15 peer-checked:text-white">
+                                        <span class="material-symbols-outlined text-primary">credit_card</span>
+                                        <div>
+                                            <div class="font-semibold text-white" data-i18n="payment-bank-card">Thẻ ngân hàng</div>
+                                            <div class="text-xs text-secondary" data-i18n="payment-bank-card-desc">Thanh toán bằng thẻ Visa, Mastercard hoặc debit</div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        <p class="text-xs text-secondary/80 leading-relaxed" data-i18n="payment-note">Bạn có thể chọn trước phương thức thanh toán online phù hợp khi gửi đơn hàng.</p>
+                    </div>
+
                     <div id="table-number-div">
                         <label class="block text-sm text-secondary mb-1"><span data-i18n="table-number">Table Number</span></label>
                         <input type="number" id="cust-table" class="w-full bg-surface border border-white/10 rounded-lg text-white p-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">

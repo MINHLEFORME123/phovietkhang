@@ -1,8 +1,6 @@
 import { db, getApiKeys } from "./firebase-config.js";
 import { addDoc, collection, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-const apiKeys = await getApiKeys();
-
 const cartContainer = document.getElementById('cart-items-container');
 const emptyMsg = document.getElementById('empty-cart-msg');
 const cartTotal = document.getElementById('cart-total');
@@ -10,6 +8,12 @@ const checkoutForm = document.getElementById('checkout-form');
 const btnSubmit = document.getElementById('btn-submit-order');
 
 let debounceTimeout = null;
+let _apiKeysPromise = null;
+
+async function getCachedApiKeys() {
+    if (!_apiKeysPromise) _apiKeysPromise = getApiKeys();
+    return _apiKeysPromise;
+}
 
 async function autoCalculateDistance() {
     const address = (document.getElementById('cust-address')?.value || '').trim();
@@ -38,7 +42,8 @@ async function autoCalculateDistance() {
     }
     
     try {
-        const apiKey = apiKeys.cerebrasPrimary;
+        const keys = await getCachedApiKeys();
+        const apiKey = keys.cerebrasPrimary;
         const response = await fetch('https://api.cerebras.ai/v1/chat/completions', {
             method: 'POST',
             headers: {
@@ -107,6 +112,32 @@ function calculateDeliveryFee(distance) {
     } else {
         return 2.00 + 0.40 * d;
     }
+}
+
+function getSelectedPaymentMethod() {
+    return document.querySelector('input[name="paymentMethod"]:checked')?.value || 'online_banking_fi';
+}
+
+function getPaymentMethodLabel(method, lang = 'en') {
+    const labels = {
+        online_banking_fi: {
+            vi: 'Online banking (Finland)',
+            en: 'Online banking (Finland)',
+            fi: 'Verkkopankki (Suomi)'
+        },
+        mobilepay: {
+            vi: 'MobilePay',
+            en: 'MobilePay',
+            fi: 'MobilePay'
+        },
+        bank_card: {
+            vi: 'Thẻ ngân hàng',
+            en: 'Bank Card',
+            fi: 'Pankkikortti'
+        }
+    };
+
+    return labels[method]?.[lang] || labels[method]?.en || method;
 }
 
 let appliedPromo = null;
@@ -213,7 +244,8 @@ window.renderCartPage = function() {
     cartTotal.textContent = `\u20AC${total.toFixed(2)}`;
 };
 
-// Initial render
+// Initial render (DOM is already parsed since module is deferred)
+if (window.renderCartPage) window.renderCartPage();
 document.addEventListener('DOMContentLoaded', () => {
     if(window.renderCartPage) window.renderCartPage();
     
@@ -233,7 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Prevent enter key from placing order, use it to call AI instead
-    if (checkoutForm) {
+if (checkoutForm) {
         checkoutForm.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault(); // Stop form submission
@@ -377,15 +409,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 });
-const WORKER_SECRET = apiKeys.workerSecret;
+
+const CLOUDFLARE_WORKER_URL = 'https://pvk-admin.minhbeo993.workers.dev';
 
 async function sendWorkerEmail(to, subject, html) {
     try {
+        const keys = await getCachedApiKeys();
         const resp = await fetch(CLOUDFLARE_WORKER_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-Admin-Secret': WORKER_SECRET,
+                'X-Admin-Secret': keys.workerSecret,
             },
             body: JSON.stringify({
                 action: 'sendEmail',
@@ -400,6 +434,29 @@ async function sendWorkerEmail(to, subject, html) {
     }
 }
 
+async function createPaytrailPayment(orderData) {
+    try {
+        const keys = await getCachedApiKeys();
+        const resp = await fetch(CLOUDFLARE_WORKER_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Admin-Secret': keys.workerSecret,
+            },
+            body: JSON.stringify({
+                action: 'createPaytrailPayment',
+                args: { orderData }
+            }),
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || 'Paytrail API error');
+        return data;
+    } catch(e) {
+        console.error("Paytrail payment creation failed:", e);
+        throw e;
+    }
+}
+
 if (checkoutForm) {
     checkoutForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -411,6 +468,7 @@ if (checkoutForm) {
         const customerPhone = document.getElementById('cust-phone').value;
         const customerEmail = document.getElementById('cust-email').value;
         const orderType = document.querySelector('input[name="orderType"]:checked').value;
+        const paymentMethod = getSelectedPaymentMethod();
         const tableNumber = document.getElementById('cust-table').value;
         const address = document.getElementById('cust-address').value;
         const distance = document.getElementById('cust-distance').value;
@@ -430,12 +488,16 @@ if (checkoutForm) {
 
         try {
             const currentLang = localStorage.getItem('selectedLanguage') || 'en';
+            const paymentMethodLabel = getPaymentMethodLabel(paymentMethod, currentLang);
 
             const orderData = {
                 customerName,
                 customerPhone,
                 customerEmail,
                 orderType,
+                paymentMethod,
+                paymentMethodLabel,
+                paymentStatus: 'pending',
                 tableNumber: orderType === 'dine-in' ? tableNumber : '',
                 address: (orderType === 'delivery' || orderType === 'takeaway') ? address : '',
                 deliveryFee: orderType === 'delivery' ? deliveryFee : 0,
@@ -447,8 +509,7 @@ if (checkoutForm) {
                 discountAmount: discountAmount,
                 promoCode: appliedPromo ? appliedPromo.code : '',
                 status: 'pending',
-                emailConfirmed: false, // Must confirm email first
-                language: currentLang, // Save language for KDS ready email
+                language: currentLang,
                 createdAt: new Date(),
                 userId: 'guest'
             };
@@ -462,253 +523,40 @@ if (checkoutForm) {
                     orderId: docRef.id
                 });
             }
-            
-            // Build items HTML list for email
-            const itemsHtml = cart.map(i => `
-                <tr>
-                    <td style="padding: 10px; border-bottom: 1px solid #eee;">${i.name}</td>
-                    <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: center;">${i.qty}</td>
-                    <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">${(i.price * i.qty).toFixed(2)}€</td>
-                </tr>
-            `).join('');
 
-            // Localized Wording dictionaries
-            const emailTranslations = {
-                vi: {
-                    subject: `[Phở Việt Khang] Xác nhận đơn hàng của bạn - #${docRef.id.substring(0, 8).toUpperCase()}`,
-                    title: "XÁC NHẬN ĐƠN HÀNG CỦA BẠN",
-                    intro: `Xin chào <strong>${customerName}</strong>,<br><br>Cảm ơn bạn đã lựa chọn Phở Việt Khang! Đơn hàng của bạn đã được đặt thành công. Vui lòng bấm vào nút bên dưới để xác nhận đơn hàng và chuyển tới nhà bếp bắt đầu chuẩn bị món ăn:`,
-                    btnLabel: "XÁC NHẬN ĐƠN HÀNG",
-                    headerItem: "Món ăn",
-                    headerQty: "SL",
-                    headerPrice: "Giá",
-                    subtotal: "Tạm tính",
-                    deliveryFee: "Phí giao hàng",
-                    vatLabel: "Trong đó VAT (13.5%)",
-                    totalLabel: "Tổng thanh toán (Đã gồm 13.5% VAT)",
-                    orderId: "Mã đơn hàng",
-                    serviceType: "Hình thức phục vụ",
-                    address: "Địa chỉ",
-                    distance: "Khoảng cách",
-                    notes: "Ghi chú",
-                    footer: "Phở Việt Khang © 2026. Bảo lưu mọi quyền."
-                },
-                en: {
-                    subject: `[Phở Việt Khang] Confirm Your Order - #${docRef.id.substring(0, 8).toUpperCase()}`,
-                    title: "CONFIRM YOUR ORDER",
-                    intro: `Hi <strong>${customerName}</strong>,<br><br>Thank you for choosing Phở Việt Khang! Your order has been placed. Please click the button below to confirm your order and start preparation in the kitchen:`,
-                    btnLabel: "CONFIRM ORDER",
-                    headerItem: "Item",
-                    headerQty: "Qty",
-                    headerPrice: "Price",
-                    subtotal: "Subtotal",
-                    deliveryFee: "Delivery Fee",
-                    vatLabel: "Of which VAT (13.5%)",
-                    totalLabel: "Total (Includes 13.5% VAT)",
-                    orderId: "Order ID",
-                    serviceType: "Service Type",
-                    address: "Address",
-                    distance: "Distance",
-                    notes: "Notes",
-                    footer: "Phở Việt Khang © 2026. All rights reserved."
-                },
-                fi: {
-                    subject: `[Phở Việt Khang] Vahvista tilauksesi - #${docRef.id.substring(0, 8).toUpperCase()}`,
-                    title: "VAHVISTA TILAUKSESI",
-                    intro: `Hei <strong>${customerName}</strong>,<br><br>Kiitos, että valitsit Phở Việt Khangin! Tilauksesi on tehty. Vahvista tilauksesi klikkaamalla alla olevaa painiketta aloittaaksesi valmistuksen keittiössä:`,
-                    btnLabel: "VAHVISTA TILAUS",
-                    headerItem: "Tuote",
-                    headerQty: "Määrä",
-                    headerPrice: "Hinta",
-                    subtotal: "Välisumma",
-                    deliveryFee: "Toimitusmaksu",
-                    vatLabel: "Josta ALV (13.5%)",
-                    totalLabel: "Yhteensä (Sisältää 13.5% ALV)",
-                    orderId: "Tilaustunnus",
-                    serviceType: "Palvelutyyppi",
-                    address: "Osoite",
-                    distance: "Etäisyys",
-                    notes: "Lisätiedot",
-                    footer: "Phở Việt Khang © 2026. Kaikki oikeudet pidätetään."
-                }
-            };
+            // Redirect to Paytrail payment gateway
+            try {
+                const paytrailResult = await createPaytrailPayment({
+                    id: docRef.id,
+                    total: total,
+                    customerEmail: customerEmail,
+                    customerName: customerName,
+                    customerPhone: customerPhone,
+                    paymentMethod: paymentMethod,
+                    items: cart,
+                    deliveryFee: deliveryFee,
+                    discountAmount: discountAmount,
+                    createdAt: new Date().toISOString(),
+                    language: currentLang,
+                });
 
-            const langData = emailTranslations[currentLang] || emailTranslations['en'];
+                // Save Paytrail transaction reference
+                await updateDoc(doc(db, "orders", docRef.id), {
+                    paytrailTransactionId: paytrailResult.transactionId,
+                    paytrailCheckoutUrl: paytrailResult.checkoutUrl,
+                    paymentStatus: 'redirected',
+                });
 
-            const subtotalHtml = `
-                <tr>
-                    <td colspan="2" style="padding: 10px; text-align: right; border-top: 1px solid #eee;">${langData.subtotal}:</td>
-                    <td style="padding: 10px; text-align: right; border-top: 1px solid #eee;">${subtotal.toFixed(2)}€</td>
-                </tr>
-            `;
-            const deliveryFeeHtml = orderType === 'delivery' ? `
-                <tr>
-                    <td colspan="2" style="padding: 10px; text-align: right;">${langData.deliveryFee}:</td>
-                    <td style="padding: 10px; text-align: right;">${deliveryFee.toFixed(2)}€</td>
-                </tr>
-            ` : '';
-
-            const discountLabel = currentLang === 'vi' ? `Giảm giá (${appliedPromo?.discountPercent}%)` : currentLang === 'fi' ? `Alennus (${appliedPromo?.discountPercent}%)` : `Discount (${appliedPromo?.discountPercent}%)`;
-            const discountHtml = appliedPromo ? `
-                <tr>
-                    <td colspan="2" style="padding: 10px; text-align: right; color: #10b981;">${discountLabel}:</td>
-                    <td style="padding: 10px; text-align: right; color: #10b981;">-${discountAmount.toFixed(2)}€</td>
-                </tr>
-            ` : '';
-
-            const vatAmountVal = total * 0.135 / 1.135;
-            const vatHtml = `
-                <tr>
-                    <td colspan="2" style="padding: 10px; text-align: right; color: #777; font-size: 0.9em; border-top: 1px solid #eee;">${langData.vatLabel}:</td>
-                    <td style="padding: 10px; text-align: right; color: #777; font-size: 0.9em; border-top: 1px solid #eee;">${vatAmountVal.toFixed(2)}€</td>
-                </tr>
-            `;
-
-            const confirmLink = `${window.location.origin}/confirm-order.html?orderId=${docRef.id}`;
-
-            // Build full confirmation template
-            const emailHtml = `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
-                    <h2 style="color: #3b82f6; text-align: center; border-bottom: 2px solid #3b82f6; padding-bottom: 15px; margin-bottom: 20px;">PHỞ VIỆT KHANG - ${langData.title}</h2>
-                    <p>${langData.intro}</p>
-                    
-                    <div style="text-align: center; margin: 30px 0;">
-                        <a href="${confirmLink}" style="background-color: #3b82f6; color: white; padding: 14px 28px; border-radius: 8px; font-weight: bold; text-decoration: none; display: inline-block; box-shadow: 0 4px 6px rgba(59, 130, 246, 0.25);">${langData.btnLabel}</a>
-                    </div>
-                    
-                    <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-                        <thead>
-                            <tr style="background-color: #f8f9fa;">
-                                <th style="padding: 10px; text-align: left;">${langData.headerItem}</th>
-                                <th style="padding: 10px; text-align: center;">${langData.headerQty}</th>
-                                <th style="padding: 10px; text-align: right;">${langData.headerPrice}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${itemsHtml}
-                        </tbody>
-                        <tfoot>
-                            ${subtotalHtml}
-                            ${deliveryFeeHtml}
-                            ${discountHtml}
-                            ${vatHtml}
-                            <tr>
-                                <td colspan="2" style="padding: 10px; font-weight: bold; text-align: right;">${langData.totalLabel}:</td>
-                                <td style="padding: 10px; font-weight: bold; text-align: right; color: #3b82f6; font-size: 1.2em;">${total.toFixed(2)}€</td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                    
-                    <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 20px;">
-                        <p style="margin: 0; font-size: 0.9em; color: #555;"><strong>${langData.orderId}</strong> #${docRef.id.toUpperCase()}</p>
-                        <p style="margin: 5px 0 0 0; font-size: 0.9em; color: #555;"><strong>${langData.serviceType}:</strong> ${orderType === 'dine-in' ? `Dine-in (Table ${tableNumber})` : orderType === 'delivery' ? 'Delivery' : 'Takeaway'}</p>
-                        ${(orderType === 'delivery' || orderType === 'takeaway') && address ? `<p style="margin: 5px 0 0 0; font-size: 0.9em; color: #555;"><strong>${langData.address}</strong> ${address}</p>` : ''}
-                        ${orderType === 'delivery' && distance ? `<p style="margin: 5px 0 0 0; font-size: 0.9em; color: #555;"><strong>${langData.distance}</strong> ${distance} km</p>` : ''}
-                        ${notes ? `<p style="margin: 5px 0 0 0; font-size: 0.9em; color: #555;"><strong>${langData.notes}</strong> ${notes}</p>` : ''}
-                    </div>
-                    
-                    <p style="text-align: center; margin-top: 30px; font-size: 0.8em; color: #999;">${langData.footer}</p>
-                </div>
-            `;
-
-            // Trigger worker to send transactional email
-            await sendWorkerEmail(customerEmail, langData.subject, emailHtml);
-
-            // Clear cart
-            window.clearCart();
-            
-            // Store order ID locally
-            let myOrders = JSON.parse(localStorage.getItem('my_orders') || '[]');
-            myOrders.push(docRef.id);
-            localStorage.setItem('my_orders', JSON.stringify(myOrders));
-
-            // Create and show success modal
-            const modalHtml = `
-                <div id="success-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
-                    <div class="bg-surface p-8 rounded-2xl border border-white/10 max-w-md w-full text-center space-y-6 shadow-2xl transform scale-95 transition-all duration-300 opacity-0" id="success-modal-content">
-                        <!-- Icon -->
-                        <div class="mx-auto w-16 h-16 bg-blue-500/10 border border-blue-500/30 rounded-full flex items-center justify-center text-blue-400">
-                            <span class="material-symbols-outlined text-4xl animate-pulse">mail</span>
-                        </div>
-                        
-                        <!-- Content -->
-                        <div class="space-y-3">
-                            <h3 class="text-2xl font-bold text-white font-['EB_Garamond']">ĐANG CHỜ XÁC NHẬN</h3>
-                            <p class="text-secondary text-sm">
-                                Một email xác nhận đơn hàng đã được gửi tới địa chỉ của bạn:
-                            </p>
-                            <p class="text-primary font-mono text-sm break-all bg-primary/10 py-1.5 px-3 rounded-lg border border-primary/20 select-all font-semibold">
-                                ${customerEmail}
-                            </p>
-                            <p class="text-yellow-400/90 text-xs mt-2 font-medium">
-                                💡 Nhắc nhở: Vui lòng click vào liên kết "Xác nhận đơn hàng" trong email để chuẩn bị món ăn.
-                            </p>
-                            
-                            <!-- Development Quick Confirmation Link -->
-                            <div class="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl text-left">
-                                <p class="text-[11px] text-blue-400 font-bold uppercase mb-1">🛠️ Link xác nhận nhanh (Môi trường Dev):</p>
-                                <a href="${confirmLink}" target="_blank" class="text-[11px] text-primary hover:underline break-all block font-mono">${confirmLink}</a>
-                            </div>
-                        </div>
-
-                        <!-- Button -->
-                        <div class="pt-2 space-y-3">
-                            <button id="btn-go-to-history" class="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition-all duration-300">
-                                Tôi đã xác nhận trong email
-                            </button>
-                            <p id="error-feedback" class="text-red-400 text-xs hidden font-medium">⚠️ Hệ thống chưa nhận được xác nhận từ email của bạn. Vui lòng bấm liên kết trong thư trước.</p>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            const wrapper = document.createElement('div');
-            wrapper.innerHTML = modalHtml;
-            const modalEl = wrapper.firstElementChild;
-            document.body.appendChild(modalEl);
-
-            // Animate in
-            setTimeout(() => {
-                const content = document.getElementById('success-modal-content');
-                if (content) {
-                    content.classList.remove('scale-95', 'opacity-0');
-                    content.classList.add('scale-100', 'opacity-100');
-                }
-            }, 50);
-
-            // Redirect on click
-            document.getElementById('btn-go-to-history').addEventListener('click', async () => {
-                const feedbackEl = document.getElementById('error-feedback');
-                const btnEl = document.getElementById('btn-go-to-history');
-                
-                feedbackEl.classList.add('hidden');
-                btnEl.disabled = true;
-                btnEl.textContent = "Đang kiểm tra...";
-
-                try {
-                    const docSnap = await getDoc(doc(db, "orders", docRef.id));
-                    if (docSnap.exists() && docSnap.data().emailConfirmed === true) {
-                        const content = document.getElementById('success-modal-content');
-                        if (content) {
-                            content.classList.add('scale-95', 'opacity-0');
-                        }
-                        setTimeout(() => {
-                            modalEl.remove();
-                            window.location.href = `order-tracking.html?orderId=${docRef.id}`;
-                        }, 200);
-                    } else {
-                        feedbackEl.classList.remove('hidden');
-                        btnEl.disabled = false;
-                        btnEl.textContent = "Tôi đã xác nhận trong email";
-                    }
-                } catch(err) {
-                    console.error("Check confirmation failed", err);
-                    feedbackEl.textContent = "⚠️ Lỗi hệ thống khi kiểm tra xác nhận. Vui lòng thử lại.";
-                    feedbackEl.classList.remove('hidden');
-                    btnEl.disabled = false;
-                    btnEl.textContent = "Tôi đã xác nhận trong email";
-                }
-            });
+                // Redirect to Paytrail checkout
+                window.location.href = paytrailResult.checkoutUrl;
+                return;
+            } catch (err) {
+                console.error("Paytrail payment failed:", err);
+                window.showNotification('Kết nối thanh toán thất bại. Vui lòng thử lại.', 'error');
+                loading.classList.add('hidden');
+                btnSubmit.disabled = false;
+                return;
+            }
 
         } catch (error) {
             console.error("Order submission error:", error);
