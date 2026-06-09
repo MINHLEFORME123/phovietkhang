@@ -109,6 +109,8 @@ function calculateDeliveryFee(distance) {
     }
 }
 
+let appliedPromo = null;
+
 // Expose render function globally so cart.js can trigger it when qty changes
 window.renderCartPage = function() {
     const cart = window.getCart();
@@ -373,12 +375,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
 });
-
-let appliedPromo = null;
-
-// Submit Order
-const CLOUDFLARE_WORKER_URL = 'https://pvk-admin.minhbeo993.workers.dev';
 const WORKER_SECRET = apiKeys.workerSecret;
 
 async function sendWorkerEmail(to, subject, html) {
