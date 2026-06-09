@@ -114,16 +114,15 @@ function showOptionsPopup(item, lang) {
     const fallbackImg = 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=500';
     const imgSrc = item.image || fallbackImg;
 
-    // Create backdrop (sibling, no children with position:fixed)
-    const backdrop = document.createElement('div');
-    backdrop.id = 'options-backdrop';
-    backdrop.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:2147483646;animation:fadeIn 0.2s ease-out;margin:0;padding:0;';
+    // Create wrapper for centering and backdrop
+    const modalWrapper = document.createElement('div');
+    modalWrapper.id = 'options-modal-wrapper';
+    modalWrapper.className = 'fixed inset-0 z-[2147483647] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm opacity-0 transition-opacity duration-300';
 
-    // Create card (sibling to backdrop, positioned via transform, independent of backdrop-filter)
+    // Create card
     const card = document.createElement('div');
     card.id = 'options-card';
-    card.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2147483647;max-height:85vh;width:calc(100vw - 32px);max-width:28rem;animation:slideUp 0.3s ease-out;';
-    card.className = 'bg-surface border border-white/10 rounded-2xl shadow-2xl flex flex-col overflow-hidden';
+    card.className = 'bg-surface border border-white/10 rounded-2xl shadow-2xl flex flex-col overflow-hidden w-full max-w-[28rem] max-h-[85vh] transform scale-95 transition-all duration-300';
 
     card.innerHTML = `
         <div class="relative h-40 shrink-0 overflow-hidden">
@@ -150,9 +149,16 @@ function showOptionsPopup(item, lang) {
         </div>
     `;
 
-    document.body.appendChild(backdrop);
-    document.body.appendChild(card);
+    modalWrapper.appendChild(card);
+    document.body.appendChild(modalWrapper);
     document.body.style.overflow = 'hidden';
+
+    // Trigger animations
+    requestAnimationFrame(() => {
+        modalWrapper.classList.remove('opacity-0');
+        card.classList.remove('scale-95');
+        card.classList.add('scale-100');
+    });
 
     // Dynamic Price Updates
     const basePrice = item.price || 0;
@@ -178,12 +184,18 @@ function showOptionsPopup(item, lang) {
 
     // Close on cancel or backdrop click
     const closePopup = () => {
-        backdrop.remove();
-        card.remove();
-        document.body.style.overflow = '';
+        modalWrapper.classList.add('opacity-0');
+        card.classList.remove('scale-100');
+        card.classList.add('scale-95');
+        setTimeout(() => {
+            modalWrapper.remove();
+            document.body.style.overflow = '';
+        }, 300);
     };
     card.querySelector('#popup-cancel').addEventListener('click', closePopup);
-    backdrop.addEventListener('click', () => closePopup());
+    modalWrapper.addEventListener('click', (e) => {
+        if (e.target === modalWrapper) closePopup();
+    });
 
     // Close on ESC key
     const handleEsc = (e) => {
@@ -226,19 +238,16 @@ function showOptionsPopup(item, lang) {
         
         window.addToCart(item.id, safeName, finalPrice, item.image || '', selectedStrings);
         document.removeEventListener('keydown', handleEsc);
-        backdrop.remove();
-        card.remove();
-        document.body.style.overflow = '';
+        
+        modalWrapper.classList.add('opacity-0');
+        card.classList.remove('scale-100');
+        card.classList.add('scale-95');
+        setTimeout(() => {
+            modalWrapper.remove();
+            document.body.style.overflow = '';
+        }, 300);
     });
 }
-
-// Inject popup animation keyframes
-const popupKeyframes = document.createElement('style');
-popupKeyframes.textContent = `
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes slideUp { from { opacity: 0; transform: translate(-50%, calc(-50% + 30px)) scale(0.95); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
-`;
-document.head.appendChild(popupKeyframes);
 
 async function loadMenu() {
     if (!menuContainer) return;
