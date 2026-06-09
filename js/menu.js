@@ -132,21 +132,21 @@ function showOptionsPopup(item, lang) {
             <h3 class="absolute bottom-4 left-5 text-2xl font-bold font-['EB_Garamond'] text-white drop-shadow-lg">${displayName}</h3>
             <span id="popup-price-tag" class="absolute top-3 right-3 text-lg font-bold text-primary bg-black/60 px-3 py-1 rounded-full backdrop-blur-sm">&euro;${(item.price || 0).toFixed(2)}</span>
         </div>
-        <div class="p-5 flex flex-col min-h-0 flex-1">
-            <h4 class="text-primary font-semibold mb-3 flex items-center gap-2 shrink-0">
+        <div class="px-5 pt-5 pb-2 shrink-0">
+            <h4 class="text-primary font-semibold flex items-center gap-2">
                 <span class="material-symbols-outlined text-sm">tune</span> ${titleText}
             </h4>
-            <div class="space-y-4 overflow-y-auto mb-5 flex-1 min-h-0">
-                ${optionsHTML}
-            </div>
-            <div class="flex gap-3 shrink-0">
-                <button id="popup-cancel" class="flex-1 py-3 border border-white/20 text-secondary rounded-xl hover:bg-white/5 transition-colors font-medium">
-                    ${cancelText}
-                </button>
-                <button id="popup-confirm" class="flex-1 py-3 bg-white hover:bg-gray-100 text-black rounded-xl font-bold shadow-lg transition-all flex items-center justify-center gap-2 border border-gray-200">
-                    <span class="material-symbols-outlined text-sm">add_shopping_cart</span> ${addBtnText}
-                </button>
-            </div>
+        </div>
+        <div class="px-5 overflow-y-auto flex-1 min-h-0 space-y-4">
+            ${optionsHTML}
+        </div>
+        <div class="p-5 shrink-0 flex gap-3">
+            <button id="popup-cancel" class="flex-1 py-3 border border-white/20 text-secondary rounded-xl hover:bg-white/5 transition-colors font-medium">
+                ${cancelText}
+            </button>
+            <button id="popup-confirm" class="flex-1 py-3 bg-white hover:bg-gray-100 text-black rounded-xl font-bold shadow-lg transition-all flex items-center justify-center gap-2 border border-gray-200">
+                <span class="material-symbols-outlined text-sm">add_shopping_cart</span> ${addBtnText}
+            </button>
         </div>
     `;
 
