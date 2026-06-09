@@ -117,12 +117,14 @@ function showOptionsPopup(item, lang) {
     // Create wrapper for centering and backdrop
     const modalWrapper = document.createElement('div');
     modalWrapper.id = 'options-modal-wrapper';
-    modalWrapper.className = 'fixed inset-0 h-screen z-[2147483647] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm opacity-0 transition-opacity duration-300';
+    modalWrapper.className = 'fixed inset-0 z-[2147483647] flex items-start justify-center overflow-y-auto bg-black/70 p-4 opacity-0 transition-opacity duration-300 backdrop-blur-sm sm:items-center sm:p-6';
+    modalWrapper.setAttribute('role', 'dialog');
+    modalWrapper.setAttribute('aria-modal', 'true');
 
     // Create card
     const card = document.createElement('div');
     card.id = 'options-card';
-    card.className = 'bg-surface border border-white/10 rounded-2xl shadow-2xl flex flex-col overflow-hidden w-full max-w-[28rem] max-h-[75vh] transform scale-95 transition-all duration-300';
+    card.className = 'my-6 flex max-h-[calc(100dvh-2rem)] w-full max-w-[28rem] scale-95 flex-col overflow-hidden rounded-2xl border border-white/10 bg-surface shadow-2xl transition-all duration-300 sm:max-h-[75vh]';
 
     card.innerHTML = `
         <div class="relative h-28 shrink-0 overflow-hidden">
@@ -150,8 +152,9 @@ function showOptionsPopup(item, lang) {
     `;
 
     modalWrapper.appendChild(card);
-    document.documentElement.appendChild(modalWrapper);
-    document.documentElement.style.overflow = 'hidden';
+    document.body.appendChild(modalWrapper);
+    const previousBodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
 
     // Trigger animations
     requestAnimationFrame(() => {
@@ -184,12 +187,12 @@ function showOptionsPopup(item, lang) {
 
     // Close on cancel or backdrop click
     const closePopup = () => {
+        document.removeEventListener('keydown', handleEsc);
         modalWrapper.classList.add('opacity-0');
-        card.classList.remove('scale-100');
         card.classList.add('scale-95');
         setTimeout(() => {
             modalWrapper.remove();
-            document.documentElement.style.overflow = '';
+            document.body.style.overflow = previousBodyOverflow;
         }, 300);
     };
     card.querySelector('#popup-cancel').addEventListener('click', closePopup);
@@ -201,7 +204,6 @@ function showOptionsPopup(item, lang) {
     const handleEsc = (e) => {
         if (e.key === 'Escape') {
             closePopup();
-            document.removeEventListener('keydown', handleEsc);
         }
     };
     document.addEventListener('keydown', handleEsc);
@@ -237,15 +239,8 @@ function showOptionsPopup(item, lang) {
         window.flyToCart(card);
         
         window.addToCart(item.id, safeName, finalPrice, item.image || '', selectedStrings);
-        document.removeEventListener('keydown', handleEsc);
-        
-        modalWrapper.classList.add('opacity-0');
-        card.classList.remove('scale-100');
-        card.classList.add('scale-95');
-        setTimeout(() => {
-            modalWrapper.remove();
-            document.documentElement.style.overflow = '';
-        }, 300);
+
+        closePopup();
     });
 }
 
