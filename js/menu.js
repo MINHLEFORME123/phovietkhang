@@ -117,7 +117,7 @@ function showOptionsPopup(item, lang) {
     // Create wrapper for centering and backdrop
     const modalWrapper = document.createElement('div');
     modalWrapper.id = 'options-modal-wrapper';
-    modalWrapper.className = 'fixed inset-0 z-[2147483647] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm opacity-0 transition-opacity duration-300';
+    modalWrapper.className = 'fixed inset-0 h-screen z-[2147483647] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm opacity-0 transition-opacity duration-300';
 
     // Create card
     const card = document.createElement('div');
