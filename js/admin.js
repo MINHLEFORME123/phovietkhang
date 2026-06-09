@@ -891,6 +891,15 @@ if (orderManagerContainer) {
         }
     };
 
+    window.clearAllOrders = async function() {
+        if (!confirm("Delete ALL orders? This cannot be undone!")) return;
+        const qSnap = await getDocs(collection(db, "orders"));
+        const batch = [];
+        qSnap.forEach(docSnap => batch.push(deleteDoc(docSnap.ref)));
+        await Promise.all(batch);
+        window.showNotification(`Deleted ${batch.length} orders.`, 'success');
+    };
+
     function renderOrders() {
         const tableBody = document.getElementById('orders-table-body');
         if (!tableBody) return;
@@ -2570,6 +2579,10 @@ Rules:
     Args: { "voucherCode": string }
     Permanently deletes a voucher from the system by code. Cannot be undone.
 
+15b4. listAllVouchers()
+    Args: none
+    Returns a list of all existing vouchers with their code, discount percentage, email, used status, expiry date, and allowed order types.
+
 15c. sendSpinsToUser(uidOrEmail, spinType, count)
     Args: { "uidOrEmail": string, "spinType": string, "count": number }
     Sends Lucky Wheel spins to a user by UID or email. spinType must be: "deu" (Normal), "xin" (Good), or "vip" (VIP).
@@ -3605,6 +3618,28 @@ Rules:
         }
     }
 
+    async function listAllVouchers() {
+        try {
+            const qSnap = await getDocs(collection(db, "vouchers"));
+            const vouchers = [];
+            qSnap.forEach(docSnap => {
+                const d = docSnap.data();
+                vouchers.push({
+                    code: docSnap.id,
+                    discountPercent: d.discountPercent,
+                    email: d.email || '',
+                    used: d.used || false,
+                    expiryDate: d.expiryDate ? d.expiryDate.toDate().toISOString() : null,
+                    allowedOrderTypes: d.allowedOrderTypes || []
+                });
+            });
+            return vouchers;
+        } catch (e) {
+            console.error(e);
+            return { error: e.message };
+        }
+    }
+
     async function updateOrderStatus(orderId, newStatus) {
         try {
             const docRef = doc(db, "orders", orderId);
@@ -3973,6 +4008,8 @@ Rules:
                         result = await disableVoucher(args.voucherCode);
                     } else if (tool === 'deleteVoucher') {
                         result = await deleteVoucher(args.voucherCode);
+                    } else if (tool === 'listAllVouchers') {
+                        result = await listAllVouchers();
                     } else if (tool === 'updateOrderStatus') {
                         result = await updateOrderStatus(args.orderId, args.newStatus);
                     } else if (tool === 'deleteOrder') {
@@ -4032,7 +4069,7 @@ Rules:
                     } else if (tool === 'updateHomepageCTA') {
                         result = await updateHomepageCTA(args.titleVi, args.descVi);
                     } else {
-                        result = { error: `Tool "${tool}" không tồn tại. Các tools hợp lệ: getOrdersSoldToday, listAllFoodItems, setOptionChoicePrice, updateMenuPrice, createMenuItem, addMenuOptionGroup, removeMenuOptionGroup, addChoiceToOptionGroup, removeChoiceFromOptionGroup, updateMenuOptionGroup, updateChoiceInOptionGroup, updateMenuName, updateMenuDescription, updateMenuCategory, updateMenuAvailability, uploadMenuImage, removeMenuImage, updateMenuPreparationTime, updateMenuNutritionInfo, addMenuTag, removeMenuTag, reorderMenuItems, duplicateMenuItem, deleteMenuItem, updateMenuCustomFields, listAllUsers, changeUserRole, deleteUserAccount, createUserAccount, sendPasswordReset, sendSpinsToUser, sendGlobalAnnouncement, createCustomVoucher, disableVoucher, deleteVoucher, updateOrderStatus, deleteOrder, getOrdersByStatus, changeCurrentAdminPassword, updateCurrentAdminEmail, updateCurrentAdminProfile, adminListAuthUsers, adminDeleteAuthUser, adminDisableUser, adminEnableUser, adminChangeUserPassword, adminChangeUserEmail, adminVerifyUserEmail, adminSetCustomClaims, adminGetUserInfo, adminRevokeUserTokens, adminUpdateDisplayName, adminGenerateCustomToken, webSearch, browseWebUrl, updateHomepageHero, updateHomepageSignatures, updateHomepageSignatureText, updateHomepageStory, updateHomepageCTA.` };
+                        result = { error: `Tool "${tool}" không tồn tại. Các tools hợp lệ: getOrdersSoldToday, listAllFoodItems, setOptionChoicePrice, updateMenuPrice, createMenuItem, addMenuOptionGroup, removeMenuOptionGroup, addChoiceToOptionGroup, removeChoiceFromOptionGroup, updateMenuOptionGroup, updateChoiceInOptionGroup, updateMenuName, updateMenuDescription, updateMenuCategory, updateMenuAvailability, uploadMenuImage, removeMenuImage, updateMenuPreparationTime, updateMenuNutritionInfo, addMenuTag, removeMenuTag, reorderMenuItems, duplicateMenuItem, deleteMenuItem, updateMenuCustomFields, listAllUsers, changeUserRole, deleteUserAccount, createUserAccount, sendPasswordReset, sendSpinsToUser, sendGlobalAnnouncement, createCustomVoucher, disableVoucher, deleteVoucher, listAllVouchers, updateOrderStatus, deleteOrder, getOrdersByStatus, changeCurrentAdminPassword, updateCurrentAdminEmail, updateCurrentAdminProfile, adminListAuthUsers, adminDeleteAuthUser, adminDisableUser, adminEnableUser, adminChangeUserPassword, adminChangeUserEmail, adminVerifyUserEmail, adminSetCustomClaims, adminGetUserInfo, adminRevokeUserTokens, adminUpdateDisplayName, adminGenerateCustomToken, webSearch, browseWebUrl, updateHomepageHero, updateHomepageSignatures, updateHomepageSignatureText, updateHomepageStory, updateHomepageCTA.` };
                     }
                     
                     if (result && typeof result === 'object' && result.hasOwnProperty('error')) {
