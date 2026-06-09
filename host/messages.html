@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/client.css">
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Admin Dashboard | Messages</title>
+    <!-- Google Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: { extend: { colors: { surface: "#121824", "surface-highlight": "#1e293b", primary: "#3b82f6", secondary: "#9ca3af", "on-surface": "#f3f4f6" } } }
+    }
+    </script>
+</head>
+<body class="bg-[#0b0f19] text-on-surface font-['Inter'] flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-surface border-r border-gray-800 flex flex-col">
+        <div class="h-20 flex items-center justify-center border-b border-gray-800">
+            <h1 class="text-xl font-bold text-primary tracking-wider">PHO HOST</h1>
+        </div>
+        <nav class="flex-1 p-4 space-y-2">
+            <a href="index.html" id="nav-dashboard" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="food-list.html" id="nav-food" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+                <span class="material-symbols-outlined">restaurant_menu</span>
+                <span>Food Menu</span>
+            </a>
+            <a href="order-manager.html" id="nav-orders" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+                <span class="material-symbols-outlined">receipt_long</span>
+                <span>Orders</span>
+            </a>
+            <a href="reservations.html" id="nav-reservations" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+                <span class="material-symbols-outlined">table_restaurant</span>
+                <span>Reservations</span>
+            </a>
+            <a href="feedback.html" id="nav-feedback" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+                <span class="material-symbols-outlined">forum</span>
+                <span>Feedback</span>
+            </a>
+            <a href="messages.html" id="nav-messages" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors bg-primary/20 text-primary">
+                <span class="material-symbols-outlined">mail</span>
+                <span>Messages</span>
+            </a>
+            <a href="../kitchen/index.html" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-surface-highlight transition-colors text-secondary">
+                <span class="material-symbols-outlined">soup_kitchen</span>
+                <span>Kitchen KDS</span>
+            </a>
+        </nav>
+        <div class="p-4 border-t border-gray-800">
+            <button onclick="window.logoutUser()" class="flex w-full items-center space-x-3 p-3 rounded-lg hover:bg-red-900/50 text-red-400 transition-colors">
+                <span class="material-symbols-outlined">logout</span>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-screen overflow-y-auto">
+        <header class="h-20 bg-surface border-b border-gray-800 flex items-center justify-between px-8 flex-shrink-0">
+            <h2 class="text-2xl font-semibold text-white font-['Inter']">Gửi tin nhắn & Khuyến mãi</h2>
+            <div class="flex items-center space-x-4">
+                <button onclick="window.exportTableToExcel('messages-table', 'messages_history.xlsx')" class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg flex items-center gap-2 transition-colors shadow">
+                    <span class="material-symbols-outlined">download</span>
+                    <span>Xuất Excel</span>
+                </button>
+                <span class="material-symbols-outlined text-secondary cursor-pointer hover:text-white">notifications</span>
+                <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold" id="user-avatar-icon">H</div>
+            </div>
+        </header>
+        
+        <div class="p-8 space-y-8">
+            <!-- Composer Card -->
+            <div class="bg-surface rounded-xl border border-gray-800 p-6 shadow-lg">
+                <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">edit_document</span> Soạn tin nhắn mới
+                </h3>
+                <form id="message-compose-form" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Left Fields -->
+                        <div class="space-y-4">
+                            <div>
+                                <label for="msg-recipient" class="block text-sm font-medium text-secondary mb-2">Người nhận</label>
+                                <select id="msg-recipient" required class="w-full bg-[#18202d] border border-gray-800 rounded-lg text-white p-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                                    <option value="all">Tất cả khách hàng (Broadcast)</option>
+                                    <!-- User list populated here -->
+                                </select>
+                            </div>
+                            <div>
+                                <label for="msg-title" class="block text-sm font-medium text-secondary mb-2">Tiêu đề tin nhắn</label>
+                                <input type="text" id="msg-title" required class="w-full bg-[#18202d] border border-gray-800 rounded-lg text-white p-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="Nhập tiêu đề...">
+                            </div>
+                            <div>
+                                <label for="msg-text" class="block text-sm font-medium text-secondary mb-2">Nội dung tin nhắn</label>
+                                <textarea id="msg-text" required class="w-full bg-[#18202d] border border-gray-800 rounded-lg text-white p-3 h-32 focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="Nhập nội dung tin nhắn chi tiết..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Right Fields -->
+                        <div class="space-y-4">
+                            <div>
+                                <label for="msg-image-url" class="block text-sm font-medium text-secondary mb-2">URL Hình ảnh (Tùy chọn)</label>
+                                <input type="url" id="msg-image-url" class="w-full bg-[#18202d] border border-gray-800 rounded-lg text-white p-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="https://images.unsplash.com/photo-...">
+                            </div>
+                            
+                            <!-- Voucher Option -->
+                            <div class="p-4 bg-[#18202d] rounded-xl border border-gray-800 space-y-4">
+                                <label class="flex items-center gap-2.5 cursor-pointer">
+                                    <input type="checkbox" id="attach-voucher-check" class="rounded border-gray-800 bg-[#0b0f19] text-primary focus:ring-primary focus:ring-offset-[#18202d]">
+                                    <span class="text-sm font-medium text-white select-none">Tạo & đính kèm Mã giảm giá (Voucher)</span>
+                                </label>
+                                
+                                <div id="voucher-config-section" class="hidden space-y-4 pt-2 border-t border-gray-800">
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label for="voucher-percent" class="block text-xs text-secondary mb-1">Mức giảm giá (%)</label>
+                                            <select id="voucher-percent" class="w-full bg-[#0b0f19] border border-gray-800 rounded-lg text-white p-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                                                <option value="5">Giảm 5%</option>
+                                                <option value="10">Giảm 10%</option>
+                                                <option value="15">Giảm 15%</option>
+                                                <option value="20">Giảm 20%</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label for="voucher-duration" class="block text-xs text-secondary mb-1">Thời hạn sử dụng</label>
+                                            <select id="voucher-duration" class="w-full bg-[#0b0f19] border border-gray-800 rounded-lg text-white p-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                                                <option value="7">7 ngày</option>
+                                                <option value="30" selected>30 ngày (1 tháng)</option>
+                                                <option value="90">90 ngày</option>
+                                                <option value="365">365 ngày (1 năm)</option>
+                                                <option value="never">Không giới hạn</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-secondary mb-1.5 font-medium">Hình thức đặt hàng áp dụng</label>
+                                        <div class="flex flex-wrap gap-4 bg-[#0b0f19] p-3 rounded-lg border border-gray-800">
+                                            <label class="flex items-center gap-1.5 cursor-pointer text-xs text-white">
+                                                <input type="checkbox" id="voucher-type-dine-in" class="rounded border-gray-800 bg-[#18202d] text-primary focus:ring-primary">
+                                                <span>Ăn tại bàn</span>
+                                            </label>
+                                            <label class="flex items-center gap-1.5 cursor-pointer text-xs text-white">
+                                                <input type="checkbox" id="voucher-type-takeaway" checked class="rounded border-gray-800 bg-[#18202d] text-primary focus:ring-primary">
+                                                <span>Mang về</span>
+                                            </label>
+                                            <label class="flex items-center gap-1.5 cursor-pointer text-xs text-white">
+                                                <input type="checkbox" id="voucher-type-delivery" checked class="rounded border-gray-800 bg-[#18202d] text-primary focus:ring-primary">
+                                                <span>Giao hàng</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <p class="text-[11px] text-secondary/70 italic">💡 Hệ thống sẽ tự tạo mã có đầu WELCOME/PROMO và gán quyền sử dụng gắn liền với email khách hàng được chọn.</p>
+                                </div>
+                            </div>
+
+                            <!-- Lucky Wheel Spin Option -->
+                            <div class="p-4 bg-[#18202d] rounded-xl border border-gray-800 space-y-4">
+                                <label class="flex items-center gap-2.5 cursor-pointer">
+                                    <input type="checkbox" id="attach-spin-check" class="rounded border-gray-800 bg-[#0b0f19] text-primary focus:ring-primary focus:ring-offset-[#18202d]">
+                                    <span class="text-sm font-medium text-white select-none">Tặng lượt quay Lucky Wheel</span>
+                                </label>
+                                
+                                <div id="spin-config-section" class="hidden space-y-4 pt-2 border-t border-gray-800">
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label for="spin-type-select" class="block text-xs text-secondary mb-1">Loại lượt quay</label>
+                                            <select id="spin-type-select" class="w-full bg-[#0b0f19] border border-gray-800 rounded-lg text-white p-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                                                <option value="deu">Thường (deu)</option>
+                                                <option value="xin">Xịn (xin)</option>
+                                                <option value="vip">VIP (vip)</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label for="spin-count-input" class="block text-xs text-secondary mb-1">Số lượng lượt tặng</label>
+                                            <input type="number" id="spin-count-input" min="1" value="1" class="w-full bg-[#0b0f19] border border-gray-800 rounded-lg text-white p-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end gap-3 pt-4 border-t border-gray-800">
+                        <button type="submit" id="btn-send-msg" class="bg-primary hover:bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition-all active:scale-95 flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-lg">send</span> Gửi tin nhắn
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Sent History Card -->
+            <div class="bg-surface rounded-xl border border-gray-800 p-6 shadow-lg">
+                <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">history</span> Nhật ký tin nhắn đã gửi
+                </h3>
+                <div class="overflow-x-auto">
+                    <table id="messages-table" class="w-full text-left">
+                        <thead>
+                            <tr class="border-b border-gray-800 text-secondary text-sm">
+                                <th class="py-3 px-4 font-medium">Tiêu đề</th>
+                                <th class="py-3 px-4 font-medium">Người nhận</th>
+                                <th class="py-3 px-4 font-medium">Hình ảnh</th>
+                                <th class="py-3 px-4 font-medium">Voucher</th>
+                                <th class="py-3 px-4 font-medium">Ngày gửi</th>
+                                <th class="py-3 px-4 font-medium">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="messages-table-body" class="text-sm">
+                            <tr><td colspan="6" class="p-4 text-center text-secondary">Đang tải lịch sử tin nhắn...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="../js/auth.js"></script>
+    <script type="module" src="../js/admin-messages.js"></script>
+</body>
+</html>
