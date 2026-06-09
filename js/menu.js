@@ -236,7 +236,7 @@ function showOptionsPopup(item, lang) {
 const popupKeyframes = document.createElement('style');
 popupKeyframes.textContent = `
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes slideUp { from { opacity: 0; transform: translateY(30px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes slideUp { from { opacity: 0; transform: translate(-50%, calc(-50% + 30px)) scale(0.95); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
 `;
 document.head.appendChild(popupKeyframes);
 
