@@ -128,7 +128,7 @@ function showOptionsPopup(item, lang) {
     card.innerHTML = `
         <div class="relative h-40 shrink-0 overflow-hidden">
             <img src="${imgSrc}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='${fallbackImg}'">
-            <div class="absolute inset-0 bg-gradient-to-t from-surface-dim to-transparent"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-[#121824] to-transparent"></div>
             <h3 class="absolute bottom-4 left-5 text-2xl font-bold font-['EB_Garamond'] text-white drop-shadow-lg">${displayName}</h3>
             <span id="popup-price-tag" class="absolute top-3 right-3 text-lg font-bold text-primary bg-black/60 px-3 py-1 rounded-full backdrop-blur-sm">&euro;${(item.price || 0).toFixed(2)}</span>
         </div>
@@ -137,7 +137,7 @@ function showOptionsPopup(item, lang) {
                 <span class="material-symbols-outlined text-sm">tune</span> ${titleText}
             </h4>
         </div>
-        <div class="px-5 overflow-y-auto flex-1 min-h-0 space-y-4">
+        <div class="px-5 overflow-y-auto space-y-4" style="max-height: 45vh;">
             ${optionsHTML}
         </div>
         <div class="p-5 shrink-0 flex gap-3">
