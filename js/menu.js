@@ -68,6 +68,8 @@ function getCategoryTitle(catName, lang) {
 
 // --- Options Popup Modal ---
 function showOptionsPopup(item, lang) {
+    if (document.getElementById('options-modal-wrapper')) return;
+
     const nameKey = lang === 'vi' ? 'nameVi' : (lang === 'fi' ? 'nameFi' : 'nameEn');
     const displayName = item[nameKey] || item.nameVi || item.nameEn || 'Unknown';
 
@@ -117,14 +119,30 @@ function showOptionsPopup(item, lang) {
     // Create wrapper for centering and backdrop
     const modalWrapper = document.createElement('div');
     modalWrapper.id = 'options-modal-wrapper';
-    modalWrapper.className = 'fixed inset-0 z-[2147483647] flex items-start justify-center overflow-y-auto bg-black/70 p-4 opacity-0 transition-opacity duration-300 backdrop-blur-sm sm:items-center sm:p-6';
+    modalWrapper.className = 'fixed inset-0 z-[2147483647] flex items-center justify-center overflow-y-auto bg-black/70 p-4 font-body-md text-on-surface antialiased opacity-0 transition-opacity duration-300 backdrop-blur-sm';
+    modalWrapper.style.cssText = [
+        'position: fixed',
+        'inset: 0',
+        'width: 100vw',
+        'height: 100dvh',
+        'z-index: 2147483647',
+        'display: flex',
+        'align-items: center',
+        'justify-content: center',
+        'overflow-y: auto',
+        'padding: 16px',
+        'background: rgba(0, 0, 0, 0.7)',
+        'font-family: Inter, sans-serif',
+        'color: #f3f4f6',
+        'box-sizing: border-box'
+    ].join(';');
     modalWrapper.setAttribute('role', 'dialog');
     modalWrapper.setAttribute('aria-modal', 'true');
 
     // Create card
     const card = document.createElement('div');
     card.id = 'options-card';
-    card.className = 'my-6 flex max-h-[calc(100dvh-2rem)] w-full max-w-[28rem] scale-95 flex-col overflow-hidden rounded-2xl border border-white/10 bg-surface shadow-2xl transition-all duration-300 sm:max-h-[75vh]';
+    card.className = 'flex max-h-[calc(100dvh-2rem)] w-full max-w-[28rem] scale-95 flex-col overflow-hidden rounded-2xl border border-white/10 bg-surface shadow-2xl transition-all duration-300 sm:max-h-[75vh]';
 
     card.innerHTML = `
         <div class="relative h-28 shrink-0 overflow-hidden">
@@ -152,9 +170,11 @@ function showOptionsPopup(item, lang) {
     `;
 
     modalWrapper.appendChild(card);
-    document.body.appendChild(modalWrapper);
     const previousBodyOverflow = document.body.style.overflow;
+    const previousHtmlOverflow = document.documentElement.style.overflow;
+    document.documentElement.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
+    document.documentElement.appendChild(modalWrapper);
 
     // Trigger animations
     requestAnimationFrame(() => {
@@ -192,6 +212,7 @@ function showOptionsPopup(item, lang) {
         card.classList.add('scale-95');
         setTimeout(() => {
             modalWrapper.remove();
+            document.documentElement.style.overflow = previousHtmlOverflow;
             document.body.style.overflow = previousBodyOverflow;
         }, 300);
     };
@@ -236,9 +257,13 @@ function showOptionsPopup(item, lang) {
         const safeName = (item.nameEn || item.nameVi || 'Unknown');
         
         // Trigger fly to cart animation on the card
-        window.flyToCart(card);
+        if (typeof window.flyToCart === 'function') {
+            window.flyToCart(card);
+        }
         
-        window.addToCart(item.id, safeName, finalPrice, item.image || '', selectedStrings);
+        if (typeof window.addToCart === 'function') {
+            window.addToCart(item.id, safeName, finalPrice, item.image || '', selectedStrings);
+        }
 
         closePopup();
     });
@@ -400,9 +425,13 @@ async function loadMenu() {
                         showOptionsPopup(item, currentLang);
                     } else {
                         // Fly entire card to cart
-                        window.flyToCart(card);
+                        if (typeof window.flyToCart === 'function') {
+                            window.flyToCart(card);
+                        }
                         const safeName = (item.nameEn || item.nameVi || 'Unknown');
-                        window.addToCart(item.id, safeName, item.price || 0, item.image || '', []);
+                        if (typeof window.addToCart === 'function') {
+                            window.addToCart(item.id, safeName, item.price || 0, item.image || '', []);
+                        }
                     }
                 });
 

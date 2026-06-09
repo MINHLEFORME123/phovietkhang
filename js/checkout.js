@@ -1,4 +1,5 @@
 import { db, getApiKeys } from "./firebase-config.js";
+import { addDoc, collection, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
 const apiKeys = await getApiKeys();
 
@@ -130,24 +131,30 @@ window.renderCartPage = function() {
     let subtotal = 0;
 
     cart.forEach(item => {
-        const itemTotal = item.price * item.qty;
+        const itemPrice = Number.parseFloat(item.price) || 0;
+        const itemQty = Number.parseInt(item.qty, 10) || 1;
+        const itemOptions = Array.isArray(item.options) ? item.options : [];
+        const itemImage = typeof item.image === 'string' ? item.image : '';
+        const itemName = typeof item.name === 'string' && item.name ? item.name : 'Unknown';
+        const itemId = typeof item.id === 'string' ? item.id : '';
+        const itemTotal = itemPrice * itemQty;
         subtotal += itemTotal;
 
         const el = document.createElement('div');
         el.className = "flex items-center gap-4 bg-surface p-4 rounded-xl border border-white/5";
         el.innerHTML = `
-            <img src="${item.image}" class="w-20 h-20 object-cover rounded-lg" onerror="this.src='https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=500'">
+            <img src="${itemImage}" class="w-20 h-20 object-cover rounded-lg" onerror="this.src='https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=500'">
             <div class="flex-1">
-                <h4 class="font-bold text-white text-lg">${item.name}</h4>
-                ${item.options && item.options.length > 0 ? `<div class="flex flex-wrap gap-1 mt-1">${item.options.map(o => `<span class="text-xs bg-teal-600/20 text-teal-400 px-2 py-0.5 rounded-full border border-teal-600/30">${o}</span>`).join('')}</div>` : ''}
-                <p class="text-primary font-semibold">\u20AC${item.price.toFixed(2)}</p>
+                <h4 class="font-bold text-white text-lg">${itemName}</h4>
+                ${itemOptions.length > 0 ? `<div class="flex flex-wrap gap-1 mt-1">${itemOptions.map(o => `<span class="text-xs bg-teal-600/20 text-teal-400 px-2 py-0.5 rounded-full border border-teal-600/30">${o}</span>`).join('')}</div>` : ''}
+                <p class="text-primary font-semibold">\u20AC${itemPrice.toFixed(2)}</p>
             </div>
             <div class="flex items-center gap-3 bg-surface-container-low rounded-lg p-1 border border-white/10">
-                <button onclick="window.updateQty('${item.id}', -1)" class="w-8 h-8 flex items-center justify-center text-secondary hover:text-white hover:bg-white/10 rounded-md transition-colors"><span class="material-symbols-outlined text-sm">remove</span></button>
-                <span class="w-4 text-center font-bold text-white">${item.qty}</span>
-                <button onclick="window.updateQty('${item.id}', 1)" class="w-8 h-8 flex items-center justify-center text-secondary hover:text-white hover:bg-white/10 rounded-md transition-colors"><span class="material-symbols-outlined text-sm">add</span></button>
+                <button onclick="window.updateQty('${itemId}', -1)" class="w-8 h-8 flex items-center justify-center text-secondary hover:text-white hover:bg-white/10 rounded-md transition-colors"><span class="material-symbols-outlined text-sm">remove</span></button>
+                <span class="w-4 text-center font-bold text-white">${itemQty}</span>
+                <button onclick="window.updateQty('${itemId}', 1)" class="w-8 h-8 flex items-center justify-center text-secondary hover:text-white hover:bg-white/10 rounded-md transition-colors"><span class="material-symbols-outlined text-sm">add</span></button>
             </div>
-            <button onclick="window.removeFromCart('${item.id}')" class="p-2 text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded-lg transition-colors ml-2">
+            <button onclick="window.removeFromCart('${itemId}')" class="p-2 text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded-lg transition-colors ml-2">
                 <span class="material-symbols-outlined">delete</span>
             </button>
         `;

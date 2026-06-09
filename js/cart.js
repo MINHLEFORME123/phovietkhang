@@ -1,6 +1,46 @@
 // js/cart.js - Handles localStorage cart state + fly-to-cart animation
 
-let cart = JSON.parse(localStorage.getItem('phoCart')) || [];
+function normalizeCartItem(item) {
+    if (!item || typeof item !== 'object') return null;
+
+    const normalizedPrice = Number.parseFloat(item.price);
+    const normalizedQty = Number.parseInt(item.qty, 10);
+    const normalizedOptions = Array.isArray(item.options)
+        ? item.options.filter(option => typeof option === 'string')
+        : [];
+
+    const rawId = typeof item.rawId === 'string' && item.rawId
+        ? item.rawId
+        : (typeof item.id === 'string' ? item.id.split('__')[0] : '');
+    const id = typeof item.id === 'string' && item.id
+        ? item.id
+        : rawId;
+
+    if (!id) return null;
+
+    return {
+        id,
+        rawId,
+        name: typeof item.name === 'string' && item.name ? item.name : 'Unknown',
+        price: Number.isFinite(normalizedPrice) ? normalizedPrice : 0,
+        image: typeof item.image === 'string' ? item.image : '',
+        qty: Number.isFinite(normalizedQty) && normalizedQty > 0 ? normalizedQty : 1,
+        options: normalizedOptions
+    };
+}
+
+function loadCart() {
+    try {
+        const parsed = JSON.parse(localStorage.getItem('phoCart') || '[]');
+        if (!Array.isArray(parsed)) return [];
+        return parsed.map(normalizeCartItem).filter(Boolean);
+    } catch (error) {
+        console.error('Failed to parse cart from localStorage:', error);
+        return [];
+    }
+}
+
+let cart = loadCart();
 
 function saveCart() {
     localStorage.setItem('phoCart', JSON.stringify(cart));
@@ -131,12 +171,21 @@ document.head.appendChild(cartAnimStyle);
 window.addToCart = function(id, name, price, image, selectedOptions) {
     const optKey = selectedOptions && selectedOptions.length > 0 ? selectedOptions.sort().join('|') : '';
     const uniqueId = optKey ? `${id}__${optKey}` : id;
+    const normalizedPrice = Number.parseFloat(price);
 
     const existing = cart.find(i => i.id === uniqueId);
     if (existing) {
         existing.qty += 1;
     } else {
-        cart.push({ id: uniqueId, rawId: id, name, price, image, qty: 1, options: selectedOptions || [] });
+        cart.push({
+            id: uniqueId,
+            rawId: id,
+            name: typeof name === 'string' && name ? name : 'Unknown',
+            price: Number.isFinite(normalizedPrice) ? normalizedPrice : 0,
+            image: typeof image === 'string' ? image : '',
+            qty: 1,
+            options: Array.isArray(selectedOptions) ? selectedOptions : []
+        });
     }
     saveCart();
 };
@@ -170,5 +219,6 @@ window.getCart = function() {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+    saveCart();
     updateCartBadge();
 });
