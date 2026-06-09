@@ -319,10 +319,20 @@ document.addEventListener('click', (e) => {
             align-items: center !important;
             justify-content: center !important;
             cursor: pointer;
-            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.5), 0 0 0 0 rgba(59, 130, 246, 0.4);
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.5);
             z-index: 2147483647 !important;
             transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s ease;
+            pointer-events: auto !important;
+            will-change: auto;
+        }
+        .pvk-chat-toggle-btn::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 2px solid rgba(59, 130, 246, 0.4);
             animation: pvk-pulse-ring 2.5s ease-out infinite;
+            pointer-events: none;
         }
         .pvk-chat-toggle-btn:hover {
             transform: scale(1.08) !important;
@@ -332,9 +342,8 @@ document.addEventListener('click', (e) => {
             transform: scale(0.94) !important;
         }
         @keyframes pvk-pulse-ring {
-            0% { box-shadow: 0 4px 14px rgba(59, 130, 246, 0.5), 0 0 0 0 rgba(59, 130, 246, 0.4); }
-            70% { box-shadow: 0 4px 14px rgba(59, 130, 246, 0.5), 0 0 0 12px rgba(59, 130, 246, 0); }
-            100% { box-shadow: 0 4px 14px rgba(59, 130, 246, 0.5), 0 0 0 0 rgba(59, 130, 246, 0); }
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
         }
         .dots-loader span {
             width: 6px;
@@ -454,6 +463,9 @@ To search the web or consult the menu, use the following tools:
 4. createReservation(name, phone, email, date, time, guests, location, notes)
    Args: { "name": string, "phone": string, "email": string, "date": string (YYYY-MM-DD), "time": string (e.g. "18:00"), "guests": number, "location": string ("pengerkatu" or "easton"), "notes": string (optional) }
    Creates a table reservation at Phở Việt Khang. Use this when the customer wants to book a table. Ask for all required fields if not provided.
+5. checkReservationStatus(phone)
+   Args: { "phone": string }
+   Checks the status of a reservation by phone number. Use this when the customer wants to know their reservation status.
 
 Rules:
 - Always respond in ${langName}. This is the customer's chosen language.
@@ -503,7 +515,7 @@ Rules:
 
     // Dynamic Firebase Firestore Import
     const { db, getApiKeys } = await import("./firebase-config.js");
-    const { collection, getDocs, addDoc } = await import("https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js");
+    const { collection, getDocs, addDoc, query, where } = await import("https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js");
 
     const apiKeys = await getApiKeys();
     const CLOUDFLARE_WORKER_URL = 'https://pvk-admin.minhbeo993.workers.dev';
@@ -593,6 +605,32 @@ Rules:
             return { success: true, message: `Reservation confirmed at ${locLabel} for ${guests} guests on ${date} at ${time}.` };
         } catch (e) {
             console.error('[createReservation]', e);
+            return { error: e.message };
+        }
+    }
+
+    async function checkReservationStatus(phone) {
+        try {
+            if (!phone) return { error: 'Phone number is required.' };
+            const q = query(collection(db, 'reservations'), where('phone', '==', phone));
+            const snap = await getDocs(q);
+            if (snap.empty) return { found: false, message: 'No reservation found for this phone number.' };
+            const reservations = [];
+            snap.forEach(docSnap => {
+                const d = docSnap.data();
+                reservations.push({
+                    name: d.name,
+                    date: d.date,
+                    time: d.time,
+                    guests: d.guests,
+                    location: d.location,
+                    status: d.status,
+                    notes: d.notes || ''
+                });
+            });
+            return { found: true, reservations };
+        } catch (e) {
+            console.error('[checkReservationStatus]', e);
             return { error: e.message };
         }
     }
@@ -747,6 +785,8 @@ Rules:
                         result = await browseWebUrl(args.url);
                     } else if (tool === 'createReservation') {
                         result = await createReservation(args.name, args.phone, args.email, args.date, args.time, args.guests, args.location, args.notes);
+                    } else if (tool === 'checkReservationStatus') {
+                        result = await checkReservationStatus(args.phone);
                     } else {
                         const notSupportedMsgs = {
                             vi: `Tool ${tool} không được hỗ trợ.`,
