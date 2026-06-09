@@ -150,6 +150,10 @@
                     <!-- Cart items injected here -->
                 </div>
 
+                <button onclick="if (confirm('Clear all items?')) window.clearCart()" id="clear-cart-btn" class="mt-4 w-full py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors">
+                    <span class="material-symbols-outlined text-lg align-middle">delete_sweep</span> Clear Cart
+                </button>
+
                 <div id="empty-cart-msg" class="hidden text-center py-12 text-secondary">
                     <span class="material-symbols-outlined text-6xl mb-4 opacity-50">remove_shopping_cart</span>
                     <p class="text-xl"><span data-i18n="empty-cart">Your cart is empty.</span></p>

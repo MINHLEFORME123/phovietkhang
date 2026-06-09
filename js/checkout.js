@@ -547,6 +547,12 @@ if (checkoutForm) {
                     paymentStatus: 'redirected',
                 });
 
+                // Save order to history & clear cart
+                const savedOrders = JSON.parse(localStorage.getItem('my_orders') || '[]');
+                savedOrders.push(docRef.id);
+                localStorage.setItem('my_orders', JSON.stringify(savedOrders));
+                if (typeof window.clearCart === 'function') window.clearCart();
+
                 // Redirect to Paytrail checkout
                 window.location.href = paytrailResult.checkoutUrl;
                 return;

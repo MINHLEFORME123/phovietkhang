@@ -96,7 +96,33 @@ onAuthStateChanged(auth, async (user) => {
     const currentPath = window.location.pathname.toLowerCase();
     const isLoginOrRegister = currentPath.endsWith('login.html') || currentPath.endsWith('register.html');
 
+    window.currentUserUid = user ? user.uid : null;
+
     if (user) {
+        // Migrate guest cart to user cart
+        const guestCart = JSON.parse(localStorage.getItem('phoCart_guest') || '[]');
+        if (guestCart.length > 0) {
+            const userCart = JSON.parse(localStorage.getItem('phoCart_' + user.uid) || '[]');
+            const merged = [...userCart];
+            guestCart.forEach(guestItem => {
+                const existing = merged.find(i => i.id === guestItem.id);
+                if (existing) {
+                    existing.qty += guestItem.qty;
+                } else {
+                    merged.push(guestItem);
+                }
+            });
+            localStorage.setItem('phoCart_' + user.uid, JSON.stringify(merged));
+            localStorage.removeItem('phoCart_guest');
+            // Reload cart in memory if cart module loaded
+            if (typeof window.getCart !== 'undefined') {
+                const cart = window.getCart();
+                cart.length = 0;
+                cart.push(...merged);
+                if (typeof window.saveCart === 'function') window.saveCart();
+            }
+        }
+
         // User is signed in
 
         // Update navigation UI on client pages

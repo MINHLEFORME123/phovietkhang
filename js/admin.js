@@ -701,6 +701,7 @@ if (orderManagerContainer) {
 
     // Modal elements
     const detailModal = document.getElementById('order-detail-modal');
+    let currentModalOrderId = null;
     const modalOrderTitle = document.getElementById('modal-order-title');
     const modalCustName = document.getElementById('modal-cust-name');
     const modalCustPhone = document.getElementById('modal-cust-phone');
@@ -733,6 +734,7 @@ if (orderManagerContainer) {
     window.viewOrderDetails = function(orderId) {
         const order = allOrders.find(o => o.id === orderId);
         if (!order) return;
+        currentModalOrderId = orderId;
 
         modalOrderTitle.textContent = `Order Details #${order.id.substring(0, 8).toUpperCase()}`;
         modalCustName.textContent = order.customerName || 'N/A';
@@ -784,6 +786,12 @@ if (orderManagerContainer) {
 
     window.closeOrderModal = function() {
         detailModal.classList.add('hidden');
+    };
+
+    window.deleteCurrentOrder = function() {
+        if (!currentModalOrderId) return;
+        window.deleteOrder(currentModalOrderId);
+        window.closeOrderModal();
     };
 
     // Update status from selector
@@ -2554,6 +2562,10 @@ Rules:
     Args: { "email": string, "discountPercent": number, "expiryDays": number, "allowedTypes": array of strings }
     Creates a new custom voucher with a percentage discount, optional expiration in days, and restricted dining/order types (dine-in, takeaway, delivery). If allowedTypes is empty, it applies to all types.
 
+15b2. disableVoucher(voucherCode)
+    Args: { "voucherCode": string }
+    Disables an existing voucher by marking it as used, preventing further use. Returns success/failure.
+
 15c. sendSpinsToUser(uidOrEmail, spinType, count)
     Args: { "uidOrEmail": string, "spinType": string, "count": number }
     Sends Lucky Wheel spins to a user by UID or email. spinType must be: "deu" (Normal), "xin" (Good), or "vip" (VIP).
@@ -3559,6 +3571,21 @@ Rules:
         }
     }
 
+    async function disableVoucher(voucherCode) {
+        try {
+            const code = (voucherCode || '').trim().toUpperCase();
+            if (!code) return { error: 'Voucher code is required.' };
+            const ref = doc(db, "vouchers", code);
+            const snap = await getDoc(ref);
+            if (!snap.exists()) return { error: `Voucher "${code}" not found.` };
+            await updateDoc(ref, { used: true });
+            return { success: true, message: `Voucher "${code}" has been disabled.` };
+        } catch (e) {
+            console.error(e);
+            return { error: e.message };
+        }
+    }
+
     async function updateOrderStatus(orderId, newStatus) {
         try {
             const docRef = doc(db, "orders", orderId);
@@ -3923,6 +3950,8 @@ Rules:
                         result = await sendGlobalAnnouncement(args.title, args.text, finalImageUrl);
                     } else if (tool === 'createCustomVoucher') {
                         result = await createCustomVoucher(args.email, args.discountPercent, args.expiryDays, args.allowedTypes);
+                    } else if (tool === 'disableVoucher') {
+                        result = await disableVoucher(args.voucherCode);
                     } else if (tool === 'updateOrderStatus') {
                         result = await updateOrderStatus(args.orderId, args.newStatus);
                     } else if (tool === 'deleteOrder') {
@@ -3982,7 +4011,7 @@ Rules:
                     } else if (tool === 'updateHomepageCTA') {
                         result = await updateHomepageCTA(args.titleVi, args.descVi);
                     } else {
-                        result = { error: `Tool "${tool}" không tồn tại. Các tools hợp lệ: getOrdersSoldToday, listAllFoodItems, setOptionChoicePrice, updateMenuPrice, createMenuItem, addMenuOptionGroup, removeMenuOptionGroup, addChoiceToOptionGroup, removeChoiceFromOptionGroup, updateMenuOptionGroup, updateChoiceInOptionGroup, updateMenuName, updateMenuDescription, updateMenuCategory, updateMenuAvailability, uploadMenuImage, removeMenuImage, updateMenuPreparationTime, updateMenuNutritionInfo, addMenuTag, removeMenuTag, reorderMenuItems, duplicateMenuItem, deleteMenuItem, updateMenuCustomFields, listAllUsers, changeUserRole, deleteUserAccount, createUserAccount, sendPasswordReset, sendSpinsToUser, sendGlobalAnnouncement, createCustomVoucher, updateOrderStatus, deleteOrder, getOrdersByStatus, changeCurrentAdminPassword, updateCurrentAdminEmail, updateCurrentAdminProfile, adminListAuthUsers, adminDeleteAuthUser, adminDisableUser, adminEnableUser, adminChangeUserPassword, adminChangeUserEmail, adminVerifyUserEmail, adminSetCustomClaims, adminGetUserInfo, adminRevokeUserTokens, adminUpdateDisplayName, adminGenerateCustomToken, webSearch, browseWebUrl, updateHomepageHero, updateHomepageSignatures, updateHomepageSignatureText, updateHomepageStory, updateHomepageCTA.` };
+                        result = { error: `Tool "${tool}" không tồn tại. Các tools hợp lệ: getOrdersSoldToday, listAllFoodItems, setOptionChoicePrice, updateMenuPrice, createMenuItem, addMenuOptionGroup, removeMenuOptionGroup, addChoiceToOptionGroup, removeChoiceFromOptionGroup, updateMenuOptionGroup, updateChoiceInOptionGroup, updateMenuName, updateMenuDescription, updateMenuCategory, updateMenuAvailability, uploadMenuImage, removeMenuImage, updateMenuPreparationTime, updateMenuNutritionInfo, addMenuTag, removeMenuTag, reorderMenuItems, duplicateMenuItem, deleteMenuItem, updateMenuCustomFields, listAllUsers, changeUserRole, deleteUserAccount, createUserAccount, sendPasswordReset, sendSpinsToUser, sendGlobalAnnouncement, createCustomVoucher, disableVoucher, updateOrderStatus, deleteOrder, getOrdersByStatus, changeCurrentAdminPassword, updateCurrentAdminEmail, updateCurrentAdminProfile, adminListAuthUsers, adminDeleteAuthUser, adminDisableUser, adminEnableUser, adminChangeUserPassword, adminChangeUserEmail, adminVerifyUserEmail, adminSetCustomClaims, adminGetUserInfo, adminRevokeUserTokens, adminUpdateDisplayName, adminGenerateCustomToken, webSearch, browseWebUrl, updateHomepageHero, updateHomepageSignatures, updateHomepageSignatureText, updateHomepageStory, updateHomepageCTA.` };
                     }
                     
                     if (result && typeof result === 'object' && result.hasOwnProperty('error')) {

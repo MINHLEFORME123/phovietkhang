@@ -240,7 +240,7 @@ function showOptionsPopup(item, lang) {
             const pr = parseFloat(cb.getAttribute('data-price')) || 0;
             finalPrice += pr;
             
-            const displayStr = pr > 0 ? `${lbl} (+&euro;${pr.toFixed(2)})` : lbl;
+            const displayStr = pr > 0 ? `${lbl} (+\u20AC${pr.toFixed(2)})` : lbl;
             selectedStrings.push(displayStr);
         });
 
@@ -250,7 +250,7 @@ function showOptionsPopup(item, lang) {
             const pr = parseFloat(r.getAttribute('data-price')) || 0;
             finalPrice += pr;
             
-            const displayStr = pr > 0 ? `${grp}: ${lbl} (+&euro;${pr.toFixed(2)})` : `${grp}: ${lbl}`;
+            const displayStr = pr > 0 ? `${grp}: ${lbl} (+\u20AC${pr.toFixed(2)})` : `${grp}: ${lbl}`;
             selectedStrings.push(displayStr);
         });
 
