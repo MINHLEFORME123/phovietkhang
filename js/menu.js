@@ -150,8 +150,8 @@ function showOptionsPopup(item, lang) {
     `;
 
     modalWrapper.appendChild(card);
-    document.body.appendChild(modalWrapper);
-    document.body.style.overflow = 'hidden';
+    document.documentElement.appendChild(modalWrapper);
+    document.documentElement.style.overflow = 'hidden';
 
     // Trigger animations
     requestAnimationFrame(() => {
@@ -189,7 +189,7 @@ function showOptionsPopup(item, lang) {
         card.classList.add('scale-95');
         setTimeout(() => {
             modalWrapper.remove();
-            document.body.style.overflow = '';
+            document.documentElement.style.overflow = '';
         }, 300);
     };
     card.querySelector('#popup-cancel').addEventListener('click', closePopup);
@@ -244,7 +244,7 @@ function showOptionsPopup(item, lang) {
         card.classList.add('scale-95');
         setTimeout(() => {
             modalWrapper.remove();
-            document.body.style.overflow = '';
+            document.documentElement.style.overflow = '';
         }, 300);
     });
 }
