@@ -2571,13 +2571,13 @@ Rules:
     Args: { "email": string, "discountPercent": number, "expiryDays": number, "allowedTypes": array of strings }
     Creates a new custom voucher with a percentage discount, optional expiration in days, and restricted dining/order types (dine-in, takeaway, delivery). If allowedTypes is empty, it applies to all types.
 
-15b2. disableVoucher(voucherCode)
+15b2. markVoucherUsed(voucherCode)
     Args: { "voucherCode": string }
-    Disables an existing voucher by marking it as used, preventing further use. Returns success/failure.
+    Marks a voucher as used so customers can no longer apply it. Use this to disable a voucher.
 
-15b3. deleteVoucher(voucherCode)
+15b3. removeVoucher(voucherCode)
     Args: { "voucherCode": string }
-    Permanently deletes a voucher from the system by code. Cannot be undone.
+    Removes a voucher permanently from the system. Use this to delete a voucher.
 
 15b4. listAllVouchers()
     Args: none
@@ -3588,7 +3588,7 @@ Rules:
         }
     }
 
-    async function disableVoucher(voucherCode) {
+    async function markVoucherUsed(voucherCode) {
         try {
             const code = (voucherCode || '').trim().toUpperCase();
             if (!code) return { error: 'Voucher code is required.' };
@@ -3596,14 +3596,14 @@ Rules:
             const snap = await getDoc(ref);
             if (!snap.exists()) return { error: `Voucher "${code}" not found.` };
             await updateDoc(ref, { used: true });
-            return { success: true, message: `Voucher "${code}" has been disabled.` };
+            return { success: true, message: `Voucher "${code}" has been marked as used.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
         }
     }
 
-    async function deleteVoucher(voucherCode) {
+    async function removeVoucher(voucherCode) {
         try {
             const code = (voucherCode || '').trim().toUpperCase();
             if (!code) return { error: 'Voucher code is required.' };
@@ -3611,7 +3611,7 @@ Rules:
             const snap = await getDoc(ref);
             if (!snap.exists()) return { error: `Voucher "${code}" not found.` };
             await deleteDoc(ref);
-            return { success: true, message: `Voucher "${code}" has been permanently deleted.` };
+            return { success: true, message: `Voucher "${code}" has been removed.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -4004,10 +4004,10 @@ Rules:
                         result = await sendGlobalAnnouncement(args.title, args.text, finalImageUrl);
                     } else if (tool === 'createCustomVoucher') {
                         result = await createCustomVoucher(args.email, args.discountPercent, args.expiryDays, args.allowedTypes);
-                    } else if (tool === 'disableVoucher') {
-                        result = await disableVoucher(args.voucherCode);
-                    } else if (tool === 'deleteVoucher') {
-                        result = await deleteVoucher(args.voucherCode);
+                    } else if (tool === 'markVoucherUsed') {
+                        result = await markVoucherUsed(args.voucherCode);
+                    } else if (tool === 'removeVoucher') {
+                        result = await removeVoucher(args.voucherCode);
                     } else if (tool === 'listAllVouchers') {
                         result = await listAllVouchers();
                     } else if (tool === 'updateOrderStatus') {
@@ -4069,7 +4069,7 @@ Rules:
                     } else if (tool === 'updateHomepageCTA') {
                         result = await updateHomepageCTA(args.titleVi, args.descVi);
                     } else {
-                        result = { error: `Tool "${tool}" không tồn tại. Các tools hợp lệ: getOrdersSoldToday, listAllFoodItems, setOptionChoicePrice, updateMenuPrice, createMenuItem, addMenuOptionGroup, removeMenuOptionGroup, addChoiceToOptionGroup, removeChoiceFromOptionGroup, updateMenuOptionGroup, updateChoiceInOptionGroup, updateMenuName, updateMenuDescription, updateMenuCategory, updateMenuAvailability, uploadMenuImage, removeMenuImage, updateMenuPreparationTime, updateMenuNutritionInfo, addMenuTag, removeMenuTag, reorderMenuItems, duplicateMenuItem, deleteMenuItem, updateMenuCustomFields, listAllUsers, changeUserRole, deleteUserAccount, createUserAccount, sendPasswordReset, sendSpinsToUser, sendGlobalAnnouncement, createCustomVoucher, disableVoucher, deleteVoucher, listAllVouchers, updateOrderStatus, deleteOrder, getOrdersByStatus, changeCurrentAdminPassword, updateCurrentAdminEmail, updateCurrentAdminProfile, adminListAuthUsers, adminDeleteAuthUser, adminDisableUser, adminEnableUser, adminChangeUserPassword, adminChangeUserEmail, adminVerifyUserEmail, adminSetCustomClaims, adminGetUserInfo, adminRevokeUserTokens, adminUpdateDisplayName, adminGenerateCustomToken, webSearch, browseWebUrl, updateHomepageHero, updateHomepageSignatures, updateHomepageSignatureText, updateHomepageStory, updateHomepageCTA.` };
+                        result = { error: `Tool "${tool}" không tồn tại. Các tools hợp lệ: getOrdersSoldToday, listAllFoodItems, setOptionChoicePrice, updateMenuPrice, createMenuItem, addMenuOptionGroup, removeMenuOptionGroup, addChoiceToOptionGroup, removeChoiceFromOptionGroup, updateMenuOptionGroup, updateChoiceInOptionGroup, updateMenuName, updateMenuDescription, updateMenuCategory, updateMenuAvailability, uploadMenuImage, removeMenuImage, updateMenuPreparationTime, updateMenuNutritionInfo, addMenuTag, removeMenuTag, reorderMenuItems, duplicateMenuItem, deleteMenuItem, updateMenuCustomFields, listAllUsers, changeUserRole, deleteUserAccount, createUserAccount, sendPasswordReset, sendSpinsToUser, sendGlobalAnnouncement, createCustomVoucher, markVoucherUsed, removeVoucher, listAllVouchers, updateOrderStatus, deleteOrder, getOrdersByStatus, changeCurrentAdminPassword, updateCurrentAdminEmail, updateCurrentAdminProfile, adminListAuthUsers, adminDeleteAuthUser, adminDisableUser, adminEnableUser, adminChangeUserPassword, adminChangeUserEmail, adminVerifyUserEmail, adminSetCustomClaims, adminGetUserInfo, adminRevokeUserTokens, adminUpdateDisplayName, adminGenerateCustomToken, webSearch, browseWebUrl, updateHomepageHero, updateHomepageSignatures, updateHomepageSignatureText, updateHomepageStory, updateHomepageCTA.` };
                     }
                     
                     if (result && typeof result === 'object' && result.hasOwnProperty('error')) {
