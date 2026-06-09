@@ -2566,6 +2566,10 @@ Rules:
     Args: { "voucherCode": string }
     Disables an existing voucher by marking it as used, preventing further use. Returns success/failure.
 
+15b3. deleteVoucher(voucherCode)
+    Args: { "voucherCode": string }
+    Permanently deletes a voucher from the system by code. Cannot be undone.
+
 15c. sendSpinsToUser(uidOrEmail, spinType, count)
     Args: { "uidOrEmail": string, "spinType": string, "count": number }
     Sends Lucky Wheel spins to a user by UID or email. spinType must be: "deu" (Normal), "xin" (Good), or "vip" (VIP).
@@ -3586,6 +3590,21 @@ Rules:
         }
     }
 
+    async function deleteVoucher(voucherCode) {
+        try {
+            const code = (voucherCode || '').trim().toUpperCase();
+            if (!code) return { error: 'Voucher code is required.' };
+            const ref = doc(db, "vouchers", code);
+            const snap = await getDoc(ref);
+            if (!snap.exists()) return { error: `Voucher "${code}" not found.` };
+            await deleteDoc(ref);
+            return { success: true, message: `Voucher "${code}" has been permanently deleted.` };
+        } catch (e) {
+            console.error(e);
+            return { error: e.message };
+        }
+    }
+
     async function updateOrderStatus(orderId, newStatus) {
         try {
             const docRef = doc(db, "orders", orderId);
@@ -3952,6 +3971,8 @@ Rules:
                         result = await createCustomVoucher(args.email, args.discountPercent, args.expiryDays, args.allowedTypes);
                     } else if (tool === 'disableVoucher') {
                         result = await disableVoucher(args.voucherCode);
+                    } else if (tool === 'deleteVoucher') {
+                        result = await deleteVoucher(args.voucherCode);
                     } else if (tool === 'updateOrderStatus') {
                         result = await updateOrderStatus(args.orderId, args.newStatus);
                     } else if (tool === 'deleteOrder') {
@@ -4011,7 +4032,7 @@ Rules:
                     } else if (tool === 'updateHomepageCTA') {
                         result = await updateHomepageCTA(args.titleVi, args.descVi);
                     } else {
-                        result = { error: `Tool "${tool}" không tồn tại. Các tools hợp lệ: getOrdersSoldToday, listAllFoodItems, setOptionChoicePrice, updateMenuPrice, createMenuItem, addMenuOptionGroup, removeMenuOptionGroup, addChoiceToOptionGroup, removeChoiceFromOptionGroup, updateMenuOptionGroup, updateChoiceInOptionGroup, updateMenuName, updateMenuDescription, updateMenuCategory, updateMenuAvailability, uploadMenuImage, removeMenuImage, updateMenuPreparationTime, updateMenuNutritionInfo, addMenuTag, removeMenuTag, reorderMenuItems, duplicateMenuItem, deleteMenuItem, updateMenuCustomFields, listAllUsers, changeUserRole, deleteUserAccount, createUserAccount, sendPasswordReset, sendSpinsToUser, sendGlobalAnnouncement, createCustomVoucher, disableVoucher, updateOrderStatus, deleteOrder, getOrdersByStatus, changeCurrentAdminPassword, updateCurrentAdminEmail, updateCurrentAdminProfile, adminListAuthUsers, adminDeleteAuthUser, adminDisableUser, adminEnableUser, adminChangeUserPassword, adminChangeUserEmail, adminVerifyUserEmail, adminSetCustomClaims, adminGetUserInfo, adminRevokeUserTokens, adminUpdateDisplayName, adminGenerateCustomToken, webSearch, browseWebUrl, updateHomepageHero, updateHomepageSignatures, updateHomepageSignatureText, updateHomepageStory, updateHomepageCTA.` };
+                        result = { error: `Tool "${tool}" không tồn tại. Các tools hợp lệ: getOrdersSoldToday, listAllFoodItems, setOptionChoicePrice, updateMenuPrice, createMenuItem, addMenuOptionGroup, removeMenuOptionGroup, addChoiceToOptionGroup, removeChoiceFromOptionGroup, updateMenuOptionGroup, updateChoiceInOptionGroup, updateMenuName, updateMenuDescription, updateMenuCategory, updateMenuAvailability, uploadMenuImage, removeMenuImage, updateMenuPreparationTime, updateMenuNutritionInfo, addMenuTag, removeMenuTag, reorderMenuItems, duplicateMenuItem, deleteMenuItem, updateMenuCustomFields, listAllUsers, changeUserRole, deleteUserAccount, createUserAccount, sendPasswordReset, sendSpinsToUser, sendGlobalAnnouncement, createCustomVoucher, disableVoucher, deleteVoucher, updateOrderStatus, deleteOrder, getOrdersByStatus, changeCurrentAdminPassword, updateCurrentAdminEmail, updateCurrentAdminProfile, adminListAuthUsers, adminDeleteAuthUser, adminDisableUser, adminEnableUser, adminChangeUserPassword, adminChangeUserEmail, adminVerifyUserEmail, adminSetCustomClaims, adminGetUserInfo, adminRevokeUserTokens, adminUpdateDisplayName, adminGenerateCustomToken, webSearch, browseWebUrl, updateHomepageHero, updateHomepageSignatures, updateHomepageSignatureText, updateHomepageStory, updateHomepageCTA.` };
                     }
                     
                     if (result && typeof result === 'object' && result.hasOwnProperty('error')) {
