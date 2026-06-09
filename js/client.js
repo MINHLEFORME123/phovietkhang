@@ -496,7 +496,6 @@ Rules:
         }
     };
 
-    applyLangToChat();
     window.addEventListener('languageChanged', applyLangToChat);
 
     // Dynamic Firebase Firestore Import
@@ -596,6 +595,7 @@ Rules:
     const chatMessages = [
         { role: 'system', content: getSystemPrompt(getCurrentLang()) }
     ];
+    applyLangToChat();
 
     function stripThinking(str) {
         if (!str) return "";
