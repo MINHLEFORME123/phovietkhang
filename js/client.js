@@ -881,12 +881,37 @@ Rules:
 
     let toolCallCount = 0;
 
+    function extractToolCalls(text) {
+        const results = [];
+        // Primary: match <tool_call>...</tool_call>
+        const tagRegex = /<tool_call>([\s\S]*?)<\/tool_call>/gi;
+        let m;
+        while ((m = tagRegex.exec(text)) !== null) {
+            try {
+                results.push(JSON.parse(m[1].trim()));
+            } catch (e) {
+                const cleaned = m[1].trim().replace(/```json\s*/g, '').replace(/```\s*/g, '');
+                try { results.push(JSON.parse(cleaned)); } catch (e2) { /* skip */ }
+            }
+        }
+        if (results.length > 0) return results;
+
+        // Fallback: detect JSON with "tool" key anywhere in the text
+        const jsonRegex = /\{[\s]*"tool"[\s]*:[\s]*"([^"]+)"[\s\S]*?\}/g;
+        while ((m = jsonRegex.exec(text)) !== null) {
+            try {
+                const obj = JSON.parse(m[0]);
+                if (obj.tool) results.push(obj);
+            } catch (e) { /* skip */ }
+        }
+        return results;
+    }
+
     async function handleAgentResponse(responseText) {
         const textClean = stripThinking(responseText);
-        const regex = /<tool_call>([\s\S]*?)<\/tool_call>/g;
-        const matches = [...textClean.matchAll(regex)];
+        const toolCalls = extractToolCalls(textClean);
 
-        if (matches.length > 0) {
+        if (toolCalls.length > 0) {
             toolCallCount++;
             if (toolCallCount > 4) {
                 removeLoadingBubble();
@@ -899,30 +924,36 @@ Rules:
                 return;
             }
 
+            // Show any text before the first tool_call to the user
+            const textBeforeTools = textClean.replace(/<tool_call>[\s\S]*?<\/tool_call>/gi, '').replace(/```json[\s\S]*?```/gi, '').trim();
+            if (textBeforeTools.length > 0) {
+                removeLoadingBubble();
+                appendBubble(textBeforeTools, 'ai');
+            }
+
             const results = [];
-            for (const match of matches) {
+            for (const payload of toolCalls) {
                 try {
-                    const payload = JSON.parse(match[1].trim());
                     const { tool, args } = payload;
                     let result;
                     if (tool === 'listAllFoodItems') {
                         result = await listAllFoodItems();
                     } else if (tool === 'webSearch') {
-                        result = await webSearch(args.query);
+                        result = await webSearch(args?.query);
                     } else if (tool === 'browseWebUrl') {
-                        result = await browseWebUrl(args.url);
+                        result = await browseWebUrl(args?.url);
                     } else if (tool === 'createReservation') {
-                        result = await createReservation(args.name, args.phone, args.email, args.date, args.time, args.guests, args.location, args.notes);
+                        result = await createReservation(args?.name, args?.phone, args?.email, args?.date, args?.time, args?.guests, args?.location, args?.notes);
                     } else if (tool === 'checkReservationStatus') {
-                        result = await checkReservationStatus(args.phone);
+                        result = await checkReservationStatus(args?.phone);
                     } else if (tool === 'getCartItems') {
                         result = await getCartItems();
                     } else if (tool === 'addCartItem') {
-                        result = await addCartItem(args.name, args.qty, args.options);
+                        result = await addCartItem(args?.name, args?.qty, args?.options);
                     } else if (tool === 'removeCartItem') {
-                        result = await removeCartItem(args.name);
+                        result = await removeCartItem(args?.name);
                     } else if (tool === 'showMenuSearch') {
-                        result = await showMenuSearch(args.query);
+                        result = await showMenuSearch(args?.query);
                     } else {
                         const notSupportedMsgs = {
                             vi: `Tool ${tool} không được hỗ trợ.`,
@@ -933,17 +964,23 @@ Rules:
                     }
                     results.push({ tool, success: true, result });
                 } catch (e) {
-                    results.push({ success: false, error: e.message });
+                    results.push({ tool: payload?.tool || 'unknown', success: false, error: e.message });
                 }
             }
 
             const feedbackContent = results.map((r, idx) => `[Tool Result ${idx + 1} - ${r.tool}]: ${JSON.stringify(r.result || { error: r.error })}`).join('\n\n');
+            const feedbackPrompts = {
+                vi: `Dưới đây là kết quả của các công cụ tra cứu bạn đã gọi:\n\n${feedbackContent}\n\nHãy tổng hợp kết quả này và trả lời khách hàng.`,
+                en: `Here are the results from the tools you called:\n\n${feedbackContent}\n\nPlease summarize these results and respond to the customer.`,
+                fi: `Tässä on työkalujen tulokset:\n\n${feedbackContent}\n\nOle hyvä ja tiivistä nämä tulokset ja vastaa asiakkaalle.`
+            };
             chatMessages.push({
                 role: 'user',
-                content: `Dưới đây là kết quả của các công cụ tra cứu bạn đã gọi:\n\n${feedbackContent}\n\nHãy tổng hợp kết quả này và trả lời khách hàng.`
+                content: feedbackPrompts[getCurrentLang()] || feedbackPrompts.en
             });
             saveChatHistory();
 
+            appendLoadingBubble();
             await fetchAiResponse();
         } else {
             removeLoadingBubble();
