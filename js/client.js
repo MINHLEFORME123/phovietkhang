@@ -38,7 +38,7 @@ const translations = {
     "cta-btn1": "Xem Thực Đơn",
     "cta-btn2": "Tìm Địa Điểm",
     "footer-desc": "Nghệ Thuật Ẩm Thực Châu Á.", "footer-privacy": "Chính sách bảo mật", "footer-terms": "Điều khoản dịch vụ", "footer-careers": "Tuyển dụng", "footer-press": "Tài liệu báo chí", "footer-copyright": "© 2026 PHỞ VIỆT KHANG. BẢN QUYỀN ĐÃ ĐƯỢC BẢO HỘ.",
-    "cart-title": "Giỏ hàng & Thanh toán", "order-items": "Món ăn đã chọn", "empty-cart": "Giỏ hàng của bạn đang trống.", "browse-menu": "Xem Thực đơn", "order-summary": "Tổng quan đơn hàng", "total-label": "Tổng cộng:", "your-name": "Tên của bạn", "phone-number": "Số điện thoại", "dine-in": "Ăn tại bàn", "takeaway": "Mang về", "delivery": "Giao hàng", "table-number": "Số bàn", "delivery-address": "Địa chỉ giao hàng", "notes": "Ghi chú cho bếp (Tùy chọn)", "place-order": "Đặt hàng ngay",
+    "cart-title": "Giỏ hàng & Thanh toán", "order-items": "Món ăn đã chọn", "empty-cart": "Giỏ hàng của bạn đang trống.", "browse-menu": "Xem Thực đơn", "order-summary": "Tổng quan đơn hàng", "total-label": "Tổng cộng:", "your-name": "Tên của bạn", "phone-number": "Số điện thoại", "dine-in": "Ăn tại bàn", "takeaway": "Mang về", "delivery": "Giao hàng", "table-number": "Số bàn", "delivery-address": "Địa chỉ giao hàng", "notes": "Ghi chú cho bếp (Tùy chọn)", "place-order": "Đặt hàng ngay", "payment-method": "Phương thức thanh toán", "payment-online-banking": "Online banking (Finland)", "payment-online-banking-desc": "Thanh toán qua ngân hàng trực tuyến tại Phần Lan", "payment-mobilepay-desc": "Thanh toán nhanh bằng ứng dụng MobilePay", "payment-bank-card": "Thẻ ngân hàng", "payment-bank-card-desc": "Thanh toán bằng thẻ Visa, Mastercard hoặc debit", "payment-note": "Bạn có thể chọn trước phương thức thanh toán online phù hợp khi gửi đơn hàng.",
     "reviews-label": "Trải nghiệm thực tế", "reviews-title": "Khách hàng nói gì về chúng tôi",
     "ai-assistant": "Trợ lý Phở Việt Khang", "ai-placeholder": "Hỏi về món ăn, địa điểm...", "ai-welcome": "Xin chào! Tôi là Trợ lý ảo của Phở Việt Khang. Tôi có thể tư vấn món ăn, tìm cửa hàng gần nhất hoặc tra cứu thông tin giúp bạn. Bạn cần giúp gì?"
   },
@@ -81,7 +81,7 @@ const translations = {
     "cta-btn1": "View Menu",
     "cta-btn2": "Find a Location",
     "footer-desc": "The Art of Asian Gastronomy.", "footer-privacy": "Privacy Policy", "footer-terms": "Terms of Service", "footer-careers": "Careers", "footer-press": "Press Kit", "footer-copyright": "© 2026 PHO VIET KHANG. ALL RIGHTS RESERVED.",
-    "cart-title": "Your Cart & Checkout", "order-items": "Order Items", "empty-cart": "Your cart is empty.", "browse-menu": "Browse Menu", "order-summary": "Order Summary", "total-label": "Total:", "your-name": "Your Name", "phone-number": "Phone Number", "dine-in": "Dine In", "takeaway": "Takeaway", "delivery": "Delivery", "table-number": "Table Number", "delivery-address": "Delivery Address", "notes": "Notes for Kitchen (Optional)", "place-order": "Place Order Now",
+    "cart-title": "Your Cart & Checkout", "order-items": "Order Items", "empty-cart": "Your cart is empty.", "browse-menu": "Browse Menu", "order-summary": "Order Summary", "total-label": "Total:", "your-name": "Your Name", "phone-number": "Phone Number", "dine-in": "Dine In", "takeaway": "Takeaway", "delivery": "Delivery", "table-number": "Table Number", "delivery-address": "Delivery Address", "notes": "Notes for Kitchen (Optional)", "place-order": "Place Order Now", "payment-method": "Payment Method", "payment-online-banking": "Online banking (Finland)", "payment-online-banking-desc": "Pay using Finnish online banking", "payment-mobilepay-desc": "Fast checkout with the MobilePay app", "payment-bank-card": "Bank Card", "payment-bank-card-desc": "Pay using Visa, Mastercard or debit card", "payment-note": "Customers can choose their preferred online payment method before sending the order.",
     "reviews-label": "Guest Experiences", "reviews-title": "What Our Guests Say",
     "ai-assistant": "Pho Viet Khang Assistant", "ai-placeholder": "Ask about dishes, locations...", "ai-welcome": "Hello! I am the Phở Việt Khang Virtual Assistant. I can recommend dishes, find locations, or search for info. How can I help you?"
   },
@@ -124,7 +124,7 @@ const translations = {
     "cta-btn1": "Näytä Menu",
     "cta-btn2": "Etsi Toimipiste",
     "footer-desc": "Aasialaisen Gastronomian Taide.", "footer-privacy": "Tietosuojakäytäntö", "footer-terms": "Käyttöehdot", "footer-careers": "Urat", "footer-press": "Lehdistöpaketti", "footer-copyright": "© 2026 PHO VIET KHANG. KAIKKI OIKEUDET PIDÄTETÄÄN.",
-    "cart-title": "Ostoskori & Kassa", "order-items": "Tilauksen tuotteet", "empty-cart": "Ostoskoriisi on tyhjä.", "browse-menu": "Selaa ruokalistaa", "order-summary": "Yhteenveto", "total-label": "Yhteensä:", "your-name": "Nimesi", "phone-number": "Puhelinnumero", "dine-in": "Syö paikan päällä", "takeaway": "Mukaan", "delivery": "Kotiinkuljetus", "table-number": "Pöydän numero", "delivery-address": "Toimitusosoite", "notes": "Huomautukset keittiölle (valinnainen)", "place-order": "Tilaa nyt",
+    "cart-title": "Ostoskori & Kassa", "order-items": "Tilauksen tuotteet", "empty-cart": "Ostoskoriisi on tyhjä.", "browse-menu": "Selaa ruokalistaa", "order-summary": "Yhteenveto", "total-label": "Yhteensä:", "your-name": "Nimesi", "phone-number": "Puhelinnumero", "dine-in": "Syö paikan päällä", "takeaway": "Mukaan", "delivery": "Kotiinkuljetus", "table-number": "Pöydän numero", "delivery-address": "Toimitusosoite", "notes": "Huomautukset keittiölle (valinnainen)", "place-order": "Tilaa nyt", "payment-method": "Maksutapa", "payment-online-banking": "Verkkopankki (Suomi)", "payment-online-banking-desc": "Maksa suomalaisen verkkopankin kautta", "payment-mobilepay-desc": "Nopea maksu MobilePay-sovelluksella", "payment-bank-card": "Pankkikortti", "payment-bank-card-desc": "Maksa Visa-, Mastercard- tai debit-kortilla", "payment-note": "Asiakas voi valita sopivan verkkomaksutavan jo ennen tilauksen lähettämistä.",
     "reviews-label": "Asiakaskokemukset", "reviews-title": "Mitä asiakkaamme sanovat",
     "ai-assistant": "Pho Viet Khang Assistentti", "ai-placeholder": "Kysy ruoista, toimipisteistä...", "ai-welcome": "Hei! Olen Phở Việt Khangin virtuaaliassistentti. Voin suositella ruokia, etsiä toimipisteitä tai hakea tietoa. Kuinka voin auttaa?"
   }
@@ -306,6 +306,7 @@ document.addEventListener('click', (e) => {
             border-bottom-left-radius: 4px;
             border: 1px solid rgba(255,255,255,0.05);
         }
+        .pvk-chat-bubble strong { color: #60a5fa; font-weight: 600; }
         .pvk-chat-toggle-btn {
             position: fixed !important;
             bottom: 20px !important;
@@ -319,10 +320,20 @@ document.addEventListener('click', (e) => {
             align-items: center !important;
             justify-content: center !important;
             cursor: pointer;
-            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.5), 0 0 0 0 rgba(59, 130, 246, 0.4);
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.5);
             z-index: 2147483647 !important;
             transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s ease;
+            pointer-events: auto !important;
+            will-change: auto;
+        }
+        .pvk-chat-toggle-btn::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 2px solid rgba(59, 130, 246, 0.4);
             animation: pvk-pulse-ring 2.5s ease-out infinite;
+            pointer-events: none;
         }
         .pvk-chat-toggle-btn:hover {
             transform: scale(1.08) !important;
@@ -332,9 +343,8 @@ document.addEventListener('click', (e) => {
             transform: scale(0.94) !important;
         }
         @keyframes pvk-pulse-ring {
-            0% { box-shadow: 0 4px 14px rgba(59, 130, 246, 0.5), 0 0 0 0 rgba(59, 130, 246, 0.4); }
-            70% { box-shadow: 0 4px 14px rgba(59, 130, 246, 0.5), 0 0 0 12px rgba(59, 130, 246, 0); }
-            100% { box-shadow: 0 4px 14px rgba(59, 130, 246, 0.5), 0 0 0 0 rgba(59, 130, 246, 0); }
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
         }
         .dots-loader span {
             width: 6px;
@@ -451,11 +461,29 @@ To search the web or consult the menu, use the following tools:
 3. browseWebUrl(url)
    Args: { "url": string }
    Reads the content of any webpage.
+4. createReservation(name, phone, email, date, time, guests, location, notes)
+   Args: { "name": string, "phone": string, "email": string, "date": string (YYYY-MM-DD), "time": string (e.g. "18:00"), "guests": number, "location": string ("pengerkatu" or "easton"), "notes": string (optional) }
+   Creates a table reservation at Phở Việt Khang. Use this when the customer wants to book a table. Ask for all required fields if not provided.
+5. checkReservationStatus(phone)
+   Args: { "phone": string }
+   Checks the status of a reservation by phone number. Use this when the customer wants to know their reservation status.
+6. getCartItems()
+   Args: {}
+   Returns all items currently in the customer's shopping cart.
+7. addCartItem(name, qty, options)
+   Args: { "name": string, "qty": number (default 1), "options": string[] (optional, e.g. ["Large", "Extra Cheese (+€2.00)"]) }
+   Adds an item to the customer's cart. You MUST first call listAllFoodItems to find the exact item name and available options. The name must match a menu item name (vi or en). Options are display strings exactly as shown in the menu popup.
+8. removeCartItem(name)
+   Args: { "name": string }
+   Removes all quantities of an item from the customer's cart by name.
+9. showMenuSearch(query)
+   Args: { "query": string }
+   Navigates to the menu page and filters items matching the query (e.g. "gà", "chicken", "phở"). The menu page will display only matching items. Use this when the customer wants to see specific dishes.
 
 Rules:
 - Always respond in ${langName}. This is the customer's chosen language.
 - When outputting tool calls, output ONLY the <tool_call> JSON block.
-- You do NOT have any tools to modify orders, menu items, prices, or user accounts. You cannot take orders or process payments. If the user asks you to modify something, politely decline and state you are only a customer service assistant.
+- You do NOT have any tools to modify orders, menu items, prices, or user accounts. You cannot take orders or process payments. If the user asks you to modify something, politely decline and state you are only a customer service assistant. However, you CAN create table reservations (createReservation), check reservation status (checkReservationStatus), and manage the shopping cart (getCartItems, addCartItem, removeCartItem).
 - Format tool calls like:
 <tool_call>
 {
@@ -496,12 +524,11 @@ Rules:
         }
     };
 
-    applyLangToChat();
     window.addEventListener('languageChanged', applyLangToChat);
 
     // Dynamic Firebase Firestore Import
     const { db, getApiKeys } = await import("./firebase-config.js");
-    const { collection, getDocs } = await import("https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js");
+    const { collection, getDocs, addDoc, query, where } = await import("https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js");
 
     const apiKeys = await getApiKeys();
     const CLOUDFLARE_WORKER_URL = 'https://pvk-admin.minhbeo993.workers.dev';
@@ -570,6 +597,136 @@ Rules:
         }
     }
 
+    async function createReservation(name, phone, email, date, time, guests, location, notes) {
+        try {
+            if (!name || !phone || !date || !time || !guests || !location) {
+                return { error: 'Missing required fields: name, phone, date, time, guests, location' };
+            }
+            const locLabel = location.toLowerCase() === 'easton' ? 'Easton Helsinki' : 'Pengerkatu';
+            await addDoc(collection(db, 'reservations'), {
+                name,
+                phone,
+                email: email || '',
+                date,
+                time,
+                guests: parseInt(guests, 10),
+                location: locLabel,
+                notes: notes || '',
+                status: 'pending',
+                createdAt: new Date()
+            });
+            return { success: true, message: `Reservation confirmed at ${locLabel} for ${guests} guests on ${date} at ${time}.` };
+        } catch (e) {
+            console.error('[createReservation]', e);
+            return { error: e.message };
+        }
+    }
+
+    async function checkReservationStatus(phone) {
+        try {
+            if (!phone) return { error: 'Phone number is required.' };
+            const q = query(collection(db, 'reservations'), where('phone', '==', phone));
+            const snap = await getDocs(q);
+            if (snap.empty) return { found: false, message: 'No reservation found for this phone number.' };
+            const reservations = [];
+            snap.forEach(docSnap => {
+                const d = docSnap.data();
+                reservations.push({
+                    name: d.name,
+                    date: d.date,
+                    time: d.time,
+                    guests: d.guests,
+                    location: d.location,
+                    status: d.status,
+                    notes: d.notes || ''
+                });
+            });
+            return { found: true, reservations };
+        } catch (e) {
+            console.error('[checkReservationStatus]', e);
+            return { error: e.message };
+        }
+    }
+
+    async function getCartItems() {
+        try {
+            const cart = typeof window.getCart === 'function' ? window.getCart() : [];
+            if (!cart || cart.length === 0) return { empty: true, message: 'Cart is empty.' };
+            const items = cart.map(item => ({
+                name: item.name,
+                qty: item.qty,
+                price: item.price,
+                options: item.options || [],
+                id: item.id
+            }));
+            const total = items.reduce((sum, i) => sum + i.price * i.qty, 0);
+            return { items, total: Math.round(total * 100) / 100, count: items.length };
+        } catch (e) {
+            console.error('[getCartItems]', e);
+            return { error: e.message };
+        }
+    }
+
+    async function addCartItem(name, qty, options) {
+        try {
+            if (!name) return { error: 'Item name is required.' };
+            const qSnap = await getDocs(collection(db, 'menu'));
+            let matched = null;
+            qSnap.forEach(docSnap => {
+                const d = docSnap.data();
+                if (d.isAvailable === false) return;
+                const names = [d.nameVi, d.nameEn, d.nameFi].map(s => (s || '').toLowerCase());
+                if (names.includes(name.toLowerCase())) {
+                    matched = { id: docSnap.id, ...d };
+                }
+            });
+            if (!matched) return { error: `Menu item "${name}" not found or unavailable.` };
+            const displayName = matched.nameVi || matched.nameEn || name;
+            const itemOptions = Array.isArray(options) ? options : [];
+            if (typeof window.addToCart === 'function') {
+                window.addToCart(matched.id, displayName, matched.price, matched.image || '', itemOptions);
+            }
+            return { success: true, message: `Added ${displayName} x${qty || 1} to cart.` };
+        } catch (e) {
+            console.error('[addCartItem]', e);
+            return { error: e.message };
+        }
+    }
+
+    async function removeCartItem(name) {
+        try {
+            if (!name) return { error: 'Item name is required.' };
+            const cart = typeof window.getCart === 'function' ? window.getCart() : [];
+            const match = cart.find(i => i.name && i.name.toLowerCase() === name.toLowerCase());
+            if (!match) return { error: `Item "${name}" not found in cart.` };
+            if (typeof window.removeFromCart === 'function') {
+                window.removeFromCart(match.id);
+            }
+            return { success: true, message: `Removed ${match.name} from cart.` };
+        } catch (e) {
+            console.error('[removeCartItem]', e);
+            return { error: e.message };
+        }
+    }
+
+    async function showMenuSearch(query) {
+        try {
+            if (!query) return { error: 'Search query is required.' };
+            const currentPath = window.location.pathname.toLowerCase();
+            const isMenuPage = currentPath.endsWith('menu.html') || currentPath.endsWith('menu/');
+            if (isMenuPage) {
+                window.__menuSearchFilter = query;
+                if (typeof window.applyMenuFilter === 'function') window.applyMenuFilter(query);
+                return { success: true, message: `Filtered menu for: "${query}"` };
+            }
+            window.location.href = `menu.html?search=${encodeURIComponent(query)}`;
+            return { success: true, message: `Navigating to menu filtered for: "${query}"` };
+        } catch (e) {
+            console.error('[showMenuSearch]', e);
+            return { error: e.message };
+        }
+    }
+
     // Toggle window
     toggleBtn.addEventListener('click', () => {
         if (chatWin.classList.contains('show')) {
@@ -596,16 +753,32 @@ Rules:
     const chatMessages = [
         { role: 'system', content: getSystemPrompt(getCurrentLang()) }
     ];
+    applyLangToChat();
 
     function stripThinking(str) {
         if (!str) return "";
         return str.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
     }
 
+    function renderMarkdown(text) {
+        if (!text) return '';
+        const escaped = text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+        return escaped
+            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\n/g, '<br>');
+    }
+
     function appendBubble(text, sender) {
         const bubble = document.createElement('div');
         bubble.className = `pvk-chat-bubble pvk-bubble-${sender}`;
-        bubble.textContent = text;
+        if (sender === 'ai') {
+            bubble.innerHTML = renderMarkdown(text);
+        } else {
+            bubble.textContent = text;
+        }
         msgArea.appendChild(bubble);
         msgArea.scrollTop = msgArea.scrollHeight;
         return bubble;
@@ -717,6 +890,18 @@ Rules:
                         result = await webSearch(args.query);
                     } else if (tool === 'browseWebUrl') {
                         result = await browseWebUrl(args.url);
+                    } else if (tool === 'createReservation') {
+                        result = await createReservation(args.name, args.phone, args.email, args.date, args.time, args.guests, args.location, args.notes);
+                    } else if (tool === 'checkReservationStatus') {
+                        result = await checkReservationStatus(args.phone);
+                    } else if (tool === 'getCartItems') {
+                        result = await getCartItems();
+                    } else if (tool === 'addCartItem') {
+                        result = await addCartItem(args.name, args.qty, args.options);
+                    } else if (tool === 'removeCartItem') {
+                        result = await removeCartItem(args.name);
+                    } else if (tool === 'showMenuSearch') {
+                        result = await showMenuSearch(args.query);
                     } else {
                         const notSupportedMsgs = {
                             vi: `Tool ${tool} không được hỗ trợ.`,

@@ -29,9 +29,14 @@ function normalizeCartItem(item) {
     };
 }
 
+function cartUid() {
+    return window.currentUserUid || 'guest';
+}
+
 function loadCart() {
     try {
-        const parsed = JSON.parse(localStorage.getItem('phoCart') || '[]');
+        const key = 'phoCart_' + cartUid();
+        const parsed = JSON.parse(localStorage.getItem(key) || '[]');
         if (!Array.isArray(parsed)) return [];
         return parsed.map(normalizeCartItem).filter(Boolean);
     } catch (error) {
@@ -43,7 +48,7 @@ function loadCart() {
 let cart = loadCart();
 
 function saveCart() {
-    localStorage.setItem('phoCart', JSON.stringify(cart));
+    localStorage.setItem('phoCart_' + cartUid(), JSON.stringify(cart));
     updateCartBadge();
 }
 
