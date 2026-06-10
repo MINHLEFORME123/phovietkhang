@@ -223,7 +223,7 @@
             </div>
 
             <!-- Lucky Wheel Card -->
-            <div class="bg-surface/90 backdrop-blur-sm rounded-2xl border border-outline-variant p-8 shadow-lg mt-6 text-center space-y-6">
+            <div id="wheel" class="bg-surface/90 backdrop-blur-sm rounded-2xl border border-outline-variant p-8 shadow-lg mt-6 text-center space-y-6">
                 <h2 class="font-headline-md text-2xl text-white flex items-center justify-center gap-2">
                     <span class="material-symbols-outlined text-[28px] text-amber-400">toys_fan</span>
                     VÒNG QUAY MAY MẮN
@@ -752,6 +752,14 @@
 
         // Initialize SVG elements drawing
         renderWheelSvg();
+
+        // Scroll to wheel section if URL has #wheel hash
+        if (window.location.hash === '#wheel') {
+            setTimeout(() => {
+                const wheelEl = document.getElementById('wheel');
+                if (wheelEl) wheelEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 500);
+        }
     </script>
 </body>
 </html>
