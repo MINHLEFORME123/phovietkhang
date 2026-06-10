@@ -392,8 +392,9 @@
             // 30 spins → 20%, 50 spins → 50%, 100 spins → Free Meal
             let guaranteeOutcome = null;
             let spinGuarantee = { totalSpins: 0, next20: 30, next50: 50, nextFree: 100 };
+            let userSnap = null;
             try {
-                const userSnap = await getDoc(doc(db, "users", currentUser.uid));
+                userSnap = await getDoc(doc(db, "users", currentUser.uid));
                 if (userSnap.exists()) {
                     spinGuarantee = userSnap.data().spinGuarantee || spinGuarantee;
                 }
