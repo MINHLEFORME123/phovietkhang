@@ -295,6 +295,7 @@
         let userSpins = { deu: 0, xin: 0, vip: 0 };
 
         const segments = [
+            { text: "50%", value: 50, color: "#ef4444" }, // Red - Rare
             { text: "20%", value: 20, color: "#eab308" }, // Gold
             { text: "5%",  value: 5,  color: "#3b82f6" }, // Blue
             { text: "15%", value: 15, color: "#6b7280" }, // Silver
@@ -305,7 +306,6 @@
             { text: "10%", value: 10, color: "#10b981" },
             { text: "20%", value: 20, color: "#eab308" },
             { text: "5%",  value: 5,  color: "#3b82f6" },
-            { text: "15%", value: 15, color: "#6b7280" },
             { text: "10%", value: 10, color: "#10b981" }
         ];
 
@@ -379,7 +379,25 @@
             
             let outcomePercent = 5;
             const rand = Math.random();
-            if (chosenType === 'deu') {
+            
+            // Balancing system: fetch last 2 outcomes from Firestore
+            let forcedOutcome = null;
+            try {
+                const userSnap = await getDoc(doc(db, "users", currentUser.uid));
+                const lastOutcomes = userSnap.exists() ? (userSnap.data().lastOutcomes || []) : [];
+                if (lastOutcomes.length >= 2) {
+                    const last1 = lastOutcomes[lastOutcomes.length - 1];
+                    const last2 = lastOutcomes[lastOutcomes.length - 2];
+                    if (last1 === 5 && last2 === 5) forcedOutcome = 10;
+                    else if (last1 === 10 && last2 === 10) forcedOutcome = 5;
+                }
+            } catch (e) {
+                console.warn("Could not fetch spin history for balancing:", e);
+            }
+
+            if (forcedOutcome !== null) {
+                outcomePercent = forcedOutcome;
+            } else if (chosenType === 'deu') {
                 outcomePercent = (rand < 0.5) ? 5 : 10;
             } else if (chosenType === 'xin') {
                 if (rand < 0.2) outcomePercent = 5;
@@ -387,6 +405,16 @@
                 else outcomePercent = 15;
             } else if (chosenType === 'vip') {
                 outcomePercent = 20;
+            }
+
+            // Save outcome for balancing (keep last 3 outcomes)
+            try {
+                const userSnap2 = await getDoc(doc(db, "users", currentUser.uid));
+                const prev = userSnap2.exists() ? (userSnap2.data().lastOutcomes || []) : [];
+                const updated = [...prev, outcomePercent].slice(-3);
+                await updateDoc(doc(db, "users", currentUser.uid), { lastOutcomes: updated });
+            } catch (e) {
+                console.warn("Could not save spin outcome:", e);
             }
             
             const matchingIndices = [];
@@ -558,6 +586,12 @@
         }
 
         function showRewardModal(percent, code) {
+            const lang = localStorage.getItem('selectedLanguage') || 'vi';
+            const rm = {
+                vi: { title: "CHÚC MỪNG CHIẾN THẮNG!", desc: `Bạn đã trúng một mã giảm giá <strong>giảm ${percent}%</strong>! Mã giảm giá đã được thêm vào hộp thư của bạn.`, btn: "Tuyệt vời!" },
+                en: { title: "CONGRATULATIONS!", desc: `You won a <strong>${percent}% OFF</strong> voucher! The voucher has been added to your inbox.`, btn: "Awesome!" },
+                fi: { title: "ONNITTELUT!", desc: `Voitit <strong>${percent}% alennuksen</strong>! Alennuskupongsi on lisätty postilaatikkoosi.`, btn: "Hienoa!" }
+            }[lang] || { vi: { title: "CHÚC MỪNG CHIẾN THẮNG!", desc: `Bạn đã trúng một mã giảm giá <strong>giảm ${percent}%</strong>!`, btn: "Tuyệt vời!" } };
             const rewardHtml = `
                 <div id="lucky-reward-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
                     <div class="bg-[#121824] p-8 rounded-2xl border border-white/10 max-w-md w-full text-center space-y-6 shadow-2xl transform scale-95 transition-all duration-300 opacity-0" id="reward-modal-content">
@@ -566,10 +600,8 @@
                         </div>
                         
                         <div class="space-y-2">
-                            <h3 class="text-2xl font-bold text-white font-['EB_Garamond']">CHÚC MỪNG CHIẾN THẮNG!</h3>
-                            <p class="text-secondary text-sm">
-                                Bạn đã trúng một mã giảm giá <strong>giảm ${percent}%</strong>! Mã giảm giá đã được thêm vào hộp thư của bạn.
-                            </p>
+                            <h3 class="text-2xl font-bold text-white font-['EB_Garamond']">${rm.title}</h3>
+                            <p class="text-secondary text-sm">${rm.desc}</p>
                         </div>
                         
                         <div class="bg-white/5 border border-amber-500/30 text-amber-400 font-mono text-2xl font-bold py-3 px-4 rounded-lg select-all my-4 tracking-wider">
@@ -577,7 +609,7 @@
                         </div>
                         
                         <button onclick="closeRewardModal()" class="w-full bg-amber-500 hover:bg-amber-400 text-white font-semibold py-3 rounded-xl transition-all font-semibold">
-                            Tuyệt vời!
+                            ${rm.btn}
                         </button>
                     </div>
                 </div>
