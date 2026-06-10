@@ -881,29 +881,79 @@ Rules:
 
     let toolCallCount = 0;
 
+    const KNOWN_TOOLS = ['listAllFoodItems','webSearch','browseWebUrl','createReservation','checkReservationStatus','getCartItems','addCartItem','removeCartItem','showMenuSearch'];
+
+    function tryParseToolJson(str) {
+        try {
+            const obj = JSON.parse(str);
+            if (obj && obj.tool && typeof obj.tool === 'string') return obj;
+        } catch (e) {}
+        return null;
+    }
+
+    function findJsonObjects(text) {
+        const results = [];
+        for (let i = 0; i < text.length; i++) {
+            if (text[i] === '{') {
+                let depth = 0;
+                let inString = false;
+                let escape = false;
+                for (let j = i; j < text.length; j++) {
+                    const ch = text[j];
+                    if (escape) { escape = false; continue; }
+                    if (ch === '\\') { escape = true; continue; }
+                    if (ch === '"') { inString = !inString; continue; }
+                    if (inString) continue;
+                    if (ch === '{') depth++;
+                    if (ch === '}') {
+                        depth--;
+                        if (depth === 0) {
+                            const candidate = text.substring(i, j + 1);
+                            const parsed = tryParseToolJson(candidate);
+                            if (parsed) results.push(parsed);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return results;
+    }
+
     function extractToolCalls(text) {
         const results = [];
-        // Primary: match <tool_call>...</tool_call>
+        // Layer 1: Match <tool_call>...</tool_call> tags
         const tagRegex = /<tool_call>([\s\S]*?)<\/tool_call>/gi;
         let m;
         while ((m = tagRegex.exec(text)) !== null) {
-            try {
-                results.push(JSON.parse(m[1].trim()));
-            } catch (e) {
-                const cleaned = m[1].trim().replace(/```json\s*/g, '').replace(/```\s*/g, '');
-                try { results.push(JSON.parse(cleaned)); } catch (e2) { /* skip */ }
-            }
+            const inner = m[1].trim().replace(/```json\s*/g, '').replace(/```\s*/g, '');
+            const parsed = tryParseToolJson(inner);
+            if (parsed) results.push(parsed);
         }
         if (results.length > 0) return results;
 
-        // Fallback: detect JSON with "tool" key anywhere in the text
-        const jsonRegex = /\{[\s]*"tool"[\s]*:[\s]*"([^"]+)"[\s\S]*?\}/g;
-        while ((m = jsonRegex.exec(text)) !== null) {
-            try {
-                const obj = JSON.parse(m[0]);
-                if (obj.tool) results.push(obj);
-            } catch (e) { /* skip */ }
+        // Layer 2: AI wraps JSON in ```...``` code blocks
+        const codeBlockRegex = /```(?:json)?\s*([\s\S]*?)\s*```/gi;
+        while ((m = codeBlockRegex.exec(text)) !== null) {
+            const parsed = tryParseToolJson(m[1].trim());
+            if (parsed) results.push(parsed);
         }
+        if (results.length > 0) return results;
+
+        // Layer 3: Bare JSON with proper bracket matching (handles nested objects/arrays)
+        const bareResults = findJsonObjects(text);
+        for (const obj of bareResults) {
+            if (KNOWN_TOOLS.includes(obj.tool)) results.push(obj);
+        }
+        if (results.length > 0) return results;
+
+        // Layer 4: Last resort — any JSON with a "tool" key
+        const allJson = findJsonObjects(text);
+        for (const obj of allJson) {
+            if (obj.tool) results.push(obj);
+        }
+
+        console.log('[extractToolCalls] input:', text.substring(0, 500), '| found:', results.length);
         return results;
     }
 
@@ -1001,10 +1051,24 @@ Rules:
                 }
             }
 
-            const responseText = data.choices[0].message.content;
-            chatMessages.push({ role: 'assistant', content: responseText });
+            const responseText = data.choices[0].message.content || '';
+            
+            // Also check for OpenAI-style tool_calls in response object
+            const nativeToolCalls = data.choices[0].message.tool_calls;
+            if (nativeToolCalls && nativeToolCalls.length > 0 && (!responseText || responseText.trim() === '')) {
+                const synthesized = nativeToolCalls.map(tc => {
+                    const fn = tc.function || {};
+                    let args = {};
+                    try { args = typeof fn.arguments === 'string' ? JSON.parse(fn.arguments) : fn.arguments; } catch(e) {}
+                    return `<tool_call>${JSON.stringify({ tool: fn.name, args })}</tool_call>`;
+                }).join('\n');
+                data.choices[0].message.content = synthesized;
+            }
+            
+            const finalText = data.choices[0].message.content;
+            chatMessages.push({ role: 'assistant', content: finalText });
             saveChatHistory();
-            await handleAgentResponse(responseText);
+            await handleAgentResponse(finalText);
         } catch (err) {
             const errMessages = {
                 vi: 'Lỗi kết nối AI: ',
