@@ -225,30 +225,11 @@ function changeLanguage(lang) {
 const savedLang = localStorage.getItem('selectedLanguage') || 'en';
 changeLanguage(savedLang);
 
-// --- FIX: Ensure body never has a persistent transform that breaks position:fixed ---
-// Problem: pageFadeIn animation's `to` state can leave transform on body,
-// which creates a new containing block, breaking position:fixed on popups/chat.
-// Approach: Immediately clear any transform, and also listen for future animation ends.
-(function() {
-    const body = document.body;
-    body.style.transform = 'none';
-    body.style.webkitTransform = 'none';
-    body.addEventListener('animationend', function(e) {
-        if (e.animationName === 'pageFadeIn' && e.target === body) {
-            body.style.transform = 'none';
-            body.style.webkitTransform = 'none';
-        }
-    });
-    // Also clear on load/transitionend as fallback
-    window.addEventListener('load', () => { body.style.transform = 'none'; body.style.webkitTransform = 'none'; });
-    // MutationObserver to catch any transform applied to body
-    new MutationObserver(() => {
-        if (body.style.transform && body.style.transform !== 'none') {
-            body.style.transform = 'none';
-            body.style.webkitTransform = 'none';
-        }
-    }).observe(body, { attributes: true, attributeFilter: ['style'] });
-})();
+// --- FIX: Append chat to <html> to avoid body animation transforms breaking position:fixed ---
+// Body animations (pageFadeIn/pageFadeOut) can create containing blocks.
+// Appending to <html> keeps chat immune to body-level transforms.
+// Chat appended to <html> for immune positioning
+const chatTarget = document.documentElement;
 
 document.addEventListener('click', (e) => {
   const link = e.target.closest('a[href]');
@@ -421,8 +402,8 @@ document.addEventListener('click', (e) => {
             </div>
         </div>
     `;
-    document.body.insertAdjacentHTML('beforeend', chatToggleHTML);
-    document.body.insertAdjacentHTML('beforeend', chatWinHTML);
+    chatTarget.insertAdjacentHTML('beforeend', chatToggleHTML);
+    chatTarget.insertAdjacentHTML('beforeend', chatWinHTML);
 
     const toggleBtn = document.getElementById('client-chat-toggle');
     const chatWin = document.getElementById('client-chat-win');
