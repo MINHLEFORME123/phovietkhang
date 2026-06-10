@@ -179,9 +179,9 @@ onAuthStateChanged(auth, async (user) => {
         try {
             const userDoc = await getDoc(doc(db, "users", user.uid));
             let role = 'customer';
+            const isNewUser = sessionStorage.getItem('pendingWelcomeSpin') === 'true';
             if (userDoc.exists()) {
                 role = userDoc.data().role || 'customer';
-                // If user document already exists, they are not a new registrant, clear flag
                 sessionStorage.removeItem('pendingWelcomeSpin');
             }
 
@@ -203,7 +203,7 @@ onAuthStateChanged(auth, async (user) => {
 
             // Login Redirect
             if (isLoginOrRegister) {
-                if (sessionStorage.getItem('pendingWelcomeSpin') === 'true') {
+                if (isNewUser) {
                     showWelcomeSpinModal(user.email, role);
                 } else {
                     if (role === 'admin') window.location.href = "admin/index.html";
@@ -321,7 +321,7 @@ function showWelcomeSpinModal(userEmail, role) {
         if (role === 'admin') window.location.href = "admin/index.html";
         else if (role === 'kitchen') window.location.href = "kitchen/index.html";
         else if (role === 'host') window.location.href = "host/index.html";
-        else window.location.href = "profile.html";
+        else window.location.href = "profile.html#wheel";
     });
 }
 // Intercept inbox link click if not logged in
