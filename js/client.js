@@ -232,11 +232,22 @@ changeLanguage(savedLang);
 (function() {
     const body = document.body;
     body.style.transform = 'none';
+    body.style.webkitTransform = 'none';
     body.addEventListener('animationend', function(e) {
         if (e.animationName === 'pageFadeIn' && e.target === body) {
             body.style.transform = 'none';
+            body.style.webkitTransform = 'none';
         }
     });
+    // Also clear on load/transitionend as fallback
+    window.addEventListener('load', () => { body.style.transform = 'none'; body.style.webkitTransform = 'none'; });
+    // MutationObserver to catch any transform applied to body
+    new MutationObserver(() => {
+        if (body.style.transform && body.style.transform !== 'none') {
+            body.style.transform = 'none';
+            body.style.webkitTransform = 'none';
+        }
+    }).observe(body, { attributes: true, attributeFilter: ['style'] });
 })();
 
 document.addEventListener('click', (e) => {
@@ -750,10 +761,37 @@ Rules:
     });
 
     // Chat Logic - system prompt is dynamically set by applyLangToChat()
-    const chatMessages = [
-        { role: 'system', content: getSystemPrompt(getCurrentLang()) }
-    ];
+    // Persist chat history across page navigation
+    const CHAT_STORAGE_KEY = 'pvk_chat_history';
+    let chatMessages = [];
+    try {
+        const saved = sessionStorage.getItem(CHAT_STORAGE_KEY);
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                chatMessages = parsed;
+            }
+        }
+    } catch (e) {
+        console.warn('Failed to restore chat history:', e);
+    }
+    // Ensure system prompt is always first
+    if (chatMessages.length === 0 || chatMessages[0].role !== 'system') {
+        chatMessages = [{ role: 'system', content: getSystemPrompt(getCurrentLang()) }];
+    }
     applyLangToChat();
+
+    function saveChatHistory() {
+        try {
+            // Keep last 50 messages + system prompt
+            const toSave = chatMessages.length > 51 
+                ? [chatMessages[0], ...chatMessages.slice(-50)]
+                : chatMessages;
+            sessionStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(toSave));
+        } catch (e) {
+            console.warn('Failed to save chat history:', e);
+        }
+    }
 
     function stripThinking(str) {
         if (!str) return "";
@@ -921,6 +959,7 @@ Rules:
                 role: 'user',
                 content: `Dưới đây là kết quả của các công cụ tra cứu bạn đã gọi:\n\n${feedbackContent}\n\nHãy tổng hợp kết quả này và trả lời khách hàng.`
             });
+            saveChatHistory();
 
             await fetchAiResponse();
         } else {
@@ -944,6 +983,7 @@ Rules:
 
             const responseText = data.choices[0].message.content;
             chatMessages.push({ role: 'assistant', content: responseText });
+            saveChatHistory();
             await handleAgentResponse(responseText);
         } catch (err) {
             const errMessages = {
@@ -964,6 +1004,7 @@ Rules:
         chatInput.value = '';
         appendBubble(val, 'user');
         chatMessages.push({ role: 'user', content: val });
+        saveChatHistory();
 
         toolCallCount = 0;
         appendLoadingBubble();
