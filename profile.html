@@ -294,12 +294,16 @@
         let selectedSpinType = 'deu';
         let userSpins = { deu: 0, xin: 0, vip: 0 };
 
+        const TOTAL_SEGMENTS = 13;
+        const SEGMENT_ANGLE = 360 / TOTAL_SEGMENTS;
+
         const segments = [
-            { text: "50%", value: 50, color: "#ef4444" }, // Red - Rare
-            { text: "20%", value: 20, color: "#eab308" }, // Gold
-            { text: "5%",  value: 5,  color: "#3b82f6" }, // Blue
-            { text: "15%", value: 15, color: "#6b7280" }, // Silver
-            { text: "10%", value: 10, color: "#10b981" }, // Green
+            { text: "Free", value: 0, color: "#d946ef" },  // Purple - Ultra Rare (Free 1 suất ăn)
+            { text: "50%", value: 50, color: "#ef4444" },  // Red - Rare
+            { text: "20%", value: 20, color: "#eab308" },  // Gold
+            { text: "5%",  value: 5,  color: "#3b82f6" },  // Blue
+            { text: "15%", value: 15, color: "#6b7280" },  // Silver
+            { text: "10%", value: 10, color: "#10b981" },  // Green
             { text: "20%", value: 20, color: "#eab308" },
             { text: "5%",  value: 5,  color: "#3b82f6" },
             { text: "15%", value: 15, color: "#6b7280" },
@@ -316,20 +320,20 @@
             let svgHtml = `<svg viewBox="0 0 200 200" class="w-full h-full">`;
             
             segments.forEach((seg, i) => {
-                const angle1 = i * 30;
-                const angle2 = (i + 1) * 30;
+                const angle1 = i * SEGMENT_ANGLE;
+                const angle2 = (i + 1) * SEGMENT_ANGLE;
                 const r = 95;
                 const x1 = 100 + r * Math.cos(angle1 * Math.PI / 180);
                 const y1 = 100 + r * Math.sin(angle1 * Math.PI / 180);
                 const x2 = 100 + r * Math.cos(angle2 * Math.PI / 180);
                 const y2 = 100 + r * Math.sin(angle2 * Math.PI / 180);
                 
-                const strokeColor = seg.value === 50 ? 'rgba(234,179,8,0.8)' : 'rgba(0,0,0,0.15)';
-                const strokeWidth = seg.value === 50 ? '2' : '1';
+                const strokeColor = seg.value === 0 ? 'rgba(217,70,239,0.8)' : seg.value === 50 ? 'rgba(234,179,8,0.8)' : 'rgba(0,0,0,0.15)';
+                const strokeWidth = (seg.value === 0 || seg.value === 50) ? '2' : '1';
                 svgHtml += `<path d="M 100 100 L ${x1} ${y1} A ${r} ${r} 0 0 1 ${x2} ${y2} Z" fill="${seg.color}" stroke="${strokeColor}" stroke-width="${strokeWidth}"></path>`;
-                const fontSize = seg.value === 50 ? '11' : '9';
-                const label = seg.value === 50 ? '★50%' : seg.text;
-                svgHtml += `<text x="100" y="32" transform="rotate(${i * 30 + 105}, 100, 100)" text-anchor="middle" fill="#ffffff" font-weight="bold" font-size="${fontSize}" font-family="Inter, sans-serif">${label}</text>`;
+                const fontSize = (seg.value === 0 || seg.value === 50) ? '10' : '9';
+                const label = seg.value === 0 ? '🎁FREE' : seg.value === 50 ? '★50%' : seg.text;
+                svgHtml += `<text x="100" y="32" transform="rotate(${i * SEGMENT_ANGLE + (SEGMENT_ANGLE / 2) + 90}, 100, 100)" text-anchor="middle" fill="#ffffff" font-weight="bold" font-size="${fontSize}" font-family="Inter, sans-serif">${label}</text>`;
             });
             
             svgHtml += `<circle cx="100" cy="100" r="14" fill="#0f172a" stroke="#fff" stroke-width="2"></circle>`;
@@ -408,7 +412,7 @@
                 else if (rand < 0.8) outcomePercent = 10;
                 else outcomePercent = 15;
             } else if (chosenType === 'vip') {
-                outcomePercent = 50;
+                outcomePercent = (rand < 0.05) ? 0 : 50;  // 5% Free meal, 95% 50%
             }
 
             // Save outcome for balancing (keep last 3 outcomes)
@@ -431,20 +435,20 @@
             
             // Pointer points down at top center (0 deg).
             // Spin counter-clockwise (increasing negative values).
-            // Land S -> targetRotationOffset = -(S * 30 + 15)
             let useInertiaSlip = (outcomePercent === 5 || outcomePercent === 10);
             
             const startAngle = currentRotation;
             const fullSpins = 6;
             
-            const baseAngle = 270 - (targetSegmentIndex * 30 + 15);
+            const halfSeg = SEGMENT_ANGLE / 2;
+            const baseAngle = 270 - (targetSegmentIndex * SEGMENT_ANGLE + halfSeg);
             const currentSpins = Math.ceil(currentRotation / 360);
             const finalTargetAngle = baseAngle + (currentSpins - fullSpins - 1) * 360;
             
             let almostStopAngle = finalTargetAngle;
             if (useInertiaSlip) {
-                const prevIndex = (targetSegmentIndex - 1 + 12) % 12;
-                almostStopAngle = finalTargetAngle + 30;
+                const pegAngle = finalTargetAngle + halfSeg;
+                almostStopAngle = finalTargetAngle + SEGMENT_ANGLE;
             }
             
             const duration = 6500; 
@@ -507,7 +511,7 @@
                 // Pointer snapping physics
                 const absAngle = Math.abs(angle);
                 const prevAbsAngle = Math.abs(lastWheelAngle);
-                const crossedPeg = Math.floor(absAngle / 30) !== Math.floor(prevAbsAngle / 30);
+                const crossedPeg = Math.floor(absAngle / SEGMENT_ANGLE) !== Math.floor(prevAbsAngle / SEGMENT_ANGLE);
                 
                 if (crossedPeg) {
                     pointerDeflection = -15; // Snap back angle in deg
@@ -538,8 +542,9 @@
         async function handleSpinCompletion(percent) {
             isSpinning = false;
             
+            const isFreeMeal = (percent === 0);
             const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
-            const code = `WHEEL${percent}-${rand}`;
+            const code = isFreeMeal ? `FREE-MEAL-${rand}` : `WHEEL${percent}-${rand}`;
             const expiry = new Date();
             expiry.setMonth(expiry.getMonth() + 1);
             
@@ -547,6 +552,7 @@
                 await setDoc(doc(db, "vouchers", code), {
                     code: code,
                     discountPercent: percent,
+                    isFreeMeal: isFreeMeal,
                     email: currentUser.email,
                     used: false,
                     allowedOrderTypes: ['takeaway', 'delivery'],
@@ -554,7 +560,21 @@
                     createdAt: new Date()
                 });
                 
-                const welcomeMsgLang = {
+                const currentLang = localStorage.getItem('selectedLanguage') || 'vi';
+                const welcomeMsgLang = isFreeMeal ? {
+                    vi: {
+                        title: "Chúc mừng bạn đã trúng MIỄN PHÍ 1 suất ăn từ Vòng quay may mắn! 🎁",
+                        text: "Chúc mừng bạn! Bạn đã may mắn trúng giải MIỄN PHÍ 1 suất ăn (Hạn sử dụng: 1 tháng, áp dụng cho Mang về hoặc Giao hàng). Hãy sao chép mã voucher bên dưới và sử dụng khi đặt hàng nhé.",
+                    },
+                    en: {
+                        title: "Congratulations! You won a FREE meal! 🎁",
+                        text: "Well done! You won a FREE meal voucher (Expiry: 1 month, valid for Takeaway or Delivery). Copy the voucher code below and apply it on your next checkout.",
+                    },
+                    fi: {
+                        title: "Onnittelut! Voitit ILMMAISEN aterian! 🎁",
+                        text: "Hienoa! Voitit ilmaisen aterian (Voimassaolo: 1 kuukausi, koskee Mukaan tai Kotiinkuljetus). Kopioi alennuskoodi alta ja käytä sitä seuraavassa tilauksessasi.",
+                    }
+                } : {
                     vi: {
                         title: `Chúc mừng bạn đã trúng mã giảm giá ${percent}% từ Vòng quay may mắn! 🎁`,
                         text: `Chúc mừng bạn! Bạn đã may mắn trúng giải giảm giá ${percent}% (Hạn sử dụng: 1 tháng, áp dụng cho Mang về hoặc Giao hàng). Hãy sao chép mã voucher bên dưới và sử dụng khi đặt hàng nhé.`,
@@ -568,6 +588,7 @@
                         text: `Hienoa! Voitit ${percent}% alennuskupongin (Voimassaolo: 1 kuukausi, koskee Mukaan tai Kotiinkuljetus). Kopioi alennuskoodi alta ja käytä sitä seuraavassa tilauksessasi.`,
                     }
                 };
+                const langMsg = welcomeMsgLang[currentLang] || welcomeMsgLang['vi'];
                 const currentLang = localStorage.getItem('selectedLanguage') || 'vi';
                 const langMsg = welcomeMsgLang[currentLang] || welcomeMsgLang['vi'];
                 
@@ -585,17 +606,22 @@
                 
             } catch (err) {
                 console.error("Voucher creation error:", err);
-                alert(`Chúc mừng bạn đã trúng mã giảm giá ${percent}%. Tuy nhiên hệ thống gặp lỗi khi tạo mã voucher. Vui lòng chụp màn hình thông báo này và liên hệ hỗ trợ!`);
+                alert(isFreeMeal ? "Chúc mừng bạn trúng MIỄN PHÍ 1 suất ăn! Tuy nhiên hệ thống gặp lỗi khi tạo mã voucher. Vui lòng chụp màn hình và liên hệ hỗ trợ!" : `Chúc mừng bạn đã trúng mã giảm giá ${percent}%. Tuy nhiên hệ thống gặp lỗi khi tạo mã voucher. Vui lòng chụp màn hình thông báo này và liên hệ hỗ trợ!`);
             }
         }
 
         function showRewardModal(percent, code) {
+            const isFreeMeal = (percent === 0);
             const lang = localStorage.getItem('selectedLanguage') || 'vi';
-            const rm = {
+            const rm = isFreeMeal ? {
+                vi: { title: "CHÚC MỪNG! BẠN TRÚNG MIỄN PHÍ 1 SUẤT ĂN!", desc: `Bạn đã trúng giải <strong>MIỄN PHÍ 1 suất ăn</strong>! Mã đã được thêm vào hộp thư.`, btn: "Tuyệt vời!" },
+                en: { title: "CONGRATULATIONS! FREE 1 MEAL!", desc: `You won a <strong>FREE meal</strong>! The voucher has been added to your inbox.`, btn: "Awesome!" },
+                fi: { title: "ONNITTELUT! ILMMAINEN ATERIA!", desc: `Voitit <strong>ilmaisen aterian</strong>! Alennuskupongsi on lisätty postilaatikkoosi.`, btn: "Hienoa!" }
+            }[lang] : {
                 vi: { title: "CHÚC MỪNG CHIẾN THẮNG!", desc: `Bạn đã trúng một mã giảm giá <strong>giảm ${percent}%</strong>! Mã giảm giá đã được thêm vào hộp thư của bạn.`, btn: "Tuyệt vời!" },
                 en: { title: "CONGRATULATIONS!", desc: `You won a <strong>${percent}% OFF</strong> voucher! The voucher has been added to your inbox.`, btn: "Awesome!" },
                 fi: { title: "ONNITTELUT!", desc: `Voitit <strong>${percent}% alennuksen</strong>! Alennuskupongsi on lisätty postilaatikkoosi.`, btn: "Hienoa!" }
-            }[lang] || { vi: { title: "CHÚC MỪNG CHIẾN THẮNG!", desc: `Bạn đã trúng một mã giảm giá <strong>giảm ${percent}%</strong>!`, btn: "Tuyệt vời!" } };
+            }[lang] || { vi: { title: "CHÚC MỪNG!", desc: `Bạn đã trúng thưởng!`, btn: "Tuyệt vời!" } };
             const rewardHtml = `
                 <div id="lucky-reward-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
                     <div class="bg-[#121824] p-8 rounded-2xl border border-white/10 max-w-md w-full text-center space-y-6 shadow-2xl transform scale-95 transition-all duration-300 opacity-0" id="reward-modal-content">
