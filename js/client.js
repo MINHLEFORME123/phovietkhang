@@ -306,6 +306,7 @@ document.addEventListener('click', (e) => {
             border-bottom-left-radius: 4px;
             border: 1px solid rgba(255,255,255,0.05);
         }
+        .pvk-chat-bubble strong { color: #60a5fa; font-weight: 600; }
         .pvk-chat-toggle-btn {
             position: fixed !important;
             bottom: 20px !important;
@@ -466,11 +467,20 @@ To search the web or consult the menu, use the following tools:
 5. checkReservationStatus(phone)
    Args: { "phone": string }
    Checks the status of a reservation by phone number. Use this when the customer wants to know their reservation status.
+6. getCartItems()
+   Args: {}
+   Returns all items currently in the customer's shopping cart.
+7. addCartItem(name, qty, options)
+   Args: { "name": string, "qty": number (default 1), "options": string[] (optional, e.g. ["Large", "Extra Cheese (+€2.00)"]) }
+   Adds an item to the customer's cart. You MUST first call listAllFoodItems to find the exact item name and available options. The name must match a menu item name (vi or en). Options are display strings exactly as shown in the menu popup.
+8. removeCartItem(name)
+   Args: { "name": string }
+   Removes all quantities of an item from the customer's cart by name.
 
 Rules:
 - Always respond in ${langName}. This is the customer's chosen language.
 - When outputting tool calls, output ONLY the <tool_call> JSON block.
-- You do NOT have any tools to modify orders, menu items, prices, or user accounts. You cannot take orders or process payments. If the user asks you to modify something, politely decline and state you are only a customer service assistant. However, you CAN create table reservations using the createReservation tool.
+- You do NOT have any tools to modify orders, menu items, prices, or user accounts. You cannot take orders or process payments. If the user asks you to modify something, politely decline and state you are only a customer service assistant. However, you CAN create table reservations (createReservation), check reservation status (checkReservationStatus), and manage the shopping cart (getCartItems, addCartItem, removeCartItem).
 - Format tool calls like:
 <tool_call>
 {
@@ -635,6 +645,67 @@ Rules:
         }
     }
 
+    async function getCartItems() {
+        try {
+            const cart = typeof window.getCart === 'function' ? window.getCart() : [];
+            if (!cart || cart.length === 0) return { empty: true, message: 'Cart is empty.' };
+            const items = cart.map(item => ({
+                name: item.name,
+                qty: item.qty,
+                price: item.price,
+                options: item.options || [],
+                id: item.id
+            }));
+            const total = items.reduce((sum, i) => sum + i.price * i.qty, 0);
+            return { items, total: Math.round(total * 100) / 100, count: items.length };
+        } catch (e) {
+            console.error('[getCartItems]', e);
+            return { error: e.message };
+        }
+    }
+
+    async function addCartItem(name, qty, options) {
+        try {
+            if (!name) return { error: 'Item name is required.' };
+            const qSnap = await getDocs(collection(db, 'menu'));
+            let matched = null;
+            qSnap.forEach(docSnap => {
+                const d = docSnap.data();
+                if (d.isAvailable === false) return;
+                const names = [d.nameVi, d.nameEn, d.nameFi].map(s => (s || '').toLowerCase());
+                if (names.includes(name.toLowerCase())) {
+                    matched = { id: docSnap.id, ...d };
+                }
+            });
+            if (!matched) return { error: `Menu item "${name}" not found or unavailable.` };
+            const displayName = matched.nameVi || matched.nameEn || name;
+            const itemOptions = Array.isArray(options) ? options : [];
+            if (typeof window.addToCart === 'function') {
+                window.addToCart(matched.id, displayName, matched.price, matched.image || '', itemOptions);
+            }
+            return { success: true, message: `Added ${displayName} x${qty || 1} to cart.` };
+        } catch (e) {
+            console.error('[addCartItem]', e);
+            return { error: e.message };
+        }
+    }
+
+    async function removeCartItem(name) {
+        try {
+            if (!name) return { error: 'Item name is required.' };
+            const cart = typeof window.getCart === 'function' ? window.getCart() : [];
+            const match = cart.find(i => i.name && i.name.toLowerCase() === name.toLowerCase());
+            if (!match) return { error: `Item "${name}" not found in cart.` };
+            if (typeof window.removeFromCart === 'function') {
+                window.removeFromCart(match.id);
+            }
+            return { success: true, message: `Removed ${match.name} from cart.` };
+        } catch (e) {
+            console.error('[removeCartItem]', e);
+            return { error: e.message };
+        }
+    }
+
     // Toggle window
     toggleBtn.addEventListener('click', () => {
         if (chatWin.classList.contains('show')) {
@@ -668,10 +739,25 @@ Rules:
         return str.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
     }
 
+    function renderMarkdown(text) {
+        if (!text) return '';
+        const escaped = text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+        return escaped
+            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\n/g, '<br>');
+    }
+
     function appendBubble(text, sender) {
         const bubble = document.createElement('div');
         bubble.className = `pvk-chat-bubble pvk-bubble-${sender}`;
-        bubble.textContent = text;
+        if (sender === 'ai') {
+            bubble.innerHTML = renderMarkdown(text);
+        } else {
+            bubble.textContent = text;
+        }
         msgArea.appendChild(bubble);
         msgArea.scrollTop = msgArea.scrollHeight;
         return bubble;
@@ -787,6 +873,12 @@ Rules:
                         result = await createReservation(args.name, args.phone, args.email, args.date, args.time, args.guests, args.location, args.notes);
                     } else if (tool === 'checkReservationStatus') {
                         result = await checkReservationStatus(args.phone);
+                    } else if (tool === 'getCartItems') {
+                        result = await getCartItems();
+                    } else if (tool === 'addCartItem') {
+                        result = await addCartItem(args.name, args.qty, args.options);
+                    } else if (tool === 'removeCartItem') {
+                        result = await removeCartItem(args.name);
                     } else {
                         const notSupportedMsgs = {
                             vi: `Tool ${tool} không được hỗ trợ.`,

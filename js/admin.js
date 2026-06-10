@@ -2089,6 +2089,7 @@ if (foodTableBody) {
             border-bottom-left-radius: 4px;
             border: 1px solid rgba(255,255,255,0.03);
         }
+        .admin-chat-bubble strong { color: #60a5fa; font-weight: 600; }
         .chat-toggle-btn {
             position: fixed;
             bottom: 24px;
@@ -4113,10 +4114,25 @@ Rules:
     }
 
     // Helper functions for UI bubble
+    function renderMarkdown(text) {
+        if (!text) return '';
+        const escaped = text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+        return escaped
+            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\n/g, '<br>');
+    }
+
     function appendBubble(text, sender) {
         const bubble = document.createElement('div');
         bubble.className = `admin-chat-bubble bubble-${sender}`;
-        bubble.textContent = text;
+        if (sender === 'ai') {
+            bubble.innerHTML = renderMarkdown(text);
+        } else {
+            bubble.textContent = text;
+        }
         msgArea.appendChild(bubble);
         msgArea.scrollTop = msgArea.scrollHeight;
         return bubble;
