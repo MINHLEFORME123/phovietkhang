@@ -289,6 +289,7 @@ document.addEventListener('click', (e) => {
             transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             opacity: 0;
             transform: translateY(20px) scale(0.95);
+            transform: translateZ(0);
         }
         .pvk-chat-window.show {
             display: flex !important;
@@ -336,6 +337,7 @@ document.addEventListener('click', (e) => {
             transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s ease;
             pointer-events: auto !important;
             will-change: auto;
+            transform: translateZ(0);
         }
         .pvk-chat-toggle-btn::before {
             content: '';
@@ -391,12 +393,12 @@ document.addEventListener('click', (e) => {
 
     // Create Markup - append directly to body (no wrapper div to avoid fixed positioning issues)
     const chatToggleHTML = `
-        <div class="pvk-chat-toggle-btn" id="client-chat-toggle" style="position:fixed!important;bottom:20px!important;right:20px!important;z-index:2147483647!important;">
+        <div class="pvk-chat-toggle-btn" id="client-chat-toggle" style="position:fixed!important;bottom:20px!important;right:20px!important;z-index:2147483647!important;transform:translateZ(0)!important;">
             <span class="material-symbols-outlined text-[28px]" id="client-chat-icon">chat</span>
         </div>
     `;
     const chatWinHTML = `
-        <div class="pvk-chat-window" id="client-chat-win" style="position:fixed!important;bottom:100px!important;right:20px!important;z-index:2147483647!important;">
+        <div class="pvk-chat-window" id="client-chat-win" style="position:fixed!important;bottom:100px!important;right:20px!important;z-index:2147483647!important;transform:translateZ(0)!important;">
             <div class="p-4 bg-[#141b2b] border-b border-gray-800 flex items-center justify-between shrink-0">
                 <div class="flex items-center gap-2">
                     <span class="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></span>
@@ -494,7 +496,7 @@ To search the web or consult the menu, use the following tools:
 Rules:
 - Always respond in ${langName}. This is the customer's chosen language.
 - When outputting tool calls, output ONLY the <tool_call> JSON block.
-- You do NOT have any tools to modify orders, menu items, prices, or user accounts. You cannot take orders or process payments. If the user asks you to modify something, politely decline and state you are only a customer service assistant. However, you CAN create table reservations (createReservation), check reservation status (checkReservationStatus), and manage the shopping cart (getCartItems, addCartItem, removeCartItem).
+- You do NOT have any tools to modify orders, menu items, prices, or user accounts. You cannot take orders or process payments. If the user asks you to modify something, politely decline and state you are only a customer service assistant. However, you CAN create table reservations (createReservation), check reservation status (checkReservationStatus), manage the shopping cart (getCartItems, addCartItem, removeCartItem), and navigate the menu page with showMenuSearch(query).
 - Format tool calls like:
 <tool_call>
 {
