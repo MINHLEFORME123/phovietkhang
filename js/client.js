@@ -476,6 +476,9 @@ To search the web or consult the menu, use the following tools:
 8. removeCartItem(name)
    Args: { "name": string }
    Removes all quantities of an item from the customer's cart by name.
+9. showMenuSearch(query)
+   Args: { "query": string }
+   Navigates to the menu page and filters items matching the query (e.g. "gà", "chicken", "phở"). The menu page will display only matching items. Use this when the customer wants to see specific dishes.
 
 Rules:
 - Always respond in ${langName}. This is the customer's chosen language.
@@ -706,6 +709,24 @@ Rules:
         }
     }
 
+    async function showMenuSearch(query) {
+        try {
+            if (!query) return { error: 'Search query is required.' };
+            const currentPath = window.location.pathname.toLowerCase();
+            const isMenuPage = currentPath.endsWith('menu.html') || currentPath.endsWith('menu/');
+            if (isMenuPage) {
+                window.__menuSearchFilter = query;
+                if (typeof window.applyMenuFilter === 'function') window.applyMenuFilter(query);
+                return { success: true, message: `Filtered menu for: "${query}"` };
+            }
+            window.location.href = `menu.html?search=${encodeURIComponent(query)}`;
+            return { success: true, message: `Navigating to menu filtered for: "${query}"` };
+        } catch (e) {
+            console.error('[showMenuSearch]', e);
+            return { error: e.message };
+        }
+    }
+
     // Toggle window
     toggleBtn.addEventListener('click', () => {
         if (chatWin.classList.contains('show')) {
@@ -879,6 +900,8 @@ Rules:
                         result = await addCartItem(args.name, args.qty, args.options);
                     } else if (tool === 'removeCartItem') {
                         result = await removeCartItem(args.name);
+                    } else if (tool === 'showMenuSearch') {
+                        result = await showMenuSearch(args.query);
                     } else {
                         const notSupportedMsgs = {
                             vi: `Tool ${tool} không được hỗ trợ.`,
