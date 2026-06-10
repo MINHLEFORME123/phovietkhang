@@ -248,6 +248,35 @@ window.logoutUser = logoutUser;
 function showWelcomeSpinModal(userEmail, role) {
     if (document.getElementById('welcome-spin-modal')) return;
 
+    const lang = localStorage.getItem('selectedLanguage') || 'vi';
+    const t = {
+        vi: {
+            title: "QUÀ CHÀO MỪNG THÀNH VIÊN!",
+            desc: 'Chào mừng bạn đến với <strong>Phở Việt Khang</strong>. Chúc mừng bạn đã nhận được <strong class="text-primary text-base uppercase">1 Lượt Quay May Mắn</strong> từ chúng tôi!',
+            btn: "Đến Vòng Quay Ngay",
+            loading: "Đang tải..."
+        },
+        en: {
+            title: "WELCOME NEW MEMBER!",
+            desc: 'Welcome to <strong>Phở Việt Khang</strong>. Congratulations on receiving <strong class="text-primary text-base uppercase">1 Free Lucky Wheel Spin</strong> from us!',
+            btn: "Go to Lucky Wheel",
+            loading: "Loading..."
+        },
+        fi: {
+            title: "TERVETULOA UUSI JÄSEN!",
+            desc: 'Tervetuloa <strong>Phở Việt Khang</strong>iin. Onnittelut saamastasi <strong class="text-primary text-base uppercase">1 ilmaisesta Onnenpyörä pyöräyksestä</strong>!',
+            btn: "Siirry Onnenpyörään",
+            loading: "Ladataan..."
+        }
+    }[lang] || {
+        vi: {
+            title: "QUÀ CHÀO MỪNG THÀNH VIÊN!",
+            desc: 'Chào mừng bạn đến với <strong>Phở Việt Khang</strong>. Chúc mừng bạn đã nhận được <strong class="text-primary text-base uppercase">1 Lượt Quay May Mắn</strong> từ chúng tôi!',
+            btn: "Đến Vòng Quay Ngay",
+            loading: "Đang tải..."
+        }
+    };
+
     const modalHtml = `
         <div id="welcome-spin-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
             <div class="bg-[#121824] p-8 rounded-2xl border border-white/10 max-w-md w-full text-center space-y-6 shadow-2xl transform scale-95 transition-all duration-300 opacity-0" id="welcome-spin-content">
@@ -256,14 +285,12 @@ function showWelcomeSpinModal(userEmail, role) {
                 </div>
                 
                 <div class="space-y-2">
-                    <h3 class="text-2xl font-bold text-white font-['EB_Garamond']">QUÀ CHÀO MỪNG THÀNH VIÊN!</h3>
-                    <p class="text-secondary text-sm">
-                        Chào mừng bạn đến với <strong>Phở Việt Khang</strong>. Chúc mừng bạn đã nhận được <strong class="text-primary text-base uppercase">1 Lượt Quay May Mắn</strong> từ chúng tôi!
-                    </p>
+                    <h3 class="text-2xl font-bold text-white font-['EB_Garamond']">${t.title}</h3>
+                    <p class="text-secondary text-sm">${t.desc}</p>
                 </div>
 
                 <button id="btn-go-spin" class="w-full bg-primary hover:bg-primary/95 text-white font-semibold py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(59,130,246,0.4)] flex items-center justify-center gap-2">
-                    <span>Đến Vòng Quay Ngay</span>
+                    <span>${t.btn}</span>
                     <span class="material-symbols-outlined">arrow_forward</span>
                 </button>
             </div>
@@ -286,7 +313,7 @@ function showWelcomeSpinModal(userEmail, role) {
     document.getElementById('btn-go-spin').addEventListener('click', async () => {
         const btn = document.getElementById('btn-go-spin');
         btn.disabled = true;
-        btn.innerHTML = `<span class="material-symbols-outlined animate-spin align-middle mr-1">sync</span> Đang tải...`;
+        btn.innerHTML = `<span class="material-symbols-outlined animate-spin align-middle mr-1">sync</span> ${t.loading}`;
 
         try {
             const currentLang = localStorage.getItem('selectedLanguage') || 'vi';
