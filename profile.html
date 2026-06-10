@@ -388,22 +388,55 @@
             let outcomePercent = 5;
             const rand = Math.random();
             
-            // Balancing system: fetch last 2 outcomes from Firestore
-            let forcedOutcome = null;
+            // === GUARANTEE SYSTEM (all spin types) ===
+            // 30 spins → 20%, 50 spins → 50%, 100 spins → Free Meal
+            let guaranteeOutcome = null;
+            let spinGuarantee = { totalSpins: 0, next20: 30, next50: 50, nextFree: 100 };
             try {
                 const userSnap = await getDoc(doc(db, "users", currentUser.uid));
-                const lastOutcomes = userSnap.exists() ? (userSnap.data().lastOutcomes || []) : [];
-                if (lastOutcomes.length >= 2) {
-                    const last1 = lastOutcomes[lastOutcomes.length - 1];
-                    const last2 = lastOutcomes[lastOutcomes.length - 2];
-                    if (last1 === 5 && last2 === 5) forcedOutcome = 10;
-                    else if (last1 === 10 && last2 === 10) forcedOutcome = 5;
+                if (userSnap.exists()) {
+                    spinGuarantee = userSnap.data().spinGuarantee || spinGuarantee;
                 }
             } catch (e) {
-                console.warn("Could not fetch spin history for balancing:", e);
+                console.warn("Could not fetch spin guarantee:", e);
             }
 
-            if (forcedOutcome !== null) {
+            spinGuarantee.totalSpins = (spinGuarantee.totalSpins || 0) + 1;
+            const spinsLeft20 = (spinGuarantee.next20 || 30) - spinGuarantee.totalSpins;
+            const spinsLeft50 = (spinGuarantee.next50 || 50) - spinGuarantee.totalSpins;
+            const spinsLeftFree = (spinGuarantee.nextFree || 100) - spinGuarantee.totalSpins;
+
+            if (spinsLeftFree <= 0) {
+                guaranteeOutcome = 0;
+                spinGuarantee.nextFree = spinGuarantee.totalSpins + 100;
+                if (spinsLeft50 <= 0) spinGuarantee.next50 = spinGuarantee.totalSpins + 50;
+                if (spinsLeft20 <= 0) spinGuarantee.next20 = spinGuarantee.totalSpins + 30;
+            } else if (spinsLeft50 <= 0) {
+                guaranteeOutcome = 50;
+                spinGuarantee.next50 = spinGuarantee.totalSpins + 50;
+                if (spinsLeft20 <= 0) spinGuarantee.next20 = spinGuarantee.totalSpins + 30;
+            } else if (spinsLeft20 <= 0) {
+                guaranteeOutcome = 20;
+                spinGuarantee.next20 = spinGuarantee.totalSpins + 30;
+            }
+
+            // === 5%/10% BALANCE SYSTEM (deu/xin only) ===
+            let forcedOutcome = null;
+            if (guaranteeOutcome === null) {
+                try {
+                    const lastOutcomes = (userSnap && userSnap.exists()) ? (userSnap.data().lastOutcomes || []) : [];
+                    if (lastOutcomes.length >= 2) {
+                        const last1 = lastOutcomes[lastOutcomes.length - 1];
+                        const last2 = lastOutcomes[lastOutcomes.length - 2];
+                        if (last1 === 5 && last2 === 5) forcedOutcome = 10;
+                        else if (last1 === 10 && last2 === 10) forcedOutcome = 5;
+                    }
+                } catch (e) {}
+            }
+
+            if (guaranteeOutcome !== null) {
+                outcomePercent = guaranteeOutcome;
+            } else if (forcedOutcome !== null) {
                 outcomePercent = forcedOutcome;
             } else if (chosenType === 'deu') {
                 outcomePercent = (rand < 0.5) ? 5 : 10;
@@ -412,17 +445,17 @@
                 else if (rand < 0.8) outcomePercent = 10;
                 else outcomePercent = 15;
             } else if (chosenType === 'vip') {
-                outcomePercent = (rand < 0.05) ? 0 : 50;  // 5% Free meal, 95% 50%
+                outcomePercent = (rand < 0.05) ? 0 : 50;
             }
 
-            // Save outcome for balancing (keep last 3 outcomes)
+            // Save guarantee + last outcomes
             try {
-                const userSnap2 = await getDoc(doc(db, "users", currentUser.uid));
-                const prev = userSnap2.exists() ? (userSnap2.data().lastOutcomes || []) : [];
-                const updated = [...prev, outcomePercent].slice(-3);
-                await updateDoc(doc(db, "users", currentUser.uid), { lastOutcomes: updated });
+                await updateDoc(doc(db, "users", currentUser.uid), {
+                    spinGuarantee: spinGuarantee,
+                    lastOutcomes: [...((userSnap && userSnap.exists()) ? (userSnap.data().lastOutcomes || []) : []), outcomePercent].slice(-3)
+                });
             } catch (e) {
-                console.warn("Could not save spin outcome:", e);
+                console.warn("Could not save spin state:", e);
             }
             
             const matchingIndices = [];
