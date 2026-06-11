@@ -1640,49 +1640,6 @@ if (btnTranslate) {
     });
 }
 
-// --- AUTO DESCRIPTION LOGIC ---
-const btnAutoDesc = document.getElementById('btn-auto-desc');
-if (btnAutoDesc) {
-    btnAutoDesc.addEventListener('click', async () => {
-        const nameVi = document.getElementById('food-name-vi').value;
-        if (!nameVi) {
-            window.showNotification('Vui lòng nhập Tên món (Tiếng Việt) trước!', 'info');
-            return;
-        }
-
-        const originalText = btnAutoDesc.innerHTML;
-        btnAutoDesc.innerHTML = '<span class="material-symbols-outlined animate-spin text-[14px]">sync</span> ...';
-        btnAutoDesc.disabled = true;
-
-        try {
-            const apiKey = apiKeys.openRouterKey2;
-            const payload = {
-                messages: [
-                    {
-                        role: 'system',
-                        content: 'Bạn là chuyên gia viết content ẩm thực nhà hàng Việt Nam cao cấp. Nhiệm vụ của bạn là viết một đoạn mô tả món ăn (Description) bằng Tiếng Việt cực kỳ hấp dẫn, kích thích vị giác, giới thiệu sơ về nguyên liệu và cách chế biến. Đoạn văn phải ngắn gọn, dài tối đa 3 câu. Chỉ trả về văn bản, không dùng ngoặc kép, không dùng markdown.'
-                    },
-                    {
-                        role: 'user',
-                        content: `Tên món ăn: ${nameVi}`
-                    }
-                ]
-            };
-
-            const data = await callOpenRouterWithFallback(payload, apiKey);
-            const desc = data.choices[0].message.content.trim();
-            document.getElementById('food-desc-vi').value = desc;
-
-        } catch (error) {
-            console.error('Auto Desc Error:', error);
-            window.showNotification('Lỗi khi tạo mô tả. Vui lòng thử lại.', 'error');
-        } finally {
-            btnAutoDesc.innerHTML = originalText;
-            btnAutoDesc.disabled = false;
-        }
-    });
-}
-
 // --- SUBMIT SINGLE ITEM LOGIC ---
 const foodAddForm = document.getElementById('food-add-form');
 if (foodAddForm) {
