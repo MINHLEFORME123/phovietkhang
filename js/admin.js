@@ -353,9 +353,8 @@ function extractJsonObject(str) {
 // Robust fallback model call utility with API Key Rotation
 async function callOpenRouterWithFallback(payload, apiKeys = OPENROUTER_API_KEYS) {
     const models = [
-        'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free',
-        'meta-llama/llama-3-8b-instruct:free',
-        'google/gemma-2-9b-it:free'
+        'nex-agi/nex-n2-pro:free',
+        'qwen/qwen3-next-80b-a3b-instruct:free'
     ];
     
     const originalModel = payload.model;
@@ -366,7 +365,7 @@ async function callOpenRouterWithFallback(payload, apiKeys = OPENROUTER_API_KEYS
     for (const model of modelsToTry) {
         for (const key of keys) {
             try {
-                console.log(`[OpenRouter] Trying model: ${model} with key: ${key.substring(0, 12)}...`);
+                console.log(`[OpenRouter] Trying model: ${model}`);
                 const requestPayload = { ...payload, model: model };
                 
                 const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -380,26 +379,26 @@ async function callOpenRouterWithFallback(payload, apiKeys = OPENROUTER_API_KEYS
                 
                 if (!response.ok) {
                     const errText = await response.text();
-                    console.warn(`[OpenRouter] ${model} HTTP error (${response.status}) with key ${key.substring(0, 12)}: ${errText}`);
+                    console.warn(`[OpenRouter] ${model} HTTP error (${response.status})`);
                     continue;
                 }
                 
                 const text = await response.text();
                 if (!text) {
-                    console.warn(`[OpenRouter] ${model} returned empty response with key ${key.substring(0, 12)}`);
+                    console.warn(`[OpenRouter] ${model} returned empty response`);
                     continue;
                 }
                 
                 const data = JSON.parse(text);
                 if (!data || !data.choices || data.choices.length === 0) {
-                    console.warn(`[OpenRouter] ${model} returned no choices with key ${key.substring(0, 12)}:`, JSON.stringify(data?.error || data));
+                    console.warn(`[OpenRouter] ${model} returned no choices:`, JSON.stringify(data?.error || data));
                     continue;
                 }
                 
                 console.log(`[OpenRouter] Success with model: ${model}`);
                 return data;
             } catch (err) {
-                console.warn(`[OpenRouter] ${model} failed with key ${key.substring(0, 12)}: ${err.message}`);
+                console.warn(`[OpenRouter] ${model} failed: ${err.message}`);
             }
         }
     }
@@ -1275,13 +1274,11 @@ if (btnAiScan) {
         btnAiScan.disabled = true;
 
         try {
-            const apiKey = apiKeys.openRouterKey1;
-            
             // Step 1: Vision Extraction
             loadingIndicator.innerHTML = '<span class="material-symbols-outlined animate-spin align-middle mr-1 text-sm">sync</span> AI Vision is reading image...';
             
             const visionPayload = {
-                model: 'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free',
+                model: 'gpt-oss-120b',
                 messages: [
                     {
                         role: 'user',
@@ -1295,7 +1292,10 @@ if (btnAiScan) {
 
             const visionResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
                 method: 'POST',
-                headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+                headers: {
+                    'Authorization': `Bearer ${apiKeys.cerebrasPrimary}`,
+                    'Content-Type': 'application/json'
+                },
                 body: JSON.stringify(visionPayload)
             });
             
@@ -1357,7 +1357,37 @@ if (btnAiScan) {
                 ]
             };
 
-            const reasonerData = await callOpenRouterWithFallback(reasonerPayload, apiKey);
+            const reasonerData = await (async () => {
+                try {
+                    const r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${apiKeys.cerebrasPrimary}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ model: 'gpt-oss-120b', messages: reasonerPayload.messages })
+                    });
+                    if (!r.ok) throw new Error(`OpenRouter HTTP ${r.status}`);
+                    return await r.json();
+                } catch (e) {
+                    console.warn('[OpenRouter] Reasoner primary failed:', e);
+                    try {
+                        const r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${apiKeys.cerebrasBackup}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ model: 'gpt-oss-120b', messages: reasonerPayload.messages })
+                        });
+                        if (!r.ok) throw new Error(`OpenRouter HTTP ${r.status}`);
+                        return await r.json();
+                    } catch (e2) {
+                        console.warn('[OpenRouter] Reasoner backup failed:', e2);
+                        throw e2;
+                    }
+                }
+            })();
             const rawJson = reasonerData.choices[0].message.content;
 
             if (!rawJson) {
@@ -1479,7 +1509,37 @@ if (btnAiExtract) {
                 ]
             };
 
-            const responseData = await callOpenRouterWithFallback(payload, apiKey);
+            const responseData = await (async () => {
+                try {
+                    const r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${apiKeys.cerebrasPrimary}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ model: 'gpt-oss-120b', messages: payload.messages })
+                    });
+                    if (!r.ok) throw new Error(`OpenRouter HTTP ${r.status}`);
+                    return await r.json();
+                } catch (e) {
+                    console.warn('[OpenRouter] Extract primary failed:', e);
+                    try {
+                        const r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${apiKeys.cerebrasBackup}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ model: 'gpt-oss-120b', messages: payload.messages })
+                        });
+                        if (!r.ok) throw new Error(`OpenRouter HTTP ${r.status}`);
+                        return await r.json();
+                    } catch (e2) {
+                        console.warn('[OpenRouter] Extract backup failed:', e2);
+                        throw e2;
+                    }
+                }
+            })();
             const rawJson = responseData.choices[0].message.content;
 
             if (!rawJson) {

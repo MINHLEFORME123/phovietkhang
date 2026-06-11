@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>PHO VIET KHANG | Reward Store</title>
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/client.css">
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#3b82f6",
+                        surface: "#121824",
+                        "surface-container-low": "#18202d",
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .reward-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .reward-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-['Inter'] min-h-screen flex flex-col antialiased">
+    <nav class="fixed top-0 w-full z-50 bg-[#0a1019]/95 backdrop-blur-md border-b border-white/5">
+        <div class="flex justify-between items-center max-w-7xl mx-auto px-4 md:px-16 h-20">
+            <a class="flex items-center gap-2.5 shrink-0" href="index.html">
+                <span class="material-symbols-outlined text-[32px] text-white">ramen_dining</span>
+                <span class="text-white font-bold text-xl tracking-wide" style="font-family:'EB Garamond',serif;">PHỞ VIỆT KHANG</span>
+            </a>
+            <div class="flex items-center gap-3">
+                <a href="profile.html" class="text-white hover:text-gray-300 transition-colors p-1">
+                    <span class="material-symbols-outlined text-[22px]">arrow_back</span>
+                </a>
+                <a id="nav-user-btn" href="login.html" class="text-white hover:text-gray-300 transition-colors">
+                    <span class="material-symbols-outlined text-[22px]">account_circle</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow pt-32 pb-20">
+        <div class="max-w-5xl mx-auto px-4 md:px-16">
+            <div class="bg-surface/90 backdrop-blur-sm rounded-2xl border border-outline-variant p-6 shadow-lg mb-8">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div>
+                        <h1 class="font-['EB_Garamond'] text-3xl text-white">Reward Store</h1>
+                        <p class="text-secondary text-sm mt-1">Đổi điểm thành voucher ưu đãi độc quyền từ Phở Việt Khang.</p>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="bg-[#18202d] px-4 py-2 rounded-xl border border-outline-variant">
+                            <div class="text-xs text-secondary uppercase tracking-wider">Hiện có</div>
+                            <div class="text-2xl font-black text-amber-400" id="user-points">0</div>
+                            <div class="text-xs text-secondary">điểm</div>
+                        </div>
+                        <div class="bg-[#18202d] px-4 py-2 rounded-xl border border-outline-variant">
+                            <div class="text-xs text-secondary uppercase tracking-wider">Tier</div>
+                            <div class="text-lg font-black text-primary" id="user-tier">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="rewards-grid">
+                <div class="col-span-full text-center text-secondary py-12">Đang tải danh sách quà tặng...</div>
+            </div>
+
+            <div class="mt-12">
+                <h2 class="font-['EB_Garamond'] text-2xl text-white mb-4">Lịch sử đổi quà</h2>
+                <div class="bg-surface/90 rounded-2xl border border-outline-variant p-6">
+                    <div id="redemption-history" class="text-secondary text-sm text-center py-6">Chưa có giao dịch nào.</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="redeem-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+        <div class="bg-[#121824] max-w-md w-full rounded-2xl border border-white/10 p-6 space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 class="text-xl font-bold text-white font-['EB_Garamond']">Xác nhận đổi quà</h3>
+                <button onclick="closeRedeemModal()" class="text-secondary hover:text-white transition-colors">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <p class="text-secondary text-sm" id="redeem-modal-desc"></p>
+            <div class="bg-[#18202d] px-4 py-3 rounded-xl border border-outline-variant flex justify-between items-center">
+                <span class="text-secondary text-sm">Phí thay đổi</span>
+                <span class="text-amber-400 font-bold" id="redeem-modal-cost">0 điểm</span>
+            </div>
+            <div class="bg-[#18202d] px-4 py-3 rounded-xl border border-outline-variant flex justify-between items-center">
+                <span class="text-secondary text-sm">Số dư sau đổi</span>
+                <span class="text-white font-bold" id="redeem-modal-balance">0 điểm</span>
+            </div>
+            <button id="btn-confirm-redeem" class="w-full bg-primary hover:bg-blue-600 text-white font-bold py-3 rounded-xl transition-all active:scale-95">
+                <span class="material-symbols-outlined text-[20px] align-middle mr-1">check</span>Xác nhận
+            </button>
+        </div>
+    </div>
+
+    <div id="redeem-success" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+        <div class="bg-[#121824] max-w-md w-full rounded-2xl border border-white/10 p-6 text-center space-y-4">
+            <span class="material-symbols-outlined text-[48px] text-green-400">check_circle</span>
+            <h3 class="text-xl font-bold text-white font-['EB_Garamond']">Đổi quà thành công!</h3>
+            <p class="text-secondary text-sm" id="redeem-success-msg"></p>
+            <button onclick="closeSuccessModal()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl transition-all active:scale-95">
+                Đóng
+            </button>
+        </div>
+    </div>
+
+    <script src="js/firebase-config.js"></script>
+    <script type="module">
+        import { auth, db } from "./js/firebase-config.js";
+        import { getLoyaltyTier, getLoyaltyRate } from "./js/auth.js";
+        import {
+            doc, getDoc, updateDoc, runTransaction, collection, query, where, orderBy, getDocs, addDoc, serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+
+        const authInstance = getAuth();
+        let currentUser = null;
+        let rewardItems = [];
+        let pendingReward = null;
+
+        const REWARD_DEFINITIONS = [
+            {
+                id: 'voucher_5',
+                name: 'Voucher Giảm 5%',
+                description: 'Giảm 5% đơn hàng tiếp theo.',
+                pointsCost: 100,
+                discountPercent: 5,
+                image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&q=80&w=500'
+            },
+            {
+                id: 'voucher_10',
+                name: 'Voucher Giảm 10%',
+                description: 'Giảm 10% cho đơn hàng.',
+                pointsCost: 180,
+                discountPercent: 10,
+                image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&q=80&w=500'
+            },
+            {
+                id: 'free_drink',
+                name: '1 Đồ Uống Miễn Phí',
+                description: 'Áp dụng cho đồ uống trong menu.',
+                pointsCost: 250,
+                discountPercent: 15,
+                image: 'https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&q=80&w=500'
+            }
+        ];
+
+        function renderRewardsGrid() {
+            const grid = document.getElementById('rewards-grid');
+            if (!grid) return;
+            if (rewardItems.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center text-secondary py-12">Chưa có quà tặng nào hiện tại.</div>';
+                return;
+            }
+            grid.innerHTML = rewardItems.map(item => `
+                <div class="reward-card bg-surface/90 rounded-2xl border border-outline-variant overflow-hidden flex flex-col">
+                    <img src="${item.image}" class="w-full h-40 object-cover" onerror="this.src='https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&q=80&w=500'">
+                    <div class="p-5 flex flex-col flex-1">
+                        <h3 class="font-bold text-white text-lg mb-1">${item.name}</h3>
+                        <p class="text-secondary text-xs mb-3 flex-1">${item.description}</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-amber-400 font-black text-lg">${item.pointsCost} <span class="text-xs font-medium">điểm</span></span>
+                            <button onclick="initRedeem('${item.id}')" class="bg-primary hover:bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-all active:scale-95">
+                                Đổi ngay
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.initRedeem = async function(rewardId) {
+            if (!currentUser) {
+                window.showNotification && window.showNotification('Vui lòng đăng nhập để đổi quà.', 'info');
+                window.location.href = 'login.html';
+                return;
+            }
+            const reward = rewardItems.find(r => r.id === rewardId);
+            if (!reward) return;
+            pendingReward = reward;
+            const userSnap = await getDoc(doc(db, "users", currentUser.uid));
+            const data = userSnap.exists() ? userSnap.data() : {};
+            const points = data.loyaltyPoints || 0;
+            const balance = points - reward.pointsCost;
+
+            document.getElementById('redeem-modal-desc').textContent = `Bạn sắp đổi "${reward.name}".`;
+            document.getElementById('redeem-modal-cost').textContent = `${reward.pointsCost} điểm`;
+            document.getElementById('redeem-modal-balance').textContent = `${balance} điểm`;
+            document.getElementById('redeem-modal').classList.remove('hidden');
+        };
+
+        window.closeRedeemModal = function() {
+            document.getElementById('redeem-modal').classList.add('hidden');
+            pendingReward = null;
+        };
+
+        window.confirmRedeem = async function() {
+            if (!currentUser || !pendingReward) return;
+            const userRef = doc(db, "users", currentUser.uid);
+            const orderRef = doc(collection(db, "orders"));
+            try {
+                await runTransaction(db, async (tx) => {
+                    const snap = await tx.get(userRef);
+                    const userData = snap.exists() ? snap.data() : {};
+                    const points = Number(userData.loyaltyPoints || 0);
+                    const cost = Number(pendingReward.pointsCost || 0);
+                    if (points < cost) {
+                        throw new Error('NOT_ENOUGH_POINTS');
+                    }
+
+                    const promoCode = `REWARD-${pendingReward.id.toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+                    const expiry = new Date();
+                    expiry.setMonth(expiry.getMonth() + 1);
+
+                    const updatedPoints = points - cost;
+                    tx.update(userRef, {
+                        loyaltyPoints: updatedPoints,
+                        updatedAt: serverTimestamp ? serverTimestamp() : new Date()
+                    });
+
+                    const rewardOrderRef = doc(collection(db, "orders"));
+                    tx.set(rewardOrderRef, {
+                        customerName: userData.name || currentUser.displayName || 'Member',
+                        customerEmail: currentUser.email || '',
+                        customerPhone: userData.phone || '',
+                        orderType: 'redeem',
+                        paymentMethod: 'cod',
+                        paymentMethodLabel: 'Reward Store',
+                        paymentStatus: 'cod_pending',
+                        status: 'pending',
+                        totalPrice: 0,
+                        discountAmount: 0,
+                        tableNumber: '',
+                        address: '',
+                        distance: 0,
+                        deliveryFee: 0,
+                        notes: 'Reward redemption - Trừ điểm quà tặng',
+                        items: [{ id: pendingReward.id, name: pendingReward.name, price: 0, qty: 1, options: [] }],
+                        userId: currentUser.uid,
+                        rewardRedeemedId: pendingReward.id,
+                        rewardPointsUsed: cost,
+                        remainingPoints: updatedPoints,
+                        language: localStorage.getItem('selectedLanguage') || 'en',
+                        createdAt: new Date()
+                    });
+
+                    tx.set(doc(db, "vouchers", promoCode), {
+                        code: promoCode,
+                        discountPercent: pendingReward.discountPercent || 0,
+                        isFreeMeal: pendingReward.discountPercent === 0,
+                        email: currentUser.email,
+                        used: false,
+                        allowedOrderTypes: ['takeaway','delivery','dine-in'],
+                        expiryDate: expiry,
+                        createdAt: new Date(),
+                        source: 'reward_store',
+                        rewardId: pendingReward.id
+                    });
+
+                    tx.set(doc(db, "pointTransactions"), {
+                        uid: currentUser.uid,
+                        type: 'redeem',
+                        amount: -cost,
+                        balanceAfter: updatedPoints,
+                        rewardId: pendingReward.id,
+                        orderId: rewardOrderRef.id,
+                        note: `Đổi ${pendingReward.name}`,
+                        createdAt: new Date()
+                    });
+                });
+
+                document.getElementById('redeem-modal').classList.add('hidden');
+                document.getElementById('redeem-success-msg').textContent = `Bạn đã đổi "${pendingReward.name}" với ${pendingReward.pointsCost} điểm. Mã voucher đã được gửi vào hộp thư của bạn.`;
+                document.getElementById('redeem-success').classList.remove('hidden');
+                pendingReward = null;
+                await loadUserProfile();
+            } catch (err) {
+                console.error('Redeem failed:', err);
+                if (err.message === 'NOT_ENOUGH_POINTS') {
+                    window.showNotification('Không đủ điểm để đổi quà này.', 'error');
+                } else {
+                    window.showNotification('Đổi quà thất bại. Vui lòng thử lại.', 'error');
+                }
+            }
+        };
+
+        window.closeSuccessModal = function() {
+            document.getElementById('redeem-success').classList.add('hidden');
+        };
+
+        async function loadUserProfile() {
+            if (!currentUser) {
+                document.getElementById('user-points').textContent = '0';
+                document.getElementById('user-tier').textContent = '-';
+                return;
+            }
+            const userSnap = await getDoc(doc(db, "users", currentUser.uid));
+            const data = userSnap.exists() ? userSnap.data() : {};
+            const points = Number(data.loyaltyPoints || 0);
+            const totalSpent = Number(data.totalSpent || 0);
+            const tier = getLoyaltyTier(totalSpent);
+            const tierLabel = { bronze: 'Đồng', silver: 'Bạc', gold: 'Vàng', diamond: 'Kim Cương', platinum: 'Bạch Kim' }[tier] || 'Đồng';
+
+            document.getElementById('user-points').textContent = points;
+            document.getElementById('user-tier').textContent = tierLabel;
+
+            const txQuery = query(
+                collection(db, "pointTransactions"),
+                where("uid", "==", currentUser.uid),
+                orderBy("createdAt", "desc"),
+                { limit: 10 }
+            );
+            const snap = await getDocs(txQuery);
+            const historyEl = document.getElementById('redemption-history');
+            if (snap.empty) {
+                historyEl.innerHTML = 'Chưa có giao dịch nào.';
+            } else {
+                const items = [];
+                snap.forEach(docSnap => {
+                    const d = docSnap.data();
+                    const amount = Number(d.amount || 0);
+                    const isPositive = amount > 0;
+                    const timeStr = d.createdAt && d.createdAt.toDate ? d.createdAt.toDate().toLocaleString() : new Date().toLocaleString();
+                    items.push(`<div class="flex justify-between text-sm py-2 border-b border-outline-variant last:border-0">
+                        <span>${d.note || 'Giao dịch'}</span>
+                        <span class="${isPositive ? 'text-green-400' : 'text-red-400'} font-medium">${isPositive ? '+' : ''}${amount}</span>
+                        <span class="text-secondary text-xs">${timeStr}</span>
+                    </div>`);
+                });
+                historyEl.innerHTML = items.join('');
+            }
+        }
+
+        onAuthStateChanged(authInstance, async (user) => {
+            currentUser = user;
+            if (user) {
+                document.querySelectorAll('a[href="login.html"]').forEach(el => el.href = 'profile.html');
+                if (document.getElementById('nav-user-btn')) {
+                    document.getElementById('nav-user-btn').href = 'profile.html';
+                    const initial = (user.displayName || user.email || 'U').charAt(0).toUpperCase();
+                    document.getElementById('nav-user-btn').innerHTML = '<span style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#3b82f6;color:#fff;font-weight:700;font-size:16px;font-family:Inter,sans-serif;">' + initial + '</span>';
+                }
+            } else {
+                document.querySelectorAll('a[href="login.html"]').forEach(el => el.href = 'login.html');
+                if (document.getElementById('nav-user-btn')) {
+                    document.getElementById('nav-user-btn').href = 'login.html';
+                    document.getElementById('nav-user-btn').innerHTML = '<span class="material-symbols-outlined text-[22px]">account_circle</span>';
+                }
+            }
+            rewardItems = REWARD_DEFINITIONS;
+            renderRewardsGrid();
+            await loadUserProfile();
+        });
+
+        document.getElementById('btn-confirm-redeem').addEventListener('click', () => {
+            window.confirmRedeem();
+        });
+    </script>
+</body>
+</html>

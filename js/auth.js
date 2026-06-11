@@ -81,6 +81,8 @@ document.addEventListener('click', async (e) => {
                     spins: { deu: 1, xin: 0, vip: 0 },
                     createdAt: new Date()
                 });
+            } else {
+                sessionStorage.removeItem('pendingWelcomeSpin');
             }
         } catch (error) {
             console.error("Google Auth Error", error);
@@ -179,10 +181,13 @@ onAuthStateChanged(auth, async (user) => {
         try {
             const userDoc = await getDoc(doc(db, "users", user.uid));
             let role = 'customer';
-            const isNewUser = sessionStorage.getItem('pendingWelcomeSpin') === 'true';
+            let isNewUser = false;
+
             if (userDoc.exists()) {
                 role = userDoc.data().role || 'customer';
                 sessionStorage.removeItem('pendingWelcomeSpin');
+            } else {
+                isNewUser = sessionStorage.getItem('pendingWelcomeSpin') === 'true';
             }
 
             // Route Protection
@@ -232,6 +237,24 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 // 4. Logout
+export function getLoyaltyTier(totalSpent) {
+    const s = Number(totalSpent) || 0;
+    if (s >= 1000000) return 'diamond';
+    if (s >= 500000) return 'platinum';
+    if (s >= 200000) return 'gold';
+    if (s >= 100000) return 'silver';
+    return 'bronze';
+}
+
+export function getLoyaltyRate(totalSpent) {
+    const tier = getLoyaltyTier(totalSpent);
+    const rates = { bronze: 0.01, silver: 0.015, gold: 0.025, platinum: 0.04, diamond: 0.05 };
+    return rates[tier] || rates.bronze;
+}
+
+window.getLoyaltyTier = getLoyaltyTier;
+window.getLoyaltyRate = getLoyaltyRate;
+
 export async function logoutUser() {
     try {
         const currentPath = window.location.pathname.toLowerCase();

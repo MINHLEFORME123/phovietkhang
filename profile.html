@@ -154,6 +154,10 @@
                         <span class="material-symbols-outlined text-[20px]">inbox</span>
                         Inbox
                     </a>
+                    <a href="rewards-store.html" rel="nofollow" class="inline-flex items-center gap-2 bg-amber-500/15 border border-amber-400/30 text-amber-200 font-semibold py-2.5 px-5 rounded-xl hover:bg-amber-500/25 transition-all text-sm">
+                        <span class="material-symbols-outlined text-[20px]">redeem</span>
+                        Reward Store
+                    </a>
                 </div>
             </div>
 
@@ -719,42 +723,24 @@
                     originalData = { name, phone, address };
                     
                     const totalSpent = data.totalSpent || 0;
-                    let tierLabel, tierColor, tierColorBg, tierIcon, tierDiscount;
-                    if (totalSpent >= 1000000) {
-                        tierLabel = 'Kim Cương';
-                        tierColor = '#7c3aed';
-                        tierColorBg = '#7c3aed22';
-                        tierIcon = 'diamond';
-                        tierDiscount = '15%';
-                    } else if (totalSpent >= 500000) {
-                        tierLabel = 'Vàng';
-                        tierColor = '#eab308';
-                        tierColorBg = '#eab30822';
-                        tierIcon = 'workspaces_premium';
-                        tierDiscount = '10%';
-                    } else if (totalSpent >= 200000) {
-                        tierLabel = 'Bạc';
-                        tierColor = '#9ca3af';
-                        tierColorBg = '#9ca3af22';
-                        tierIcon = 'shield';
-                        tierDiscount = '5%';
-                    } else if (totalSpent >= 100000) {
-                        tierLabel = 'Đồng';
-                        tierColor = '#9a3412';
-                        tierColorBg = '#9a341222';
-                        tierIcon = 'shield';
-                        tierDiscount = '0%';
-                    } else {
-                        tierLabel = 'Đồng';
-                        tierColor = '#78350f';
-                        tierColorBg = '#78350f22';
-                        tierIcon = 'shield';
-                        tierDiscount = '0%';
-                    }
+                    const loyaltyPoints = data.loyaltyPoints || 0;
+                    const tier = getLoyaltyTier(totalSpent);
+                    const rate = getLoyaltyRate(totalSpent);
+                    const tierConfig = {
+                        bronze: { label: 'Đồng', color: '#9a3412', colorBg: '#9a341222', icon: 'shield', discount: '0%', rate: '1%' },
+                        silver: { label: 'Bạc', color: '#9ca3af', colorBg: '#9ca3af22', icon: 'shield', discount: '5%', rate: '1.5%' },
+                        gold: { label: 'Vàng', color: '#eab308', colorBg: '#eab30822', icon: 'workspaces_premium', discount: '10%', rate: '2.5%' },
+                        platinum: { label: 'Bạch Kim', color: '#06b6d4', colorBg: '#06b6d422', icon: 'diamond', discount: '15%', rate: '4%' },
+                        diamond: { label: 'Kim Cương', color: '#7c3aed', colorBg: '#7c3aed22', icon: 'diamond', discount: '20%', rate: '5%' }
+                    }[tier] || { label: 'Đồng', color: '#78350f', colorBg: '#78350f22', icon: 'shield', discount: '0%', rate: '1%' };
                     const loyaltyBadge = `
-                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold" style="background:${tierColorBg}; color:${tierColor}; border:1px solid ${tierColor}44;">
-                            <span class="material-symbols-outlined text-[14px]" style="color:${tierColor}">${tierIcon}</span>
-                            ${tierLabel} -${tierDiscount}
+                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold" style="background:${tierConfig.colorBg}; color:${tierConfig.color}; border:1px solid ${tierConfig.color}44;">
+                            <span class="material-symbols-outlined text-[14px]" style="color:${tierConfig.color}">${tierConfig.icon}</span>
+                            ${tierConfig.label} -${tierConfig.discount} (Tích ${tierConfig.rate})
+                        </span>
+                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-primary/15 text-primary border border-primary/30 ml-2">
+                            <span class="material-symbols-outlined text-[14px]">stars</span>
+                            ${loyaltyPoints} điểm
                         </span>`;
                     document.getElementById('loyalty-tier-container').innerHTML = loyaltyBadge;
                     

@@ -1,4 +1,5 @@
 import { db, getApiKeys } from "./firebase-config.js";
+import { getLoyaltyRate, getLoyaltyTier } from "./auth.js";
 import { addDoc, collection, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
 const cartContainer = document.getElementById('cart-items-container');
@@ -486,6 +487,19 @@ if (checkoutForm) {
         }
         const discountAmount = appliedPromo ? (subtotal * (appliedPromo.discountPercent / 100)) : 0;
         const total = subtotal + deliveryFee - discountAmount;
+        const uid = (typeof window !== 'undefined' && window.currentUserUid) || 'guest';
+        const isGuest = uid === 'guest';
+        let earnedPoints = 0;
+        if (!isGuest) {
+            try {
+                const snap = await getDoc(doc(db, "users", uid));
+                const uData = snap.exists() ? snap.data() : {};
+                const rate = (typeof getLoyaltyRate === 'function' ? getLoyaltyRate(uData.totalSpent || 0) : 0.01);
+                earnedPoints = Math.round(total * rate * 100) / 100;
+            } catch (e) {
+                earnedPoints = Math.round(total * 0.01 * 100) / 100;
+            }
+        }
 
         const loading = document.getElementById('checkout-loading');
         loading.classList.remove('hidden');
@@ -516,7 +530,8 @@ if (checkoutForm) {
                 status: 'pending',
                 language: currentLang,
                 createdAt: new Date(),
-                userId: 'guest'
+                userId: uid,
+                loyaltyPoints: !isGuest ? earnedPoints : 0
             };
 
             const docRef = await addDoc(collection(db, "orders"), orderData);
@@ -527,6 +542,19 @@ if (checkoutForm) {
                     usedAt: new Date(),
                     orderId: docRef.id
                 });
+            }
+
+            if (!isGuest) {
+                try {
+                    const userRef = doc(db, "users", uid);
+                    await updateDoc(userRef, {
+                        loyaltyPoints: (Number((await getDoc(userRef)).data()?.loyaltyPoints || 0) + earnedPoints),
+                        lastOrderPointsEarned: earnedPoints,
+                        lastOrderId: docRef.id
+                    });
+                } catch (e) {
+                    console.warn('Loyalty points update failed:', e);
+                }
             }
 
             // Redirect to Paytrail payment gateway
@@ -564,19 +592,12 @@ if (checkoutForm) {
                     return;
                 }
 
-                // Redirect to Paytrail payment gateway
-                try {
-                    const paytrailResult = await createPaytrailPayment({
-                        id: docRef.id,
-                        total: total,
-                        customerEmail: customerEmail,
-                        customerName: customerName,
-                        customerPhone: customerPhone,
-                        paymentMethod: paymentMethod,
-                        items: cart,
-                        deliveryFee: deliveryFee,
-                        discountAmount: discountAmount,
-                        createdAt: new Date().toISOString(),
-                        language: currentLang,
-                    });
-}
+            } catch (error) {
+                console.error("Order submission error:", error);
+                window.showNotification('Failed to place order. Please try again.', 'error');
+            } finally {
+                loading.classList.add('hidden');
+                btnSubmit.disabled = false;
+            }
+        });
+    }
