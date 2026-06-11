@@ -137,9 +137,9 @@ function getPaymentMethodLabel(method, lang = 'en') {
             fi: 'Pankkikortti'
         }
         cod: {
-            vi: 'COD (Cash on Delivery)',
-            en: 'COD (Cash on Delivery)',
-            fi: 'COD (Kotiinkuljetus, maksu käteisellä/kortilla)'
+            vi: 'Cash or Card (trực tiếp)',
+            en: 'Cash or Card (on-site)',
+            fi: 'Cash or Card (paikalla)'
         }
     };
 
@@ -555,6 +555,144 @@ if (checkoutForm) {
                 } catch (e) {
                     console.warn('Loyalty points update failed:', e);
                 }
+            }
+
+            const orderIdShort = docRef.id.substring(0, 8).toUpperCase();
+            const orderLang = currentLang || 'vi';
+            const orderTotal = total.toFixed(2);
+            const orderItemsSummary = (cart || []).map(i => `${i.qty}x ${i.name}`).join(', ');
+            const orderTypeLabel = orderType === 'dine-in' ? 'Dine-in' : orderType === 'takeaway' ? 'Takeaway' : 'Delivery';
+            const orderDetail = orderType === 'dine-in' ? `Table: ${tableNumber || 'N/A'}` : (orderType === 'delivery' || orderType === 'takeaway') ? address : '';
+
+            const customerTranslations = {
+                vi: {
+                    subject: `[Phở Việt Khang] Xác nhận đơn hàng #${orderIdShort}`,
+                    title: 'ĐƠN HÀNG ĐÃ ĐƯỢC NHẬN',
+                    greeting: `Xin chào ${customerName || 'Quý khách'},`,
+                    intro: 'Cảm ơn bạn đã đặt hàng tại Phở Việt Khang. Đơn hàng của bạn đã được nhận và đang được xử lý.',
+                    summaryHeader: 'Chi tiết đơn hàng:',
+                    totalLabel: 'Tổng cộng',
+                    orderTypeLabel: 'Hình thức',
+                    orderIdLabel: 'Mã đơn hàng',
+                    paymentLabel: 'Thanh toán',
+                    note: orderNotes ? `Ghi chú: ${notes}` : '',
+                    footer: 'Chúng tôi sẽ thông báo khi đơn hàng của bạn sẵn sàng. Cảm ơn quý khách!<br>Phở Việt Khang © 2026.'
+                },
+                en: {
+                    subject: `[Phở Việt Khang] Order Confirmed #${orderIdShort}`,
+                    title: 'ORDER CONFIRMED',
+                    greeting: `Hi ${customerName || 'Customer'},`,
+                    intro: 'Thank you for ordering with Phở Việt Khang. Your order has been received and is being processed.',
+                    summaryHeader: 'Order Details:',
+                    totalLabel: 'Total',
+                    orderTypeLabel: 'Service Type',
+                    orderIdLabel: 'Order ID',
+                    paymentLabel: 'Payment',
+                    note: orderNotes ? `Note: ${notes}` : '',
+                    footer: 'We will notify you when your order is ready. Thank you!<br>Phở Việt Khang © 2026.'
+                },
+                fi: {
+                    subject: `[Phở Việt Khang] Tilaus vahvistettu #${orderIdShort}`,
+                    title: 'TILAUS VAHVISTETTU',
+                    greeting: `Hei ${customerName || 'Asiakas'},`,
+                    intro: 'Kiitos tilauksestasi Phở Việt Khangissa. Tilauksesi on vastaanotettu ja sitä käsitellään.',
+                    summaryHeader: 'Tilaustiedot:',
+                    totalLabel: 'Yhteensä',
+                    orderTypeLabel: 'Palvelutyyppi',
+                    orderIdLabel: 'Tilaustunnus',
+                    paymentLabel: 'Maksu',
+                    note: orderNotes ? `Huomautus: ${notes}` : '',
+                    footer: 'Ilmoitamme sinulle kun tilauksesi on valmis. Kiitos!<br>Phở Việt Khang © 2026.'
+                }
+            };
+            const t = orderTranslations ? orderTranslations[orderLang] || orderTranslations['en'] : customerTranslations['en'];
+
+            const customerHtml = `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
+                    <h2 style="color: #3b82f6; text-align: center; border-bottom: 2px solid #3b82f6; padding-bottom: 15px; margin-bottom: 20px;">${t.title}</h2>
+                    <p>${t.greeting}</p>
+                    <p>${t.intro}</p>
+                    <p><strong>${t.summaryHeader}</strong></p>
+                    <ul style="padding-left: 20px; margin: 15px 0;">
+                        <li style="margin-bottom: 5px;"><strong>${t.orderIdLabel}:</strong> #${orderIdShort}</li>
+                        <li style="margin-bottom: 5px;"><strong>${t.orderTypeLabel}:</strong> ${orderTypeLabel}${orderDetail ? ` (${orderDetail})` : ''}</li>
+                        <li style="margin-bottom: 5px;"><strong>${t.paymentLabel}:</strong> ${paymentMethodLabel}</li>
+                        <li style="margin-bottom: 5px;"><strong>Items:</strong> ${orderItemsSummary}</li>
+                        ${t.note ? `<li style="margin-bottom: 5px;"><strong>Note:</strong> ${t.note}</li>` : ''}
+                    </ul>
+                    <p style="font-size: 1.1em;"><strong>${t.totalLabel}:</strong> <span style="color: #3b82f6; font-weight: bold;">${orderTotal}€</span></p>
+                    <p style="margin-top: 25px; font-size: 0.9em; color: #666;">${t.footer}</p>
+                </div>`;
+
+            const restaurantTranslations = {
+                vi: {
+                    subject: `[Phở Việt Khang] Đơn hàng mới #${orderIdShort}`,
+                    title: 'ĐƠN HÀNG MỚI',
+                    greeting: `Khách: ${customerName || 'Guest'}`,
+                    phone: `SĐT: ${customerPhone || 'N/A'}`,
+                    email: `Email: ${customerEmail || 'N/A'}`,
+                    intro: 'Có đơn hàng mới vừa được đặt trên hệ thống.',
+                    summaryHeader: 'Chi tiết đơn hàng:',
+                    totalLabel: 'Tổng cộng',
+                    orderTypeLabel: 'Hình thức',
+                    orderIdLabel: 'Mã đơn hàng',
+                    paymentLabel: 'Thanh toán',
+                    footer: 'Vui lòng kiểm tra hệ thống để xử lý đơn hàng.<br>Phở Việt Khang © 2026.'
+                },
+                en: {
+                    subject: `[Phở Việt Khang] New Order #${orderIdShort}`,
+                    title: 'NEW ORDER',
+                    greeting: `Customer: ${customerName || 'Guest'}`,
+                    phone: `Phone: ${customerPhone || 'N/A'}`,
+                    email: `Email: ${customerEmail || 'N/A'}`,
+                    intro: 'A new order has just been placed on the system.',
+                    summaryHeader: 'Order Details:',
+                    totalLabel: 'Total',
+                    orderTypeLabel: 'Service Type',
+                    orderIdLabel: 'Order ID',
+                    paymentLabel: 'Payment',
+                    footer: 'Please check the system to process the order.<br>Phở Việt Khang © 2026.'
+                },
+                fi: {
+                    subject: `[Phở Việt Khang] Uusi tilaus #${orderIdShort}`,
+                    title: 'UUSI TILAUS',
+                    greeting: `Asiakas: ${customerName || 'Guest'}`,
+                    phone: `Puhelin: ${customerPhone || 'N/A'}`,
+                    email: `Sähköposti: ${customerEmail || 'N/A'}`,
+                    intro: 'Järjestelmään on tehty uusi tilaus.',
+                    summaryHeader: 'Tilaustiedot:',
+                    totalLabel: 'Yhteensä',
+                    orderTypeLabel: 'Palvelutyyppi',
+                    orderIdLabel: 'Tilaustunnus',
+                    paymentLabel: 'Maksu',
+                    footer: 'Tarkista järjestelmä tilauksen käsittelyä varten.<br>Phở Việt Khang © 2026.'
+                }
+            };
+            const tr = restaurantTranslations[orderLang] || restaurantTranslations['en'];
+
+            const restaurantHtml = `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
+                    <h2 style="color: #ef4444; text-align: center; border-bottom: 2px solid #ef4444; padding-bottom: 15px; margin-bottom: 20px;">${tr.title}</h2>
+                    <p>${tr.greeting}</p>
+                    <p>${tr.phone}</p>
+                    <p>${tr.email}</p>
+                    <p>${tr.intro}</p>
+                    <p><strong>${tr.summaryHeader}</strong></p>
+                    <ul style="padding-left: 20px; margin: 15px 0;">
+                        <li style="margin-bottom: 5px;"><strong>${tr.orderIdLabel}:</strong> #${orderIdShort}</li>
+                        <li style="margin-bottom: 5px;"><strong>${tr.orderTypeLabel}:</strong> ${orderTypeLabel}${orderDetail ? ` (${orderDetail})` : ''}</li>
+                        <li style="margin-bottom: 5px;"><strong>${tr.paymentLabel}:</strong> ${paymentMethodLabel}</li>
+                        <li style="margin-bottom: 5px;"><strong>Items:</strong> ${orderItemsSummary}</li>
+                    </ul>
+                    <p style="font-size: 1.1em;"><strong>${tr.totalLabel}:</strong> <span style="color: #ef4444; font-weight: bold;">${orderTotal}€</span></p>
+                    <p style="margin-top: 25px; font-size: 0.9em; color: #666;">${tr.footer}</p>
+                </div>`;
+
+            try {
+                await sendWorkerEmail(customerEmail, t.subject, customerHtml);
+                await sendWorkerEmail('phovietkhang2024@gmail.com', tr.subject, restaurantHtml);
+            } catch (emailErr) {
+                console.error('Order email notification failed:', emailErr);
             }
 
             // Redirect to Paytrail payment gateway
