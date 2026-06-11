@@ -505,7 +505,6 @@ Rules:
 
     // Language sync helper
     let chatInitialized = false;
-    let chatMessages = [];
     const applyLangToChat = () => {
         const lang = getCurrentLang();
         const t = chatTranslations[lang] || chatTranslations.en;

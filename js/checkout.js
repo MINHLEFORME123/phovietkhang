@@ -575,7 +575,7 @@ if (checkoutForm) {
                     orderTypeLabel: 'Hình thức',
                     orderIdLabel: 'Mã đơn hàng',
                     paymentLabel: 'Thanh toán',
-                    note: orderNotes ? `Ghi chú: ${notes}` : '',
+                    note: notes ? `Ghi chú: ${notes}` : '',
                     footer: 'Chúng tôi sẽ thông báo khi đơn hàng của bạn sẵn sàng. Cảm ơn quý khách!<br>Phở Việt Khang © 2026.'
                 },
                 en: {
@@ -588,7 +588,7 @@ if (checkoutForm) {
                     orderTypeLabel: 'Service Type',
                     orderIdLabel: 'Order ID',
                     paymentLabel: 'Payment',
-                    note: orderNotes ? `Note: ${notes}` : '',
+                    note: notes ? `Note: ${notes}` : '',
                     footer: 'We will notify you when your order is ready. Thank you!<br>Phở Việt Khang © 2026.'
                 },
                 fi: {
@@ -601,11 +601,11 @@ if (checkoutForm) {
                     orderTypeLabel: 'Palvelutyyppi',
                     orderIdLabel: 'Tilaustunnus',
                     paymentLabel: 'Maksu',
-                    note: orderNotes ? `Huomautus: ${notes}` : '',
+                    note: notes ? `Huomautus: ${notes}` : '',
                     footer: 'Ilmoitamme sinulle kun tilauksesi on valmis. Kiitos!<br>Phở Việt Khang © 2026.'
                 }
             };
-            const t = orderTranslations ? orderTranslations[orderLang] || orderTranslations['en'] : customerTranslations['en'];
+            const t = customerTranslations[orderLang] || customerTranslations['en'];
 
             const customerHtml = `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
@@ -737,5 +737,12 @@ if (checkoutForm) {
                 loading.classList.add('hidden');
                 btnSubmit.disabled = false;
             }
-        });
-    }
+        } catch (outerErr) {
+            console.error("Checkout error:", outerErr);
+            window.showNotification('Failed to place order. Please try again.', 'error');
+            const loading = document.getElementById('checkout-loading');
+            if (loading) loading.classList.add('hidden');
+            btnSubmit.disabled = false;
+        }
+    });
+}
