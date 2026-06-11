@@ -445,34 +445,46 @@ Locations:
 2. Easton Helsinki Branch: Kauppakartanonkatu 3, 00930 Helsinki (Mon-Fri: 11:00-21:00, Sat-Sun: 12:00-21:00).
 Phone: +358 44 978 9995.
 
-To search the web or consult the menu, use the following tools:
-1. listAllFoodItems()
-   Args: {}
-   Returns the current menu dishes (names in Vi/En/Fi, prices, and descriptions).
-2. webSearch(query)
-   Args: { "query": string }
-   Searches the web for additional info.
-3. browseWebUrl(url)
-   Args: { "url": string }
-   Reads the content of any webpage.
-4. createReservation(name, phone, email, date, time, guests, location, notes)
-   Args: { "name": string, "phone": string, "email": string, "date": string (YYYY-MM-DD), "time": string (e.g. "18:00"), "guests": number, "location": string ("pengerkatu" or "easton"), "notes": string (optional) }
-   Creates a table reservation at Phở Việt Khang. Use this when the customer wants to book a table. Ask for all required fields if not provided.
-5. checkReservationStatus(phone)
-   Args: { "phone": string }
-   Checks the status of a reservation by phone number. Use this when the customer wants to know their reservation status.
-6. getCartItems()
-   Args: {}
-   Returns all items currently in the customer's shopping cart.
-7. addCartItem(name, qty, options)
-   Args: { "name": string, "qty": number (default 1), "options": string[] (optional, e.g. ["Large", "Extra Cheese (+€2.00)"]) }
-   Adds an item to the customer's cart. You MUST first call listAllFoodItems to find the exact item name and available options. The name must match a menu item name (vi or en). Options are display strings exactly as shown in the menu popup.
-8. removeCartItem(name)
-   Args: { "name": string }
-   Removes all quantities of an item from the customer's cart by name.
-9. showMenuSearch(query)
-   Args: { "query": string }
-   Navigates to the menu page and filters items matching the query (e.g. "gà", "chicken", "phở"). The menu page will display only matching items. Use this when the customer wants to see specific dishes.
+ To search the web or consult the menu, use the following tools:
+ 1. listAllFoodItems()
+    Args: {}
+    Returns ONLY a lightweight list of menu items: id, nameVi/nameEn/nameFi, categoryVi/categoryEn/categoryFi, isAvailable. No descriptions, prices or options.
+ 2. searchFoodItems(query)
+    Args: { "query": string }
+    Returns a lightweight filtered list matching the query (same shape as listAllFoodItems). Use this when the customer says a dish name or category instead of calling listAllFoodItems first.
+ 3. getFoodItemDetails(nameOrId)
+    Args: { "nameOrId": string }
+    Returns full details for one item: descriptions in all languages, tags, images, preparationTime. Use this after you already know the item id/name from listAllFoodItems or searchFoodItems.
+ 4. getFoodPrice(nameOrId)
+    Args: { "nameOrId": string }
+    Returns only the price and currency for one item.
+ 5. getFoodOptions(nameOrId)
+    Args: { "nameOrId": string }
+    Returns only the options/choices for one item. Use this before adding to cart so you can show exact option labels.
+ 6. webSearch(query)
+    Args: { "query": string }
+    Searches the web for additional info.
+ 7. browseWebUrl(url)
+    Args: { "url": string }
+    Reads the content of any webpage.
+ 8. createReservation(name, phone, email, date, time, guests, location, notes)
+    Args: { "name": string, "phone": string, "email": string, "date": string (YYYY-MM-DD), "time": string (e.g. "18:00"), "guests": number, "location": string ("pengerkatu" or "easton"), "notes": string (optional) }
+    Creates a table reservation at Phở Việt Khang. Use this when the customer wants to book a table. Ask for all required fields if not provided.
+ 9. checkReservationStatus(phone)
+    Args: { "phone": string }
+    Checks the status of a reservation by phone number. Use this when the customer wants to know their reservation status.
+ 10. getCartItems()
+    Args: {}
+    Returns all items currently in the customer's shopping cart.
+ 11. addCartItem(name, qty, options)
+    Args: { "name": string, "qty": number (default 1), "options": string[] (optional, e.g. ["Large", "Extra Cheese (+€2.00)"]) }
+    Adds an item to the cart. You MUST first call listAllFoodItems or searchFoodItems to find the exact item name, and getFoodOptions to know valid options. The name must match a menu item name (vi or en). Options are display strings exactly as shown by getFoodOptions.
+ 12. removeCartItem(name)
+    Args: { "name": string }
+    Removes all quantities of an item from the customer's cart by name.
+ 13. showMenuSearch(query)
+    Args: { "query": string }
+    Navigates to the menu page and filters items matching the query (e.g. "gà", "chicken", "phở"). The menu page will display only matching items. Use this when the customer wants to see specific dishes.
 
 Rules:
 - Always respond in ${langName}. This is the customer's chosen language.
@@ -546,32 +558,132 @@ Rules:
     }
 
     // Tools for customer AI
+    async function resolveMenuRef(nameOrId) {
+        const qSnap = await getDocs(collection(db, 'menu'));
+        let matched = null;
+        qSnap.forEach(docSnap => {
+            const d = docSnap.data();
+            if (d.isAvailable === false) return;
+            const ids = [docSnap.id, d.id, d.rawId].filter(Boolean).map(s => String(s).toLowerCase());
+            const names = [d.nameVi, d.nameEn, d.nameFi].map(s => (s || '').toLowerCase());
+            const target = String(nameOrId || '').toLowerCase();
+            if (ids.includes(target) || names.includes(target)) {
+                matched = { id: docSnap.id, ...d };
+            }
+        });
+        return matched;
+    }
+
     async function listAllFoodItems() {
         try {
-            const qSnap = await getDocs(collection(db, "menu"));
+            const qSnap = await getDocs(collection(db, 'menu'));
             const items = [];
             qSnap.forEach(docSnap => {
-                const data = docSnap.data();
-                if (data.isAvailable !== false) {
+                const d = docSnap.data();
+                if (d.isAvailable !== false) {
                     items.push({
-                        nameVi: data.nameVi || '',
-                        nameEn: data.nameEn || '',
-                        nameFi: data.nameFi || '',
-                        categoryVi: data.categoryVi || data.category || '',
-                        categoryEn: data.categoryEn || '',
-                        categoryFi: data.categoryFi || '',
-                        price: data.price,
-                        descriptionVi: data.descVi || '',
-                        descriptionEn: data.descEn || '',
-                        descriptionFi: data.descFi || '',
-                        preparationTime: data.preparationTime || 15,
-                        tags: data.tags || []
+                        id: docSnap.id,
+                        nameVi: d.nameVi || '',
+                        nameEn: d.nameEn || '',
+                        nameFi: d.nameFi || '',
+                        categoryVi: d.categoryVi || d.category || '',
+                        categoryEn: d.categoryEn || '',
+                        categoryFi: d.categoryFi || '',
+                        isAvailable: d.isAvailable !== false
                     });
                 }
             });
-            return items;
+            return { items };
         } catch (e) {
-            console.error(e);
+            console.error('[listAllFoodItems]', e);
+            return { error: e.message };
+        }
+    }
+
+    async function searchFoodItems(query) {
+        try {
+            if (!query) return { error: 'Search query is required.' };
+            const qSnap = await getDocs(collection(db, 'menu'));
+            const q = String(query).toLowerCase();
+            const items = [];
+            qSnap.forEach(docSnap => {
+                const d = docSnap.data();
+                if (d.isAvailable === false) return;
+                const hay = [d.nameVi, d.nameEn, d.nameFi, d.categoryVi, d.categoryEn, d.categoryFi, d.descVi, d.descEn, d.descFi, (d.tags || []).join(' ')].join(' ').toLowerCase();
+                if (hay.includes(q)) {
+                    items.push({
+                        id: docSnap.id,
+                        nameVi: d.nameVi || '',
+                        nameEn: d.nameEn || '',
+                        nameFi: d.nameFi || '',
+                        categoryVi: d.categoryVi || d.category || '',
+                        categoryEn: d.categoryEn || '',
+                        categoryFi: d.categoryFi || '',
+                        isAvailable: d.isAvailable !== false
+                    });
+                }
+            });
+            return { items };
+        } catch (e) {
+            console.error('[searchFoodItems]', e);
+            return { error: e.message };
+        }
+    }
+
+    async function getFoodItemDetails(nameOrId) {
+        try {
+            const item = await resolveMenuRef(nameOrId);
+            if (!item) return { error: `Menu item "${nameOrId}" not found.` };
+            return {
+                id: item.id,
+                nameVi: item.nameVi || '',
+                nameEn: item.nameEn || '',
+                nameFi: item.nameFi || '',
+                descriptionVi: item.descVi || '',
+                descriptionEn: item.descEn || '',
+                descriptionFi: item.descFi || '',
+                preparationTime: item.preparationTime || 15,
+                tags: item.tags || []
+            };
+        } catch (e) {
+            console.error('[getFoodItemDetails]', e);
+            return { error: e.message };
+        }
+    }
+
+    async function getFoodPrice(nameOrId) {
+        try {
+            const item = await resolveMenuRef(nameOrId);
+            if (!item) return { error: `Menu item "${nameOrId}" not found.` };
+            return { id: item.id, price: item.price };
+        } catch (e) {
+            console.error('[getFoodPrice]', e);
+            return { error: e.message };
+        }
+    }
+
+    async function getFoodOptions(nameOrId) {
+        try {
+            const item = await resolveMenuRef(nameOrId);
+            if (!item) return { error: `Menu item "${nameOrId}" not found.` };
+            const options = Array.isArray(item.options) ? item.options : [];
+            return {
+                id: item.id,
+                options: options.map(opt => ({
+                    nameVi: opt.nameVi || opt.name || '',
+                    nameEn: opt.nameEn || opt.name || '',
+                    nameFi: opt.nameFi || opt.name || '',
+                    type: opt.type || 'single-select',
+                    choices: (opt.choices || []).map(c => ({
+                        labelVi: c.labelVi || c.label || '',
+                        labelEn: c.labelEn || c.label || '',
+                        labelFi: c.labelFi || c.label || '',
+                        price: Number(c.price || 0)
+                    }))
+                }))
+            };
+        } catch (e) {
+            console.error('[getFoodOptions]', e);
             return { error: e.message };
         }
     }
@@ -883,7 +995,7 @@ Rules:
 
     let toolCallCount = 0;
 
-    const KNOWN_TOOLS = ['listAllFoodItems','webSearch','browseWebUrl','createReservation','checkReservationStatus','getCartItems','addCartItem','removeCartItem','showMenuSearch'];
+    const KNOWN_TOOLS = ['listAllFoodItems','searchFoodItems','getFoodItemDetails','getFoodPrice','getFoodOptions','webSearch','browseWebUrl','createReservation','checkReservationStatus','getCartItems','addCartItem','removeCartItem','showMenuSearch'];
 
     function tryParseToolJson(str) {
         try {
@@ -990,6 +1102,14 @@ Rules:
                     let result;
                     if (tool === 'listAllFoodItems') {
                         result = await listAllFoodItems();
+                    } else if (tool === 'searchFoodItems') {
+                        result = await searchFoodItems(args?.query);
+                    } else if (tool === 'getFoodItemDetails') {
+                        result = await getFoodItemDetails(args?.nameOrId);
+                    } else if (tool === 'getFoodPrice') {
+                        result = await getFoodPrice(args?.nameOrId);
+                    } else if (tool === 'getFoodOptions') {
+                        result = await getFoodOptions(args?.nameOrId);
                     } else if (tool === 'webSearch') {
                         result = await webSearch(args?.query);
                     } else if (tool === 'browseWebUrl') {
