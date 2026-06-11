@@ -26,14 +26,52 @@
         }
     </script>
     <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
         .reward-card {
             transition: transform 0.2s ease, box-shadow 0.2s ease;
+            animation: fadeIn 0.4s ease-out both;
         }
         .reward-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 14px 28px -6px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.08);
         }
-    </style>
+        .reward-grid .reward-card:nth-child(1) { animation-delay: 0.05s; }
+        .reward-grid .reward-card:nth-child(2) { animation-delay: 0.1s; }
+        .reward-grid .reward-card:nth-child(3) { animation-delay: 0.15s; }
+        .reward-grid .reward-card:nth-child(4) { animation-delay: 0.2s; }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.94) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-panel {
+            animation: modalIn 0.2s ease-out;
+        }
+        @keyframes successIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .success-panel {
+            animation: successIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .point-badge {
+            background: linear-gradient(135deg, #78350f 0%, #92400e 50%, #b45309 100%);
+            box-shadow: inset 0 0 0 1px rgba(251, 191, 36, 0.3), 0 6px 10px -4px rgba(0,0,0,0.4);
+        }
+        .redeem-btn {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            box-shadow: 0 4px 10px -3px rgba(37, 99, 235, 0.5);
+        }
+        .redeem-btn:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            box-shadow: 0 6px 14px -3px rgba(37, 99, 235, 0.6);
+        }
+        .redeem-btn:active {
+            transform: scale(0.97);
+        }
+        </style>
 </head>
 <body class="bg-background text-on-surface font-['Inter'] min-h-screen flex flex-col antialiased">
     <nav class="fixed top-0 w-full z-50 bg-[#0a1019]/95 backdrop-blur-md border-b border-white/5">
