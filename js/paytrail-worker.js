@@ -430,7 +430,7 @@ async function browseWebUrl(url) {
 
 async function sendEmailNotification(to, subject, html, customApiKey = null) {
     if (!to || !subject || !html) throw new Error("Missing parameters: to, subject, or html");
-    let key = customApiKey || 're_btL9vRa1_F5U5MyzMECeReQhRQmQXvEBT';
+    let key = customApiKey || 're_8PXskfp9_BVDSUvuPNqbfHo1y43ecKipt';
 
     const response = await fetch('https://api.resend.com/emails', {
         method: 'POST',

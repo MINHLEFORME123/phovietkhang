@@ -305,12 +305,11 @@ async function sendEmailNotification(to, subject, html, customApiKey = null) {
     if (!to || !subject || !html) throw new Error("Missing parameters: to, subject, or html");
     
     let key = customApiKey;
-    if (!key && typeof RESEND_API_KEY !== 'undefined') {
+    if (!customApiKey && typeof RESEND_API_KEY !== 'undefined') {
         key = RESEND_API_KEY;
     }
-    // Provided Resend API Key fallback
     if (!key) {
-        key = 're_btL9vRa1_F5U5MyzMECeReQhRQmQXvEBT';
+        key = 're_8PXskfp9_BVDSUvuPNqbfHo1y43ecKipt';
     }
 
     const response = await fetch('https://api.resend.com/emails', {
