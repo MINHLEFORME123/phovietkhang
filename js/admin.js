@@ -1640,8 +1640,11 @@ if (btnTranslate) {
     });
 }
 
-// --- FLOATING AI ADMIN CHAT (MESSENGER-STYLE) ---;
-        
+// --- FOOD ADD FORM SUBMIT LOGIC ---
+const foodAddForm = document.getElementById('food-add-form');
+if (foodAddForm) {
+    foodAddForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
         const categoryVi = document.getElementById('food-category-vi').value;
         const categoryEn = document.getElementById('food-category-en').value;
         const categoryFi = document.getElementById('food-category-fi').value;
@@ -1798,6 +1801,52 @@ if (foodTableBody) {
     }
 
     setupAdminFoodSearch();
+
+    window.deleteFood = async function(id) {
+        if (confirm("Are you sure you want to delete this food item?")) {
+            try {
+                await deleteDoc(doc(db, "menu", id));
+                window.showNotification("Food item deleted successfully!", "success");
+                loadFood();
+                loadCategories();
+            } catch (e) {
+                console.error("Delete error:", e);
+                window.showNotification("Failed to delete.", "error");
+            }
+        }
+    };
+
+    const btnClearMenu = document.getElementById('btn-clear-menu');
+    if (btnClearMenu) {
+        btnClearMenu.addEventListener('click', async () => {
+            if (confirm('DANGER: Are you sure you want to delete ALL food items? This cannot be undone.')) {
+                const pwd = prompt('Type "DELETE" to confirm:');
+                if (pwd === "DELETE") {
+                    try {
+                        btnClearMenu.disabled = true;
+                        btnClearMenu.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Clearing...';
+                        const querySnapshot = await getDocs(collection(db, "menu"));
+                        const deletePromises = [];
+                        querySnapshot.forEach((docSnap) => {
+                            deletePromises.push(deleteDoc(doc(db, "menu", docSnap.id)));
+                        });
+                        await Promise.all(deletePromises);
+                        window.showNotification(`Successfully deleted ${deletePromises.length} items.`, 'success');
+                        loadFood();
+                        loadCategories();
+                    } catch (e) {
+                        console.error("Error clearing menu:", e);
+                        window.showNotification("Failed to clear menu.", 'error');
+                    } finally {
+                        btnClearMenu.disabled = false;
+                        btnClearMenu.innerHTML = '<span class="material-symbols-outlined">delete_sweep</span><span>Clear Menu</span>';
+                    }
+                } else {
+                    window.showNotification("Confirmation failed. Cancelled.", 'error');
+                }
+            }
+        });
+    }
 }
 
 // --- AUTO DESCRIPTION LOGIC ---

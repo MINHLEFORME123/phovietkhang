@@ -2,6 +2,12 @@
 
 ## Modifications
 
+### [2026-06-11] Fixed Admin Area Not Loading Firestore Data
+- **Root Cause**: A syntax error was introduced in `js/admin.js` where the `food-add-form` submit handler block header went missing due to an accidental text deletion/comment overwrite, leaving dangling closing brackets (`Uncaught SyntaxError: Unexpected token '}'` at line 1701). Additionally, the `window.deleteFood` function and `btn-clear-menu` handlers were deleted during previous cleanup commits, preventing the admin module script from loading/parsing entirely.
+- **Fix in `js/admin.js`**:
+  - Restored the wrapper header `const foodAddForm = document.getElementById('food-add-form'); if (foodAddForm) { foodAddForm.addEventListener('submit', async (e) => { ... }) }` around the food adding code block.
+  - Re-implemented and restored `window.deleteFood(id)` and the `btn-clear-menu` click handlers inside the `foodTableBody` block.
+
 ### [2026-06-11] Fixed Cart Page Not Displaying Added Items
 - **Root Cause**: `cart.js` initializes the in-memory cart array at script load time using `cartUid()`, which returns `'guest'` because Firebase Auth hasn't resolved yet. When the user is logged in, items are stored under `phoCart_<uid>` in localStorage, but the cart page loaded from `phoCart_guest` (empty). By the time `onAuthStateChanged` fires and sets `window.currentUserUid`, the cart page had already rendered with the wrong (empty) data.
 - **Fix in `js/cart.js`**: Added `window.reloadCart()` function that re-reads cart data from localStorage using the now-correct `cartUid()` (which reflects the authenticated user's UID), updates the in-memory array, refreshes the badge, and re-renders the cart page.
