@@ -1830,6 +1830,201 @@ if (foodTableBody) {
         adminFoodSearch.addEventListener('input', () => {
             const q = (adminFoodSearch.value || '').toLowerCase();
             const all = window.__adminFoodItems || [];
+            btnTranslate.disabled = false;
+        }
+    });
+}
+
+// --- AUTO DESCRIPTION LOGIC ---
+const btnAutoDesc = document.getElementById('btn-auto-desc');
+if (btnAutoDesc) {
+    btnAutoDesc.addEventListener('click', async () => {
+        const nameVi = document.getElementById('food-name-vi').value;
+        if (!nameVi) {
+            window.showNotification('Vui lòng nhập Tên món (Tiếng Việt) trước!', 'info');
+            return;
+        }
+
+        const originalText = btnAutoDesc.innerHTML;
+        btnAutoDesc.innerHTML = '<span class="material-symbols-outlined animate-spin text-[14px]">sync</span> ...';
+        btnAutoDesc.disabled = true;
+
+        try {
+            const apiKey = apiKeys.openRouterKey2;
+            const payload = {
+                messages: [
+                    {
+                        role: 'system',
+                        content: 'Bạn là chuyên gia viết content ẩm thực nhà hàng Việt Nam cao cấp. Nhiệm vụ của bạn là viết một đoạn mô tả món ăn (Description) bằng Tiếng Việt cực kỳ hấp dẫn, kích thích vị giác, giới thiệu sơ về nguyên liệu và cách chế biến. Đoạn văn phải ngắn gọn, dài tối đa 3 câu. Chỉ trả về văn bản, không dùng ngoặc kép, không dùng markdown.'
+                    },
+                    {
+                        role: 'user',
+                        content: `Tên món ăn: ${nameVi}`
+                    }
+                ]
+            };
+
+            const data = await callOpenRouterWithFallback(payload, apiKey);
+            const desc = data.choices[0].message.content.trim();
+            document.getElementById('food-desc-vi').value = desc;
+
+        } catch (error) {
+            console.error('Auto Desc Error:', error);
+            window.showNotification('Lỗi khi tạo mô tả. Vui lòng thử lại.', 'error');
+        } finally {
+            btnAutoDesc.innerHTML = originalText;
+            btnAutoDesc.disabled = false;
+        }
+    });
+}
+
+// --- SUBMIT SINGLE ITEM LOGIC ---
+const foodAddForm = document.getElementById('food-add-form');
+if (foodAddForm) {
+    foodAddForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const categoryVi = document.getElementById('food-category-vi').value;
+        const categoryEn = document.getElementById('food-category-en').value;
+        const categoryFi = document.getElementById('food-category-fi').value;
+        const price = parseFloat(document.getElementById('food-price').value);
+        const nameVi = document.getElementById('food-name-vi').value;
+        const descVi = document.getElementById('food-desc-vi').value;
+        const nameEn = document.getElementById('food-name-en').value;
+        const descEn = document.getElementById('food-desc-en').value;
+        const nameFi = document.getElementById('food-name-fi').value;
+        const descFi = document.getElementById('food-desc-fi').value;
+        
+        const loadingIndicator = document.getElementById('ai-loading');
+        loadingIndicator.innerHTML = '<span class="material-symbols-outlined animate-spin align-middle mr-2">sync</span> Saving to Database...';
+        loadingIndicator.classList.remove('hidden');
+        document.getElementById('btn-save-food').disabled = true;
+
+        try {
+            let finalImage = currentCompressedImage;
+            if (!finalImage) {
+                finalImage = 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=500';
+            }
+
+            const allergenWarning = document.getElementById('food-allergen')?.checked || false;
+
+            await addDoc(collection(db, "menu"), {
+                nameVi, descVi, nameEn, descEn, nameFi, descFi, 
+                category: categoryVi,
+                categoryVi,
+                categoryEn: categoryEn || categoryVi,
+                categoryFi: categoryFi || categoryVi,
+                price, 
+                image: finalImage,
+                options: foodOptions.length > 0 ? [...foodOptions] : [],
+                allergenWarning,
+                createdAt: new Date()
+            });
+            
+            window.showNotification('Food item added successfully!', 'success');
+            foodAddForm.reset();
+            currentCompressedImage = "";
+            foodOptions = [];
+            renderOptions();
+            if (imagePreview) {
+                imagePreview.classList.add('hidden');
+                imagePreview.src = "";
+            }
+            loadCategories(); 
+            
+        } catch (error) {
+            console.error("Error adding food:", error);
+            window.showNotification('Failed to add food. Ensure you have admin rights.', 'error');
+        } finally {
+            loadingIndicator.classList.add('hidden');
+            loadingIndicator.innerHTML = '<span class="material-symbols-outlined animate-spin align-middle mr-2">sync</span> Processing... Please wait.';
+            document.getElementById('btn-save-food').disabled = false;
+        }
+    });
+}
+
+// --- FOOD LIST & EDIT LOGIC ---
+const foodTableBody = document.getElementById('food-table-body');
+if (foodTableBody) {
+    async function loadFood() {
+        window.loadFood = loadFood;
+        try {
+            const querySnapshot = await getDocs(collection(db, "menu"));
+            foodTableBody.innerHTML = '';
+            
+            if (querySnapshot.empty) {
+                foodTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-secondary">No food items found.</td></tr>';
+                return;
+            }
+
+            const items = [];
+            querySnapshot.forEach((documentSnapshot) => {
+                items.push({ id: documentSnapshot.id, ...documentSnapshot.data() });
+            });
+            window.__adminFoodItems = items;
+            renderFoodRows(items);
+        } catch (error) {
+            console.error("Error loading menu:", error);
+            foodTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-red-500">Failed to load menu.</td></tr>';
+        }
+    }
+
+    function renderFoodRows(items) {
+        if (!foodTableBody) return;
+        foodTableBody.innerHTML = '';
+        if (!items.length) {
+            foodTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-secondary">No matching items.</td></tr>';
+            return;
+        }
+        items.forEach((item) => {
+            const id = item.id;
+            const normalized = normalizeOptions(item.options);
+            const optCount = normalized.length > 0 ? `<span class="text-xs bg-teal-600/20 text-teal-400 px-1.5 py-0.5 rounded-full ml-1">${normalized.length} opt groups</span>` : '';
+
+            const tr = document.createElement('tr');
+            tr.className = "border-b border-gray-800/50 hover:bg-surface-highlight transition-colors";
+            tr.innerHTML = `
+                <td class="py-3 px-4"><img src="${item.image}" class="w-12 h-12 object-cover rounded" onerror="this.src='https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=100'"></td>
+                <td class="py-3 px-4">
+                    <span class="font-bold text-white">${item.nameVi || ''}</span>
+                    ${item.allergenWarning ? '<span class="inline-flex items-center gap-1 bg-red-900/30 text-red-400 text-xs px-2 py-0.5 rounded-md font-semibold border border-red-800/50 ml-2" title="Chứa thành phần dễ gây dị ứng"><span class="material-symbols-outlined text-[14px]">warning</span> Dị ứng</span>' : ''}
+                    <br>
+                    <span class="text-xs text-secondary">EN: ${item.nameEn || ''}</span><br>
+                    <span class="text-xs text-secondary">FI: ${item.nameFi || ''}</span>
+                </td>
+                <td class="py-3 px-4">
+                    <span class="font-bold text-white">VI: ${item.categoryVi || item.category || ''}</span><br>
+                    <span class="text-xs text-secondary">EN: ${item.categoryEn || ''}</span><br>
+                    <span class="text-xs text-secondary">FI: ${item.categoryFi || ''}</span>
+                </td>
+                <td class="py-3 px-4">€${(item.price || 0).toFixed(2)}</td>
+                <td class="py-3 px-4">${optCount || '<span class="text-xs text-secondary/50">None</span>'}</td>
+                ${window.location.pathname.includes('/host/') ? '' : `
+                <td class="py-3 px-4 flex gap-2">
+                    <button class="btn-edit text-blue-400 hover:text-blue-300 transition-colors" data-id="${id}">
+                        <span class="material-symbols-outlined">edit</span>
+                    </button>
+                    <button class="btn-delete text-red-400 hover:text-red-300 transition-colors" data-id="${id}">
+                        <span class="material-symbols-outlined">delete</span>
+                    </button>
+                </td>
+                `}
+            `;
+
+            if (!window.location.pathname.includes('/host/')) {
+                tr.querySelector('.btn-edit').addEventListener('click', () => window.openEditModal(id, item));
+                tr.querySelector('.btn-delete').addEventListener('click', () => window.deleteFood(id));
+            }
+
+            foodTableBody.appendChild(tr);
+        });
+    }
+
+    const adminFoodSearch = document.getElementById('admin-food-search');
+    if (adminFoodSearch) {
+        adminFoodSearch.addEventListener('input', () => {
+            const q = (adminFoodSearch.value || '').toLowerCase();
+            const all = window.__adminFoodItems || [];
             if (!q) return renderFoodRows(all);
             const filtered = all.filter((item) => {
                 const text = [item.nameVi, item.nameEn, item.nameFi, item.categoryVi, item.categoryEn, item.categoryFi, item.descVi, item.descEn, item.descFi, (item.tags || []).join(' ')].join(' ').toLowerCase();
@@ -1841,10 +2036,6 @@ if (foodTableBody) {
 }
 
 window.deleteFood = async function(id) {
-        if(confirm('Are you sure you want to delete this item?')) {
-            try {
-                await deleteDoc(doc(db, "menu", id));
-                window.showNotification('Deleted successfully.', 'success');
                 loadFood();
                 loadCategories();
             } catch(e) {
