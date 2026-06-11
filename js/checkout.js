@@ -135,7 +135,7 @@ function getPaymentMethodLabel(method, lang = 'en') {
             vi: 'Thẻ ngân hàng',
             en: 'Bank Card',
             fi: 'Pankkikortti'
-        }
+        },
         cod: {
             vi: 'Cash or Card (trực tiếp)',
             en: 'Cash or Card (on-site)',

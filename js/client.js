@@ -494,6 +494,7 @@ Rules:
     // Language sync helper
     let chatInitialized = false;
     const applyLangToChat = () => {
+        if (typeof chatMessages === 'undefined') return;
         const lang = getCurrentLang();
         const t = chatTranslations[lang] || chatTranslations.en;
         const titleEl = chatWin.querySelector('[data-chat-title]');
@@ -501,7 +502,9 @@ Rules:
         if (chatInput) chatInput.placeholder = t.placeholder;
 
         // Update system prompt to match current language
-        chatMessages[0] = { role: 'system', content: getSystemPrompt(lang) };
+        if (chatMessages.length > 0) {
+            chatMessages[0] = { role: 'system', content: getSystemPrompt(lang) };
+        }
 
         // If chat was already opened, reset conversation on language change
         if (chatInitialized) {
