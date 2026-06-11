@@ -47,6 +47,16 @@ function loadCart() {
 
 let cart = loadCart();
 
+// Reload cart from localStorage using the current UID.
+// Call this after auth state resolves so the correct user cart is loaded.
+window.reloadCart = function() {
+    const freshCart = loadCart();
+    cart.length = 0;
+    cart.push(...freshCart);
+    updateCartBadge();
+    if (window.renderCartPage) window.renderCartPage();
+};
+
 function saveCart() {
     localStorage.setItem('phoCart_' + cartUid(), JSON.stringify(cart));
     updateCartBadge();

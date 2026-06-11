@@ -116,13 +116,10 @@ onAuthStateChanged(auth, async (user) => {
             });
             localStorage.setItem('phoCart_' + user.uid, JSON.stringify(merged));
             localStorage.removeItem('phoCart_guest');
-            // Reload cart in memory if cart module loaded
-            if (typeof window.getCart !== 'undefined') {
-                const cart = window.getCart();
-                cart.length = 0;
-                cart.push(...merged);
-                if (typeof window.saveCart === 'function') window.saveCart();
-            }
+        }
+        // Reload cart from the correct user-specific localStorage key
+        if (typeof window.reloadCart === 'function') {
+            window.reloadCart();
         }
 
         // User is signed in
