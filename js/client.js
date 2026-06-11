@@ -854,9 +854,8 @@ Rules:
 
     async function callOpenRouterWithFallback(payload) {
         const models = [
-            'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free',
-            'meta-llama/llama-3-8b-instruct:free',
-            'google/gemma-2-9b-it:free'
+            'nex-agi/nex-n2-pro:free',
+            'qwen/qwen3-next-80b-a3b-instruct:free'
         ];
         
         for (const model of models) {

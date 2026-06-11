@@ -4418,7 +4418,7 @@ Rules:
                 } catch (backupErr) {
                     console.warn("[AI Chat] zai-glm-4.7 also failed. Falling back to OpenRouter...", backupErr);
                     const payload = {
-                        model: 'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free',
+                        model: 'nex-agi/nex-n2-pro:free',
                         messages: chatMessages
                     };
                     data = await callOpenRouterWithFallback(payload);
