@@ -726,7 +726,7 @@ if (checkoutForm) {
 
                 if (paymentMethod === 'cod') {
                     window.showNotification('Đặt hàng thành công! Vui lòng chuẩn bị tiền mặt hoặc thẻ khi nhận hàng.', 'success');
-                    window.location.href = 'order-tracking.html';
+                    window.location.href = `order-tracking.html?orderId=${encodeURIComponent(docRef.id)}`;
                     return;
                 }
 
