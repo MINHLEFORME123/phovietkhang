@@ -1825,8 +1825,10 @@ if (foodTableBody) {
         });
     }
 
-    const adminFoodSearch = document.getElementById('admin-food-search');
-    if (adminFoodSearch) {
+    function setupAdminFoodSearch() {
+        const adminFoodSearch = document.getElementById('admin-food-search');
+        if (!adminFoodSearch) return;
+        
         adminFoodSearch.addEventListener('input', () => {
             const q = (adminFoodSearch.value || '').toLowerCase();
             const all = window.__adminFoodItems || [];
@@ -1835,12 +1837,14 @@ if (foodTableBody) {
                 return;
             }
             const filtered = all.filter((item) => {
-                const text = [item.nameVi, item.nameEn, item.nameFi, item.categoryVi, item.categoryEn, item.categoryFi, item.descVi, item.descEn, item.descFi].join(' ').toLowerCase();
+                const text = [item.nameVi, item.nameEn, item.nameFi, item.categoryVi, item.categoryEn, item.categoryFi, item.descVi, item.descEn, item.descFi, (item.tags || []).join(' ')].join(' ').toLowerCase();
                 return text.indexOf(q) !== -1;
             });
             renderFoodRows(filtered);
         });
     }
+
+    setupAdminFoodSearch();
 }
 
 // --- AUTO DESCRIPTION LOGIC ---
