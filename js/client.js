@@ -493,8 +493,8 @@ Rules:
 
     // Language sync helper
     let chatInitialized = false;
+    let chatMessages = [];
     const applyLangToChat = () => {
-        if (typeof chatMessages === 'undefined') return;
         const lang = getCurrentLang();
         const t = chatTranslations[lang] || chatTranslations.en;
         const titleEl = chatWin.querySelector('[data-chat-title]');
