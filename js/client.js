@@ -1012,7 +1012,11 @@ Rules:
                         };
                         result = { error: notSupportedMsgs[getCurrentLang()] || notSupportedMsgs.en };
                     }
-                    results.push({ tool, success: true, result });
+                    if (result && typeof result === 'object' && result.hasOwnProperty('error')) {
+                        results.push({ tool, success: false, error: result.error });
+                    } else {
+                        results.push({ tool, success: true, result });
+                    }
                 } catch (e) {
                     results.push({ tool: payload?.tool || 'unknown', success: false, error: e.message });
                 }

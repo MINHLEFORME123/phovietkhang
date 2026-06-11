@@ -143,6 +143,7 @@
                     <div class="profile-avatar mb-4" id="profile-avatar-display">U</div>
                     <h1 class="font-headline-md text-3xl text-white" id="profile-display-name">Loading...</h1>
                     <p class="text-secondary text-sm mt-1" id="profile-display-email"></p>
+                    <div class="mt-3" id="loyalty-tier-container"></div>
                 </div>
                 <div class="flex justify-center gap-3">
                     <a href="order-history.html" class="inline-flex items-center gap-2 bg-surface-container-low border border-outline-variant text-white font-semibold py-2.5 px-5 rounded-xl hover:bg-white/5 transition-all text-sm">
@@ -388,75 +389,70 @@
             let outcomePercent = 5;
             const rand = Math.random();
             
-            // === GUARANTEE SYSTEM (all spin types) ===
-            // 30 spins → 20%, 50 spins → 50%, 100 spins → Free Meal
+            // === GLOBAL GUARANTEE SYSTEM ===
             let guaranteeOutcome = null;
-            let spinGuarantee = { totalSpins: 0, next20: 30, next50: 50, nextFree: 100 };
-            let userSnap = null;
+            let guaranteeSnap = null;
             try {
-                userSnap = await getDoc(doc(db, "users", currentUser.uid));
-                if (userSnap.exists()) {
-                    spinGuarantee = userSnap.data().spinGuarantee || spinGuarantee;
-                }
+                guaranteeSnap = await getDoc(doc(db, "config", "luckyWheel"));
             } catch (e) {
-                console.warn("Could not fetch spin guarantee:", e);
+                console.warn("Could not fetch global wheel guarantee:", e);
             }
-
-            spinGuarantee.totalSpins = (spinGuarantee.totalSpins || 0) + 1;
-            const spinsLeft20 = (spinGuarantee.next20 || 30) - spinGuarantee.totalSpins;
-            const spinsLeft50 = (spinGuarantee.next50 || 50) - spinGuarantee.totalSpins;
-            const spinsLeftFree = (spinGuarantee.nextFree || 100) - spinGuarantee.totalSpins;
-
-            if (spinsLeftFree <= 0) {
-                guaranteeOutcome = 0;
-                spinGuarantee.nextFree = spinGuarantee.totalSpins + 100;
-                if (spinsLeft50 <= 0) spinGuarantee.next50 = spinGuarantee.totalSpins + 50;
-                if (spinsLeft20 <= 0) spinGuarantee.next20 = spinGuarantee.totalSpins + 30;
-            } else if (spinsLeft50 <= 0) {
+            let spinGuarantee = guaranteeSnap?.exists() ? (guaranteeSnap.data().guarantee || {}) : {};
+            
+            if (!spinGuarantee.totalSpins) spinGuarantee.totalSpins = 0;
+            if (!spinGuarantee.next20) spinGuarantee.next20 = 20;
+            if (!spinGuarantee.next50) spinGuarantee.next50 = 50;
+            if (!spinGuarantee.next100) spinGuarantee.next100 = 100;
+            
+            spinGuarantee.totalSpins = spinGuarantee.totalSpins + 1;
+            const spinsLeft20 = spinGuarantee.next20 - spinGuarantee.totalSpins;
+            const spinsLeft50 = spinGuarantee.next50 - spinGuarantee.totalSpins;
+            const spinsLeft100 = spinGuarantee.next100 - spinGuarantee.totalSpins;
+            
+            if (spinsLeft100 <= 0) {
                 guaranteeOutcome = 50;
-                spinGuarantee.next50 = spinGuarantee.totalSpins + 50;
-                if (spinsLeft20 <= 0) spinGuarantee.next20 = spinGuarantee.totalSpins + 30;
-            } else if (spinsLeft20 <= 0) {
+                spinGuarantee.next100 = spinGuarantee.totalSpins + 100;
+                if (spinsLeft50 <= 0) spinGuarantee.next50 = spinGuarantee.totalSpins + 50;
+                if (spinsLeft20 <= 0) spinGuarantee.next20 = spinGuarantee.totalSpins + 20;
+            } else if (spinsLeft50 <= 0) {
                 guaranteeOutcome = 20;
-                spinGuarantee.next20 = spinGuarantee.totalSpins + 30;
+                spinGuarantee.next50 = spinGuarantee.totalSpins + 50;
+                if (spinsLeft20 <= 0) spinGuarantee.next20 = spinGuarantee.totalSpins + 20;
+            } else if (spinsLeft20 <= 0) {
+                guaranteeOutcome = 15;
+                spinGuarantee.next20 = spinGuarantee.totalSpins + 20;
             }
-
-            // === 5%/10% BALANCE SYSTEM (deu/xin only) ===
-            let forcedOutcome = null;
-            if (guaranteeOutcome === null) {
-                try {
-                    const lastOutcomes = (userSnap && userSnap.exists()) ? (userSnap.data().lastOutcomes || []) : [];
-                    if (lastOutcomes.length >= 2) {
-                        const last1 = lastOutcomes[lastOutcomes.length - 1];
-                        const last2 = lastOutcomes[lastOutcomes.length - 2];
-                        if (last1 === 5 && last2 === 5) forcedOutcome = 10;
-                        else if (last1 === 10 && last2 === 10) forcedOutcome = 5;
-                    }
-                } catch (e) {}
-            }
-
+            
             if (guaranteeOutcome !== null) {
                 outcomePercent = guaranteeOutcome;
-            } else if (forcedOutcome !== null) {
-                outcomePercent = forcedOutcome;
-            } else if (chosenType === 'deu') {
-                outcomePercent = (rand < 0.5) ? 5 : 10;
-            } else if (chosenType === 'xin') {
-                if (rand < 0.2) outcomePercent = 5;
-                else if (rand < 0.8) outcomePercent = 10;
-                else outcomePercent = 15;
-            } else if (chosenType === 'vip') {
-                outcomePercent = (rand < 0.05) ? 0 : 50;
+            } else {
+                if (chosenType === 'deu') {
+                    outcomePercent = (rand < 0.5) ? 5 : 10;
+                } else if (chosenType === 'xin') {
+                    if (rand < 0.2) outcomePercent = 5;
+                    else if (rand < 0.8) outcomePercent = 10;
+                    else outcomePercent = 15;
+                } else if (chosenType === 'vip') {
+                    outcomePercent = 20;
+                }
             }
-
-            // Save guarantee + last outcomes
+            
             try {
-                await updateDoc(doc(db, "users", currentUser.uid), {
-                    spinGuarantee: spinGuarantee,
-                    lastOutcomes: [...((userSnap && userSnap.exists()) ? (userSnap.data().lastOutcomes || []) : []), outcomePercent].slice(-3)
+                await updateDoc(doc(db, "config", "luckyWheel"), {
+                    guarantee: spinGuarantee
                 });
             } catch (e) {
-                console.warn("Could not save spin state:", e);
+                console.warn("Could not save global spin guarantee:", e);
+            }
+            
+            try {
+                const userSnapForOutcomes = await getDoc(doc(db, "users", currentUser.uid));
+                const currentOutcomes = (userSnapForOutcomes.exists() ? (userSnapForOutcomes.data().lastOutcomes || []) : []);
+                await updateDoc(doc(db, "users", currentUser.uid), {
+                    lastOutcomes: [...currentOutcomes, outcomePercent].slice(-3)
+                });
+            } catch (e) {
+                console.warn("Could not save user last outcomes:", e);
             }
             
             const matchingIndices = [];
@@ -623,8 +619,6 @@
                     }
                 };
                 const langMsg = welcomeMsgLang[currentLang] || welcomeMsgLang['vi'];
-                const currentLang = localStorage.getItem('selectedLanguage') || 'vi';
-                const langMsg = welcomeMsgLang[currentLang] || welcomeMsgLang['vi'];
                 
                 await addDoc(collection(db, "messages"), {
                     title: langMsg.title,
@@ -723,6 +717,46 @@
                     document.getElementById('profile-display-name').textContent = name || 'Member';
 
                     originalData = { name, phone, address };
+                    
+                    const totalSpent = data.totalSpent || 0;
+                    let tierLabel, tierColor, tierColorBg, tierIcon, tierDiscount;
+                    if (totalSpent >= 1000000) {
+                        tierLabel = 'Kim Cương';
+                        tierColor = '#7c3aed';
+                        tierColorBg = '#7c3aed22';
+                        tierIcon = 'diamond';
+                        tierDiscount = '15%';
+                    } else if (totalSpent >= 500000) {
+                        tierLabel = 'Vàng';
+                        tierColor = '#eab308';
+                        tierColorBg = '#eab30822';
+                        tierIcon = 'workspaces_premium';
+                        tierDiscount = '10%';
+                    } else if (totalSpent >= 200000) {
+                        tierLabel = 'Bạc';
+                        tierColor = '#9ca3af';
+                        tierColorBg = '#9ca3af22';
+                        tierIcon = 'shield';
+                        tierDiscount = '5%';
+                    } else if (totalSpent >= 100000) {
+                        tierLabel = 'Đồng';
+                        tierColor = '#9a3412';
+                        tierColorBg = '#9a341222';
+                        tierIcon = 'shield';
+                        tierDiscount = '0%';
+                    } else {
+                        tierLabel = 'Đồng';
+                        tierColor = '#78350f';
+                        tierColorBg = '#78350f22';
+                        tierIcon = 'shield';
+                        tierDiscount = '0%';
+                    }
+                    const loyaltyBadge = `
+                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold" style="background:${tierColorBg}; color:${tierColor}; border:1px solid ${tierColor}44;">
+                            <span class="material-symbols-outlined text-[14px]" style="color:${tierColor}">${tierIcon}</span>
+                            ${tierLabel} -${tierDiscount}
+                        </span>`;
+                    document.getElementById('loyalty-tier-container').innerHTML = loyaltyBadge;
                     
                     // Spins data loading
                     userSpins = data.spins || { deu: 0, xin: 0, vip: 0 };

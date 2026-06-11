@@ -414,19 +414,23 @@ if (userTableBody) {
     async function loadUsers() {
         window.loadUsers = loadUsers;
         try {
-            const querySnapshot = await getDocs(collection(db, "users"));
+            const result = await listAllUsers();
+            if (result && result.error) {
+                throw new Error(result.error);
+            }
             userTableBody.innerHTML = '';
-            
-            if (querySnapshot.empty) {
-                userTableBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-secondary">No users found.</td></tr>';
+
+            if (!result || result.length === 0) {
+                userTableBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-secondary">No users found.</td></tr>';
                 return;
             }
 
-            querySnapshot.forEach((documentSnapshot) => {
-                const user = documentSnapshot.data();
+            result.forEach((user) => {
+                const totalSpent = Number(user.totalSpent || 0);
+                const tier = computeLoyaltyTier(totalSpent);
                 const tr = document.createElement('tr');
                 tr.className = "border-b border-gray-800/50 hover:bg-surface-highlight transition-colors";
-                
+
                 tr.innerHTML = `
                     <td class="py-3 px-4">${user.name || 'N/A'}</td>
                     <td class="py-3 px-4">${user.email}</td>
@@ -439,14 +443,21 @@ if (userTableBody) {
                         </select>
                     </td>
                     <td class="py-3 px-4 text-secondary text-sm">
-                        UID: ${user.uid.substring(0, 8)}...
+                        ${totalSpent.toLocaleString('vi-VN')} đ
+                    </td>
+                    <td class="py-3 px-4">
+                        <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold" style="background:${tier.color}22; color:${tier.color}; border:1px solid ${tier.color}44;">
+                            <span class="material-symbols-outlined text-[14px]" style="color:${tier.color}">${tier.icon}</span>
+                            ${tier.labelVi}
+                            ${tier.discountPercent > 0 ? `(−${tier.discountPercent}%)` : ''}
+                        </span>
                     </td>
                 `;
                 userTableBody.appendChild(tr);
             });
         } catch (error) {
             console.error("Error loading users:", error);
-            userTableBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-red-500">Failed to load users.</td></tr>';
+            userTableBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-red-500">Failed to load users.</td></tr>';
         }
     }
 
@@ -2149,24 +2160,6 @@ if (foodTableBody) {
                     <span class="material-symbols-outlined text-[20px]">close</span>
                 </button>
             </div>
-
-            <!-- Quick Actions (Spin Gifter Panel) -->
-            <div class="bg-[#18202d] border-b border-gray-800 p-3 text-xs space-y-2">
-                <div class="text-[10px] text-secondary font-bold uppercase tracking-wider">Tặng lượt quay (Quick Gift)</div>
-                <div class="flex gap-1.5 items-center">
-                    <input type="text" id="admin-spin-user" placeholder="Email hoặc UID..." class="flex-1 min-w-[110px] bg-[#0b0f19] border border-gray-700 rounded-lg text-white px-2 py-1.5 text-[11px] focus:outline-none focus:ring-1 focus:ring-primary">
-                    <select id="admin-spin-type" class="bg-[#0b0f19] border border-gray-700 rounded-lg text-white px-1 py-1.5 text-[11px] focus:outline-none focus:ring-1 focus:ring-primary">
-                        <option value="deu">Thường</option>
-                        <option value="xin">Xịn</option>
-                        <option value="vip">VIP</option>
-                    </select>
-                    <input type="number" id="admin-spin-count" min="1" value="1" class="w-10 bg-[#0b0f19] border border-gray-700 rounded-lg text-white px-1 py-1.5 text-[11px] text-center focus:outline-none focus:ring-1 focus:ring-primary">
-                    <button id="admin-btn-send-spins" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1 active:scale-95 text-[11px]">
-                        Gửi
-                    </button>
-                </div>
-                <div id="admin-spin-status" class="hidden text-[10px] font-semibold text-center mt-1"></div>
-            </div>
             
             <!-- Message Area -->
             <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-3" id="admin-chat-messages">
@@ -2238,8 +2231,8 @@ if (foodTableBody) {
                     const img = new Image();
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        const MAX_WIDTH = 800;
-                        const MAX_HEIGHT = 800;
+                        const MAX_WIDTH = 480;
+                        const MAX_HEIGHT = 480;
                         let width = img.width;
                         let height = img.height;
 
@@ -2260,17 +2253,14 @@ if (foodTableBody) {
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
 
-                        // Compress to WebP or JPEG with 0.8 quality to save Firestore space
-                        const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-                        
-                        // Store the Base64 securely in a global object and give AI a lightweight token reference
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.78);
+                        const sizeLabel = Math.round((dataUrl.length * 3 / 4) / 1024) + 'KB';
                         window.__uploadedImages = window.__uploadedImages || {};
                         const imgId = "ATTACHED_IMAGE_" + Date.now();
                         window.__uploadedImages[imgId] = dataUrl;
-                        
+
                         chatInput.value += (chatInput.value ? ' ' : '') + `[Ảnh đính kèm: ${imgId}] `;
-                        
-                        // Cleanup UI after Base64 processing completes
+
                         attachIcon.classList.remove('animate-spin');
                         attachIcon.textContent = originalIcon;
                         chatInput.placeholder = 'Hỏi về đơn hàng, chỉnh giá sốt...';
@@ -2279,7 +2269,7 @@ if (foodTableBody) {
                         fileInput.value = '';
                     };
                     img.onerror = () => {
-                        alert("Lỗi khi đọc file ảnh!");
+                        alert("Lỗi khi đọc ảnh!");
                         attachIcon.classList.remove('animate-spin');
                         attachIcon.textContent = originalIcon;
                         chatInput.disabled = false;
@@ -2287,7 +2277,7 @@ if (foodTableBody) {
                     img.src = event.target.result;
                 };
                 reader.readAsDataURL(file);
-                return; // Return early because FileReader is asynchronous, the finally block will be handled inside reader.onload
+                return;
             }
             // 2. Handle Word (.docx)
             else if (ext === 'docx' || ext === 'doc') {
@@ -2321,44 +2311,6 @@ if (foodTableBody) {
             fileInput.value = ''; // Reset input
         }
     });
-
-    // Quick Action Send Spins Handler
-    const btnSendSpins = document.getElementById('admin-btn-send-spins');
-    if (btnSendSpins) {
-        btnSendSpins.addEventListener('click', async () => {
-            const userVal = document.getElementById('admin-spin-user').value.trim();
-            const typeVal = document.getElementById('admin-spin-type').value;
-            const countVal = parseInt(document.getElementById('admin-spin-count').value, 10) || 1;
-            const statusEl = document.getElementById('admin-spin-status');
-            
-            if (!userVal) {
-                statusEl.textContent = "Vui lòng nhập Email hoặc UID!";
-                statusEl.className = "text-red-400 text-[10px] font-semibold text-center mt-1";
-                statusEl.classList.remove('hidden');
-                return;
-            }
-            
-            btnSendSpins.disabled = true;
-            btnSendSpins.textContent = "Đang gửi...";
-            statusEl.classList.add('hidden');
-            
-            const result = await sendSpinsToUser(userVal, typeVal, countVal);
-            btnSendSpins.disabled = false;
-            btnSendSpins.textContent = "Gửi";
-            
-            if (result.error) {
-                statusEl.textContent = "Lỗi: " + result.error;
-                statusEl.className = "text-red-400 text-[10px] font-semibold text-center mt-1";
-            } else {
-                statusEl.textContent = "Thành công: " + result.message;
-                statusEl.className = "text-green-400 text-[10px] font-semibold text-center mt-1";
-                document.getElementById('admin-spin-user').value = '';
-                document.getElementById('admin-spin-count').value = '1';
-            }
-            statusEl.classList.remove('hidden');
-            setTimeout(() => statusEl.classList.add('hidden'), 4000);
-        });
-    }
 
     // Toggle logic
     toggleBtn.addEventListener('click', () => {
@@ -2549,12 +2501,36 @@ Rules:
     Args: { "titleVi": string, "descVi": string }
     Updates the "Experience the Full Journey" Call to Action section on the homepage.
 
+11w. updateHomepageReviews(reviews)
+    Args: { "reviews": array of { name: string, location: string, message: string, rating: number, avatar?: string } }
+    Overrides the homepage feedback/reviews marquee with custom review entries.
+
+11x. updateReviewImageUrl(index, imageUrl)
+    Args: { "index": number, "imageUrl": string }
+    Updates the avatar image of a specific review entry by its index in the currently saved reviews list.
+
+11y. getWheelGuarantee()
+    Args: {}
+    Returns the current Lucky Wheel guarantee thresholds: totalSpins, next20, next50, next100.
+
+11z. updateWheelGuarantee(next20, next50, next100)
+    Args: { "next20": number?, "next50": number?, "next100": number? }
+    Updates the Lucky Wheel spin guarantee thresholds. Pass null or omit to leave unchanged.
+
 ═══════════════════════════════════════════════
 👥 USER / FIRESTORE TOOLS
 ═══════════════════════════════════════════════
 12. listAllUsers()
     Args: {}
-    Returns all users from Firestore (uid, email, name, role).
+    Returns all users from Firestore (uid, email, name, role, totalSpent, loyaltyTier).
+
+12b. getUserLoyalty(uid)
+    Args: { "uid": string }
+    Returns detailed loyalty info for a single user: totalSpent, tier key, tier label, and discount percent.
+
+12c. addLoyaltyProgressByOrderId(orderId)
+    Args: { "orderId": string }
+    Adds the order's totalPrice into that customer's loyalty totalSpent. Use this when an order is completed/paid.
 
 13. changeUserRole(uid, newRole)
     Args: { "uid": string, "newRole": string }  // "admin", "customer", "kitchen", "host"
@@ -2743,6 +2719,26 @@ Rules:
         }
     }
 
+    async function updateReviewImageUrl(index, imageUrl) {
+        try {
+            const snap = await getDoc(doc(db, "config", "homepage"));
+            const data = snap.exists() ? snap.data() : {};
+            const reviews = Array.isArray(data.customReviews) ? [...data.customReviews] : [];
+            if (index < 0 || index >= reviews.length) {
+                return { error: `Index ${index} không hợp lệ. Hiện có ${reviews.length} reviews.` };
+            }
+            reviews[index] = {
+                ...reviews[index],
+                avatar: imageUrl || reviews[index].avatar
+            };
+            await setDoc(doc(db, "config", "homepage"), { customReviews: reviews }, { merge: true });
+            return { success: true, message: `Đã cập nhật ảnh review index ${index} thành công.` };
+        } catch (e) {
+            console.error(e);
+            return { error: e.message };
+        }
+    }
+
     async function createMenuItem(nameVi, price, categoryVi, descriptionVi, imageUrl) {
         try {
             const newItemRef = doc(collection(db, "menu"));
@@ -2764,6 +2760,40 @@ Rules:
                 tags: []
             });
             return { success: true, message: `Menu item created successfully with ID: ${newItemRef.id}` };
+        } catch (e) {
+            console.error(e);
+            return { error: e.message };
+        }
+    }
+
+    async function getWheelGuarantee() {
+        try {
+            const snap = await getDoc(doc(db, "config", "luckyWheel"));
+            const guarantee = snap.exists() ? (snap.data().guarantee || {}) : {};
+            return {
+                totalSpins: guarantee.totalSpins ?? 0,
+                next20: guarantee.next20 ?? 20,
+                next50: guarantee.next50 ?? 50,
+                next100: guarantee.next100 ?? 100
+            };
+        } catch (e) {
+            console.error(e);
+            return { error: e.message };
+        }
+    }
+
+    async function updateWheelGuarantee(next20, next50, next100) {
+        try {
+            const updates = {};
+            if (typeof next20 === "number") updates.next20 = next20;
+            if (typeof next50 === "number") updates.next50 = next50;
+            if (typeof next100 === "number") updates.next100 = next100;
+
+            await setDoc(doc(db, "config", "luckyWheel"), {
+                guarantee: updates
+            }, { merge: true });
+
+            return { success: true, message: `Đã cập nhật bộ đếm Lucky Wheel: next20=${next20 ?? " giữ nguyên"}, next50=${next50 ?? " giữ nguyên"}, next100=${next100 ?? " giữ nguyên"}.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3410,17 +3440,63 @@ Rules:
             const users = [];
             qSnap.forEach(d => {
                 const data = d.data();
+                const totalSpent = data.totalSpent || 0;
                 users.push({
                     uid: d.id,
                     email: data.email,
                     name: data.name,
-                    role: data.role
+                    role: data.role,
+                    totalSpent,
+                    loyaltyTier: computeLoyaltyTier(totalSpent).key
                 });
             });
             return users;
         } catch (e) {
             return { error: e.message };
         }
+    }
+
+    async function getUserLoyalty(uid) {
+        try {
+            const snap = await getDoc(doc(db, "users", uid));
+            if (!snap.exists()) return { error: "Không tìm thấy user." };
+            const data = snap.data();
+            const totalSpent = data.totalSpent || 0;
+            const tier = computeLoyaltyTier(totalSpent);
+            return { uid, totalSpent, tier: tier.key, tierLabelVi: tier.labelVi, discountPercent: tier.discountPercent };
+        } catch (e) {
+            return { error: e.message };
+        }
+    }
+
+    async function addLoyaltyProgressByOrderId(orderId) {
+        try {
+            const orderSnap = await getDoc(doc(db, "orders", orderId));
+            if (!orderSnap.exists()) return { error: "Không tìm thấy đơn hàng." };
+            const order = orderSnap.data();
+            const userId = order.userId;
+            if (!userId) return { error: "Đơn hàng không có userId." };
+            const totalVnd = Number(order.totalPrice || 0);
+            if (totalVnd <= 0) return { error: "Giá trị đơn hàng không hợp lệ." };
+
+            const EUR_RATE = 25000;
+            const totalEur = +(totalVnd / EUR_RATE).toFixed(2);
+
+            const userRef = doc(db, "users", userId);
+            await updateDoc(userRef, { totalSpent: Number(((order.totalSpent || 0) + totalEur).toFixed(2)) });
+            return { success: true, message: `Đã cộng ${totalEur} EUR vào loyalty của user ${userId}.` };
+        } catch (e) {
+            return { error: e.message };
+        }
+    }
+
+    function computeLoyaltyTier(totalSpent) {
+        const spent = Number(totalSpent) || 0;
+        if (spent >= 40) return { key: 'kim_cuong', labelVi: 'Kim Cương', color: '#7c3aed', icon: 'diamond', discountPercent: 15 };
+        if (spent >= 20) return { key: 'kim', labelVi: 'Vàng', color: '#eab308', icon: 'workspace_premium', discountPercent: 10 };
+        if (spent >= 8) return { key: 'bac', labelVi: 'Bạc', color: '#9ca3af', icon: 'shield', discountPercent: 5 };
+        if (spent >= 4) return { key: 'vang', labelVi: 'Đồng', color: '#9a3412', icon: 'monetization_on', discountPercent: 0 };
+        return { key: 'dong', labelVi: 'Đồng', color: '#78350f', icon: 'stars', discountPercent: 0 };
     }
 
     async function changeUserRole(uid, newRole) {
@@ -3868,15 +3944,84 @@ Rules:
 
     let toolCallCount = 0;
 
+    function tryParseToolJson(str) {
+        try {
+            const obj = JSON.parse(str);
+            if (obj && obj.tool && typeof obj.tool === 'string') return obj;
+        } catch (e) {}
+        return null;
+    }
+
+    function findJsonObjects(text) {
+        const results = [];
+        for (let i = 0; i < text.length; i++) {
+            if (text[i] === '{') {
+                let depth = 0;
+                let inString = false;
+                let escape = false;
+                for (let j = i; j < text.length; j++) {
+                    const ch = text[j];
+                    if (escape) { escape = false; continue; }
+                    if (ch === '\\') { escape = true; continue; }
+                    if (ch === '"') { inString = !inString; continue; }
+                    if (inString) continue;
+                    if (ch === '{') depth++;
+                    if (ch === '}') {
+                        depth--;
+                        if (depth === 0) {
+                            const candidate = text.substring(i, j + 1);
+                            const parsed = tryParseToolJson(candidate);
+                            if (parsed) results.push(parsed);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return results;
+    }
+
+    const KNOWN_TOOLS = new Set(['getOrdersSoldToday','listAllFoodItems','setOptionChoicePrice','updateMenuPrice','addMenuOptionGroup','removeMenuOptionGroup','addChoiceToOptionGroup','removeChoiceFromOptionGroup','updateMenuOptionGroup','updateChoiceInOptionGroup','updateMenuName','updateMenuDescription','updateMenuCategory','updateMenuAvailability','uploadMenuImage','removeMenuImage','updateMenuPreparationTime','updateMenuNutritionInfo','addMenuTag','removeMenuTag','reorderMenuItems','duplicateMenuItem','deleteMenuItem','updateMenuCustomFields','listAllUsers','getUserLoyalty','addLoyaltyProgressByOrderId','changeUserRole','deleteUserAccount','createUserAccount','sendPasswordReset','sendSpinsToUser','sendGlobalAnnouncement','createCustomVoucher','markVoucherUsed','removeVoucher','listAllVouchers','updateOrderStatus','deleteOrder','getOrdersByStatus','changeCurrentAdminPassword','updateCurrentAdminEmail','updateCurrentAdminProfile','adminListAuthUsers','adminDeleteAuthUser','adminDisableUser','adminEnableUser','adminChangeUserPassword','adminChangeUserEmail','adminVerifyUserEmail','adminSetCustomClaims','adminGetUserInfo','adminRevokeUserTokens','adminUpdateDisplayName','adminGenerateCustomToken','webSearch','browseWebUrl','updateHomepageHero','updateHomepageSignatures','updateHomepageSignatureText','updateHomepageStory','updateHomepageCTA','getWheelGuarantee','updateWheelGuarantee','updateHomepageReviews','updateReviewImageUrl']);
+
+    function extractToolCalls(text) {
+        const results = [];
+        const tagRegex = /<tool_call>([\s\S]*?)<\/tool_call>/gi;
+        let m;
+        while ((m = tagRegex.exec(text)) !== null) {
+            const inner = m[1].trim().replace(/```json\s*/g, '').replace(/```\s*/g, '');
+            const parsed = tryParseToolJson(inner);
+            if (parsed) results.push(parsed);
+        }
+        if (results.length > 0) return results;
+
+        const codeBlockRegex = /```(?:json)?\s*([\s\S]*?)\s*```/gi;
+        while ((m = codeBlockRegex.exec(text)) !== null) {
+            const parsed = tryParseToolJson(m[1].trim());
+            if (parsed) results.push(parsed);
+        }
+        if (results.length > 0) return results;
+
+        const bareResults = findJsonObjects(text);
+        for (const obj of bareResults) {
+            if (KNOWN_TOOLS.has(obj.tool)) results.push(obj);
+        }
+        if (results.length > 0) return results;
+
+        const allJson = findJsonObjects(text);
+        for (const obj of allJson) {
+            if (obj.tool) results.push(obj);
+        }
+
+        console.log('[extractToolCalls] input:', text.substring(0, 500), '| found:', results.length);
+        return results;
+    }
+
     // Agent Loop Handler
     async function handleAgentResponse(responseText) {
         const textClean = stripThinking(responseText);
-        
-        // Match all tool calls globally
-        const regex = /<tool_call>([\s\S]*?)<\/tool_call>/g;
-        const matches = [...textClean.matchAll(regex)];
+        const toolCalls = extractToolCalls(textClean);
 
-        if (matches.length > 0) {
+        if (toolCalls.length > 0) {
             toolCallCount++;
             if (toolCallCount > 5) {
                 removeLoadingBubble();
@@ -3884,220 +4029,236 @@ Rules:
                 return;
             }
 
-            // Create status bubble for real-time sequential updates
-            const progressBubble = appendBubble(`Hệ thống: Bắt đầu xử lý ${matches.length} yêu cầu dữ liệu/thay đổi...`, 'ai');
-            
+            if (toolCallCount === 1 && toolCalls.length === 1) {
+                const single = toolCalls[0];
+                if (KNOWN_TOOLS.has(single.tool)) {
+                    appendBubble(`Hệ thống: Đang thực hiện yêu cầu (${single.tool})...`, 'ai');
+                }
+            } else {
+                appendBubble(`Hệ thống: Đang thực hiện ${toolCalls.length} yêu cầu dữ liệu/thay đổi...`, 'ai');
+            }
+
+            const progressBubbleEl = msgArea.lastElementChild;
             const results = [];
             let successCount = 0;
             let failCount = 0;
 
-            for (let i = 0; i < matches.length; i++) {
-                const match = matches[i];
-                const toolCallStr = match[1].trim();
-                let toolName = "unknown";
-                
-                try {
-                    const payload = JSON.parse(toolCallStr);
-                    const { tool, args } = payload;
-                    toolName = tool;
-                    
-                    progressBubble.textContent = `Hệ thống: Đang thực hiện ${i + 1}/${matches.length} (${toolName})... (Thành công: ${successCount}, Thất bại: ${failCount})`;
-                    
-                    let result;
-                    if (tool === 'getOrdersSoldToday') {
-                        result = await getOrdersSoldToday();
-                    } else if (tool === 'listAllFoodItems') {
-                        result = await listAllFoodItems();
-                    } else if (tool === 'setOptionChoicePrice') {
-                        result = await setOptionChoicePrice(args.dishId, args.optionName, args.choiceLabel, args.newPrice);
-                    } else if (tool === 'updateMenuPrice') {
-                        result = await updateMenuPrice(args.dishId, args.newPrice);
-                    } else if (tool === 'addMenuOptionGroup') {
-                        result = await addMenuOptionGroup(
-                            args.dishId,
-                            args.optionNameVi || args.optionName,
-                            args.optionNameEn || args.optionName,
-                            args.optionNameFi || args.optionName,
-                            args.optionType,
-                            args.choices
-                        );
-                    } else if (tool === 'removeMenuOptionGroup') {
-                        result = await removeMenuOptionGroup(args.dishId, args.optionName);
-                    } else if (tool === 'addChoiceToOptionGroup') {
-                        result = await addChoiceToOptionGroup(
-                            args.dishId,
-                            args.optionName,
-                            args.choiceLabelVi || args.choiceLabel,
-                            args.choiceLabelEn || args.choiceLabel,
-                            args.choiceLabelFi || args.choiceLabel,
-                            args.choicePrice
-                        );
-                    } else if (tool === 'removeChoiceFromOptionGroup') {
-                        result = await removeChoiceFromOptionGroup(args.dishId, args.optionName, args.choiceLabel);
-                    } else if (tool === 'updateMenuOptionGroup') {
-                        result = await updateMenuOptionGroup(
-                            args.dishId,
-                            args.oldOptionName,
-                            args.newOptionNameVi,
-                            args.newOptionNameEn,
-                            args.newOptionNameFi,
-                            args.newOptionType
-                        );
-                    } else if (tool === 'updateChoiceInOptionGroup') {
-                        result = await updateChoiceInOptionGroup(
-                            args.dishId,
-                            args.optionName,
-                            args.oldChoiceLabel,
-                            args.newChoiceLabelVi,
-                            args.newChoiceLabelEn,
-                            args.newChoiceLabelFi,
-                            args.newChoicePrice
-                        );
-                    } else if (tool === 'updateMenuName') {
-                        result = await updateMenuName(args.dishId, args.nameVi, args.nameEn, args.nameFi);
-                    } else if (tool === 'updateMenuDescription') {
-                        result = await updateMenuDescription(args.dishId, args.descriptionVi, args.descriptionEn, args.descriptionFi);
-                    } else if (tool === 'updateMenuCategory') {
-                        result = await updateMenuCategory(args.dishId, args.categoryVi || args.newCategoryId || args.categoryId, args.categoryEn, args.categoryFi);
-                    } else if (tool === 'updateMenuAvailability') {
-                        result = await updateMenuAvailability(args.dishId, args.isAvailable);
-                    } else if (tool === 'uploadMenuImage') {
-                        let finalImageUrl = args.imageUrl;
-                        if (finalImageUrl && window.__uploadedImages && window.__uploadedImages[finalImageUrl]) {
-                            finalImageUrl = window.__uploadedImages[finalImageUrl];
-                        }
-                        result = await uploadMenuImage(args.dishId, finalImageUrl);
-                    } else if (tool === 'removeMenuImage') {
-                        result = await removeMenuImage(args.dishId, args.imageUrl);
-                    } else if (tool === 'updateMenuPreparationTime') {
-                        result = await updateMenuPreparationTime(args.dishId, args.minutes);
-                    } else if (tool === 'updateMenuNutritionInfo') {
-                        result = await updateMenuNutritionInfo(args.dishId, args.calories, args.protein, args.fat, args.carbs);
-                    } else if (tool === 'addMenuTag') {
-                        result = await addMenuTag(args.dishId, args.tagLabelVi, args.tagLabelEn, args.tagLabelFi);
-                    } else if (tool === 'removeMenuTag') {
-                        result = await removeMenuTag(args.dishId, args.tagLabel);
-                    } else if (tool === 'reorderMenuItems') {
-                        result = await reorderMenuItems(args.orderedDishIds);
-                    } else if (tool === 'duplicateMenuItem') {
-                        result = await duplicateMenuItem(args.dishId, args.newDishId);
-                    } else if (tool === 'deleteMenuItem') {
-                        result = await deleteMenuItem(args.dishId);
-                    } else if (tool === 'updateMenuCustomFields') {
-                        result = await updateMenuCustomFields(args.dishId, args.customFields || args.customFieldsObject);
-                    } else if (tool === 'listAllUsers') {
-                        result = await listAllUsers();
-                    } else if (tool === 'changeUserRole') {
-                        result = await changeUserRole(args.uid, args.newRole);
-                    } else if (tool === 'deleteUserAccount') {
-                        result = await deleteUserAccount(args.uid);
-                    } else if (tool === 'createUserAccount') {
-                        result = await createUserAccount(args.email, args.password, args.name, args.role);
-                    } else if (tool === 'sendPasswordReset') {
-                        result = await sendPasswordReset(args.email);
-                    } else if (tool === 'sendSpinsToUser') {
-                        result = await sendSpinsToUser(args.uidOrEmail || args.uid, args.spinType, args.count);
-                    } else if (tool === 'sendGlobalAnnouncement') {
-                        let finalImageUrl = args.imageUrl;
-                        if (finalImageUrl && window.__uploadedImages && window.__uploadedImages[finalImageUrl]) {
-                            finalImageUrl = window.__uploadedImages[finalImageUrl];
-                        }
-                        result = await sendGlobalAnnouncement(args.title, args.text, finalImageUrl);
-                    } else if (tool === 'createCustomVoucher') {
-                        result = await createCustomVoucher(args.email, args.discountPercent, args.expiryDays, args.allowedTypes);
-                    } else if (tool === 'markVoucherUsed') {
-                        result = await markVoucherUsed(args.voucherCode);
-                    } else if (tool === 'removeVoucher') {
-                        result = await removeVoucher(args.voucherCode);
-                    } else if (tool === 'listAllVouchers') {
-                        result = await listAllVouchers();
-                    } else if (tool === 'updateOrderStatus') {
-                        result = await updateOrderStatus(args.orderId, args.newStatus);
-                    } else if (tool === 'deleteOrder') {
-                        result = await deleteOrder(args.orderId);
-                    } else if (tool === 'getOrdersByStatus') {
-                        result = await getOrdersByStatus(args.status);
-                    } else if (tool === 'changeCurrentAdminPassword') {
-                        result = await changeCurrentAdminPassword(args.newPassword);
-                    } else if (tool === 'updateCurrentAdminEmail') {
-                        result = await updateCurrentAdminEmail(args.newEmail);
-                    } else if (tool === 'updateCurrentAdminProfile') {
-                        result = await updateCurrentAdminProfile(args.name);
-                    } else if (tool === 'adminListAuthUsers') {
-                        result = await adminListAuthUsers();
-                    } else if (tool === 'adminDeleteAuthUser') {
-                        result = await adminDeleteAuthUser(args.uid);
-                    } else if (tool === 'adminDisableUser') {
-                        result = await adminDisableUser(args.uid);
-                    } else if (tool === 'adminEnableUser') {
-                        result = await adminEnableUser(args.uid);
-                    } else if (tool === 'adminChangeUserPassword') {
-                        result = await adminChangeUserPassword(args.uid, args.newPassword);
-                    } else if (tool === 'adminChangeUserEmail') {
-                        result = await adminChangeUserEmail(args.uid, args.newEmail);
-                    } else if (tool === 'adminVerifyUserEmail') {
-                        result = await adminVerifyUserEmail(args.uid);
-                    } else if (tool === 'adminSetCustomClaims') {
-                        result = await adminSetCustomClaims(args.uid, args.claims);
-                    } else if (tool === 'adminGetUserInfo') {
-                        result = await adminGetUserInfo(args.uid, args.email);
-                    } else if (tool === 'adminRevokeUserTokens') {
-                        result = await adminRevokeUserTokens(args.uid);
-                    } else if (tool === 'adminUpdateDisplayName') {
-                        result = await adminUpdateDisplayName(args.uid, args.displayName);
-                    } else if (tool === 'adminGenerateCustomToken') {
-                        result = await adminGenerateCustomToken(args.uid);
-                    } else if (tool === 'webSearch') {
-                        result = await webSearch(args.query);
-                    } else if (tool === 'browseWebUrl') {
-                        result = await browseWebUrl(args.url);
-                    } else if (tool === 'updateHomepageHero') {
-                        let finalImageUrl = args.imageUrl;
-                        if (finalImageUrl && window.__uploadedImages && window.__uploadedImages[finalImageUrl]) {
-                            finalImageUrl = window.__uploadedImages[finalImageUrl];
-                        }
-                        result = await updateHomepageHero(finalImageUrl, args.titleVi, args.descVi);
-                    } else if (tool === 'updateHomepageSignatures') {
-                        result = await updateHomepageSignatures(args.dishIdArray);
-                    } else if (tool === 'updateHomepageSignatureText') {
-                        result = await updateHomepageSignatureText(args.titleVi, args.descVi);
-                    } else if (tool === 'updateHomepageStory') {
-                        let finalImageUrl = args.imageUrl;
-                        if (finalImageUrl && window.__uploadedImages && window.__uploadedImages[finalImageUrl]) {
-                            finalImageUrl = window.__uploadedImages[finalImageUrl];
-                        }
-                        result = await updateHomepageStory(finalImageUrl, args.labelVi, args.titleVi, args.p1Vi, args.p2Vi);
-                    } else if (tool === 'updateHomepageCTA') {
-                        result = await updateHomepageCTA(args.titleVi, args.descVi);
-                    } else {
-                        result = { error: `Tool "${tool}" không tồn tại. Các tools hợp lệ: getOrdersSoldToday, listAllFoodItems, setOptionChoicePrice, updateMenuPrice, createMenuItem, addMenuOptionGroup, removeMenuOptionGroup, addChoiceToOptionGroup, removeChoiceFromOptionGroup, updateMenuOptionGroup, updateChoiceInOptionGroup, updateMenuName, updateMenuDescription, updateMenuCategory, updateMenuAvailability, uploadMenuImage, removeMenuImage, updateMenuPreparationTime, updateMenuNutritionInfo, addMenuTag, removeMenuTag, reorderMenuItems, duplicateMenuItem, deleteMenuItem, updateMenuCustomFields, listAllUsers, changeUserRole, deleteUserAccount, createUserAccount, sendPasswordReset, sendSpinsToUser, sendGlobalAnnouncement, createCustomVoucher, markVoucherUsed, removeVoucher, listAllVouchers, updateOrderStatus, deleteOrder, getOrdersByStatus, changeCurrentAdminPassword, updateCurrentAdminEmail, updateCurrentAdminProfile, adminListAuthUsers, adminDeleteAuthUser, adminDisableUser, adminEnableUser, adminChangeUserPassword, adminChangeUserEmail, adminVerifyUserEmail, adminSetCustomClaims, adminGetUserInfo, adminRevokeUserTokens, adminUpdateDisplayName, adminGenerateCustomToken, webSearch, browseWebUrl, updateHomepageHero, updateHomepageSignatures, updateHomepageSignatureText, updateHomepageStory, updateHomepageCTA.` };
+            for (let i = 0; i < toolCalls.length; i++) {
+                const payload = toolCalls[i];
+                const tool = payload.tool;
+                const args = payload.args || {};
+                const toolName = tool;
+
+                if (progressBubbleEl && msgArea.contains(progressBubbleEl) && progressBubbleEl.classList.contains('admin-chat-bubble')) {
+                    progressBubbleEl.textContent = `Hệ thống: Đang thực hiện ${i + 1}/${toolCalls.length} (${toolName})... (Thành công: ${successCount}, Thất bại: ${failCount})`;
+                }
+
+                let result;
+                if (tool === 'getOrdersSoldToday') {
+                    result = await getOrdersSoldToday();
+                } else if (tool === 'listAllFoodItems') {
+                    result = await listAllFoodItems();
+                } else if (tool === 'setOptionChoicePrice') {
+                    result = await setOptionChoicePrice(args.dishId, args.optionName, args.choiceLabel, args.newPrice);
+                } else if (tool === 'updateMenuPrice') {
+                    result = await updateMenuPrice(args.dishId, args.newPrice);
+                } else if (tool === 'addMenuOptionGroup') {
+                    result = await addMenuOptionGroup(
+                        args.dishId,
+                        args.optionNameVi || args.optionName,
+                        args.optionNameEn || args.optionName,
+                        args.optionNameFi || args.optionName,
+                        args.optionType,
+                        args.choices
+                    );
+                } else if (tool === 'removeMenuOptionGroup') {
+                    result = await removeMenuOptionGroup(args.dishId, args.optionName);
+                } else if (tool === 'addChoiceToOptionGroup') {
+                    result = await addChoiceToOptionGroup(
+                        args.dishId,
+                        args.optionName,
+                        args.choiceLabelVi || args.choiceLabel,
+                        args.choiceLabelEn || args.choiceLabel,
+                        args.choiceLabelFi || args.choiceLabel,
+                        args.choicePrice
+                    );
+                } else if (tool === 'removeChoiceFromOptionGroup') {
+                    result = await removeChoiceFromOptionGroup(args.dishId, args.optionName, args.choiceLabel);
+                } else if (tool === 'updateMenuOptionGroup') {
+                    result = await updateMenuOptionGroup(
+                        args.dishId,
+                        args.oldOptionName,
+                        args.newOptionNameVi,
+                        args.newOptionNameEn,
+                        args.newOptionNameFi,
+                        args.newOptionType
+                    );
+                } else if (tool === 'updateChoiceInOptionGroup') {
+                    result = await updateChoiceInOptionGroup(
+                        args.dishId,
+                        args.optionName,
+                        args.oldChoiceLabel,
+                        args.newChoiceLabelVi,
+                        args.newChoiceLabelEn,
+                        args.newChoiceLabelFi,
+                        args.newChoicePrice
+                    );
+                } else if (tool === 'updateMenuName') {
+                    result = await updateMenuName(args.dishId, args.nameVi, args.nameEn, args.nameFi);
+                } else if (tool === 'updateMenuDescription') {
+                    result = await updateMenuDescription(args.dishId, args.descriptionVi, args.descriptionEn, args.descriptionFi);
+                } else if (tool === 'updateMenuCategory') {
+                    result = await updateMenuCategory(args.dishId, args.categoryVi || args.newCategoryId || args.categoryId, args.categoryEn, args.categoryFi);
+                } else if (tool === 'updateMenuAvailability') {
+                    result = await updateMenuAvailability(args.dishId, args.isAvailable);
+                } else if (tool === 'uploadMenuImage') {
+                    let finalImageUrl = args.imageUrl;
+                    if (finalImageUrl && window.__uploadedImages && window.__uploadedImages[finalImageUrl]) {
+                        finalImageUrl = window.__uploadedImages[finalImageUrl];
                     }
-                    
-                    if (result && typeof result === 'object' && result.hasOwnProperty('error')) {
-                        results.push({ tool: toolName, success: false, error: result.error });
-                        failCount++;
-                    } else {
-                        results.push({ tool: toolName, success: true, result });
-                        successCount++;
+                    result = await uploadMenuImage(args.dishId, finalImageUrl);
+                } else if (tool === 'removeMenuImage') {
+                    result = await removeMenuImage(args.dishId, args.imageUrl);
+                } else if (tool === 'updateMenuPreparationTime') {
+                    result = await updateMenuPreparationTime(args.dishId, args.minutes);
+                } else if (tool === 'updateMenuNutritionInfo') {
+                    result = await updateMenuNutritionInfo(args.dishId, args.calories, args.protein, args.fat, args.carbs);
+                } else if (tool === 'addMenuTag') {
+                    result = await addMenuTag(args.dishId, args.tagLabelVi, args.tagLabelEn, args.tagLabelFi);
+                } else if (tool === 'removeMenuTag') {
+                    result = await removeMenuTag(args.dishId, args.tagLabel);
+                } else if (tool === 'reorderMenuItems') {
+                    result = await reorderMenuItems(args.orderedDishIds);
+                } else if (tool === 'duplicateMenuItem') {
+                    result = await duplicateMenuItem(args.dishId, args.newDishId);
+                } else if (tool === 'deleteMenuItem') {
+                    result = await deleteMenuItem(args.dishId);
+                } else if (tool === 'updateMenuCustomFields') {
+                    result = await updateMenuCustomFields(args.dishId, args.customFields || args.customFieldsObject);
+                } else if (tool === 'listAllUsers') {
+                    result = await listAllUsers();
+                } else if (tool === 'changeUserRole') {
+                    result = await changeUserRole(args.uid, args.newRole);
+                } else if (tool === 'deleteUserAccount') {
+                    result = await deleteUserAccount(args.uid);
+                } else if (tool === 'createUserAccount') {
+                    result = await createUserAccount(args.email, args.password, args.name, args.role);
+                } else if (tool === 'sendPasswordReset') {
+                    result = await sendPasswordReset(args.email);
+                } else if (tool === 'sendSpinsToUser') {
+                    result = await sendSpinsToUser(args.uidOrEmail || args.uid, args.spinType, args.count);
+                } else if (tool === 'sendGlobalAnnouncement') {
+                    let finalImageUrl = args.imageUrl;
+                    if (finalImageUrl && window.__uploadedImages && window.__uploadedImages[finalImageUrl]) {
+                        finalImageUrl = window.__uploadedImages[finalImageUrl];
                     }
-                } catch (e) {
-                    results.push({ tool: toolName, success: false, error: e.message });
-                    failCount++;
+                    result = await sendGlobalAnnouncement(args.title, args.text, finalImageUrl);
+                } else if (tool === 'createCustomVoucher') {
+                    result = await createCustomVoucher(args.email, args.discountPercent, args.expiryDays, args.allowedTypes);
+                } else if (tool === 'markVoucherUsed') {
+                    result = await markVoucherUsed(args.voucherCode);
+                } else if (tool === 'removeVoucher') {
+                    result = await removeVoucher(args.voucherCode);
+                } else if (tool === 'listAllVouchers') {
+                    result = await listAllVouchers();
+                } else if (tool === 'updateOrderStatus') {
+                    result = await updateOrderStatus(args.orderId, args.newStatus);
+                } else if (tool === 'deleteOrder') {
+                    result = await deleteOrder(args.orderId);
+                } else if (tool === 'getOrdersByStatus') {
+                    result = await getOrdersByStatus(args.status);
+                } else if (tool === 'changeCurrentAdminPassword') {
+                    result = await changeCurrentAdminPassword(args.newPassword);
+                } else if (tool === 'updateCurrentAdminEmail') {
+                    result = await updateCurrentAdminEmail(args.newEmail);
+                } else if (tool === 'updateCurrentAdminProfile') {
+                    result = await updateCurrentAdminProfile(args.name);
+                } else if (tool === 'adminListAuthUsers') {
+                    result = await adminListAuthUsers();
+                } else if (tool === 'adminDeleteAuthUser') {
+                    result = await adminDeleteAuthUser(args.uid);
+                } else if (tool === 'adminDisableUser') {
+                    result = await adminDisableUser(args.uid);
+                } else if (tool === 'adminEnableUser') {
+                    result = await adminEnableUser(args.uid);
+                } else if (tool === 'adminChangeUserPassword') {
+                    result = await adminChangeUserPassword(args.uid, args.newPassword);
+                } else if (tool === 'adminChangeUserEmail') {
+                    result = await adminChangeUserEmail(args.uid, args.newEmail);
+                } else if (tool === 'adminVerifyUserEmail') {
+                    result = await adminVerifyUserEmail(args.uid);
+                } else if (tool === 'adminSetCustomClaims') {
+                    result = await adminSetCustomClaims(args.uid, args.claims);
+                } else if (tool === 'adminGetUserInfo') {
+                    result = await adminGetUserInfo(args.uid, args.email);
+                } else if (tool === 'adminRevokeUserTokens') {
+                    result = await adminRevokeUserTokens(args.uid);
+                } else if (tool === 'adminUpdateDisplayName') {
+                    result = await adminUpdateDisplayName(args.uid, args.displayName);
+                } else if (tool === 'adminGenerateCustomToken') {
+                    result = await adminGenerateCustomToken(args.uid);
+                } else if (tool === 'webSearch') {
+                    result = await webSearch(args.query);
+                } else if (tool === 'browseWebUrl') {
+                    result = await browseWebUrl(args.url);
+                } else if (tool === 'updateHomepageHero') {
+                    let finalImageUrl = args.imageUrl;
+                    if (finalImageUrl && window.__uploadedImages && window.__uploadedImages[finalImageUrl]) {
+                        finalImageUrl = window.__uploadedImages[finalImageUrl];
+                    }
+                    result = await updateHomepageHero(finalImageUrl, args.titleVi, args.descVi);
+                } else if (tool === 'updateHomepageSignatures') {
+                    result = await updateHomepageSignatures(args.dishIdArray);
+                } else if (tool === 'updateHomepageSignatureText') {
+                    result = await updateHomepageSignatureText(args.titleVi, args.descVi);
+                } else if (tool === 'updateHomepageStory') {
+                    let finalImageUrl = args.imageUrl;
+                    if (finalImageUrl && window.__uploadedImages && window.__uploadedImages[finalImageUrl]) {
+                        finalImageUrl = window.__uploadedImages[finalImageUrl];
+                    }
+                    result = await updateHomepageStory(finalImageUrl, args.labelVi, args.titleVi, args.p1Vi, args.p2Vi);
+                } else if (tool === 'updateHomepageCTA') {
+                    result = await updateHomepageCTA(args.titleVi, args.descVi);
+                } else if (tool === 'getWheelGuarantee') {
+                    result = await getWheelGuarantee();
+                } else if (tool === 'updateWheelGuarantee') {
+                    result = await updateWheelGuarantee(args.next20, args.next50, args.next100);
+                } else if (tool === 'updateHomepageReviews') {
+                    result = await updateHomepageReviews(args.reviews);
+                } else if (tool === 'updateReviewImageUrl') {
+                    result = await updateReviewImageUrl(args.index, args.imageUrl);
+                } else {
+                    result = { error: `Tool "${tool}" không tồn tại.` };
                 }
                 
-                // Add a small 40ms delay between updates to avoid rate limit spikes & allow DOM drawing
+                if (result && typeof result === 'object' && result !== null && result.hasOwnProperty('error')) {
+                    results.push({ tool: toolName, success: false, error: result.error });
+                    failCount++;
+                } else {
+                    results.push({ tool: toolName, success: true, result });
+                    successCount++;
+                }
+                
+                if (progressBubbleEl && msgArea.contains(progressBubbleEl) && progressBubbleEl.classList.contains('admin-chat-bubble')) {
+                    progressBubbleEl.textContent = `Hệ thống: Đang thực hiện ${i + 1}/${toolCalls.length} (${toolName})... (Thành công: ${successCount}, Thất bại: ${failCount})`;
+                }
+
                 await new Promise(r => setTimeout(r, 40));
             }
 
-            // Final progress update
-            progressBubble.textContent = `Hệ thống: Đã xử lý xong ${matches.length} yêu cầu. (Thành công: ${successCount}, Thất bại: ${failCount})`;
-
             // Feed all results back in a single feedback message
-            const summaryHeader = `[TỔNG HỢP KẾT QUẢ THỰC THI]:\n- Tổng số yêu cầu: ${matches.length}\n- Thành công: ${successCount}\n- Thất bại: ${failCount}\n\n`;
+            const summaryHeader = `[TỔNG HỢP KẾT QUẢ THỰC THI]:\n- Tổng số yêu cầu: ${toolCalls.length}\n- Thành công: ${successCount}\n- Thất bại: ${failCount}\n\n`;
             
             const feedbackContent = results.map((r, idx) => {
-                return `[Kết quả Yêu cầu ${idx + 1} - ${r.tool}]:\n${JSON.stringify(r.success ? r.result : { error: r.error })}`;
+                const body = r.success ? r.result : { error: r.error };
+                const safeStr = typeof body === 'string' ? body : JSON.stringify(body);
+                return `[Kết quả Yêu cầu ${idx + 1} - ${r.tool}]:\n${safeStr}`;
             }).join('\n\n');
+
+            chatMessages.push({
+                role: 'user',
+                content: `Dưới đây là kết quả thực thi các công cụ bạn yêu cầu:\n\n${summaryHeader}${feedbackContent}\n\nHãy tổng hợp các kết quả trên và trả lời trực tiếp cho người dùng bằng Tiếng Việt. Chú ý chỉ ra rõ những yêu cầu nào đã THÀNH CÔNG và những yêu cầu nào THẤT BẠI (kèm theo lỗi tương ứng).`
+            });
 
             chatMessages.push({
                 role: 'user',

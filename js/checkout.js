@@ -135,6 +135,11 @@ function getPaymentMethodLabel(method, lang = 'en') {
             en: 'Bank Card',
             fi: 'Pankkikortti'
         }
+        cod: {
+            vi: 'COD (Cash on Delivery)',
+            en: 'COD (Cash on Delivery)',
+            fi: 'COD (Kotiinkuljetus, maksu käteisellä/kortilla)'
+        }
     };
 
     return labels[method]?.[lang] || labels[method]?.en || method;
@@ -496,8 +501,8 @@ if (checkoutForm) {
                 customerEmail,
                 orderType,
                 paymentMethod,
-                paymentMethodLabel,
-                paymentStatus: 'pending',
+                paymentMethodLabel: paymentMethod === 'cod' ? getPaymentMethodLabel('cod', currentLang) : paymentMethodLabel,
+                paymentStatus: paymentMethod === 'cod' ? 'cod_pending' : 'pending',
                 tableNumber: orderType === 'dine-in' ? tableNumber : '',
                 address: (orderType === 'delivery' || orderType === 'takeaway') ? address : '',
                 deliveryFee: orderType === 'delivery' ? deliveryFee : 0,
@@ -547,29 +552,31 @@ if (checkoutForm) {
                     paymentStatus: 'redirected',
                 });
 
-                // Save order to history & clear cart
+            // Save order to history & clear cart
                 const savedOrders = JSON.parse(localStorage.getItem('my_orders') || '[]');
                 savedOrders.push(docRef.id);
                 localStorage.setItem('my_orders', JSON.stringify(savedOrders));
                 if (typeof window.clearCart === 'function') window.clearCart();
 
-                // Redirect to Paytrail checkout
-                window.location.href = paytrailResult.checkoutUrl;
-                return;
-            } catch (err) {
-                console.error("Paytrail payment failed:", err);
-                window.showNotification('Kết nối thanh toán thất bại. Vui lòng thử lại.', 'error');
-                loading.classList.add('hidden');
-                btnSubmit.disabled = false;
-                return;
-            }
+                if (paymentMethod === 'cod') {
+                    window.showNotification('Đặt hàng thành công! Vui lòng chuẩn bị tiền mặt hoặc thẻ khi nhận hàng.', 'success');
+                    window.location.href = 'index.html';
+                    return;
+                }
 
-        } catch (error) {
-            console.error("Order submission error:", error);
-            window.showNotification('Failed to place order. Please try again.', 'error');
-        } finally {
-            loading.classList.add('hidden');
-            btnSubmit.disabled = false;
-        }
-    });
+                // Redirect to Paytrail payment gateway
+                try {
+                    const paytrailResult = await createPaytrailPayment({
+                        id: docRef.id,
+                        total: total,
+                        customerEmail: customerEmail,
+                        customerName: customerName,
+                        customerPhone: customerPhone,
+                        paymentMethod: paymentMethod,
+                        items: cart,
+                        deliveryFee: deliveryFee,
+                        discountAmount: discountAmount,
+                        createdAt: new Date().toISOString(),
+                        language: currentLang,
+                    });
 }
