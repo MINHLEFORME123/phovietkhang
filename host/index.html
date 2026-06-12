@@ -28,8 +28,11 @@
     </script>
 </head>
 <body class="bg-[#0b0f19] text-on-surface font-['Inter'] flex h-screen overflow-hidden">
-    <!-- Sidebar -->
-    <aside class="w-64 bg-surface border-r border-gray-800 flex flex-col">
+    <button id="sidebar-toggle" class="md:hidden fixed top-4 left-4 z-50 bg-surface-highlight border border-gray-700 text-white p-2 rounded-lg shadow">
+        <span class="material-symbols-outlined">menu</span>
+    </button>
+    <div id="sidebar-overlay" class="hidden fixed inset-0 bg-black/60 z-40 md:hidden"></div>
+    <aside id="admin-sidebar" class="w-64 bg-surface border-r border-gray-800 flex flex-col fixed md:relative inset-y-0 left-0 z-40 transform -translate-x-full md:translate-x-0 transition-transform duration-200">
         <div class="h-20 flex items-center justify-center border-b border-gray-800">
             <h1 class="text-xl font-bold text-primary tracking-wider">PHO HOST</h1>
         </div>
@@ -87,7 +90,7 @@
                 <div class="bg-surface rounded-xl border border-gray-800 p-6 flex items-center justify-between shadow-lg hover:scale-[1.02] transition-transform duration-300">
                     <div>
                         <p class="text-sm text-secondary font-medium uppercase tracking-wider">Today's Revenue</p>
-                        <h3 id="stat-revenue" class="text-3xl font-bold text-white mt-1">0.00€</h3>
+                        <h3 id="stat-revenue" class="text-3xl font-bold text-white mt-1">0.00â‚¬</h3>
                     </div>
                     <div class="w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center text-green-500">
                         <span class="material-symbols-outlined text-3xl">payments</span>
@@ -150,7 +153,7 @@
                     <div class="flex items-center gap-3">
                         <button onclick="window.exportTableToExcel('recent-orders-table', 'recent_orders.xlsx')" class="bg-green-600 hover:bg-green-700 text-white py-1.5 px-3 rounded-lg text-sm font-semibold flex items-center gap-1.5 transition-colors shadow">
                             <span class="material-symbols-outlined text-sm">download</span>
-                            <span>Xuất Excel</span>
+                            <span>Xuáº¥t Excel</span>
                         </button>
                         <a href="order-manager.html" class="text-primary hover:text-blue-400 text-sm font-medium">View All Orders &rarr;</a>
                     </div>
@@ -177,7 +180,7 @@
             </div>
         </div>
     </main>
-    <script type="module" src="../js/admin.js"></script>
+    <script type="module" src="../js/admin/main.js?v=5"></script>
     <script type="module" src="../js/auth.js"></script>
 </body>
 </html>

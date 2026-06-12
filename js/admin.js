@@ -5,20 +5,20 @@ import { collection, getDocs, getDoc, doc, updateDoc, addDoc, deleteDoc, setDoc,
 window.exportTableToExcel = function(tableId, filename = 'export.xlsx') {
     const table = document.getElementById(tableId);
     if (!table) {
-        if (window.showNotification) window.showNotification('Không tìm thấy bảng để xuất dữ liệu!', 'error');
+        if (window.showNotification) window.showNotification('KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y bÃ¡ÂºÂ£ng Ã„â€˜Ã¡Â»Æ’ xuÃ¡ÂºÂ¥t dÃ¡Â»Â¯ liÃ¡Â»â€¡u!', 'error');
         return;
     }
-    
+
     // Load XLSX from CDN if not already present
     const proceedExport = () => {
         try {
             // Clone the table to avoid modifying the visual UI table
             const clonedTable = table.cloneNode(true);
-            
+
             // Clean up elements that shouldn't be in Excel (buttons, action links, images, select options, etc.)
             const elementsToRemove = clonedTable.querySelectorAll('button, a, select, input, img, .material-symbols-outlined, script, style');
             elementsToRemove.forEach(el => el.remove());
-            
+
             // Clean up rows: remove action columns (typically the last th/td in each row)
             const rows = clonedTable.querySelectorAll('tr');
             rows.forEach(row => {
@@ -26,30 +26,30 @@ window.exportTableToExcel = function(tableId, filename = 'export.xlsx') {
                 if (cells.length > 0) {
                     const lastCell = cells[cells.length - 1];
                     // If the cell contains action text or is empty after cleaning, remove it
-                    if (lastCell.textContent.toLowerCase().includes('action') || 
-                        lastCell.textContent.toLowerCase().includes('hành động') || 
-                        lastCell.querySelector('button') || 
+                    if (lastCell.textContent.toLowerCase().includes('action') ||
+                        lastCell.textContent.toLowerCase().includes('hÃƒÂ nh Ã„â€˜Ã¡Â»â„¢ng') ||
+                        lastCell.querySelector('button') ||
                         lastCell.innerHTML.trim() === '') {
                         lastCell.remove();
                     }
                 }
             });
-            
+
             const wb = XLSX.utils.table_to_book(clonedTable, { sheet: "Sheet1" });
             XLSX.writeFile(wb, filename);
-            if (window.showNotification) window.showNotification('Xuất file Excel thành công!', 'success');
+            if (window.showNotification) window.showNotification('XuÃ¡ÂºÂ¥t file Excel thÃƒÂ nh cÃƒÂ´ng!', 'success');
         } catch (error) {
-            console.error('Lỗi khi xuất file Excel:', error);
-            if (window.showNotification) window.showNotification('Lỗi khi xuất Excel: ' + error.message, 'error');
+            console.error('LÃ¡Â»â€”i khi xuÃ¡ÂºÂ¥t file Excel:', error);
+            if (window.showNotification) window.showNotification('LÃ¡Â»â€”i khi xuÃ¡ÂºÂ¥t Excel: ' + error.message, 'error');
         }
     };
-    
+
     if (typeof XLSX === 'undefined') {
         const script = document.createElement('script');
         script.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
         script.onload = proceedExport;
         script.onerror = () => {
-            if (window.showNotification) window.showNotification('Không thể tải thư viện XLSX!', 'error');
+            if (window.showNotification) window.showNotification('KhÃƒÂ´ng thÃ¡Â»Æ’ tÃ¡ÂºÂ£i thÃ†Â° viÃ¡Â»â€¡n XLSX!', 'error');
         };
         document.head.appendChild(script);
     } else {
@@ -59,7 +59,7 @@ window.exportTableToExcel = function(tableId, filename = 'export.xlsx') {
 
 const apiKeys = await getApiKeys();
 
-// ─── Cloudflare Worker Admin Proxy ────────────────────────────────────────────
+// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Cloudflare Worker Admin Proxy Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 // After deploying cloudflare-worker/worker.js, paste your worker URL below:
 const CLOUDFLARE_WORKER_URL = 'https://pvk-admin.minhbeo993.workers.dev'; // Cloudflare Worker URL
 const WORKER_SECRET = apiKeys.workerSecret;
@@ -92,12 +92,12 @@ function normalizeOptions(options) {
                 choices: [{ label: opt, labelVi: opt, labelEn: opt, labelFi: opt, price: 0 }]
             };
         }
-        
+
         const name = opt.name || '';
         const nameVi = opt.nameVi || name;
         const nameEn = opt.nameEn || name;
         const nameFi = opt.nameFi || name;
-        
+
         const choices = Array.isArray(opt.choices) ? opt.choices.map(c => {
             const label = c.label || '';
             return {
@@ -135,58 +135,58 @@ function formatOrderDate(dateObj) {
 
 function getOrderTimeAlert(createdAt, completedAt, status) {
     if (status === 'cancelled') {
-        return { label: 'Đã hủy', color: 'gray', badgeClass: 'bg-gray-500/10 text-gray-400 border border-gray-500/20' };
+        return { label: 'Ã„ÂÃƒÂ£ hÃ¡Â»Â§y', color: 'gray', badgeClass: 'bg-gray-500/10 text-gray-400 border border-gray-500/20' };
     }
-    
+
     const created = createdAt ? (createdAt instanceof Date ? createdAt : new Date(createdAt)) : null;
     if (!created) return { label: 'N/A', color: 'gray', badgeClass: 'bg-gray-500/10 text-gray-400 border border-gray-500/20' };
-    
+
     const now = new Date();
-    
+
     if (status === 'completed') {
         let completedTime = null;
         if (completedAt) {
             completedTime = completedAt instanceof Date ? completedAt : new Date(completedAt);
         }
-        
+
         if (completedTime) {
             const diffMin = Math.round((completedTime - created) / (60 * 1000));
-            return { 
-                label: `Hoàn tất trong ${diffMin} phút`, 
-                color: 'green', 
-                badgeClass: 'bg-green-500/10 text-green-400 border border-green-500/20' 
+            return {
+                label: `HoÃƒÂ n tÃ¡ÂºÂ¥t trong ${diffMin} phÃƒÂºt`,
+                color: 'green',
+                badgeClass: 'bg-green-500/10 text-green-400 border border-green-500/20'
             };
         }
-        return { label: 'Đã hoàn tất', color: 'green', badgeClass: 'bg-green-500/10 text-green-400 border border-green-500/20' };
+        return { label: 'Ã„ÂÃƒÂ£ hoÃƒÂ n tÃ¡ÂºÂ¥t', color: 'green', badgeClass: 'bg-green-500/10 text-green-400 border border-green-500/20' };
     }
-    
+
     // Active orders (pending, cooking, ready)
     const diffMin = Math.floor((now - created) / (60 * 1000));
     if (diffMin < 1) {
-        return { 
-            label: 'Vừa xong', 
-            color: 'green', 
-            badgeClass: 'bg-green-500/10 text-green-400 border border-green-500/20' 
+        return {
+            label: 'VÃ¡Â»Â«a xong',
+            color: 'green',
+            badgeClass: 'bg-green-500/10 text-green-400 border border-green-500/20'
         };
     }
     if (diffMin >= 15) {
-        return { 
-            label: `${diffMin} phút trước`, 
-            color: 'red', 
-            badgeClass: 'bg-red-500/10 text-red-400 border border-red-500/20 animate-pulse' 
+        return {
+            label: `${diffMin} phÃƒÂºt trÃ†Â°Ã¡Â»â€ºc`,
+            color: 'red',
+            badgeClass: 'bg-red-500/10 text-red-400 border border-red-500/20 animate-pulse'
         };
     }
     if (diffMin >= 10) {
-        return { 
-            label: `${diffMin} phút trước`, 
-            color: 'yellow', 
-            badgeClass: 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20' 
+        return {
+            label: `${diffMin} phÃƒÂºt trÃ†Â°Ã¡Â»â€ºc`,
+            color: 'yellow',
+            badgeClass: 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20'
         };
     }
-    return { 
-        label: `${diffMin} phút trước`, 
-        color: 'green', 
-        badgeClass: 'bg-green-500/10 text-green-400 border border-green-500/20' 
+    return {
+        label: `${diffMin} phÃƒÂºt trÃ†Â°Ã¡Â»â€ºc`,
+        color: 'green',
+        badgeClass: 'bg-green-500/10 text-green-400 border border-green-500/20'
     };
 }
 
@@ -264,7 +264,7 @@ function cleanJsonString(jsonStr) {
     jsonStr = jsonStr.replace(/:\s*\+\s*([0-9]+(?:\.[0-9]+)?)/g, ': $1');
     // 3. Remove trailing commas in objects and arrays
     jsonStr = jsonStr.replace(/,\s*([\]}])/g, '$1');
-    
+
     // 4. Escape literal raw newlines inside double-quoted string values
     let inString = false;
     let cleanStr = "";
@@ -285,11 +285,11 @@ function cleanJsonString(jsonStr) {
 function extractJsonArray(str) {
     if (!str) return [];
     const noThink = stripThinking(str);
-    
+
     // Search for array block
     const start = noThink.indexOf('[');
     const end = noThink.lastIndexOf(']');
-    
+
     if (start === -1 || end === -1 || end < start) {
         // Fallback: If it's wrapped in an object like {"items": [...]}, try to parse as object
         const objStart = noThink.indexOf('{');
@@ -309,7 +309,7 @@ function extractJsonArray(str) {
         }
         throw new Error("Could not find a valid JSON array block in AI response.");
     }
-    
+
     const jsonStr = noThink.substring(start, end + 1);
     const cleaned = cleanJsonString(jsonStr);
     try {
@@ -356,45 +356,45 @@ async function callOpenRouterWithFallback(payload, apiKeys = OPENROUTER_API_KEYS
         'nex-agi/nex-n2-pro:free',
         'qwen/qwen3-next-80b-a3b-instruct:free'
     ];
-    
+
     const originalModel = payload.model;
     const modelsToTry = originalModel ? [originalModel, ...models.filter(m => m !== originalModel)] : models;
-    
+
     const keys = Array.isArray(apiKeys) ? apiKeys : [apiKeys];
-    
+
     for (const model of modelsToTry) {
         for (const key of keys) {
             try {
                 console.log(`[OpenRouter] Trying model: ${model}`);
                 const requestPayload = { ...payload, model: model };
-                
+
                 const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
                     method: 'POST',
-                    headers: { 
-                        'Authorization': `Bearer ${key}`, 
-                        'Content-Type': 'application/json' 
+                    headers: {
+                        'Authorization': `Bearer ${key}`,
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(requestPayload)
                 });
-                
+
                 if (!response.ok) {
                     const errText = await response.text();
                     console.warn(`[OpenRouter] ${model} HTTP error (${response.status})`);
                     continue;
                 }
-                
+
                 const text = await response.text();
                 if (!text) {
                     console.warn(`[OpenRouter] ${model} returned empty response`);
                     continue;
                 }
-                
+
                 const data = JSON.parse(text);
                 if (!data || !data.choices || data.choices.length === 0) {
                     console.warn(`[OpenRouter] ${model} returned no choices:`, JSON.stringify(data?.error || data));
                     continue;
                 }
-                
+
                 console.log(`[OpenRouter] Success with model: ${model}`);
                 return data;
             } catch (err) {
@@ -406,6 +406,39 @@ async function callOpenRouterWithFallback(payload, apiKeys = OPENROUTER_API_KEYS
 }
 
 
+
+// --- LOYALTY TIER COMPUTATION (module scope) ---
+function computeLoyaltyTier(totalSpent) {
+    const spent = Number(totalSpent) || 0;
+    if (spent >= 40) return { key: 'kim_cuong', labelVi: 'Kim CÃ†Â°Ã†Â¡ng', color: '#7c3aed', icon: 'diamond', discountPercent: 15 };
+    if (spent >= 20) return { key: 'kim', labelVi: 'VÃƒÂ ng', color: '#eab308', icon: 'workspace_premium', discountPercent: 10 };
+    if (spent >= 8) return { key: 'bac', labelVi: 'BÃ¡ÂºÂ¡c', color: '#9ca3af', icon: 'shield', discountPercent: 5 };
+    if (spent >= 4) return { key: 'vang', labelVi: 'Ã„ÂÃ¡Â»â€œng', color: '#9a3412', icon: 'monetization_on', discountPercent: 0 };
+    return { key: 'dong', labelVi: 'Ã„ÂÃ¡Â»â€œng', color: '#78350f', icon: 'stars', discountPercent: 0 };
+}
+
+// --- LIST ALL USERS (module scope) ---
+async function listAllUsers() {
+    try {
+        const qSnap = await getDocs(collection(db, "users"));
+        const users = [];
+        qSnap.forEach(d => {
+            const data = d.data();
+            const totalSpent = data.totalSpent || 0;
+            users.push({
+                uid: d.id,
+                email: data.email,
+                name: data.name,
+                role: data.role,
+                totalSpent,
+                loyaltyTier: computeLoyaltyTier(totalSpent).key
+            });
+        });
+        return users;
+    } catch (e) {
+        return { error: e.message };
+    }
+}
 
 // --- USER MANAGER LOGIC ---
 const userTableBody = document.getElementById('user-table-body');
@@ -442,13 +475,13 @@ if (userTableBody) {
                         </select>
                     </td>
                     <td class="py-3 px-4 text-secondary text-sm">
-                        ${totalSpent.toLocaleString('vi-VN')} đ
+                        ${totalSpent.toLocaleString('vi-VN')} Ã„â€˜
                     </td>
                     <td class="py-3 px-4">
                         <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold" style="background:${tier.color}22; color:${tier.color}; border:1px solid ${tier.color}44;">
                             <span class="material-symbols-outlined text-[14px]" style="color:${tier.color}">${tier.icon}</span>
                             ${tier.labelVi}
-                            ${tier.discountPercent > 0 ? `(−${tier.discountPercent}%)` : ''}
+                            ${tier.discountPercent > 0 ? `(Ã¢Ë†â€™${tier.discountPercent}%)` : ''}
                         </span>
                     </td>
                 `;
@@ -497,7 +530,7 @@ if (dashboardContainer) {
             let todayRevenue = 0;
             let activeCount = 0;
             let completedTodayCount = 0;
-            
+
             const today = new Date();
             today.setHours(0, 0, 0, 0);
 
@@ -573,7 +606,7 @@ if (dashboardContainer) {
 
             // Update DOM stats
             const statRevEl = document.getElementById('stat-revenue');
-            if (statRevEl) statRevEl.textContent = todayRevenue.toFixed(2) + '€';
+            if (statRevEl) statRevEl.textContent = todayRevenue.toFixed(2) + 'Ã¢â€šÂ¬';
             const statActEl = document.getElementById('stat-active');
             if (statActEl) statActEl.textContent = activeCount;
             const statCompEl = document.getElementById('stat-completed');
@@ -590,7 +623,7 @@ if (dashboardContainer) {
                     allOrders.slice(0, 5).forEach(order => {
                         const tr = document.createElement('tr');
                         tr.className = "border-b border-gray-800/50 hover:bg-surface-highlight transition-colors text-sm text-white";
-                        
+
                         let badgeColor = 'gray';
                         if (order.status === 'pending') badgeColor = 'red';
                         else if (['cooking', 'preparing'].includes(order.status)) badgeColor = 'yellow';
@@ -610,7 +643,7 @@ if (dashboardContainer) {
                             </td>
                             <td class="py-3 px-4">${order.customerName}</td>
                             <td class="py-3 px-4 max-w-[200px] truncate" title="${itemsText}">${itemsText}</td>
-                            <td class="py-3 px-4 text-green-400 font-medium">${order.totalPrice.toFixed(2)}€</td>
+                            <td class="py-3 px-4 text-green-400 font-medium">${order.totalPrice.toFixed(2)}Ã¢â€šÂ¬</td>
                             <td class="py-3 px-4">
                                 <span class="px-2 py-0.5 rounded text-xs font-bold uppercase bg-${badgeColor}-500/10 text-${badgeColor}-400 border border-${badgeColor}-500/20">${order.status}</span>
                             </td>
@@ -623,7 +656,7 @@ if (dashboardContainer) {
             // Draw/Update Line Chart: Revenue Trend
             const trendLabels = Object.keys(last7Days);
             const trendData = Object.values(last7Days);
-            
+
             const revChartEl = document.getElementById('revenueChart');
             if (revChartEl) {
                 if (revenueChartInstance) {
@@ -637,7 +670,7 @@ if (dashboardContainer) {
                         data: {
                             labels: trendLabels,
                             datasets: [{
-                                label: 'Revenue (€)',
+                                label: 'Revenue (Ã¢â€šÂ¬)',
                                 data: trendData,
                                 borderColor: '#3b82f6',
                                 backgroundColor: 'rgba(59, 130, 246, 0.1)',
@@ -727,7 +760,7 @@ if (orderManagerContainer) {
     // Tab switcher
     window.setFilter = function(filter) {
         currentFilter = filter;
-        
+
         // Update active tab styles
         document.querySelectorAll('.status-tab-btn').forEach(btn => {
             if (btn.getAttribute('onclick').includes(filter)) {
@@ -751,7 +784,7 @@ if (orderManagerContainer) {
         modalCustPhone.textContent = order.customerPhone || 'N/A';
         modalServiceType.textContent = order.orderType === 'dine-in' ? 'Dine-In' : order.orderType === 'takeaway' ? 'Takeaway' : 'Delivery';
         modalServiceDetail.textContent = order.orderType === 'dine-in' ? `Table: ${order.tableNumber || 'N/A'}` : 'N/A';
-        
+
         if (order.orderType === 'takeaway' && order.address) {
             modalAddressBlock.classList.remove('hidden');
             modalAddressText.textContent = order.address;
@@ -764,7 +797,7 @@ if (orderManagerContainer) {
         order.items.forEach(item => {
             const tr = document.createElement('tr');
             tr.className = "border-b border-gray-800/30 text-white text-xs";
-            
+
             // Options text
             let optsText = '';
             if (item.selectedOptions && item.selectedOptions.length > 0) {
@@ -777,7 +810,7 @@ if (orderManagerContainer) {
                     ${optsText}
                 </td>
                 <td class="py-2 px-3 text-center">${item.qty}</td>
-                <td class="py-2 px-3 text-right font-medium">${(item.price * item.qty).toFixed(2)}€</td>
+                <td class="py-2 px-3 text-right font-medium">${(item.price * item.qty).toFixed(2)}Ã¢â€šÂ¬</td>
             `;
             modalOrderItems.appendChild(tr);
         });
@@ -789,8 +822,8 @@ if (orderManagerContainer) {
             modalNotesBlock.classList.add('hidden');
         }
 
-        modalTotalPrice.textContent = order.totalPrice.toFixed(2) + '€';
-        
+        modalTotalPrice.textContent = order.totalPrice.toFixed(2) + 'Ã¢â€šÂ¬';
+
         detailModal.classList.remove('hidden');
     };
 
@@ -820,34 +853,34 @@ if (orderManagerContainer) {
                     const orderLang = order.language || 'en';
                     const readyTranslations = {
                         vi: {
-                            subject: `[Phở Việt Khang] Đơn hàng của bạn đã sẵn sàng! - #${orderId.substring(0, 8).toUpperCase()}`,
-                            title: "ĐƠN HÀNG ĐÃ SẴN SÀNG",
-                            intro: `Xin chào <strong>${order.customerName || 'Quý khách'}</strong>,<br><br>Tin vui! Đơn hàng của bạn tại Phở Việt Khang đã được chế biến xong và sẵn sàng phục vụ.`,
-                            summaryHeader: "Chi tiết đơn hàng:",
-                            totalLabel: "Tổng cộng",
-                            serviceType: "Hình thức",
-                            orderId: "Mã đơn hàng",
-                            footer: "Cảm ơn quý khách đã ủng hộ nhà hàng. Phở Việt Khang © 2026."
+                            subject: `[PhÃ¡Â»Å¸ ViÃ¡Â»â€¡t Khang] Ã„ÂÃ†Â¡n hÃƒÂ ng cÃ¡Â»Â§a bÃ¡ÂºÂ¡n Ã„â€˜ÃƒÂ£ sÃ¡ÂºÂµn sÃƒÂ ng! - #${orderId.substring(0, 8).toUpperCase()}`,
+                            title: "Ã„ÂÃ†Â N HÃƒâ‚¬NG Ã„ÂÃƒÆ’ SÃ¡ÂºÂ´N SÃƒâ‚¬NG",
+                            intro: `Xin chÃƒÂ o <strong>${order.customerName || 'QuÃƒÂ½ khÃƒÂ¡ch'}</strong>,<br><br>Tin vui! Ã„ÂÃ†Â¡n hÃƒÂ ng cÃ¡Â»Â§a bÃ¡ÂºÂ¡n tÃ¡ÂºÂ¡i PhÃ¡Â»Å¸ ViÃ¡Â»â€¡t Khang Ã„â€˜ÃƒÂ£ Ã„â€˜Ã†Â°Ã¡Â»Â£c chÃ¡ÂºÂ¿ biÃ¡ÂºÂ¿n xong vÃƒÂ  sÃ¡ÂºÂµn sÃƒÂ ng phÃ¡Â»Â¥c vÃ¡Â»Â¥.`,
+                            summaryHeader: "Chi tiÃ¡ÂºÂ¿t Ã„â€˜Ã†Â¡n hÃƒÂ ng:",
+                            totalLabel: "TÃ¡Â»â€¢ng cÃ¡Â»â„¢ng",
+                            serviceType: "HÃƒÂ¬nh thÃ¡Â»Â©c",
+                            orderId: "MÃƒÂ£ Ã„â€˜Ã†Â¡n hÃƒÂ ng",
+                            footer: "CÃ¡ÂºÂ£m Ã†Â¡n quÃƒÂ½ khÃƒÂ¡ch Ã„â€˜ÃƒÂ£ Ã¡Â»Â§ng hÃ¡Â»â„¢ nhÃƒÂ  hÃƒÂ ng. PhÃ¡Â»Å¸ ViÃ¡Â»â€¡t Khang Ã‚Â© 2026."
                         },
                         en: {
-                            subject: `[Phở Việt Khang] Your Order is Ready! - #${orderId.substring(0, 8).toUpperCase()}`,
+                            subject: `[PhÃ¡Â»Å¸ ViÃ¡Â»â€¡t Khang] Your Order is Ready! - #${orderId.substring(0, 8).toUpperCase()}`,
                             title: "YOUR ORDER IS READY",
-                            intro: `Hi <strong>${order.customerName || 'Customer'}</strong>,<br><br>Great news! Your order at Phở Việt Khang is ready and waiting for you.`,
+                            intro: `Hi <strong>${order.customerName || 'Customer'}</strong>,<br><br>Great news! Your order at PhÃ¡Â»Å¸ ViÃ¡Â»â€¡t Khang is ready and waiting for you.`,
                             summaryHeader: "Here is a summary of your order:",
                             totalLabel: "Total Price",
                             serviceType: "Service Type",
                             orderId: "Order ID",
-                            footer: "Thank you for dining with us! Phở Việt Khang © 2026."
+                            footer: "Thank you for dining with us! PhÃ¡Â»Å¸ ViÃ¡Â»â€¡t Khang Ã‚Â© 2026."
                         },
                         fi: {
-                            subject: `[Phở Việt Khang] Tilauksesi on valmis! - #${orderId.substring(0, 8).toUpperCase()}`,
+                            subject: `[PhÃ¡Â»Å¸ ViÃ¡Â»â€¡t Khang] Tilauksesi on valmis! - #${orderId.substring(0, 8).toUpperCase()}`,
                             title: "TILAUKSESI ON VALMIS",
-                            intro: `Hei <strong>${order.customerName || 'Asiakas'}</strong>,<br><br>Hienoja uutisia! Tilauksesi Phở Việt Khangissa on valmis ja odottaa sinua.`,
-                            summaryHeader: "Tässä on yhteenveto tilauksestasi:",
-                            totalLabel: "Yhteensä",
+                            intro: `Hei <strong>${order.customerName || 'Asiakas'}</strong>,<br><br>Hienoja uutisia! Tilauksesi PhÃ¡Â»Å¸ ViÃ¡Â»â€¡t Khangissa on valmis ja odottaa sinua.`,
+                            summaryHeader: "TÃƒÂ¤ssÃƒÂ¤ on yhteenveto tilauksestasi:",
+                            totalLabel: "YhteensÃƒÂ¤",
                             serviceType: "Palvelutyyppi",
                             orderId: "Tilaustunnus",
-                            footer: "Kiitos asioinnistasi kanssamme! Phở Việt Khang © 2026."
+                            footer: "Kiitos asioinnistasi kanssamme! PhÃ¡Â»Å¸ ViÃ¡Â»â€¡t Khang Ã‚Â© 2026."
                         }
                     };
 
@@ -860,19 +893,19 @@ if (orderManagerContainer) {
                         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
                             <h2 style="color: #10b981; text-align: center; border-bottom: 2px solid #10b981; padding-bottom: 15px; margin-bottom: 20px;">${rData.title}</h2>
                             <p>${rData.intro}</p>
-                            
+
                             <p><strong>${rData.summaryHeader}</strong></p>
                             <ul style="padding-left: 20px; margin: 15px 0;">
                                 ${itemsHtml}
                             </ul>
-                            
-                            <p style="font-size: 1.1em;"><strong>${rData.totalLabel}:</strong> <span style="color: #10b981; font-weight: bold;">${(order.totalPrice || 0).toFixed(2)}€</span></p>
-                            
+
+                            <p style="font-size: 1.1em;"><strong>${rData.totalLabel}:</strong> <span style="color: #10b981; font-weight: bold;">${(order.totalPrice || 0).toFixed(2)}Ã¢â€šÂ¬</span></p>
+
                             <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 20px; border: 1px solid #e9ecef;">
                                 <p style="margin: 0; font-size: 0.9em; color: #555;"><strong>${rData.serviceType}:</strong> ${order.orderType === 'dine-in' ? `Dine-in (Table ${order.tableNumber || 'N/A'})` : order.orderType === 'delivery' ? 'Delivery' : 'Takeaway'}</p>
                                 <p style="margin: 5px 0 0 0; font-size: 0.9em; color: #555;"><strong>${rData.orderId}:</strong> #${orderId.toUpperCase()}</p>
                             </div>
-                            
+
                             <p style="margin-top: 25px;">${rData.footer}</p>
                         </div>
                     `;
@@ -956,10 +989,10 @@ if (orderManagerContainer) {
                 <td class="py-3.5 px-4">
                     <span class="capitalize font-medium">${order.orderType === 'dine-in' ? `Dine-In (Table ${order.tableNumber || 'N/A'})` : order.orderType}</span>
                 </td>
-                <td class="py-3.5 px-4 text-green-400 font-semibold">${order.totalPrice.toFixed(2)}€</td>
+                <td class="py-3.5 px-4 text-green-400 font-semibold">${order.totalPrice.toFixed(2)}Ã¢â€šÂ¬</td>
                 <td class="py-3.5 px-4">
-                    ${order.emailConfirmed === false ? 
-                        `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">Chờ email</span>` : 
+                    ${order.emailConfirmed === false ?
+                        `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">ChÃ¡Â»Â email</span>` :
                         `<span class="px-2 py-0.5 rounded text-xs font-bold uppercase bg-${badgeColor}-500/10 text-${badgeColor}-400 border border-${badgeColor}-500/20">${order.status}</span>`
                     }
                 </td>
@@ -1005,7 +1038,7 @@ if (orderManagerContainer) {
             } else if (data.createdAt) {
                 date = new Date(data.createdAt);
             }
-            
+
             allOrders.push({
                 ...data,
                 id: docSnap.id,
@@ -1022,6 +1055,10 @@ if (orderManagerContainer) {
 
 // --- DYNAMIC CATEGORY LOADER ---
 async function loadCategories() {
+    const dl = document.getElementById('category-datalist');
+    const dlEdit = document.getElementById('edit-category-datalist');
+    if (!dl && !dlEdit) return;
+
     try {
         const querySnapshot = await getDocs(collection(db, "menu"));
         const categories = new Set();
@@ -1031,9 +1068,8 @@ async function loadCategories() {
                 categories.add(data.category);
             }
         });
-        
+
         // Populate category-datalist (add page)
-        const dl = document.getElementById('category-datalist');
         if (dl) {
             dl.innerHTML = '';
             categories.forEach(cat => {
@@ -1042,9 +1078,8 @@ async function loadCategories() {
                 dl.appendChild(opt);
             });
         }
-        
+
         // Populate edit-category-datalist (list page modal)
-        const dlEdit = document.getElementById('edit-category-datalist');
         if (dlEdit) {
             dlEdit.innerHTML = '';
             categories.forEach(cat => {
@@ -1057,7 +1092,10 @@ async function loadCategories() {
         console.error("Error loading categories: ", e);
     }
 }
-loadCategories();
+window.loadCategories = loadCategories;
+if (document.getElementById('category-datalist')) {
+    loadCategories();
+}
 
 // --- IMAGE PREVIEW & COMPRESSION (Base64) ---
 let currentCompressedImage = "";
@@ -1068,7 +1106,7 @@ if (imageInput) {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
             const reader = new FileReader();
-            
+
             reader.onload = function(event) {
                 const img = new Image();
                 img.onload = function() {
@@ -1077,10 +1115,10 @@ if (imageInput) {
                     const scaleSize = MAX_WIDTH / img.width;
                     canvas.width = MAX_WIDTH;
                     canvas.height = img.height * scaleSize;
-                    
+
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    
+
                     currentCompressedImage = canvas.toDataURL('image/jpeg', 0.7);
                     if (imagePreview) {
                         imagePreview.src = currentCompressedImage;
@@ -1098,8 +1136,8 @@ if (imageInput) {
 }
 
 // --- STRUCTURED OPTIONS BUILDER (ADD PAGE) ---
-let foodOptions = []; 
-let currentAddingChoices = []; 
+let foodOptions = [];
+let currentAddingChoices = [];
 
 const btnAddChoice = document.getElementById('btn-add-choice');
 const choicePriceInput = document.getElementById('new-choice-price');
@@ -1112,7 +1150,7 @@ function renderCurrentAddingChoices() {
         const row = document.createElement('div');
         row.className = 'flex items-center justify-between bg-surface-highlight p-1.5 rounded text-xs text-white';
         row.innerHTML = `
-            <span>${ch.labelVi} / ${ch.labelEn} / ${ch.labelFi} (${ch.price > 0 ? '+' + ch.price.toFixed(2) + '€' : 'Free'})</span>
+            <span>${ch.labelVi} / ${ch.labelEn} / ${ch.labelFi} (${ch.price > 0 ? '+' + ch.price.toFixed(2) + 'Ã¢â€šÂ¬' : 'Free'})</span>
             <button type="button" class="text-red-400 hover:text-red-300 px-1 font-bold text-sm" data-idx="${idx}">&times;</button>
         `;
         row.querySelector('button').addEventListener('click', () => {
@@ -1129,16 +1167,16 @@ if (btnAddChoice) {
         const labelEn = document.getElementById('new-choice-label-en').value.trim();
         const labelFi = document.getElementById('new-choice-label-fi').value.trim();
         const priceVal = parseFloat(choicePriceInput.value) || 0;
-        
+
         if (!labelVi && !labelEn && !labelFi) {
             window.showNotification('Please enter a choice label in at least one language.', 'info');
             return;
         }
-        
+
         const safeVi = labelVi || labelEn || labelFi;
         const safeEn = labelEn || safeVi;
         const safeFi = labelFi || safeVi;
-        
+
         currentAddingChoices.push({
             label: safeEn,
             labelVi: safeVi,
@@ -1146,7 +1184,7 @@ if (btnAddChoice) {
             labelFi: safeFi,
             price: priceVal
         });
-        
+
         document.getElementById('new-choice-label-vi').value = '';
         document.getElementById('new-choice-label-en').value = '';
         document.getElementById('new-choice-label-fi').value = '';
@@ -1165,10 +1203,10 @@ function renderOptions() {
     foodOptions.forEach((opt, idx) => {
         const div = document.createElement('div');
         div.className = 'bg-surface-highlight p-3 rounded-lg border border-gray-700/50 space-y-1.5 relative';
-        
-        const choicesHtml = opt.choices.map(c => 
+
+        const choicesHtml = opt.choices.map(c =>
             `<span class="inline-block bg-gray-800 text-secondary text-[11px] px-2 py-0.5 rounded mr-1">
-                ${c.labelVi || c.label} (${c.price > 0 ? '+' + c.price.toFixed(2) + '€' : 'Free'})
+                ${c.labelVi || c.label} (${c.price > 0 ? '+' + c.price.toFixed(2) + 'Ã¢â€šÂ¬' : 'Free'})
              </span>`
         ).join('');
 
@@ -1198,7 +1236,7 @@ if (btnAddOption) {
         const nameEn = document.getElementById('new-opt-name-en').value.trim();
         const nameFi = document.getElementById('new-opt-name-fi').value.trim();
         const type = optTypeSelect.value;
-        
+
         if (!nameVi && !nameEn && !nameFi) {
             window.showNotification('Please enter an option group name in at least one language.', 'info');
             return;
@@ -1207,11 +1245,11 @@ if (btnAddOption) {
             window.showNotification('Please add at least one choice to this option group.', 'info');
             return;
         }
-        
+
         const safeVi = nameVi || nameEn || nameFi;
         const safeEn = nameEn || safeVi;
         const safeFi = nameFi || safeVi;
-        
+
         foodOptions.push({
             name: safeEn,
             nameVi: safeVi,
@@ -1220,7 +1258,7 @@ if (btnAddOption) {
             type,
             choices: [...currentAddingChoices]
         });
-        
+
         document.getElementById('new-opt-name-vi').value = '';
         document.getElementById('new-opt-name-en').value = '';
         document.getElementById('new-opt-name-fi').value = '';
@@ -1242,11 +1280,11 @@ if (menuImageInput) {
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 800; 
+                    const MAX_WIDTH = 800;
                     const scaleSize = MAX_WIDTH / img.width;
                     canvas.width = MAX_WIDTH;
                     canvas.height = img.height * scaleSize;
-                    
+
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     menuImageBase64 = canvas.toDataURL('image/jpeg', 0.8);
@@ -1276,7 +1314,7 @@ if (btnAiScan) {
         try {
             // Step 1: Vision Extraction
             loadingIndicator.innerHTML = '<span class="material-symbols-outlined animate-spin align-middle mr-1 text-sm">sync</span> AI Vision is reading image...';
-            
+
             const visionPayload = {
                 model: 'gpt-oss-120b',
                 messages: [
@@ -1298,7 +1336,7 @@ if (btnAiScan) {
                 },
                 body: JSON.stringify(visionPayload)
             });
-            
+
             if (!visionResponse.ok) throw new Error(`Vision API error: ${await visionResponse.text()}`);
             const visionData = await visionResponse.json();
             if (!visionData || !visionData.choices || visionData.choices.length === 0) {
@@ -1314,34 +1352,34 @@ if (btnAiScan) {
             For each dish:
             1. Translate name/description to Vietnamese, English, Finnish.
             2. Auto-generate high-quality Vietnamese description if missing, then translate.
-            3. Categorize in three languages (e.g. categoryVi: "Phở", categoryEn: "Pho", categoryFi: "Pho"). DO NOT use "Món chính".
+            3. Categorize in three languages (e.g. categoryVi: "PhÃ¡Â»Å¸", categoryEn: "Pho", categoryFi: "Pho"). DO NOT use "MÃƒÂ³n chÃƒÂ­nh".
             4. Infer options:
                - ONLY add PAID options (price > 0) IF they are EXPLICITLY written. Do NOT hallucinate.
-               - You CAN and SHOULD auto-generate common FREE exclusion options (price = 0) based on the dish type. For example, for "Phở" or "Bún", add multiple "toggle" options like "Không hành" (No onions), "Không rau mùi" (No cilantro), "Không mì chính" (No MSG). For dishes with peanuts, add "Không lạc" (No peanuts).
-            
+               - You CAN and SHOULD auto-generate common FREE exclusion options (price = 0) based on the dish type. For example, for "PhÃ¡Â»Å¸" or "BÃƒÂºn", add multiple "toggle" options like "KhÃƒÂ´ng hÃƒÂ nh" (No onions), "KhÃƒÂ´ng rau mÃƒÂ¹i" (No cilantro), "KhÃƒÂ´ng mÃƒÂ¬ chÃƒÂ­nh" (No MSG). For dishes with peanuts, add "KhÃƒÂ´ng lÃ¡ÂºÂ¡c" (No peanuts).
+
             You MUST return ONLY a JSON object with a single key "items" containing the array of dishes. No markdown blocks.
             JSON Structure:
             {
               "items": [
                 {
-                  "nameVi": "Tên món",
-                  "descVi": "Mô tả hấp dẫn",
+                  "nameVi": "TÃƒÂªn mÃƒÂ³n",
+                  "descVi": "MÃƒÂ´ tÃ¡ÂºÂ£ hÃ¡ÂºÂ¥p dÃ¡ÂºÂ«n",
                   "nameEn": "English name",
                   "descEn": "English desc",
                   "nameFi": "Finnish name",
                   "descFi": "Finnish desc",
                   "price": 12.50,
-                  "categoryVi": "Phở",
+                  "categoryVi": "PhÃ¡Â»Å¸",
                   "categoryEn": "Pho",
                   "categoryFi": "Pho",
                   "options": [
                     {
-                      "nameVi": "Cấp độ cay",
+                      "nameVi": "CÃ¡ÂºÂ¥p Ã„â€˜Ã¡Â»â„¢ cay",
                       "nameEn": "Spicy Level",
                       "nameFi": "Tulisuusaste",
                       "type": "single-select",
                       "choices": [
-                        { "labelVi": "Không cay", "labelEn": "Not Spicy", "labelFi": "Ei tulinen", "price": 0 },
+                        { "labelVi": "KhÃƒÂ´ng cay", "labelEn": "Not Spicy", "labelFi": "Ei tulinen", "price": 0 },
                         { "labelVi": "Cay", "labelEn": "Spicy", "labelFi": "Tulinen", "price": 0 }
                       ]
                     }
@@ -1402,7 +1440,7 @@ if (btnAiScan) {
 
             let successCount = 0;
             for (const item of items) {
-                const catVi = item.categoryVi || item.category || 'Phở';
+                const catVi = item.categoryVi || item.category || 'PhÃ¡Â»Å¸';
                 await addDoc(collection(db, "menu"), {
                     nameVi: item.nameVi || 'Unknown',
                     descVi: item.descVi || '',
@@ -1415,16 +1453,16 @@ if (btnAiScan) {
                     categoryEn: item.categoryEn || catVi,
                     categoryFi: item.categoryFi || catVi,
                     price: parseFloat(item.price) || 0,
-                    image: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=500', 
+                    image: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=500',
                     options: Array.isArray(item.options) ? item.options : [],
                     createdAt: new Date()
                 });
                 successCount++;
             }
-            
+
             window.showNotification(`Menu Scan Complete! Successfully added ${successCount} items from the image.`, 'success');
-            loadCategories(); 
-            
+            loadCategories();
+
         } catch (error) {
             console.error('AI Menu Scan Error:', error);
             window.showNotification('AI Menu Scan failed. Check console for details.', 'error');
@@ -1455,45 +1493,45 @@ if (btnAiExtract) {
         try {
             const file = fileInput.files[0];
             const data = await file.arrayBuffer();
-            
+
             const workbook = XLSX.read(data);
             const firstSheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[firstSheetName];
             const csvData = XLSX.utils.sheet_to_csv(worksheet);
-            
+
             const apiKey = apiKeys.openRouterKey1;
 
             const systemPrompt = `You are an expert data parser. Extract ALL food items from the CSV data.
             1. Translate missing names/descriptions to VI, EN, FI.
             2. Auto-generate appetizing Vietnamese description if missing, then translate.
-            3. Categorize in three languages (e.g. categoryVi: "Phở", categoryEn: "Pho", categoryFi: "Pho"). DO NOT use "Món chính".
+            3. Categorize in three languages (e.g. categoryVi: "PhÃ¡Â»Å¸", categoryEn: "Pho", categoryFi: "Pho"). DO NOT use "MÃƒÂ³n chÃƒÂ­nh".
             4. Infer options:
                - ONLY add PAID options (price > 0) IF they are EXPLICITLY present in the CSV. Do NOT hallucinate paid options.
-               - You CAN and SHOULD auto-generate common FREE exclusion options (price = 0). For example, for "Phở" or "Bún", add multiple "toggle" options like "Không hành" (No onions), "Không rau mùi" (No cilantro), "Không mì chính" (No MSG).
-            
+               - You CAN and SHOULD auto-generate common FREE exclusion options (price = 0). For example, for "PhÃ¡Â»Å¸" or "BÃƒÂºn", add multiple "toggle" options like "KhÃƒÂ´ng hÃƒÂ nh" (No onions), "KhÃƒÂ´ng rau mÃƒÂ¹i" (No cilantro), "KhÃƒÂ´ng mÃƒÂ¬ chÃƒÂ­nh" (No MSG).
+
             You MUST return ONLY a JSON object with a single key "items" containing the array of dishes. No markdown blocks.
             JSON Structure:
             {
               "items": [
                 {
-                  "nameVi": "Tên món",
-                  "descVi": "Mô tả hấp dẫn",
+                  "nameVi": "TÃƒÂªn mÃƒÂ³n",
+                  "descVi": "MÃƒÂ´ tÃ¡ÂºÂ£ hÃ¡ÂºÂ¥p dÃ¡ÂºÂ«n",
                   "nameEn": "English name",
                   "descEn": "English desc",
                   "nameFi": "Finnish name",
                   "descFi": "Finnish desc",
                   "price": 12.50,
-                  "categoryVi": "Phở",
+                  "categoryVi": "PhÃ¡Â»Å¸",
                   "categoryEn": "Pho",
                   "categoryFi": "Pho",
                   "options": [
                     {
-                      "nameVi": "Cấp độ cay",
+                      "nameVi": "CÃ¡ÂºÂ¥p Ã„â€˜Ã¡Â»â„¢ cay",
                       "nameEn": "Spicy Level",
                       "nameFi": "Tulisuusaste",
                       "type": "single-select",
                       "choices": [
-                        { "labelVi": "Không cay", "labelEn": "Not Spicy", "labelFi": "Ei tulinen", "price": 0 },
+                        { "labelVi": "KhÃƒÂ´ng cay", "labelEn": "Not Spicy", "labelFi": "Ei tulinen", "price": 0 },
                         { "labelVi": "Cay", "labelEn": "Spicy", "labelFi": "Tulinen", "price": 0 }
                       ]
                     }
@@ -1547,7 +1585,7 @@ if (btnAiExtract) {
             }
             let rawJsonFinal = rawJson;
             const items = extractJsonArray(rawJson);
-            
+
             if (!Array.isArray(items)) {
                 throw new Error("AI did not return an array.");
             }
@@ -1556,7 +1594,7 @@ if (btnAiExtract) {
 
             let successCount = 0;
             for (const item of items) {
-                const catVi = item.categoryVi || item.category || 'Phở';
+                const catVi = item.categoryVi || item.category || 'PhÃ¡Â»Å¸';
                 await addDoc(collection(db, "menu"), {
                     nameVi: item.nameVi || 'Unknown',
                     descVi: item.descVi || '',
@@ -1569,13 +1607,13 @@ if (btnAiExtract) {
                     categoryEn: item.categoryEn || catVi,
                     categoryFi: item.categoryFi || catVi,
                     price: parseFloat(item.price) || 0,
-                    image: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=500', 
+                    image: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=500',
                     options: Array.isArray(item.options) ? item.options : [],
                     createdAt: new Date()
                 });
                 successCount++;
             }
-            
+
             window.showNotification(`Bulk Import Complete! Successfully added and translated ${successCount} items.`, 'success');
             loadCategories();
 
@@ -1596,7 +1634,7 @@ if (btnTranslate) {
     btnTranslate.addEventListener('click', async () => {
         const nameVi = document.getElementById('food-name-vi').value;
         const descVi = document.getElementById('food-desc-vi').value;
-        
+
         if (!nameVi) {
             window.showNotification('Please enter at least the Vietnamese Name before translating.', 'info');
             return;
@@ -1655,7 +1693,7 @@ if (foodAddForm) {
         const descEn = document.getElementById('food-desc-en').value;
         const nameFi = document.getElementById('food-name-fi').value;
         const descFi = document.getElementById('food-desc-fi').value;
-        
+
         const loadingIndicator = document.getElementById('ai-loading');
         loadingIndicator.innerHTML = '<span class="material-symbols-outlined animate-spin align-middle mr-2">sync</span> Saving to Database...';
         loadingIndicator.classList.remove('hidden');
@@ -1670,18 +1708,18 @@ if (foodAddForm) {
             const allergenWarning = document.getElementById('food-allergen')?.checked || false;
 
             await addDoc(collection(db, "menu"), {
-                nameVi, descVi, nameEn, descEn, nameFi, descFi, 
+                nameVi, descVi, nameEn, descEn, nameFi, descFi,
                 category: categoryVi,
                 categoryVi,
                 categoryEn: categoryEn || categoryVi,
                 categoryFi: categoryFi || categoryVi,
-                price, 
+                price,
                 image: finalImage,
                 options: foodOptions.length > 0 ? [...foodOptions] : [],
                 allergenWarning,
                 createdAt: new Date()
             });
-            
+
             window.showNotification('Food item added successfully!', 'success');
             foodAddForm.reset();
             currentCompressedImage = "";
@@ -1691,8 +1729,8 @@ if (foodAddForm) {
                 imagePreview.classList.add('hidden');
                 imagePreview.src = "";
             }
-            loadCategories(); 
-            
+            loadCategories();
+
         } catch (error) {
             console.error("Error adding food:", error);
             window.showNotification('Failed to add food. Ensure you have admin rights.', 'error');
@@ -1712,7 +1750,7 @@ if (foodTableBody) {
         try {
             const querySnapshot = await getDocs(collection(db, "menu"));
             foodTableBody.innerHTML = '';
-            
+
             if (querySnapshot.empty) {
                 foodTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-secondary">No food items found.</td></tr>';
                 return;
@@ -1748,7 +1786,7 @@ if (foodTableBody) {
                 <td class="py-3 px-4"><img src="${item.image}" class="w-12 h-12 object-cover rounded" onerror="this.src='https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=100'"></td>
                 <td class="py-3 px-4">
                     <span class="font-bold text-white">${item.nameVi || ''}</span>
-                    ${item.allergenWarning ? '<span class="inline-flex items-center gap-1 bg-red-900/30 text-red-400 text-xs px-2 py-0.5 rounded-md font-semibold border border-red-800/50 ml-2" title="Chứa thành phần dễ gây dị ứng"><span class="material-symbols-outlined text-[14px]">warning</span> Dị ứng</span>' : ''}
+                    ${item.allergenWarning ? '<span class="inline-flex items-center gap-1 bg-red-900/30 text-red-400 text-xs px-2 py-0.5 rounded-md font-semibold border border-red-800/50 ml-2" title="ChÃ¡Â»Â©a thÃƒÂ nh phÃ¡ÂºÂ§n dÃ¡Â»â€¦ gÃƒÂ¢y dÃ¡Â»â€¹ Ã¡Â»Â©ng"><span class="material-symbols-outlined text-[14px]">warning</span> DÃ¡Â»â€¹ Ã¡Â»Â©ng</span>' : ''}
                     <br>
                     <span class="text-xs text-secondary">EN: ${item.nameEn || ''}</span><br>
                     <span class="text-xs text-secondary">FI: ${item.nameFi || ''}</span>
@@ -1758,7 +1796,7 @@ if (foodTableBody) {
                     <span class="text-xs text-secondary">EN: ${item.categoryEn || ''}</span><br>
                     <span class="text-xs text-secondary">FI: ${item.categoryFi || ''}</span>
                 </td>
-                <td class="py-3 px-4">€${(item.price || 0).toFixed(2)}</td>
+                <td class="py-3 px-4">Ã¢â€šÂ¬${(item.price || 0).toFixed(2)}</td>
                 <td class="py-3 px-4">${optCount || '<span class="text-xs text-secondary/50">None</span>'}</td>
                 ${window.location.pathname.includes('/host/') ? '' : `
                 <td class="py-3 px-4 flex gap-2">
@@ -1784,7 +1822,7 @@ if (foodTableBody) {
     function setupAdminFoodSearch() {
         const adminFoodSearch = document.getElementById('admin-food-search');
         if (!adminFoodSearch) return;
-        
+
         adminFoodSearch.addEventListener('input', () => {
             const q = (adminFoodSearch.value || '').toLowerCase();
             const all = window.__adminFoodItems || [];
@@ -1808,7 +1846,7 @@ if (foodTableBody) {
                 await deleteDoc(doc(db, "menu", id));
                 window.showNotification("Food item deleted successfully!", "success");
                 loadFood();
-                loadCategories();
+                if (document.getElementById('category-datalist')) loadCategories();
             } catch (e) {
                 console.error("Delete error:", e);
                 window.showNotification("Failed to delete.", "error");
@@ -1833,7 +1871,7 @@ if (foodTableBody) {
                         await Promise.all(deletePromises);
                         window.showNotification(`Successfully deleted ${deletePromises.length} items.`, 'success');
                         loadFood();
-                        loadCategories();
+                        if (document.getElementById('category-datalist')) loadCategories();
                     } catch (e) {
                         console.error("Error clearing menu:", e);
                         window.showNotification("Failed to clear menu.", 'error');
@@ -1847,6 +1885,8 @@ if (foodTableBody) {
             }
         });
     }
+
+    loadFood();
 }
 
 // --- AUTO DESCRIPTION LOGIC ---
@@ -1855,7 +1895,7 @@ if (btnAutoDesc) {
     btnAutoDesc.addEventListener('click', async () => {
         const nameVi = document.getElementById('food-name-vi').value;
         if (!nameVi) {
-            window.showNotification('Vui lòng nhập Tên món (Tiếng Việt) trước!', 'info');
+            window.showNotification('Vui lÃƒÂ²ng nhÃ¡ÂºÂ­p TÃƒÂªn mÃƒÂ³n (TiÃ¡ÂºÂ¿ng ViÃ¡Â»â€¡t) trÃ†Â°Ã¡Â»â€ºc!', 'info');
             return;
         }
 
@@ -1869,11 +1909,11 @@ if (btnAutoDesc) {
                 messages: [
                     {
                         role: 'system',
-                        content: 'Bạn là chuyên gia viết content ẩm thực nhà hàng Việt Nam cao cấp. Nhiệm vụ của bạn là viết một đoạn mô tả món ăn (Description) bằng Tiếng Việt cực kỳ hấp dẫn, kích thích vị giác, giới thiệu sơ về nguyên liệu và cách chế biến. Đoạn văn phải ngắn gọn, dài tối đa 3 câu. Chỉ trả về văn bản, không dùng ngoặc kép, không dùng markdown.'
+                        content: 'BÃ¡ÂºÂ¡n lÃƒÂ  chuyÃƒÂªn gia viÃ¡ÂºÂ¿t content Ã¡ÂºÂ©m thÃ¡Â»Â±c nhÃƒÂ  hÃƒÂ ng ViÃ¡Â»â€¡t Nam cao cÃ¡ÂºÂ¥p. NhiÃ¡Â»â€¡m vÃ¡Â»Â¥ cÃ¡Â»Â§a bÃ¡ÂºÂ¡n lÃƒÂ  viÃ¡ÂºÂ¿t mÃ¡Â»â„¢t Ã„â€˜oÃ¡ÂºÂ¡n mÃƒÂ´ tÃ¡ÂºÂ£ mÃƒÂ³n Ã„Æ’n (Description) bÃ¡ÂºÂ±ng TiÃ¡ÂºÂ¿ng ViÃ¡Â»â€¡t cÃ¡Â»Â±c kÃ¡Â»Â³ hÃ¡ÂºÂ¥p dÃ¡ÂºÂ«n, kÃƒÂ­ch thÃƒÂ­ch vÃ¡Â»â€¹ giÃƒÂ¡c, giÃ¡Â»â€ºi thiÃ¡Â»â€¡u sÃ†Â¡ vÃ¡Â»Â nguyÃƒÂªn liÃ¡Â»â€¡u vÃƒÂ  cÃƒÂ¡ch chÃ¡ÂºÂ¿ biÃ¡ÂºÂ¿n. Ã„ÂoÃ¡ÂºÂ¡n vÃ„Æ’n phÃ¡ÂºÂ£i ngÃ¡ÂºÂ¯n gÃ¡Â»Ân, dÃƒÂ i tÃ¡Â»â€˜i Ã„â€˜a 3 cÃƒÂ¢u. ChÃ¡Â»â€° trÃ¡ÂºÂ£ vÃ¡Â»Â vÃ„Æ’n bÃ¡ÂºÂ£n, khÃƒÂ´ng dÃƒÂ¹ng ngoÃ¡ÂºÂ·c kÃƒÂ©p, khÃƒÂ´ng dÃƒÂ¹ng markdown.'
                     },
                     {
                         role: 'user',
-                        content: `Tên món ăn: ${nameVi}`
+                        content: `TÃƒÂªn mÃƒÂ³n Ã„Æ’n: ${nameVi}`
                     }
                 ]
             };
@@ -1884,7 +1924,7 @@ if (btnAutoDesc) {
 
         } catch (error) {
             console.error('Auto Desc Error:', error);
-            window.showNotification('Lỗi khi tạo mô tả. Vui lòng thử lại.', 'error');
+            window.showNotification('LÃ¡Â»â€”i khi tÃ¡ÂºÂ¡o mÃƒÂ´ tÃ¡ÂºÂ£. Vui lÃƒÂ²ng thÃ¡Â»Â­ lÃ¡ÂºÂ¡i.', 'error');
         } finally {
             btnAutoDesc.innerHTML = originalText;
             btnAutoDesc.disabled = false;
@@ -1892,15 +1932,18 @@ if (btnAutoDesc) {
     });
 }
 
-// --- FOOD LIST & EDIT LOGIC ---
+// --- FOOD EDIT MODAL LOGIC ---
+const foodTableBody2 = document.getElementById('food-table-body');
+if (foodTableBody2) {
     let editOptions = [];
     let editAddingChoices = [];
     let editCompressedImage = '';
 
-    window.openEditModal = function(id, item) {
+    window.openEditModal = async function(id, item) {
         const modal = document.getElementById('edit-modal');
         if (!modal) return;
-        
+        await loadCategories();
+
         document.getElementById('edit-food-id').value = id;
         document.getElementById('edit-name-vi').value = item.nameVi || '';
         document.getElementById('edit-name-en').value = item.nameEn || '';
@@ -1912,16 +1955,16 @@ if (btnAutoDesc) {
         document.getElementById('edit-category-en').value = item.categoryEn || '';
         document.getElementById('edit-category-fi').value = item.categoryFi || '';
         document.getElementById('edit-price').value = item.price || 0;
-        
+
         const editAllergenCb = document.getElementById('edit-allergen');
         if (editAllergenCb) editAllergenCb.checked = item.allergenWarning || false;
-        
+
         editOptions = item.options ? normalizeOptions(item.options) : [];
         editAddingChoices = [];
         editCompressedImage = '';
         renderEditAddingChoices();
         renderEditOptions();
-        
+
         modal.classList.remove('hidden');
     };
 
@@ -1941,7 +1984,7 @@ if (btnAutoDesc) {
             const row = document.createElement('div');
             row.className = 'flex items-center justify-between bg-surface-highlight p-1 rounded text-xs text-white';
             row.innerHTML = `
-                <span>${ch.labelVi} / ${ch.labelEn} / ${ch.labelFi} (${ch.price > 0 ? '+' + ch.price.toFixed(2) + '€' : 'Free'})</span>
+                <span>${ch.labelVi} / ${ch.labelEn} / ${ch.labelFi} (${ch.price > 0 ? '+' + ch.price.toFixed(2) + 'Ã¢â€šÂ¬' : 'Free'})</span>
                 <button type="button" class="text-red-400 hover:text-red-300 px-1 font-bold" data-idx="${idx}">&times;</button>
             `;
             row.querySelector('button').addEventListener('click', () => {
@@ -1958,16 +2001,16 @@ if (btnAutoDesc) {
             const labelEn = document.getElementById('edit-new-choice-label-en').value.trim();
             const labelFi = document.getElementById('edit-new-choice-label-fi').value.trim();
             const priceVal = parseFloat(editChoicePriceInput.value) || 0;
-            
+
             if (!labelVi && !labelEn && !labelFi) {
                 window.showNotification('Please enter a choice label in at least one language.', 'info');
                 return;
             }
-            
+
             const safeVi = labelVi || labelEn || labelFi;
             const safeEn = labelEn || safeVi;
             const safeFi = labelFi || safeVi;
-            
+
             editAddingChoices.push({
                 label: safeEn,
                 labelVi: safeVi,
@@ -1975,7 +2018,7 @@ if (btnAutoDesc) {
                 labelFi: safeFi,
                 price: priceVal
             });
-            
+
             document.getElementById('edit-new-choice-label-vi').value = '';
             document.getElementById('edit-new-choice-label-en').value = '';
             document.getElementById('edit-new-choice-label-fi').value = '';
@@ -1995,10 +2038,10 @@ if (btnAutoDesc) {
         editOptions.forEach((opt, idx) => {
             const div = document.createElement('div');
             div.className = 'bg-surface-highlight p-2 rounded-lg border border-gray-700/50 space-y-1 relative';
-            
-            const choicesHtml = opt.choices.map(c => 
+
+            const choicesHtml = opt.choices.map(c =>
                 `<span class="inline-block bg-gray-800 text-secondary text-[10px] px-1.5 py-0.5 rounded mr-1">
-                    ${c.labelVi || c.label} (${c.price > 0 ? '+' + c.price.toFixed(2) + '€' : 'Free'})
+                    ${c.labelVi || c.label} (${c.price > 0 ? '+' + c.price.toFixed(2) + 'Ã¢â€šÂ¬' : 'Free'})
                  </span>`
             ).join('');
 
@@ -2028,7 +2071,7 @@ if (btnAutoDesc) {
             const nameEn = document.getElementById('edit-new-opt-name-en').value.trim();
             const nameFi = document.getElementById('edit-new-opt-name-fi').value.trim();
             const type = editOptTypeSelect.value;
-            
+
             if (!nameVi && !nameEn && !nameFi) {
                 window.showNotification('Please enter an option group name in at least one language.', 'info');
                 return;
@@ -2037,11 +2080,11 @@ if (btnAutoDesc) {
                 window.showNotification('Please add at least one choice to this option group.', 'info');
                 return;
             }
-            
+
             const safeVi = nameVi || nameEn || nameFi;
             const safeEn = nameEn || safeVi;
             const safeFi = nameFi || safeVi;
-            
+
             editOptions.push({
                 name: safeEn,
                 nameVi: safeVi,
@@ -2050,7 +2093,7 @@ if (btnAutoDesc) {
                 type,
                 choices: [...editAddingChoices]
             });
-            
+
             document.getElementById('edit-new-opt-name-vi').value = '';
             document.getElementById('edit-new-opt-name-en').value = '';
             document.getElementById('edit-new-opt-name-fi').value = '';
@@ -2121,8 +2164,8 @@ if (btnAutoDesc) {
                 await updateDoc(doc(db, "menu", id), updateData);
                 window.showNotification('Food item updated successfully!', 'success');
                 window.closeEditModal();
-                loadFood();
-                loadCategories();
+                if (window.loadFood) window.loadFood();
+                if (window.loadCategories) window.loadCategories();
             } catch (err) {
                 console.error("Edit error:", err);
                 window.showNotification('Failed to update. Check console.', 'error');
@@ -2131,8 +2174,6 @@ if (btnAutoDesc) {
             }
         });
     }
-
-    loadFood();
 }
 
 // --- FLOATING AI ADMIN CHAT (MESSENGER-STYLE) ---
@@ -2247,21 +2288,21 @@ if (btnAutoDesc) {
                     <span class="material-symbols-outlined text-[20px]">close</span>
                 </button>
             </div>
-            
+
             <!-- Message Area -->
             <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-3" id="admin-chat-messages">
                 <div class="admin-chat-bubble bubble-ai">
-                    Xin chào! Tôi là Trợ lý AI của Phố Việt Khang. Tôi có thể hỗ trợ bạn kiểm tra đơn hàng hôm nay hoặc cập nhật giá cả các món ăn trực tiếp. Bạn cần giúp gì?
+                    Xin chÃƒÂ o! TÃƒÂ´i lÃƒÂ  TrÃ¡Â»Â£ lÃƒÂ½ AI cÃ¡Â»Â§a PhÃ¡Â»â€˜ ViÃ¡Â»â€¡t Khang. TÃƒÂ´i cÃƒÂ³ thÃ¡Â»Æ’ hÃ¡Â»â€” trÃ¡Â»Â£ bÃ¡ÂºÂ¡n kiÃ¡Â»Æ’m tra Ã„â€˜Ã†Â¡n hÃƒÂ ng hÃƒÂ´m nay hoÃ¡ÂºÂ·c cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t giÃƒÂ¡ cÃ¡ÂºÂ£ cÃƒÂ¡c mÃƒÂ³n Ã„Æ’n trÃ¡Â»Â±c tiÃ¡ÂºÂ¿p. BÃ¡ÂºÂ¡n cÃ¡ÂºÂ§n giÃƒÂºp gÃƒÂ¬?
                 </div>
             </div>
-            
+
             <!-- Input Bar -->
             <div class="p-3 border-t border-gray-800 bg-[#121824] flex gap-2 relative">
                 <input type="file" id="admin-chat-file" accept="image/*,.doc,.docx,.xls,.xlsx,.csv" class="hidden">
-                <button id="admin-chat-attach" class="bg-[#1e293b] hover:bg-gray-700 text-secondary hover:text-white p-2 rounded-xl border border-gray-700 transition-colors flex items-center justify-center" title="Đính kèm (Ảnh, Word, Excel)">
+                <button id="admin-chat-attach" class="bg-[#1e293b] hover:bg-gray-700 text-secondary hover:text-white p-2 rounded-xl border border-gray-700 transition-colors flex items-center justify-center" title="Ã„ÂÃƒÂ­nh kÃƒÂ¨m (Ã¡ÂºÂ¢nh, Word, Excel)">
                     <span class="material-symbols-outlined text-[18px]">attach_file</span>
                 </button>
-                <input type="text" id="admin-chat-input" placeholder="Hỏi về đơn hàng, chỉnh giá sốt..." class="flex-1 bg-[#0b0f19] border border-gray-700 rounded-xl text-white px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary">
+                <input type="text" id="admin-chat-input" placeholder="HÃ¡Â»Âi vÃ¡Â»Â Ã„â€˜Ã†Â¡n hÃƒÂ ng, chÃ¡Â»â€°nh giÃƒÂ¡ sÃ¡Â»â€˜t..." class="flex-1 bg-[#0b0f19] border border-gray-700 rounded-xl text-white px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary">
                 <button id="admin-chat-send" class="bg-primary hover:bg-blue-600 text-white p-2 rounded-xl transition-colors flex items-center justify-center">
                     <span class="material-symbols-outlined text-[18px]">send</span>
                 </button>
@@ -2300,17 +2341,17 @@ if (btnAutoDesc) {
     fileInput.addEventListener('change', async (e) => {
         const file = e.target.files[0];
         if (!file) return;
-        
+
         const attachIcon = attachBtn.querySelector('span');
         const originalIcon = attachIcon.textContent;
         attachIcon.textContent = 'hourglass_empty';
         attachIcon.classList.add('animate-spin');
-        chatInput.placeholder = 'Đang xử lý file...';
+        chatInput.placeholder = 'Ã„Âang xÃ¡Â»Â­ lÃƒÂ½ file...';
         chatInput.disabled = true;
 
         try {
             const ext = file.name.split('.').pop().toLowerCase();
-            
+
             // 1. Handle Images (Convert to Base64 using Canvas)
             if (['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(ext)) {
                 const reader = new FileReader();
@@ -2346,17 +2387,17 @@ if (btnAutoDesc) {
                         const imgId = "ATTACHED_IMAGE_" + Date.now();
                         window.__uploadedImages[imgId] = dataUrl;
 
-                        chatInput.value += (chatInput.value ? ' ' : '') + `[Ảnh đính kèm: ${imgId}] `;
+                        chatInput.value += (chatInput.value ? ' ' : '') + `[Ã¡ÂºÂ¢nh Ã„â€˜ÃƒÂ­nh kÃƒÂ¨m: ${imgId}] `;
 
                         attachIcon.classList.remove('animate-spin');
                         attachIcon.textContent = originalIcon;
-                        chatInput.placeholder = 'Hỏi về đơn hàng, chỉnh giá sốt...';
+                        chatInput.placeholder = 'HÃ¡Â»Âi vÃ¡Â»Â Ã„â€˜Ã†Â¡n hÃƒÂ ng, chÃ¡Â»â€°nh giÃƒÂ¡ sÃ¡Â»â€˜t...';
                         chatInput.disabled = false;
                         chatInput.focus();
                         fileInput.value = '';
                     };
                     img.onerror = () => {
-                        alert("Lỗi khi đọc ảnh!");
+                        alert("LÃ¡Â»â€”i khi Ã„â€˜Ã¡Â»Âc Ã¡ÂºÂ£nh!");
                         attachIcon.classList.remove('animate-spin');
                         attachIcon.textContent = originalIcon;
                         chatInput.disabled = false;
@@ -2371,7 +2412,7 @@ if (btnAutoDesc) {
                 await loadScript('https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js');
                 const arrayBuffer = await file.arrayBuffer();
                 const result = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
-                chatInput.value += (chatInput.value ? '\\n' : '') + `[Nội dung file Word ${file.name}:\\n${result.value}]\\n`;
+                chatInput.value += (chatInput.value ? '\\n' : '') + `[NÃ¡Â»â„¢i dung file Word ${file.name}:\\n${result.value}]\\n`;
             }
             // 3. Handle Excel (.xlsx, .xls, .csv)
             else if (['xlsx', 'xls', 'csv'].includes(ext)) {
@@ -2381,18 +2422,18 @@ if (btnAutoDesc) {
                 const firstSheetName = workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[firstSheetName];
                 const csvStr = XLSX.utils.sheet_to_csv(worksheet);
-                chatInput.value += (chatInput.value ? '\\n' : '') + `[Nội dung file Excel ${file.name}:\\n${csvStr}]\\n`;
+                chatInput.value += (chatInput.value ? '\\n' : '') + `[NÃ¡Â»â„¢i dung file Excel ${file.name}:\\n${csvStr}]\\n`;
             }
             else {
-                alert('Định dạng file không được hỗ trợ!');
+                alert('Ã„ÂÃ¡Â»â€¹nh dÃ¡ÂºÂ¡ng file khÃƒÂ´ng Ã„â€˜Ã†Â°Ã¡Â»Â£c hÃ¡Â»â€” trÃ¡Â»Â£!');
             }
         } catch (err) {
             console.error(err);
-            alert('Lỗi xử lý file: ' + err.message);
+            alert('LÃ¡Â»â€”i xÃ¡Â»Â­ lÃƒÂ½ file: ' + err.message);
         } finally {
             attachIcon.classList.remove('animate-spin');
             attachIcon.textContent = originalIcon;
-            chatInput.placeholder = 'Hỏi về đơn hàng, chỉnh giá sốt...';
+            chatInput.placeholder = 'HÃ¡Â»Âi vÃ¡Â»Â Ã„â€˜Ã†Â¡n hÃƒÂ ng, chÃ¡Â»â€°nh giÃƒÂ¡ sÃ¡Â»â€˜t...';
             chatInput.disabled = false;
             chatInput.focus();
             fileInput.value = ''; // Reset input
@@ -2428,7 +2469,7 @@ if (btnAutoDesc) {
     const chatMessages = [
         {
             role: 'system',
-            content: `You are a helpful Vietnamese restaurant AI Admin Assistant for Phở Việt Khang restaurant.
+            content: `You are a helpful Vietnamese restaurant AI Admin Assistant for PhÃ¡Â»Å¸ ViÃ¡Â»â€¡t Khang restaurant.
 You have full access to Firebase tools that can manage orders, food menu, AND Firebase Auth user accounts with real admin privileges.
 You MUST answer in Vietnamese.
 
@@ -2442,14 +2483,14 @@ To call a tool, output a <tool_call> JSON block:
 </tool_call>
 
 Rules:
-- You CAN output multiple <tool_call> blocks in one turn — they run in parallel.
+- You CAN output multiple <tool_call> blocks in one turn Ã¢â‚¬â€ they run in parallel.
 - When outputting tool calls, output ONLY the <tool_call> blocks, nothing else.
 - After receiving tool results, formulate your final Vietnamese response.
 - You MAY call tools again in a subsequent turn if you need more information.
 
-═══════════════════════════════════════════════
-📦 ORDER TOOLS
-═══════════════════════════════════════════════
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+Ã°Å¸â€œÂ¦ ORDER TOOLS
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 1. getOrdersSoldToday()
    Args: {}
    Returns today's orders: count, total revenue, and list.
@@ -2466,9 +2507,9 @@ Rules:
    Args: { "orderId": string }
    Permanently deletes an order.
 
-═══════════════════════════════════════════════
-🍜 MENU TOOLS
-═══════════════════════════════════════════════
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+Ã°Å¸ÂÅ“ MENU TOOLS
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 5. listAllFoodItems()
    Args: {}
    Returns all food items with IDs, prices, categories, and options.
@@ -2555,7 +2596,7 @@ Rules:
 
 11o. duplicateMenuItem(dishId)
     Args: { "dishId": string }
-    Duplicates a menu item (clones document and appends " (Bản sao)").
+    Duplicates a menu item (clones document and appends " (BÃ¡ÂºÂ£n sao)").
 
 11p. deleteMenuItem(dishId)
     Args: { "dishId": string }
@@ -2565,9 +2606,9 @@ Rules:
     Args: { "dishId": string, "customFields": object }
     Updates any other custom metadata fields in the menu item.
 
-═══════════════════════════════════════════════
-🏠 HOMEPAGE CONFIG TOOLS
-═══════════════════════════════════════════════
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+Ã°Å¸ÂÂ  HOMEPAGE CONFIG TOOLS
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 11r. updateHomepageHero(imageUrl, titleVi, descVi)
     Args: { "imageUrl": string, "titleVi": string, "descVi": string }
     Updates the hero background image and text on the main index page. If the user attaches an image, use the provided ID (e.g., "ATTACHED_IMAGE_123456").
@@ -2604,9 +2645,9 @@ Rules:
     Args: { "next20": number?, "next50": number?, "next100": number? }
     Updates the Lucky Wheel spin guarantee thresholds. Pass null or omit to leave unchanged.
 
-═══════════════════════════════════════════════
-👥 USER / FIRESTORE TOOLS
-═══════════════════════════════════════════════
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+Ã°Å¸â€˜Â¥ USER / FIRESTORE TOOLS
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 12. listAllUsers()
     Args: {}
     Returns all users from Firestore (uid, email, name, role, totalSpent, loyaltyTier).
@@ -2655,9 +2696,9 @@ Rules:
     Args: { "title": string, "text": string, "imageUrl": string }
     Sends a broadcast inbox message to all registered users. Use this for general announcements. If the user attaches an image, use the provided ID.
 
-═══════════════════════════════════════════════
-🔥 FIREBASE ADMIN TOOLS (Real Auth Management)
-═══════════════════════════════════════════════
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+Ã°Å¸â€Â¥ FIREBASE ADMIN TOOLS (Real Auth Management)
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 16. adminListAuthUsers()
     Args: {}
     Lists ALL Firebase Auth users with disabled status, email verification, and sign-in time.
@@ -2707,9 +2748,9 @@ Rules:
     Args: { "uid": string }
     Generates a custom sign-in token for testing/impersonation.
 
-═══════════════════════════════════════════════
-🔧 CURRENT ADMIN SELF-MANAGEMENT
-═══════════════════════════════════════════════
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+Ã°Å¸â€Â§ CURRENT ADMIN SELF-MANAGEMENT
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 28. changeCurrentAdminPassword(newPassword)
     Args: { "newPassword": string }
     Changes YOUR OWN admin password.
@@ -2722,9 +2763,9 @@ Rules:
     Args: { "name": string }
     Changes YOUR OWN display name.
 
-═══════════════════════════════════════════════
-🌐 WEB SEARCH & BROWSER TOOLS
-═══════════════════════════════════════════════
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+Ã°Å¸Å’Â WEB SEARCH & BROWSER TOOLS
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 31. webSearch(query)
     Args: { "query": string }
     Searches the web for news, menu items, or competitor information.
@@ -2812,14 +2853,14 @@ Rules:
             const data = snap.exists() ? snap.data() : {};
             const reviews = Array.isArray(data.customReviews) ? [...data.customReviews] : [];
             if (index < 0 || index >= reviews.length) {
-                return { error: `Index ${index} không hợp lệ. Hiện có ${reviews.length} reviews.` };
+                return { error: `Index ${index} khÃƒÂ´ng hÃ¡Â»Â£p lÃ¡Â»â€¡. HiÃ¡Â»â€¡n cÃƒÂ³ ${reviews.length} reviews.` };
             }
             reviews[index] = {
                 ...reviews[index],
                 avatar: imageUrl || reviews[index].avatar
             };
             await setDoc(doc(db, "config", "homepage"), { customReviews: reviews }, { merge: true });
-            return { success: true, message: `Đã cập nhật ảnh review index ${index} thành công.` };
+            return { success: true, message: `Ã„ÂÃƒÂ£ cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t Ã¡ÂºÂ£nh review index ${index} thÃƒÂ nh cÃƒÂ´ng.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -2880,7 +2921,7 @@ Rules:
                 guarantee: updates
             }, { merge: true });
 
-            return { success: true, message: `Đã cập nhật bộ đếm Lucky Wheel: next20=${next20 ?? " giữ nguyên"}, next50=${next50 ?? " giữ nguyên"}, next100=${next100 ?? " giữ nguyên"}.` };
+            return { success: true, message: `Ã„ÂÃƒÂ£ cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t bÃ¡Â»â„¢ Ã„â€˜Ã¡ÂºÂ¿m Lucky Wheel: next20=${next20 ?? " giÃ¡Â»Â¯ nguyÃƒÂªn"}, next50=${next50 ?? " giÃ¡Â»Â¯ nguyÃƒÂªn"}, next100=${next100 ?? " giÃ¡Â»Â¯ nguyÃƒÂªn"}.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -2890,7 +2931,7 @@ Rules:
     async function sendGlobalAnnouncement(title, text, imageUrl) {
         try {
             await addDoc(collection(db, "messages"), {
-                title: title || "Thông báo từ Nhà hàng",
+                title: title || "ThÃƒÂ´ng bÃƒÂ¡o tÃ¡Â»Â« NhÃƒÂ  hÃƒÂ ng",
                 text: text || "",
                 imageUrl: imageUrl || null,
                 voucherCode: null,
@@ -3000,10 +3041,10 @@ Rules:
             });
             if (!updated) return { error: "Option or choice not found" };
             await updateDoc(docRef, { options });
-            
+
             // Reload page list if we are on food-list
             if (typeof window.loadFood === 'function') window.loadFood();
-            
+
             return { success: true, message: `Set option choice price for ${choiceLabel} to ${newPrice} EUR successfully.` };
         } catch (e) {
             console.error(e);
@@ -3019,20 +3060,20 @@ Rules:
             qSnap.forEach(d => {
                 if (d.id === dishId) targetDoc = d.data();
             });
-            if (!targetDoc) return { error: "Không tìm thấy món ăn." };
-            
+            if (!targetDoc) return { error: "KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y mÃƒÂ³n Ã„Æ’n." };
+
             const nameVi = optionNameVi || '';
             const nameEn = optionNameEn || nameVi;
             const nameFi = optionNameFi || nameVi;
-            
+
             const options = normalizeOptions(targetDoc.options || []);
             // Check if group already exists in any language
-            const exists = options.some(opt => 
+            const exists = options.some(opt =>
                 (opt.nameVi || '').toLowerCase() === nameVi.toLowerCase() ||
                 (opt.nameEn || '').toLowerCase() === nameEn.toLowerCase()
             );
-            if (exists) return { error: `Nhóm option "${nameVi}" đã tồn tại.` };
-            
+            if (exists) return { error: `NhÃƒÂ³m option "${nameVi}" Ã„â€˜ÃƒÂ£ tÃ¡Â»â€œn tÃ¡ÂºÂ¡i.` };
+
             options.push({
                 name: nameEn,
                 nameVi: nameVi,
@@ -3052,10 +3093,10 @@ Rules:
                     };
                 }) : []
             });
-            
+
             await updateDoc(docRef, { options });
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Đã thêm nhóm option "${nameVi}" thành công.` };
+            return { success: true, message: `Ã„ÂÃƒÂ£ thÃƒÂªm nhÃƒÂ³m option "${nameVi}" thÃƒÂ nh cÃƒÂ´ng.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3070,8 +3111,8 @@ Rules:
             qSnap.forEach(d => {
                 if (d.id === dishId) targetDoc = d.data();
             });
-            if (!targetDoc) return { error: "Không tìm thấy món ăn." };
-            
+            if (!targetDoc) return { error: "KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y mÃƒÂ³n Ã„Æ’n." };
+
             const options = normalizeOptions(targetDoc.options || []);
             const originalLength = options.length;
             const updatedOptions = options.filter(opt => {
@@ -3081,14 +3122,14 @@ Rules:
                                    (opt.nameFi || '').toLowerCase() === optionName.toLowerCase();
                 return !matchesOpt;
             });
-            
+
             if (originalLength === updatedOptions.length) {
-                return { error: `Không tìm thấy nhóm option "${optionName}".` };
+                return { error: `KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y nhÃƒÂ³m option "${optionName}".` };
             }
-            
+
             await updateDoc(docRef, { options: updatedOptions });
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Đã xoá nhóm option "${optionName}" thành công.` };
+            return { success: true, message: `Ã„ÂÃƒÂ£ xoÃƒÂ¡ nhÃƒÂ³m option "${optionName}" thÃƒÂ nh cÃƒÂ´ng.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3103,8 +3144,8 @@ Rules:
             qSnap.forEach(d => {
                 if (d.id === dishId) targetDoc = d.data();
             });
-            if (!targetDoc) return { error: "Không tìm thấy món ăn." };
-            
+            if (!targetDoc) return { error: "KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y mÃƒÂ³n Ã„Æ’n." };
+
             let updated = false;
             const options = normalizeOptions(targetDoc.options || []).map(opt => {
                 const matchesOpt = (opt.name || '').toLowerCase() === optionName.toLowerCase() ||
@@ -3115,9 +3156,9 @@ Rules:
                     const lVi = choiceLabelVi || '';
                     const lEn = choiceLabelEn || lVi;
                     const lFi = choiceLabelFi || lVi;
-                    
+
                     // Check if choice already exists in any language
-                    const exists = opt.choices.some(c => 
+                    const exists = opt.choices.some(c =>
                         (c.label || '').toLowerCase() === lEn.toLowerCase() ||
                         (c.labelVi || '').toLowerCase() === lVi.toLowerCase()
                     );
@@ -3134,12 +3175,12 @@ Rules:
                 }
                 return opt;
             });
-            
-            if (!updated) return { error: `Nhóm option "${optionName}" không tồn tại hoặc lựa chọn "${choiceLabelVi}" đã có sẵn.` };
-            
+
+            if (!updated) return { error: `NhÃƒÂ³m option "${optionName}" khÃƒÂ´ng tÃ¡Â»â€œn tÃ¡ÂºÂ¡i hoÃ¡ÂºÂ·c lÃ¡Â»Â±a chÃ¡Â»Ân "${choiceLabelVi}" Ã„â€˜ÃƒÂ£ cÃƒÂ³ sÃ¡ÂºÂµn.` };
+
             await updateDoc(docRef, { options });
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Đã thêm lựa chọn "${choiceLabelVi}" vào nhóm "${optionName}" thành công.` };
+            return { success: true, message: `Ã„ÂÃƒÂ£ thÃƒÂªm lÃ¡Â»Â±a chÃ¡Â»Ân "${choiceLabelVi}" vÃƒÂ o nhÃƒÂ³m "${optionName}" thÃƒÂ nh cÃƒÂ´ng.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3154,8 +3195,8 @@ Rules:
             qSnap.forEach(d => {
                 if (d.id === dishId) targetDoc = d.data();
             });
-            if (!targetDoc) return { error: "Không tìm thấy món ăn." };
-            
+            if (!targetDoc) return { error: "KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y mÃƒÂ³n Ã„Æ’n." };
+
             let updated = false;
             const options = normalizeOptions(targetDoc.options || []).map(opt => {
                 const matchesOpt = (opt.name || '').toLowerCase() === optionName.toLowerCase() ||
@@ -3177,12 +3218,12 @@ Rules:
                 }
                 return opt;
             });
-            
-            if (!updated) return { error: `Không tìm thấy nhóm "${optionName}" hoặc lựa chọn "${choiceLabel}".` };
-            
+
+            if (!updated) return { error: `KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y nhÃƒÂ³m "${optionName}" hoÃ¡ÂºÂ·c lÃ¡Â»Â±a chÃ¡Â»Ân "${choiceLabel}".` };
+
             await updateDoc(docRef, { options });
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Đã xoá lựa chọn "${choiceLabel}" khỏi nhóm "${optionName}" thành công.` };
+            return { success: true, message: `Ã„ÂÃƒÂ£ xoÃƒÂ¡ lÃ¡Â»Â±a chÃ¡Â»Ân "${choiceLabel}" khÃ¡Â»Âi nhÃƒÂ³m "${optionName}" thÃƒÂ nh cÃƒÂ´ng.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3197,8 +3238,8 @@ Rules:
             qSnap.forEach(d => {
                 if (d.id === dishId) targetDoc = d.data();
             });
-            if (!targetDoc) return { error: "Không tìm thấy món ăn." };
-            
+            if (!targetDoc) return { error: "KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y mÃƒÂ³n Ã„Æ’n." };
+
             let updated = false;
             const options = normalizeOptions(targetDoc.options || []).map(opt => {
                 const matchesOpt = (opt.name || '').toLowerCase() === oldOptionName.toLowerCase() ||
@@ -3217,12 +3258,12 @@ Rules:
                 }
                 return opt;
             });
-            
-            if (!updated) return { error: `Không tìm thấy nhóm option "${oldOptionName}".` };
-            
+
+            if (!updated) return { error: `KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y nhÃƒÂ³m option "${oldOptionName}".` };
+
             await updateDoc(docRef, { options });
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Đã cập nhật nhóm option "${oldOptionName}" thành công.` };
+            return { success: true, message: `Ã„ÂÃƒÂ£ cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t nhÃƒÂ³m option "${oldOptionName}" thÃƒÂ nh cÃƒÂ´ng.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3237,8 +3278,8 @@ Rules:
             qSnap.forEach(d => {
                 if (d.id === dishId) targetDoc = d.data();
             });
-            if (!targetDoc) return { error: "Không tìm thấy món ăn." };
-            
+            if (!targetDoc) return { error: "KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y mÃƒÂ³n Ã„Æ’n." };
+
             let updated = false;
             const options = normalizeOptions(targetDoc.options || []).map(opt => {
                 const matchesOpt = (opt.name || '').toLowerCase() === optionName.toLowerCase() ||
@@ -3266,12 +3307,12 @@ Rules:
                 }
                 return opt;
             });
-            
-            if (!updated) return { error: `Không tìm thấy lựa chọn "${oldChoiceLabel}" trong nhóm "${optionName}".` };
-            
+
+            if (!updated) return { error: `KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y lÃ¡Â»Â±a chÃ¡Â»Ân "${oldChoiceLabel}" trong nhÃƒÂ³m "${optionName}".` };
+
             await updateDoc(docRef, { options });
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Đã cập nhật lựa chọn "${oldChoiceLabel}" thành công.` };
+            return { success: true, message: `Ã„ÂÃƒÂ£ cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t lÃ¡Â»Â±a chÃ¡Â»Ân "${oldChoiceLabel}" thÃƒÂ nh cÃƒÂ´ng.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3287,7 +3328,7 @@ Rules:
             if (nameFi !== undefined) updateData.nameFi = nameFi;
             await updateDoc(docRef, updateData);
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Đã cập nhật tên món ăn thành công.` };
+            return { success: true, message: `Ã„ÂÃƒÂ£ cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t tÃƒÂªn mÃƒÂ³n Ã„Æ’n thÃƒÂ nh cÃƒÂ´ng.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3303,7 +3344,7 @@ Rules:
             if (descriptionFi !== undefined) updateData.descFi = descriptionFi;
             await updateDoc(docRef, updateData);
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Đã cập nhật mô tả món ăn thành công.` };
+            return { success: true, message: `Ã„ÂÃƒÂ£ cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t mÃƒÂ´ tÃ¡ÂºÂ£ mÃƒÂ³n Ã„Æ’n thÃƒÂ nh cÃƒÂ´ng.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3324,7 +3365,7 @@ Rules:
             if (categoryFi !== undefined) updateData.categoryFi = categoryFi;
             await updateDoc(docRef, updateData);
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Đã cập nhật danh mục món ăn thành công.` };
+            return { success: true, message: `Ã„ÂÃƒÂ£ cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t danh mÃ¡Â»Â¥c mÃƒÂ³n Ã„Æ’n thÃƒÂ nh cÃƒÂ´ng.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3336,7 +3377,7 @@ Rules:
             const docRef = doc(db, "menu", dishId);
             await updateDoc(docRef, { isAvailable: !!isAvailable });
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Đã cập nhật trạng thái có sẵn thành công.` };
+            return { success: true, message: `Ã„ÂÃƒÂ£ cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t trÃ¡ÂºÂ¡ng thÃƒÂ¡i cÃƒÂ³ sÃ¡ÂºÂµn thÃƒÂ nh cÃƒÂ´ng.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3348,7 +3389,7 @@ Rules:
             const docRef = doc(db, "menu", dishId);
             await updateDoc(docRef, { image: imageUrl });
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Đã cập nhật ảnh món ăn thành công.` };
+            return { success: true, message: `Ã„ÂÃƒÂ£ cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t Ã¡ÂºÂ£nh mÃƒÂ³n Ã„Æ’n thÃƒÂ nh cÃƒÂ´ng.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3361,7 +3402,7 @@ Rules:
             const defaultImg = 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=500';
             await updateDoc(docRef, { image: defaultImg });
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Đã xoá ảnh món ăn thành công.` };
+            return { success: true, message: `Ã„ÂÃƒÂ£ xoÃƒÂ¡ Ã¡ÂºÂ£nh mÃƒÂ³n Ã„Æ’n thÃƒÂ nh cÃƒÂ´ng.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3373,7 +3414,7 @@ Rules:
             const docRef = doc(db, "menu", dishId);
             await updateDoc(docRef, { preparationTime: parseInt(minutes) || 0 });
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Đã cập nhật thời gian chuẩn bị thành công.` };
+            return { success: true, message: `Ã„ÂÃƒÂ£ cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t thÃ¡Â»Âi gian chuÃ¡ÂºÂ©n bÃ¡Â»â€¹ thÃƒÂ nh cÃƒÂ´ng.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3391,7 +3432,7 @@ Rules:
             };
             await updateDoc(docRef, { nutrition });
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Đã cập nhật thông tin dinh dưỡng thành công.` };
+            return { success: true, message: `Ã„ÂÃƒÂ£ cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t thÃƒÂ´ng tin dinh dÃ†Â°Ã¡Â»Â¡ng thÃƒÂ nh cÃƒÂ´ng.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3402,15 +3443,15 @@ Rules:
         try {
             const docRef = doc(db, "menu", dishId);
             const docSnap = await getDoc(docRef);
-            if (!docSnap.exists()) return { error: "Không tìm thấy món ăn." };
+            if (!docSnap.exists()) return { error: "KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y mÃƒÂ³n Ã„Æ’n." };
             const data = docSnap.data();
             const tags = Array.isArray(data.tags) ? data.tags : [];
-            
+
             const lVi = tagLabelVi || '';
             const lEn = tagLabelEn || lVi;
             const lFi = tagLabelFi || lVi;
-            
-            const exists = tags.some(t => 
+
+            const exists = tags.some(t =>
                 (t.labelVi || '').toLowerCase() === lVi.toLowerCase() ||
                 (t.labelEn || '').toLowerCase() === lEn.toLowerCase()
             );
@@ -3419,7 +3460,7 @@ Rules:
                 await updateDoc(docRef, { tags });
             }
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Đã thêm tag "${lVi}" thành công.` };
+            return { success: true, message: `Ã„ÂÃƒÂ£ thÃƒÂªm tag "${lVi}" thÃƒÂ nh cÃƒÂ´ng.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3430,22 +3471,22 @@ Rules:
         try {
             const docRef = doc(db, "menu", dishId);
             const docSnap = await getDoc(docRef);
-            if (!docSnap.exists()) return { error: "Không tìm thấy món ăn." };
+            if (!docSnap.exists()) return { error: "KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y mÃƒÂ³n Ã„Æ’n." };
             const data = docSnap.data();
             const tags = Array.isArray(data.tags) ? data.tags : [];
-            const newTags = tags.filter(t => 
+            const newTags = tags.filter(t =>
                 (t.labelVi || '').toLowerCase() !== tagLabel.toLowerCase() &&
                 (t.labelEn || '').toLowerCase() !== tagLabel.toLowerCase() &&
                 (t.labelFi || '').toLowerCase() !== tagLabel.toLowerCase()
             );
-            
+
             if (tags.length === newTags.length) {
-                return { error: `Không tìm thấy tag "${tagLabel}".` };
+                return { error: `KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y tag "${tagLabel}".` };
             }
-            
+
             await updateDoc(docRef, { tags: newTags });
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Đã xoá tag "${tagLabel}" thành công.` };
+            return { success: true, message: `Ã„ÂÃƒÂ£ xoÃƒÂ¡ tag "${tagLabel}" thÃƒÂ nh cÃƒÂ´ng.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3454,13 +3495,13 @@ Rules:
 
     async function reorderMenuItems(orderedDishIds) {
         try {
-            if (!Array.isArray(orderedDishIds)) return { error: "orderedDishIds phải là một mảng các IDs." };
+            if (!Array.isArray(orderedDishIds)) return { error: "orderedDishIds phÃ¡ÂºÂ£i lÃƒÂ  mÃ¡Â»â„¢t mÃ¡ÂºÂ£ng cÃƒÂ¡c IDs." };
             for (let i = 0; i < orderedDishIds.length; i++) {
                 const dishId = orderedDishIds[i];
                 await updateDoc(doc(db, "menu", dishId), { sortOrder: i });
             }
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: "Đã sắp xếp lại thứ tự hiển thị món ăn thành công." };
+            return { success: true, message: "Ã„ÂÃƒÂ£ sÃ¡ÂºÂ¯p xÃ¡ÂºÂ¿p lÃ¡ÂºÂ¡i thÃ¡Â»Â© tÃ¡Â»Â± hiÃ¡Â»Æ’n thÃ¡Â»â€¹ mÃƒÂ³n Ã„Æ’n thÃƒÂ nh cÃƒÂ´ng." };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3471,11 +3512,11 @@ Rules:
         try {
             const docRef = doc(db, "menu", dishId);
             const docSnap = await getDoc(docRef);
-            if (!docSnap.exists()) return { error: "Không tìm thấy món ăn để sao chép." };
+            if (!docSnap.exists()) return { error: "KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y mÃƒÂ³n Ã„Æ’n Ã„â€˜Ã¡Â»Æ’ sao chÃƒÂ©p." };
             const data = docSnap.data();
             const newData = {
                 ...data,
-                nameVi: (data.nameVi || "") + " (Bản sao)",
+                nameVi: (data.nameVi || "") + " (BÃ¡ÂºÂ£n sao)",
                 createdAt: new Date()
             };
             let targetId;
@@ -3487,7 +3528,7 @@ Rules:
                 targetId = newDocRef.id;
             }
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Đã nhân bản món ăn thành công với ID mới: ${targetId}` };
+            return { success: true, message: `Ã„ÂÃƒÂ£ nhÃƒÂ¢n bÃ¡ÂºÂ£n mÃƒÂ³n Ã„Æ’n thÃƒÂ nh cÃƒÂ´ng vÃ¡Â»â€ºi ID mÃ¡Â»â€ºi: ${targetId}` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3499,7 +3540,7 @@ Rules:
             await deleteDoc(doc(db, "menu", dishId));
             if (typeof window.loadFood === 'function') window.loadFood();
             if (typeof window.loadCategories === 'function') window.loadCategories();
-            return { success: true, message: `Đã xoá hoàn toàn món ăn thành công.` };
+            return { success: true, message: `Ã„ÂÃƒÂ£ xoÃƒÂ¡ hoÃƒÂ n toÃƒÂ n mÃƒÂ³n Ã„Æ’n thÃƒÂ nh cÃƒÂ´ng.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3510,11 +3551,11 @@ Rules:
         try {
             const docRef = doc(db, "menu", dishId);
             if (typeof customFields !== 'object' || customFields === null) {
-                return { error: "customFields phải là một object chứa các khoá cần cập nhật." };
+                return { error: "customFields phÃ¡ÂºÂ£i lÃƒÂ  mÃ¡Â»â„¢t object chÃ¡Â»Â©a cÃƒÂ¡c khoÃƒÂ¡ cÃ¡ÂºÂ§n cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t." };
             }
             await updateDoc(docRef, customFields);
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Đã cập nhật các trường tuỳ chỉnh thành công.` };
+            return { success: true, message: `Ã„ÂÃƒÂ£ cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t cÃƒÂ¡c trÃ†Â°Ã¡Â»Âng tuÃ¡Â»Â³ chÃ¡Â»â€°nh thÃƒÂ nh cÃƒÂ´ng.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3546,7 +3587,7 @@ Rules:
     async function getUserLoyalty(uid) {
         try {
             const snap = await getDoc(doc(db, "users", uid));
-            if (!snap.exists()) return { error: "Không tìm thấy user." };
+            if (!snap.exists()) return { error: "KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y user." };
             const data = snap.data();
             const totalSpent = data.totalSpent || 0;
             const tier = computeLoyaltyTier(totalSpent);
@@ -3559,19 +3600,19 @@ Rules:
     async function addLoyaltyProgressByOrderId(orderId) {
         try {
             const orderSnap = await getDoc(doc(db, "orders", orderId));
-            if (!orderSnap.exists()) return { error: "Không tìm thấy đơn hàng." };
+            if (!orderSnap.exists()) return { error: "KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y Ã„â€˜Ã†Â¡n hÃƒÂ ng." };
             const order = orderSnap.data();
             const userId = order.userId;
-            if (!userId) return { error: "Đơn hàng không có userId." };
+            if (!userId) return { error: "Ã„ÂÃ†Â¡n hÃƒÂ ng khÃƒÂ´ng cÃƒÂ³ userId." };
             const totalVnd = Number(order.totalPrice || 0);
-            if (totalVnd <= 0) return { error: "Giá trị đơn hàng không hợp lệ." };
+            if (totalVnd <= 0) return { error: "GiÃƒÂ¡ trÃ¡Â»â€¹ Ã„â€˜Ã†Â¡n hÃƒÂ ng khÃƒÂ´ng hÃ¡Â»Â£p lÃ¡Â»â€¡." };
 
             const EUR_RATE = 25000;
             const totalEur = +(totalVnd / EUR_RATE).toFixed(2);
 
             const userRef = doc(db, "users", userId);
             await updateDoc(userRef, { totalSpent: Number(((order.totalSpent || 0) + totalEur).toFixed(2)) });
-            return { success: true, message: `Đã cộng ${totalEur} EUR vào loyalty của user ${userId}.` };
+            return { success: true, message: `Ã„ÂÃƒÂ£ cÃ¡Â»â„¢ng ${totalEur} EUR vÃƒÂ o loyalty cÃ¡Â»Â§a user ${userId}.` };
         } catch (e) {
             return { error: e.message };
         }
@@ -3579,21 +3620,21 @@ Rules:
 
     function computeLoyaltyTier(totalSpent) {
         const spent = Number(totalSpent) || 0;
-        if (spent >= 40) return { key: 'kim_cuong', labelVi: 'Kim Cương', color: '#7c3aed', icon: 'diamond', discountPercent: 15 };
-        if (spent >= 20) return { key: 'kim', labelVi: 'Vàng', color: '#eab308', icon: 'workspace_premium', discountPercent: 10 };
-        if (spent >= 8) return { key: 'bac', labelVi: 'Bạc', color: '#9ca3af', icon: 'shield', discountPercent: 5 };
-        if (spent >= 4) return { key: 'vang', labelVi: 'Đồng', color: '#9a3412', icon: 'monetization_on', discountPercent: 0 };
-        return { key: 'dong', labelVi: 'Đồng', color: '#78350f', icon: 'stars', discountPercent: 0 };
+        if (spent >= 40) return { key: 'kim_cuong', labelVi: 'Kim CÃ†Â°Ã†Â¡ng', color: '#7c3aed', icon: 'diamond', discountPercent: 15 };
+        if (spent >= 20) return { key: 'kim', labelVi: 'VÃƒÂ ng', color: '#eab308', icon: 'workspace_premium', discountPercent: 10 };
+        if (spent >= 8) return { key: 'bac', labelVi: 'BÃ¡ÂºÂ¡c', color: '#9ca3af', icon: 'shield', discountPercent: 5 };
+        if (spent >= 4) return { key: 'vang', labelVi: 'Ã„ÂÃ¡Â»â€œng', color: '#9a3412', icon: 'monetization_on', discountPercent: 0 };
+        return { key: 'dong', labelVi: 'Ã„ÂÃ¡Â»â€œng', color: '#78350f', icon: 'stars', discountPercent: 0 };
     }
 
     async function changeUserRole(uid, newRole) {
         try {
             const userRef = doc(db, "users", uid);
             await updateDoc(userRef, { role: newRole });
-            
+
             // Refresh list if on user-manager page
             if (typeof window.loadUsers === 'function') window.loadUsers();
-            
+
             return { success: true, message: `Changed role of user ${uid} to ${newRole}.` };
         } catch (e) {
             return { error: e.message };
@@ -3603,10 +3644,10 @@ Rules:
     async function deleteUserAccount(uid) {
         try {
             await deleteDoc(doc(db, "users", uid));
-            
+
             // Refresh list if on user-manager page
             if (typeof window.loadUsers === 'function') window.loadUsers();
-            
+
             return { success: true, message: `Deleted user profile for ${uid} from Firestore.` };
         } catch (e) {
             return { error: e.message };
@@ -3617,32 +3658,32 @@ Rules:
         try {
             const type = (spinType || 'deu').toLowerCase();
             if (!['deu', 'xin', 'vip'].includes(type)) {
-                return { error: "Loại lượt quay không hợp lệ. Chỉ chấp nhận: deu, xin, vip" };
+                return { error: "LoÃ¡ÂºÂ¡i lÃ†Â°Ã¡Â»Â£t quay khÃƒÂ´ng hÃ¡Â»Â£p lÃ¡Â»â€¡. ChÃ¡Â»â€° chÃ¡ÂºÂ¥p nhÃ¡ÂºÂ­n: deu, xin, vip" };
             }
             const qty = parseInt(count, 10) || 1;
-            
+
             let uid = uidOrEmail;
             if (uidOrEmail.includes('@')) {
                 const q = query(collection(db, "users"), where("email", "==", uidOrEmail.trim()));
                 const snap = await getDocs(q);
                 if (snap.empty) {
-                    return { error: `Không tìm thấy user với email: ${uidOrEmail}` };
+                    return { error: `KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y user vÃ¡Â»â€ºi email: ${uidOrEmail}` };
                 }
                 uid = snap.docs[0].id;
             }
-            
+
             const docRef = doc(db, "users", uid);
             const docSnap = await getDoc(docRef);
             if (!docSnap.exists()) {
-                return { error: `Không tìm thấy user với UID/Email: ${uidOrEmail}` };
+                return { error: `KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y user vÃ¡Â»â€ºi UID/Email: ${uidOrEmail}` };
             }
-            
+
             const data = docSnap.data();
             const spins = data.spins || { deu: 0, xin: 0, vip: 0 };
             spins[type] = (spins[type] || 0) + qty;
-            
+
             await updateDoc(docRef, { spins });
-            return { success: true, message: `Đã gửi ${qty} lượt quay loại "${type}" cho user ${data.name || uid} thành công.` };
+            return { success: true, message: `Ã„ÂÃƒÂ£ gÃ¡Â»Â­i ${qty} lÃ†Â°Ã¡Â»Â£t quay loÃ¡ÂºÂ¡i "${type}" cho user ${data.name || uid} thÃƒÂ nh cÃƒÂ´ng.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3654,7 +3695,7 @@ Rules:
             const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js");
             const { getAuth, createUserWithEmailAndPassword, signOut } = await import("https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js");
             const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js");
-            
+
             const firebaseConfig = {
                 apiKey: "AIzaSyCdrnjnOD2yvQm1WhQvL-G1FuZyatnDyZk",
                 authDomain: "phovietkhang.firebaseapp.com",
@@ -3697,7 +3738,7 @@ Rules:
         try {
             const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js");
             const { getAuth, sendPasswordResetEmail } = await import("https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js");
-            
+
             const firebaseConfig = {
                 apiKey: "AIzaSyCdrnjnOD2yvQm1WhQvL-G1FuZyatnDyZk",
                 authDomain: "phovietkhang.firebaseapp.com",
@@ -3725,14 +3766,14 @@ Rules:
             const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
             const percent = parseInt(discountPercent, 10) || 10;
             const code = `PROMO${percent}-${rand}`;
-            
+
             let expiryDate = null;
             if (expiryDays && expiryDays !== 'never') {
                 const days = parseInt(expiryDays, 10);
                 expiryDate = new Date();
                 expiryDate.setDate(expiryDate.getDate() + days);
             }
-            
+
             const allowedOrderTypes = Array.isArray(allowedTypes) ? allowedTypes : [];
 
             await setDoc(doc(db, "vouchers", code), {
@@ -3909,7 +3950,7 @@ Rules:
         }
     }
 
-    // ─── Firebase Admin Tool Implementations (via Cloudflare Worker proxy) ─────
+    // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Firebase Admin Tool Implementations (via Cloudflare Worker proxy) Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
     async function adminListAuthUsers() {
         try {
             return await callWorker('listAuthUsers');
@@ -3927,7 +3968,7 @@ Rules:
             try { await deleteDoc(doc(db, 'users', uid)); } catch (_) {}
             // Refresh list
             if (typeof window.loadUsers === 'function') window.loadUsers();
-            return { ...result, message: result.message + ' + đã xoá profile Firestore.' };
+            return { ...result, message: result.message + ' + Ã„â€˜ÃƒÂ£ xoÃƒÂ¡ profile Firestore.' };
         } catch (e) {
             console.error('[adminDeleteAuthUser]', e);
             return { error: e.message };
@@ -4023,9 +4064,9 @@ Rules:
 
     async function adminGenerateCustomToken(uid) {
         // Not supported via REST API without full Admin SDK - return guidance
-        return { 
-            success: false, 
-            message: `Custom token generation cần Firebase Admin SDK (Blaze Plan). Hãy dùng Firebase Console nếu cần.`
+        return {
+            success: false,
+            message: `Custom token generation cÃ¡ÂºÂ§n Firebase Admin SDK (Blaze Plan). HÃƒÂ£y dÃƒÂ¹ng Firebase Console nÃ¡ÂºÂ¿u cÃ¡ÂºÂ§n.`
         };
     }
 
@@ -4112,17 +4153,17 @@ Rules:
             toolCallCount++;
             if (toolCallCount > 5) {
                 removeLoadingBubble();
-                appendBubble("Hệ thống: Phát hiện nguy cơ lặp gọi công cụ vô hạn. AI đã dừng lại để bảo vệ hạn ngạch API.", 'ai');
+                appendBubble("HÃ¡Â»â€¡ thÃ¡Â»â€˜ng: PhÃƒÂ¡t hiÃ¡Â»â€¡n nguy cÃ†Â¡ lÃ¡ÂºÂ·p gÃ¡Â»Âi cÃƒÂ´ng cÃ¡Â»Â¥ vÃƒÂ´ hÃ¡ÂºÂ¡n. AI Ã„â€˜ÃƒÂ£ dÃ¡Â»Â«ng lÃ¡ÂºÂ¡i Ã„â€˜Ã¡Â»Æ’ bÃ¡ÂºÂ£o vÃ¡Â»â€¡ hÃ¡ÂºÂ¡n ngÃ¡ÂºÂ¡ch API.", 'ai');
                 return;
             }
 
             if (toolCallCount === 1 && toolCalls.length === 1) {
                 const single = toolCalls[0];
                 if (KNOWN_TOOLS.has(single.tool)) {
-                    appendBubble(`Hệ thống: Đang thực hiện yêu cầu (${single.tool})...`, 'ai');
+                    appendBubble(`HÃ¡Â»â€¡ thÃ¡Â»â€˜ng: Ã„Âang thÃ¡Â»Â±c hiÃ¡Â»â€¡n yÃƒÂªu cÃ¡ÂºÂ§u (${single.tool})...`, 'ai');
                 }
             } else {
-                appendBubble(`Hệ thống: Đang thực hiện ${toolCalls.length} yêu cầu dữ liệu/thay đổi...`, 'ai');
+                appendBubble(`HÃ¡Â»â€¡ thÃ¡Â»â€˜ng: Ã„Âang thÃ¡Â»Â±c hiÃ¡Â»â€¡n ${toolCalls.length} yÃƒÂªu cÃ¡ÂºÂ§u dÃ¡Â»Â¯ liÃ¡Â»â€¡u/thay Ã„â€˜Ã¡Â»â€¢i...`, 'ai');
             }
 
             const progressBubbleEl = msgArea.lastElementChild;
@@ -4137,7 +4178,7 @@ Rules:
                 const toolName = tool;
 
                 if (progressBubbleEl && msgArea.contains(progressBubbleEl) && progressBubbleEl.classList.contains('admin-chat-bubble')) {
-                    progressBubbleEl.textContent = `Hệ thống: Đang thực hiện ${i + 1}/${toolCalls.length} (${toolName})... (Thành công: ${successCount}, Thất bại: ${failCount})`;
+                    progressBubbleEl.textContent = `HÃ¡Â»â€¡ thÃ¡Â»â€˜ng: Ã„Âang thÃ¡Â»Â±c hiÃ¡Â»â€¡n ${i + 1}/${toolCalls.length} (${toolName})... (ThÃƒÂ nh cÃƒÂ´ng: ${successCount}, ThÃ¡ÂºÂ¥t bÃ¡ÂºÂ¡i: ${failCount})`;
                 }
 
                 let result;
@@ -4315,9 +4356,9 @@ Rules:
                 } else if (tool === 'updateReviewImageUrl') {
                     result = await updateReviewImageUrl(args.index, args.imageUrl);
                 } else {
-                    result = { error: `Tool "${tool}" không tồn tại.` };
+                    result = { error: `Tool "${tool}" khÃƒÂ´ng tÃ¡Â»â€œn tÃ¡ÂºÂ¡i.` };
                 }
-                
+
                 if (result && typeof result === 'object' && result !== null && result.hasOwnProperty('error')) {
                     results.push({ tool: toolName, success: false, error: result.error });
                     failCount++;
@@ -4325,31 +4366,31 @@ Rules:
                     results.push({ tool: toolName, success: true, result });
                     successCount++;
                 }
-                
+
                 if (progressBubbleEl && msgArea.contains(progressBubbleEl) && progressBubbleEl.classList.contains('admin-chat-bubble')) {
-                    progressBubbleEl.textContent = `Hệ thống: Đang thực hiện ${i + 1}/${toolCalls.length} (${toolName})... (Thành công: ${successCount}, Thất bại: ${failCount})`;
+                    progressBubbleEl.textContent = `HÃ¡Â»â€¡ thÃ¡Â»â€˜ng: Ã„Âang thÃ¡Â»Â±c hiÃ¡Â»â€¡n ${i + 1}/${toolCalls.length} (${toolName})... (ThÃƒÂ nh cÃƒÂ´ng: ${successCount}, ThÃ¡ÂºÂ¥t bÃ¡ÂºÂ¡i: ${failCount})`;
                 }
 
                 await new Promise(r => setTimeout(r, 40));
             }
 
             // Feed all results back in a single feedback message
-            const summaryHeader = `[TỔNG HỢP KẾT QUẢ THỰC THI]:\n- Tổng số yêu cầu: ${toolCalls.length}\n- Thành công: ${successCount}\n- Thất bại: ${failCount}\n\n`;
-            
+            const summaryHeader = `[TÃ¡Â»â€NG HÃ¡Â»Â¢P KÃ¡ÂºÂ¾T QUÃ¡ÂºÂ¢ THÃ¡Â»Â°C THI]:\n- TÃ¡Â»â€¢ng sÃ¡Â»â€˜ yÃƒÂªu cÃ¡ÂºÂ§u: ${toolCalls.length}\n- ThÃƒÂ nh cÃƒÂ´ng: ${successCount}\n- ThÃ¡ÂºÂ¥t bÃ¡ÂºÂ¡i: ${failCount}\n\n`;
+
             const feedbackContent = results.map((r, idx) => {
                 const body = r.success ? r.result : { error: r.error };
                 const safeStr = typeof body === 'string' ? body : JSON.stringify(body);
-                return `[Kết quả Yêu cầu ${idx + 1} - ${r.tool}]:\n${safeStr}`;
+                return `[KÃ¡ÂºÂ¿t quÃ¡ÂºÂ£ YÃƒÂªu cÃ¡ÂºÂ§u ${idx + 1} - ${r.tool}]:\n${safeStr}`;
             }).join('\n\n');
 
             chatMessages.push({
                 role: 'user',
-                content: `Dưới đây là kết quả thực thi các công cụ bạn yêu cầu:\n\n${summaryHeader}${feedbackContent}\n\nHãy tổng hợp các kết quả trên và trả lời trực tiếp cho người dùng bằng Tiếng Việt. Chú ý chỉ ra rõ những yêu cầu nào đã THÀNH CÔNG và những yêu cầu nào THẤT BẠI (kèm theo lỗi tương ứng).`
+                content: `DÃ†Â°Ã¡Â»â€ºi Ã„â€˜ÃƒÂ¢y lÃƒÂ  kÃ¡ÂºÂ¿t quÃ¡ÂºÂ£ thÃ¡Â»Â±c thi cÃƒÂ¡c cÃƒÂ´ng cÃ¡Â»Â¥ bÃ¡ÂºÂ¡n yÃƒÂªu cÃ¡ÂºÂ§u:\n\n${summaryHeader}${feedbackContent}\n\nHÃƒÂ£y tÃ¡Â»â€¢ng hÃ¡Â»Â£p cÃƒÂ¡c kÃ¡ÂºÂ¿t quÃ¡ÂºÂ£ trÃƒÂªn vÃƒÂ  trÃ¡ÂºÂ£ lÃ¡Â»Âi trÃ¡Â»Â±c tiÃ¡ÂºÂ¿p cho ngÃ†Â°Ã¡Â»Âi dÃƒÂ¹ng bÃ¡ÂºÂ±ng TiÃ¡ÂºÂ¿ng ViÃ¡Â»â€¡t. ChÃƒÂº ÃƒÂ½ chÃ¡Â»â€° ra rÃƒÂµ nhÃ¡Â»Â¯ng yÃƒÂªu cÃ¡ÂºÂ§u nÃƒÂ o Ã„â€˜ÃƒÂ£ THÃƒâ‚¬NH CÃƒâ€NG vÃƒÂ  nhÃ¡Â»Â¯ng yÃƒÂªu cÃ¡ÂºÂ§u nÃƒÂ o THÃ¡ÂºÂ¤T BÃ¡ÂºÂ I (kÃƒÂ¨m theo lÃ¡Â»â€”i tÃ†Â°Ã†Â¡ng Ã¡Â»Â©ng).`
             });
 
             chatMessages.push({
                 role: 'user',
-                content: `Dưới đây là kết quả thực thi các công cụ bạn yêu cầu:\n\n${summaryHeader}${feedbackContent}\n\nHãy tổng hợp các kết quả trên và trả lời trực tiếp cho người dùng bằng Tiếng Việt. Chú ý chỉ ra rõ những yêu cầu nào đã THÀNH CÔNG và những yêu cầu nào THẤT BẠI (kèm theo lỗi tương ứng). Nếu bạn cần thêm thông tin hoặc cần thực hiện thêm thao tác, hãy tiếp tục gọi tool. Nếu đã đủ thông tin thì trả lời ngay.`
+                content: `DÃ†Â°Ã¡Â»â€ºi Ã„â€˜ÃƒÂ¢y lÃƒÂ  kÃ¡ÂºÂ¿t quÃ¡ÂºÂ£ thÃ¡Â»Â±c thi cÃƒÂ¡c cÃƒÂ´ng cÃ¡Â»Â¥ bÃ¡ÂºÂ¡n yÃƒÂªu cÃ¡ÂºÂ§u:\n\n${summaryHeader}${feedbackContent}\n\nHÃƒÂ£y tÃ¡Â»â€¢ng hÃ¡Â»Â£p cÃƒÂ¡c kÃ¡ÂºÂ¿t quÃ¡ÂºÂ£ trÃƒÂªn vÃƒÂ  trÃ¡ÂºÂ£ lÃ¡Â»Âi trÃ¡Â»Â±c tiÃ¡ÂºÂ¿p cho ngÃ†Â°Ã¡Â»Âi dÃƒÂ¹ng bÃ¡ÂºÂ±ng TiÃ¡ÂºÂ¿ng ViÃ¡Â»â€¡t. ChÃƒÂº ÃƒÂ½ chÃ¡Â»â€° ra rÃƒÂµ nhÃ¡Â»Â¯ng yÃƒÂªu cÃ¡ÂºÂ§u nÃƒÂ o Ã„â€˜ÃƒÂ£ THÃƒâ‚¬NH CÃƒâ€NG vÃƒÂ  nhÃ¡Â»Â¯ng yÃƒÂªu cÃ¡ÂºÂ§u nÃƒÂ o THÃ¡ÂºÂ¤T BÃ¡ÂºÂ I (kÃƒÂ¨m theo lÃ¡Â»â€”i tÃ†Â°Ã†Â¡ng Ã¡Â»Â©ng). NÃ¡ÂºÂ¿u bÃ¡ÂºÂ¡n cÃ¡ÂºÂ§n thÃƒÂªm thÃƒÂ´ng tin hoÃ¡ÂºÂ·c cÃ¡ÂºÂ§n thÃ¡Â»Â±c hiÃ¡Â»â€¡n thÃƒÂªm thao tÃƒÂ¡c, hÃƒÂ£y tiÃ¡ÂºÂ¿p tÃ¡Â»Â¥c gÃ¡Â»Âi tool. NÃ¡ÂºÂ¿u Ã„â€˜ÃƒÂ£ Ã„â€˜Ã¡Â»Â§ thÃƒÂ´ng tin thÃƒÂ¬ trÃ¡ÂºÂ£ lÃ¡Â»Âi ngay.`
             });
 
             // Call API once for the final response
@@ -4453,15 +4494,15 @@ Rules:
             }
 
             const responseText = data.choices[0].message.content;
-            
+
             // Push response to history
             chatMessages.push({ role: 'assistant', content: responseText });
-            
+
             // Handle tool calling or plain response
             await handleAgentResponse(responseText);
         } catch (err) {
             removeLoadingBubble();
-            appendBubble(`Lỗi kết nối AI: ${err.message}`, 'ai');
+            appendBubble(`LÃ¡Â»â€”i kÃ¡ÂºÂ¿t nÃ¡Â»â€˜i AI: ${err.message}`, 'ai');
         }
     }
 
@@ -4469,11 +4510,11 @@ Rules:
     async function sendMessage() {
         const val = chatInput.value.trim();
         if (!val) return;
-        
+
         chatInput.value = '';
         appendBubble(val, 'user');
         chatMessages.push({ role: 'user', content: val });
-        
+
         toolCallCount = 0; // Reset tool count on new user message
         appendLoadingBubble();
         await fetchAiResponse();
@@ -4484,4 +4525,3 @@ Rules:
         if (e.key === 'Enter') sendMessage();
     });
 })();
-

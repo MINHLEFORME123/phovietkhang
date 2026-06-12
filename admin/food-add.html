@@ -18,8 +18,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body class="bg-[#0b0f19] text-on-surface font-['Inter'] flex h-screen overflow-hidden">
-    <!-- Sidebar -->
-    <aside class="w-64 bg-surface border-r border-gray-800 flex flex-col">
+    <button id="sidebar-toggle" class="md:hidden fixed top-4 left-4 z-50 bg-surface-highlight border border-gray-700 text-white p-2 rounded-lg shadow">
+        <span class="material-symbols-outlined">menu</span>
+    </button>
+    <div id="sidebar-overlay" class="hidden fixed inset-0 bg-black/60 z-40 md:hidden"></div>
+    <aside id="admin-sidebar" class="w-64 bg-surface border-r border-gray-800 flex flex-col fixed md:relative inset-y-0 left-0 z-40 transform -translate-x-full md:translate-x-0 transition-transform duration-200">
         <div class="h-20 flex items-center justify-center border-b border-gray-800">
             <h1 class="text-xl font-bold text-primary tracking-wider">PHO ADMIN</h1>
         </div>
@@ -80,7 +83,7 @@
                         <h3 class="text-base font-bold text-purple-400 mb-2 flex items-center gap-2">
                             <span class="material-symbols-outlined text-lg">table_view</span> Excel Import (Cerebras)
                         </h3>
-                        <p class="text-secondary text-xs mb-3">Upload Excel/CSV → Cerebras extracts, translates & generates descriptions.</p>
+                        <p class="text-secondary text-xs mb-3">Upload Excel/CSV â†’ Cerebras extracts, translates & generates descriptions.</p>
                         <input type="file" id="excel-upload" accept=".xlsx, .xls, .csv" class="block w-full text-sm text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-500 mb-2">
                         <button type="button" id="btn-ai-extract" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 rounded-lg text-sm transition-colors flex items-center justify-center gap-1">
                             <span class="material-symbols-outlined text-sm">smart_toy</span> Extract Data
@@ -95,7 +98,7 @@
                         <h3 class="text-base font-bold text-amber-400 mb-2 flex items-center gap-2">
                             <span class="material-symbols-outlined text-lg">photo_camera</span> Menu Image Scan (Cerebras)
                         </h3>
-                        <p class="text-secondary text-xs mb-3">Upload a photo of a menu → Cerebras reads, extracts items & infers options.</p>
+                        <p class="text-secondary text-xs mb-3">Upload a photo of a menu â†’ Cerebras reads, extracts items & infers options.</p>
                         <input type="file" id="menu-image-upload" accept="image/*" class="block w-full text-sm text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-600 file:text-white hover:file:bg-amber-500 mb-2">
                         <button type="button" id="btn-ai-scan" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-2 rounded-lg text-sm transition-colors flex items-center justify-center gap-1">
                             <span class="material-symbols-outlined text-sm">document_scanner</span> Scan Menu
@@ -136,7 +139,7 @@
                             <h3 class="font-bold text-primary mb-2">Metadata</h3>
                             <div>
                                 <label class="block text-sm font-medium text-secondary mb-1">Category (VI)</label>
-                                <input type="text" id="food-category-vi" list="category-datalist" required placeholder="Nhóm món ăn (VI)..." class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-3">
+                                <input type="text" id="food-category-vi" list="category-datalist" required placeholder="NhÃ³m mÃ³n Äƒn (VI)..." class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-3">
                                 <label class="block text-sm font-medium text-secondary mt-2 mb-1">Category (EN)</label>
                                 <input type="text" id="food-category-en" required placeholder="Category (EN)..." class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-3">
                                 <label class="block text-sm font-medium text-secondary mt-2 mb-1">Category (FI)</label>
@@ -147,7 +150,7 @@
                                 <p class="text-xs text-secondary mt-1">Provide category in all 3 languages.</p>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-secondary mb-1">Price (€)</label>
+                                <label class="block text-sm font-medium text-secondary mb-1">Price (â‚¬)</label>
                                 <input type="number" step="0.01" id="food-price" required class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-3">
                             </div>
                             <div>
@@ -201,7 +204,7 @@
                                 <div class="space-y-2">
                                     <div>
                                         <label class="block text-xs text-secondary mb-1">Option Group Name (VI)</label>
-                                        <input type="text" id="new-opt-name-vi" placeholder="e.g. Cấp độ cay" class="w-full bg-[#121824] border border-gray-600 rounded-lg text-white p-2 text-sm">
+                                        <input type="text" id="new-opt-name-vi" placeholder="e.g. Cáº¥p Ä‘á»™ cay" class="w-full bg-[#121824] border border-gray-600 rounded-lg text-white p-2 text-sm">
                                     </div>
                                     <div>
                                         <label class="block text-xs text-secondary mb-1">Option Group Name (EN)</label>
@@ -256,6 +259,6 @@
     </main>
 
     <script type="module" src="../js/auth.js"></script>
-    <script type="module" src="../js/admin.js"></script>
+    <script type="module" src="../js/admin/main.js?v=5"></script>
 </body>
 </html>

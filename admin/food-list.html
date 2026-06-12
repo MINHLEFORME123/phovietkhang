@@ -17,8 +17,11 @@
     </script>
 </head>
 <body class="bg-[#0b0f19] text-on-surface font-['Inter'] flex h-screen overflow-hidden">
-    <!-- Sidebar -->
-    <aside class="w-64 bg-surface border-r border-gray-800 flex flex-col">
+    <button id="sidebar-toggle" class="md:hidden fixed top-4 left-4 z-50 bg-surface-highlight border border-gray-700 text-white p-2 rounded-lg shadow">
+        <span class="material-symbols-outlined">menu</span>
+    </button>
+    <div id="sidebar-overlay" class="hidden fixed inset-0 bg-black/60 z-40 md:hidden"></div>
+    <aside id="admin-sidebar" class="w-64 bg-surface border-r border-gray-800 flex flex-col fixed md:relative inset-y-0 left-0 z-40 transform -translate-x-full md:translate-x-0 transition-transform duration-200">
         <div class="h-20 flex items-center justify-center border-b border-gray-800">
             <h1 class="text-xl font-bold text-primary tracking-wider">PHO ADMIN</h1>
         </div>
@@ -78,7 +81,7 @@
                 </button>
                 <button onclick="window.exportTableToExcel('food-table', 'food_menu.xlsx')" class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg flex items-center gap-2 transition-colors shadow">
                     <span class="material-symbols-outlined">download</span>
-                    <span>Xuất Excel</span>
+                    <span>Xuáº¥t Excel</span>
                 </button>
                 <span class="material-symbols-outlined text-secondary cursor-pointer hover:text-white">notifications</span>
                 <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold">A</div>
@@ -87,10 +90,10 @@
         <div class="p-8 flex-1">
             <div class="bg-surface rounded-xl border border-gray-800 p-6 shadow-lg">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-white">Danh sách món</h3>
+                    <h3 class="text-lg font-semibold text-white">Danh sÃ¡ch mÃ³n</h3>
                     <div class="relative">
                         <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-secondary text-[18px]">search</span>
-                        <input id="admin-food-search" type="text" placeholder="Tìm món..." class="pl-9 pr-4 py-2 rounded-lg bg-surface-highlight border border-gray-700 text-sm text-white placeholder:text-secondary focus:border-primary focus:outline-none w-64">
+                        <input id="admin-food-search" type="text" placeholder="TÃ¬m mÃ³n..." class="pl-9 pr-4 py-2 rounded-lg bg-surface-highlight border border-gray-700 text-sm text-white placeholder:text-secondary focus:border-primary focus:outline-none w-64">
                     </div>
                 </div>
                 <table id="food-table" class="w-full text-left">
@@ -170,7 +173,7 @@
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs text-secondary mb-1">Price (€)</label>
+                        <label class="block text-xs text-secondary mb-1">Price (â‚¬)</label>
                         <input type="number" step="0.01" id="edit-price" class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-2.5 text-sm">
                     </div>
                     <div>
@@ -186,7 +189,7 @@
                         <div class="grid grid-cols-1 gap-2">
                             <div>
                                 <label class="block text-[10px] text-secondary mb-0.5">Option Group Name (VI)</label>
-                                <input type="text" id="edit-new-opt-name-vi" placeholder="e.g. Cấp độ cay" class="w-full bg-[#121824] border border-gray-600 rounded-lg text-white p-2 text-xs">
+                                <input type="text" id="edit-new-opt-name-vi" placeholder="e.g. Cáº¥p Ä‘á»™ cay" class="w-full bg-[#121824] border border-gray-600 rounded-lg text-white p-2 text-xs">
                             </div>
                             <div>
                                 <label class="block text-[10px] text-secondary mb-0.5">Option Group Name (EN)</label>
@@ -228,11 +231,6 @@
     </div>
 
     <script type="module" src="../js/auth.js"></script>
-    <script type="module" src="../js/admin.js?v=2"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.loadFood) window.loadFood();
-        });
-    </script>
+    <script type="module" src="../js/admin/main.js?v=5"></script>
 </body>
 </html>
