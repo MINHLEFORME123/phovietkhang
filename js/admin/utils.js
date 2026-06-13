@@ -1,7 +1,66 @@
-import { db, auth, getApiKeys } from "../firebase-config.js";
-import { collection, getDocs, getDoc, doc, updateDoc, addDoc, deleteDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { db, getApiKeys } from "../firebase-config.js";
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-// â”€â”€â”€ Cloudflare Worker Admin Proxy â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+export function ensureAdminNotification() {
+    if (window.showNotification) return;
+    window.showNotification = function(message, type = 'info') {
+        let container = document.getElementById('pvk-toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'pvk-toast-container';
+            container.className = 'fixed top-24 right-4 z-[9999] flex flex-col gap-3 pointer-events-none';
+            document.body.appendChild(container);
+
+            const style = document.createElement('style');
+            style.innerHTML = `
+                @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+                @keyframes slideOutRight { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+                .toast-enter { animation: slideInRight 0.3s ease-out forwards; }
+                .toast-exit { animation: slideOutRight 0.3s ease-in forwards; }
+            `;
+            document.head.appendChild(style);
+        }
+
+        const toast = document.createElement('div');
+        const colors = type === 'success'
+            ? 'bg-green-500/15 border-green-400/30 text-green-50'
+            : type === 'error'
+                ? 'bg-red-500/15 border-red-400/30 text-red-50'
+                : 'bg-surface-highlight border-gray-700 text-white';
+        const icon = type === 'success' ? 'check_circle' : type === 'error' ? 'error' : 'info';
+
+        toast.className = `toast-enter pointer-events-auto flex items-center gap-3 px-5 py-4 rounded-xl shadow-lg border backdrop-blur-md min-w-[300px] max-w-[400px] transition-all ${colors}`;
+        toast.innerHTML = `
+            <span class="material-symbols-outlined">${icon}</span>
+            <div class="flex-1 text-sm leading-tight">${escapeHtml(String(message))}</div>
+            <button class="text-current opacity-60 hover:opacity-100 transition-opacity p-1" type="button">
+                <span class="material-symbols-outlined text-[18px]">close</span>
+            </button>
+        `;
+        toast.querySelector('button').addEventListener('click', () => toast.remove());
+        container.appendChild(toast);
+
+        setTimeout(() => {
+            if (toast.parentElement) {
+                toast.classList.replace('toast-enter', 'toast-exit');
+                setTimeout(() => toast.remove(), 300);
+            }
+        }, 4000);
+    };
+}
+
+function escapeHtml(value) {
+    return value
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+}
+
+ensureAdminNotification();
+
+// ─── Cloudflare Worker Admin Proxy ────────────────────────────────────────────
 const CLOUDFLARE_WORKER_URL = 'https://pvk-admin.minhbeo993.workers.dev';
 let WORKER_SECRET = '';
 
@@ -15,12 +74,12 @@ export async function initApiKeys() {
     return keys;
 }
 
-// â”€â”€â”€ API Keys (lazy loaded) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── API Keys (lazy loaded) ──────────────────────────────────────────────────
 export function getApiKeysCached() {
     return apiKeysCache;
 }
 
-// â”€â”€â”€ Cloudflare Worker Proxy â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Cloudflare Worker Proxy ─────────────────────────────────────────────────
 export async function callWorker(action, args = {}) {
     const resp = await fetch(CLOUDFLARE_WORKER_URL, {
         method: 'POST',
@@ -35,7 +94,7 @@ export async function callWorker(action, args = {}) {
     return data;
 }
 
-// â”€â”€â”€ NORMALIZATION UTILITY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── NORMALIZATION UTILITY ───────────────────────────────────────────────────
 export function normalizeOptions(options) {
     if (!options || !Array.isArray(options)) return [];
     return options.map(opt => {
@@ -61,10 +120,11 @@ export function normalizeOptions(options) {
     });
 }
 
-// â”€â”€â”€ DATE & TIME UTILITIES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── DATE & TIME UTILITIES ───────────────────────────────────────────────────
 export function formatOrderDate(dateObj) {
     if (!dateObj) return 'N/A';
     const d = dateObj instanceof Date ? dateObj : new Date(dateObj);
+    if (Number.isNaN(d.getTime())) return 'N/A';
     const hours = d.getHours().toString().padStart(2, '0');
     const minutes = d.getMinutes().toString().padStart(2, '0');
     const seconds = d.getSeconds().toString().padStart(2, '0');
@@ -76,38 +136,38 @@ export function formatOrderDate(dateObj) {
 
 export function getOrderTimeAlert(createdAt, completedAt, status) {
     if (status === 'cancelled') {
-        return { label: 'ÄÃ£ há»§y', color: 'gray', badgeClass: 'bg-gray-500/10 text-gray-400 border border-gray-500/20' };
+        return { label: 'Đã hủy', color: 'gray', badgeClass: 'bg-gray-500/10 text-gray-400 border border-gray-500/20' };
     }
     const created = createdAt ? (createdAt instanceof Date ? createdAt : new Date(createdAt)) : null;
-    if (!created) return { label: 'N/A', color: 'gray', badgeClass: 'bg-gray-500/10 text-gray-400 border border-gray-500/20' };
+    if (!created || Number.isNaN(created.getTime())) return { label: 'N/A', color: 'gray', badgeClass: 'bg-gray-500/10 text-gray-400 border border-gray-500/20' };
     const now = new Date();
     if (status === 'completed') {
         let completedTime = null;
         if (completedAt) completedTime = completedAt instanceof Date ? completedAt : new Date(completedAt);
         if (completedTime) {
             const diffMin = Math.round((completedTime - created) / (60 * 1000));
-            return { label: `HoÃ n táº¥t trong ${diffMin} phÃºt`, color: 'green', badgeClass: 'bg-green-500/10 text-green-400 border border-green-500/20' };
+            return { label: `Hoàn thành trong ${diffMin} phút`, color: 'green', badgeClass: 'bg-green-500/10 text-green-400 border border-green-500/20' };
         }
-        return { label: 'ÄÃ£ hoÃ n táº¥t', color: 'green', badgeClass: 'bg-green-500/10 text-green-400 border border-green-500/20' };
+        return { label: 'Đã hoàn thành', color: 'green', badgeClass: 'bg-green-500/10 text-green-400 border border-green-500/20' };
     }
     const diffMin = Math.floor((now - created) / (60 * 1000));
-    if (diffMin < 1) return { label: 'Vá»«a xong', color: 'green', badgeClass: 'bg-green-500/10 text-green-400 border border-green-500/20' };
-    if (diffMin >= 15) return { label: `${diffMin} phÃºt trÆ°á»›c`, color: 'red', badgeClass: 'bg-red-500/10 text-red-400 border border-red-500/20 animate-pulse' };
-    if (diffMin >= 10) return { label: `${diffMin} phÃºt trÆ°á»›c`, color: 'yellow', badgeClass: 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20' };
-    return { label: `${diffMin} phÃºt trÆ°á»›c`, color: 'green', badgeClass: 'bg-green-500/10 text-green-400 border border-green-500/20' };
+    if (diffMin < 1) return { label: 'Vừa xong', color: 'green', badgeClass: 'bg-green-500/10 text-green-400 border border-green-500/20' };
+    if (diffMin >= 15) return { label: `${diffMin} phút trước`, color: 'red', badgeClass: 'bg-red-500/10 text-red-400 border border-red-500/20 animate-pulse' };
+    if (diffMin >= 10) return { label: `${diffMin} phút trước`, color: 'yellow', badgeClass: 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20' };
+    return { label: `${diffMin} phút trước`, color: 'green', badgeClass: 'bg-green-500/10 text-green-400 border border-green-500/20' };
 }
 
-// â”€â”€â”€ LOYALTY TIER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── LOYALTY TIER ────────────────────────────────────────────────────────────
 export function computeLoyaltyTier(totalSpent) {
     const spent = Number(totalSpent) || 0;
-    if (spent >= 40) return { key: 'kim_cuong', labelVi: 'Kim CÆ°Æ¡ng', color: '#7c3aed', icon: 'diamond', discountPercent: 15 };
-    if (spent >= 20) return { key: 'kim', labelVi: 'VÃ ng', color: '#eab308', icon: 'workspace_premium', discountPercent: 10 };
-    if (spent >= 8) return { key: 'bac', labelVi: 'Báº¡c', color: '#9ca3af', icon: 'shield', discountPercent: 5 };
-    if (spent >= 4) return { key: 'vang', labelVi: 'Äá»“ng', color: '#9a3412', icon: 'monetization_on', discountPercent: 0 };
-    return { key: 'dong', labelVi: 'Äá»“ng', color: '#78350f', icon: 'stars', discountPercent: 0 };
+    if (spent >= 40) return { key: 'kim_cuong', labelVi: 'Kim Cương', color: '#7c3aed', icon: 'diamond', discountPercent: 15 };
+    if (spent >= 20) return { key: 'kim', labelVi: 'Vàng', color: '#eab308', icon: 'workspace_premium', discountPercent: 10 };
+    if (spent >= 8) return { key: 'bac', labelVi: 'Bạc', color: '#9ca3af', icon: 'shield', discountPercent: 5 };
+    if (spent >= 4) return { key: 'vang', labelVi: 'Đồng', color: '#9a3412', icon: 'monetization_on', discountPercent: 0 };
+    return { key: 'dong', labelVi: 'Đồng', color: '#78350f', icon: 'stars', discountPercent: 0 };
 }
 
-// â”€â”€â”€ LIST ALL USERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── LIST ALL USERS ──────────────────────────────────────────────────────────
 export async function listAllUsers() {
     try {
         const qSnap = await getDocs(collection(db, "users"));
@@ -123,7 +183,7 @@ export async function listAllUsers() {
     }
 }
 
-// â”€â”€â”€ JSON PARSING HELPERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── JSON PARSING HELPERS ────────────────────────────────────────────────────
 export function stripThinking(str) {
     if (!str) return "";
     return str.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
@@ -216,7 +276,7 @@ export function extractJsonObject(str) {
     }
 }
 
-// â”€â”€â”€ OPENROUTER HELPERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── OPENROUTER HELPERS ──────────────────────────────────────────────────────
 export async function callOpenRouterWithFallback(payload, apiKeysOverride = null) {
     const keys = apiKeysOverride || (apiKeysCache ? apiKeysCache.openRouterKeys : []);
     const models = ['nex-agi/nex-n2-pro:free', 'qwen/qwen3-next-80b-a3b-instruct:free'];
@@ -243,11 +303,11 @@ export async function callOpenRouterWithFallback(payload, apiKeysOverride = null
     throw new Error("All OpenRouter models and API keys failed to respond.");
 }
 
-// â”€â”€â”€ GLOBAL EXPORT TO EXCEL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── GLOBAL EXPORT TO EXCEL ──────────────────────────────────────────────────
 window.exportTableToExcel = function(tableId, filename = 'export.xlsx') {
     const table = document.getElementById(tableId);
     if (!table) {
-        if (window.showNotification) window.showNotification('KhÃ´ng tÃ¬m tháº¥y báº£ng Ä‘á»ƒ xuáº¥t dá»¯ liá»‡u!', 'error');
+        if (window.showNotification) window.showNotification('Không tìm thấy bảng để xuất dữ liệu!', 'error');
         return;
     }
     const proceedExport = () => {
@@ -261,7 +321,7 @@ window.exportTableToExcel = function(tableId, filename = 'export.xlsx') {
                 if (cells.length > 0) {
                     const lastCell = cells[cells.length - 1];
                     if (lastCell.textContent.toLowerCase().includes('action') ||
-                        lastCell.textContent.toLowerCase().includes('hÃ nh Ä‘á»™ng') ||
+                        lastCell.textContent.toLowerCase().includes('hành động') ||
                         lastCell.querySelector('button') ||
                         lastCell.innerHTML.trim() === '') {
                         lastCell.remove();
@@ -270,17 +330,17 @@ window.exportTableToExcel = function(tableId, filename = 'export.xlsx') {
             });
             const wb = XLSX.utils.table_to_book(clonedTable, { sheet: "Sheet1" });
             XLSX.writeFile(wb, filename);
-            if (window.showNotification) window.showNotification('Xuáº¥t file Excel thÃ nh cÃ´ng!', 'success');
+            if (window.showNotification) window.showNotification('Xuất file Excel thành công!', 'success');
         } catch (error) {
-            console.error('Lá»—i khi xuáº¥t file Excel:', error);
-            if (window.showNotification) window.showNotification('Lá»—i khi xuáº¥t Excel: ' + error.message, 'error');
+            console.error('Lỗi khi xuất file Excel:', error);
+            if (window.showNotification) window.showNotification('Lỗi khi xuất Excel: ' + error.message, 'error');
         }
     };
     if (typeof XLSX === 'undefined') {
         const script = document.createElement('script');
         script.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
         script.onload = proceedExport;
-        script.onerror = () => { if (window.showNotification) window.showNotification('KhÃ´ng thá»ƒ táº£i thÆ° viá»‡n XLSX!', 'error'); };
+        script.onerror = () => { if (window.showNotification) window.showNotification('Không thể tải thư viện XLSX!', 'error'); };
         document.head.appendChild(script);
     } else {
         proceedExport();

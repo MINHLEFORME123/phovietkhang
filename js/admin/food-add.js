@@ -1,8 +1,8 @@
 import { db, auth } from "../firebase-config.js";
-import { collection, addDoc, doc, setDoc, getDocs, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-import { initApiKeys, getApiKeysCached, callOpenRouterWithFallback, normalizeOptions, extractJsonArray, extractJsonObject, stripThinking } from "./utils.js";
+import { collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { initApiKeys, getApiKeysCached, callOpenRouterWithFallback, normalizeOptions, extractJsonArray, extractJsonObject } from "./utils.js";
 
-// â”€â”€â”€ DYNAMIC CATEGORY LOADER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── DYNAMIC CATEGORY LOADER ─────────────────────────────────────────────────
 export async function loadCategories() {
     const dl = document.getElementById('category-datalist');
     const dlEdit = document.getElementById('edit-category-datalist');
@@ -28,7 +28,7 @@ export async function loadCategories() {
 }
 window.loadCategories = loadCategories;
 
-// â”€â”€â”€ IMAGE PREVIEW â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── IMAGE PREVIEW ───────────────────────────────────────────────────────────
 let currentCompressedImage = "";
 const imageInput = document.getElementById('food-image-file');
 const imagePreview = document.getElementById('image-preview');
@@ -63,7 +63,7 @@ if (imageInput) {
     });
 }
 
-// â”€â”€â”€ STRUCTURED OPTIONS BUILDER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── STRUCTURED OPTIONS BUILDER ──────────────────────────────────────────────
 let foodOptions = [];
 let currentAddingChoices = [];
 
@@ -71,13 +71,22 @@ const btnAddChoice = document.getElementById('btn-add-choice');
 const choicePriceInput = document.getElementById('new-choice-price');
 const addedChoicesList = document.getElementById('new-opt-choices');
 
+function escapeHtml(value) {
+    return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+}
+
 function renderCurrentAddingChoices() {
     if (!addedChoicesList) return;
     addedChoicesList.innerHTML = '';
     currentAddingChoices.forEach((ch, idx) => {
         const row = document.createElement('div');
         row.className = 'flex items-center justify-between bg-surface-highlight p-1.5 rounded text-xs text-white';
-        row.innerHTML = `<span>${ch.labelVi} / ${ch.labelEn} / ${ch.labelFi} (${ch.price > 0 ? '+' + ch.price.toFixed(2) + 'â‚¬' : 'Free'})</span>
+        row.innerHTML = `<span>${ch.labelVi} / ${ch.labelEn} / ${ch.labelFi} (${ch.price > 0 ? '+' + ch.price.toFixed(2) + '€' : 'Free'})</span>
             <button type="button" class="text-red-400 hover:text-red-300 px-1 font-bold text-sm" data-idx="${idx}">&times;</button>`;
         row.querySelector('button').addEventListener('click', () => {
             currentAddingChoices.splice(idx, 1);
@@ -120,7 +129,7 @@ function renderOptions() {
         const div = document.createElement('div');
         div.className = 'bg-surface-highlight p-3 rounded-lg border border-gray-700/50 space-y-1.5 relative';
         const choicesHtml = opt.choices.map(c =>
-            `<span class="inline-block bg-gray-800 text-secondary text-[11px] px-2 py-0.5 rounded mr-1">${c.labelVi || c.label} (${c.price > 0 ? '+' + c.price.toFixed(2) + 'â‚¬' : 'Free'})</span>`
+            `<span class="inline-block bg-gray-800 text-secondary text-[11px] px-2 py-0.5 rounded mr-1">${c.labelVi || c.label} (${c.price > 0 ? '+' + c.price.toFixed(2) + '€' : 'Free'})</span>`
         ).join('');
         const displayTitle = `${opt.nameVi} / ${opt.nameEn} / ${opt.nameFi}`;
         div.innerHTML = `
@@ -158,7 +167,7 @@ if (btnAddOption) {
     });
 }
 
-// â”€â”€â”€ AI MENU IMAGE SCANNER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── AI MENU IMAGE SCANNER ──────────────────────────────────────────────────
 let menuImageBase64 = "";
 const menuImageInput = document.getElementById('menu-image-upload');
 if (menuImageInput) {
@@ -215,13 +224,13 @@ if (btnAiScan) {
 For each dish:
 1. Translate name/description to Vietnamese, English, Finnish.
 2. Auto-generate high-quality Vietnamese description if missing, then translate.
-3. Categorize in three languages (e.g. categoryVi: "Phá»Ÿ", categoryEn: "Pho", categoryFi: "Pho"). DO NOT use "MÃ³n chÃ­nh".
+3. Categorize in three languages (e.g. categoryVi: "Phở", categoryEn: "Pho", categoryFi: "Pho"). DO NOT use "Món chính".
 4. Infer options:
    - ONLY add PAID options (price > 0) IF they are EXPLICITLY written. Do NOT hallucinate.
-   - You CAN and SHOULD auto-generate common FREE exclusion options (price = 0) based on the dish type. For example, for "Phá»Ÿ" or "BÃºn", add multiple "toggle" options like "KhÃ´ng hÃ nh" (No onions), "KhÃ´ng rau mÃ¹i" (No cilantro), "KhÃ´ng mÃ¬ chÃ­nh" (No MSG). For dishes with peanuts, add "KhÃ´ng láº¡c" (No peanuts).
+   - You CAN and SHOULD auto-generate common FREE exclusion options (price = 0) based on the dish type. For example, for "Phở" or "Bún", add multiple "toggle" options like "Không hành" (No onions), "Không rau mùi" (No cilantro), "Không mì chính" (No MSG). For dishes with peanuts, add "Không lạc" (No peanuts).
 You MUST return ONLY a JSON object with a single key "items" containing the array of dishes. No markdown blocks.
 JSON Structure:
-{ "items": [ { "nameVi": "TÃªn mÃ³n", "descVi": "MÃ´ táº£ háº¥p dáº«n", "nameEn": "English name", "descEn": "English desc", "nameFi": "Finnish name", "descFi": "Finnish desc", "price": 12.50, "categoryVi": "Phá»Ÿ", "categoryEn": "Pho", "categoryFi": "Pho", "options": [ { "nameVi": "Cáº¥p Ä‘á»™ cay", "nameEn": "Spicy Level", "nameFi": "Tulisuusaste", "type": "single-select", "choices": [ { "labelVi": "KhÃ´ng cay", "labelEn": "Not Spicy", "labelFi": "Ei tulinen", "price": 0 }, { "labelVi": "Cay", "labelEn": "Spicy", "labelFi": "Tulinen", "price": 0 } ] } ] } ] }`;
+{ "items": [ { "nameVi": "Tên món", "descVi": "Mô tả hấp dẫn", "nameEn": "English name", "descEn": "English desc", "nameFi": "Finnish name", "descFi": "Finnish desc", "price": 12.50, "categoryVi": "Phở", "categoryEn": "Pho", "categoryFi": "Pho", "options": [ { "nameVi": "Cấp độ cay", "nameEn": "Spicy Level", "nameFi": "Tulisuusaste", "type": "single-select", "choices": [ { "labelVi": "Không cay", "labelEn": "Not Spicy", "labelFi": "Ei tulinen", "price": 0 }, { "labelVi": "Cay", "labelEn": "Spicy", "labelFi": "Tulinen", "price": 0 } ] } ] } ] }`;
 
             const reasonerData = await (async () => {
                 try {
@@ -251,7 +260,7 @@ JSON Structure:
             loadingIndicator.innerHTML = '<span class="material-symbols-outlined animate-spin align-middle mr-1 text-sm">sync</span> Saving items to Database...';
             let successCount = 0;
             for (const item of items) {
-                const catVi = item.categoryVi || item.category || 'Phá»Ÿ';
+                const catVi = item.categoryVi || item.category || 'Phở';
                 await addDoc(collection(db, "menu"), {
                     nameVi: item.nameVi || 'Unknown', descVi: item.descVi || '', nameEn: item.nameEn || '', descEn: item.descEn || '',
                     nameFi: item.nameFi || '', descFi: item.descFi || '', category: catVi, categoryVi: catVi,
@@ -276,7 +285,7 @@ JSON Structure:
     });
 }
 
-// â”€â”€â”€ AI EXCEL BULK IMPORT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── AI EXCEL BULK IMPORT ────────────────────────────────────────────────────
 const btnAiExtract = document.getElementById('btn-ai-extract');
 if (btnAiExtract) {
     btnAiExtract.addEventListener('click', async () => {
@@ -298,12 +307,12 @@ if (btnAiExtract) {
             const systemPrompt = `You are an expert data parser. Extract ALL food items from the CSV data.
 1. Translate missing names/descriptions to VI, EN, FI.
 2. Auto-generate appetizing Vietnamese description if missing, then translate.
-3. Categorize in three languages (e.g. categoryVi: "Phá»Ÿ", categoryEn: "Pho", categoryFi: "Pho"). DO NOT use "MÃ³n chÃ­nh".
+3. Categorize in three languages (e.g. categoryVi: "Phở", categoryEn: "Pho", categoryFi: "Pho"). DO NOT use "Món chính".
 4. Infer options:
    - ONLY add PAID options (price > 0) IF they are EXPLICITLY present in the CSV. Do NOT hallucinate paid options.
-   - You CAN and SHOULD auto-generate common FREE exclusion options (price = 0). For example, for "Phá»Ÿ" or "BÃºn", add multiple "toggle" options like "KhÃ´ng hÃ nh" (No onions), "KhÃ´ng rau mÃ¹i" (No cilantro), "KhÃ´ng mÃ¬ chÃ­nh" (No MSG).
+   - You CAN and SHOULD auto-generate common FREE exclusion options (price = 0). For example, for "Phở" or "Bún", add multiple "toggle" options like "Không hành" (No onions), "Không rau mùi" (No cilantro), "Không mì chính" (No MSG).
 You MUST return ONLY a JSON object with a single key "items" containing the array of dishes. No markdown blocks.
-JSON Structure: { "items": [ { "nameVi": "TÃªn mÃ³n", "descVi": "MÃ´ táº£ háº¥p dáº«n", "nameEn": "English name", "descEn": "English desc", "nameFi": "Finnish name", "descFi": "Finnish desc", "price": 12.50, "categoryVi": "Phá»Ÿ", "categoryEn": "Pho", "categoryFi": "Pho", "options": [] } ] }`;
+JSON Structure: { "items": [ { "nameVi": "Tên món", "descVi": "Mô tả hấp dẫn", "nameEn": "English name", "descEn": "English desc", "nameFi": "Finnish name", "descFi": "Finnish desc", "price": 12.50, "categoryVi": "Phở", "categoryEn": "Pho", "categoryFi": "Pho", "options": [] } ] }`;
 
             const responseData = await (async () => {
                 try {
@@ -333,7 +342,7 @@ JSON Structure: { "items": [ { "nameVi": "TÃªn mÃ³n", "descVi": "MÃ´ táº
             loadingIndicator.innerHTML = '<span class="material-symbols-outlined animate-spin align-middle mr-1 text-sm">sync</span> Saving items to Database...';
             let successCount = 0;
             for (const item of items) {
-                const catVi = item.categoryVi || item.category || 'Phá»Ÿ';
+                const catVi = item.categoryVi || item.category || 'Phở';
                 await addDoc(collection(db, "menu"), {
                     nameVi: item.nameVi || 'Unknown', descVi: item.descVi || '', nameEn: item.nameEn || '', descEn: item.descEn || '',
                     nameFi: item.nameFi || '', descFi: item.descFi || '', category: catVi, categoryVi: catVi,
@@ -357,7 +366,7 @@ JSON Structure: { "items": [ { "nameVi": "TÃªn mÃ³n", "descVi": "MÃ´ táº
     });
 }
 
-// â”€â”€â”€ AUTO TRANSLATE LOGIC â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── AUTO TRANSLATE LOGIC ────────────────────────────────────────────────────
 const btnTranslate = document.getElementById('btn-translate');
 if (btnTranslate) {
     btnTranslate.addEventListener('click', async () => {
@@ -391,12 +400,12 @@ if (btnTranslate) {
     });
 }
 
-// â”€â”€â”€ AUTO DESCRIPTION LOGIC â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── AUTO DESCRIPTION LOGIC ──────────────────────────────────────────────────
 const btnAutoDesc = document.getElementById('btn-auto-desc');
 if (btnAutoDesc) {
     btnAutoDesc.addEventListener('click', async () => {
         const nameVi = document.getElementById('food-name-vi').value;
-        if (!nameVi) { window.showNotification('Vui lÃ²ng nháº­p TÃªn mÃ³n (Tiáº¿ng Viá»‡t) trÆ°á»›c!', 'info'); return; }
+        if (!nameVi) { window.showNotification('Vui lòng nhập Tên món (Tiếng Việt) trước!', 'info'); return; }
         const originalText = btnAutoDesc.innerHTML;
         btnAutoDesc.innerHTML = '<span class="material-symbols-outlined animate-spin text-[14px]">sync</span> ...';
         btnAutoDesc.disabled = true;
@@ -404,15 +413,15 @@ if (btnAutoDesc) {
             const keys = getApiKeysCached();
             const payload = {
                 messages: [
-                    { role: 'system', content: 'Báº¡n lÃ  chuyÃªn gia viáº¿t content áº©m thá»±c nhÃ  hÃ ng Viá»‡t Nam cao cáº¥p. Nhiá»‡m vá»¥ cá»§a báº¡n lÃ  viáº¿t má»™t Ä‘oáº¡n mÃ´ táº£ mÃ³n Äƒn (Description) báº±ng Tiáº¿ng Viá»‡t cá»±c ká»³ háº¥p dáº«n, kÃ­ch thÃ­ch vá»‹ giÃ¡c, giá»›i thiá»‡u sÆ¡ vá» nguyÃªn liá»‡u vÃ  cÃ¡ch cháº¿ biáº¿n. Äoáº¡n vÄƒn pháº£i ngáº¯n gá»n, dÃ i tá»‘i Ä‘a 3 cÃ¢u. Chá»‰ tráº£ vá» vÄƒn báº£n, khÃ´ng dÃ¹ng ngoáº·c kÃ©p, khÃ´ng dÃ¹ng markdown.' },
-                    { role: 'user', content: `TÃªn mÃ³n Äƒn: ${nameVi}` }
+                    { role: 'system', content: 'Bạn là chuyên gia viết content ẩm thực nhà hàng Việt Nam cao cấp. Nhiệm vụ của bạn là viết một đoản mô tả món ăn (Description) bằng Tiếng Việt cực kỳ hấp dẫn, kích thích vị giác, giới thiệu sơ về nguyên liệu và cách chế biến. Đoạn văn phải ngắn gọn, dài tối đa 3 câu. Chỉ trả về văn bản, không dùng ngoặc kép, không dùng markdown.' },
+                    { role: 'user', content: `Tên món Ăn: ${nameVi}` }
                 ]
             };
             const data = await callOpenRouterWithFallback(payload, keys.openRouterKey2);
             document.getElementById('food-desc-vi').value = data.choices[0].message.content.trim();
         } catch (error) {
             console.error('Auto Desc Error:', error);
-            window.showNotification('Lá»—i khi táº¡o mÃ´ táº£. Vui lÃ²ng thá»­ láº¡i.', 'error');
+            window.showNotification('Lỗi khi tạo mô tả. Vui lòng thử lại.', 'error');
         } finally {
             btnAutoDesc.innerHTML = originalText;
             btnAutoDesc.disabled = false;
@@ -420,7 +429,7 @@ if (btnAutoDesc) {
     });
 }
 
-// â”€â”€â”€ FOOD ADD FORM SUBMIT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── FOOD ADD FORM SUBMIT ────────────────────────────────────────────────────
 const foodAddForm = document.getElementById('food-add-form');
 if (foodAddForm) {
     foodAddForm.addEventListener('submit', async (e) => {
@@ -471,7 +480,7 @@ if (foodAddForm) {
     });
 }
 
-// â”€â”€â”€ INIT: Load categories on mount & init API keys â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── INIT: Load categories on mount & init API keys ─────────────────────────
 (async () => {
     await initApiKeys();
     if (document.getElementById('category-datalist')) loadCategories();

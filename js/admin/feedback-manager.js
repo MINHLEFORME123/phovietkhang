@@ -8,6 +8,19 @@ import {
     query,
     orderBy
 } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { ensureAdminNotification } from "./utils.js";
+
+ensureAdminNotification();
+
+function escapeHtml(value) {
+    if (value === null || value === undefined) return '';
+    return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+}
 
 function renderFeedback() {
     const grid = document.getElementById('feedback-grid');
@@ -35,30 +48,38 @@ function renderFeedback() {
                 ${data.status === 'unread' ? '<div class="absolute top-4 right-4 w-3 h-3 bg-primary rounded-full animate-pulse"></div>' : ''}
                 <div class="flex items-center gap-3 mb-4">
                     <div class="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400 font-bold uppercase">
-                        ${data.name ? data.name.charAt(0) : '?'}
+                        ${escapeHtml((data.name || '?').charAt(0))}
                     </div>
                     <div>
-                        <h4 class="font-semibold text-white">${data.name || 'Anonymous'}</h4>
-                        <p class="text-xs text-secondary">${dateStr}</p>
+                        <h4 class="font-semibold text-white">${escapeHtml(data.name || 'Anonymous')}</h4>
+                        <p class="text-xs text-secondary">${escapeHtml(dateStr)}</p>
                     </div>
                 </div>
-                <div class="mb-4 text-sm text-gray-300 flex-1 bg-black/20 p-3 rounded-lg border border-white/5 break-words whitespace-pre-wrap">${data.message}</div>
+                <div class="mb-4 text-sm text-gray-300 flex-1 bg-black/20 p-3 rounded-lg border border-white/5 break-words whitespace-pre-wrap">${escapeHtml(data.message)}</div>
                 <div class="flex flex-col gap-1 mb-4 text-xs text-secondary">
-                    <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[14px]">mail</span> <a href="mailto:${data.email}" class="hover:text-primary transition-colors">${data.email || 'N/A'}</a></div>
-                    <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[14px]">call</span> ${data.phone || 'N/A'}</div>
+                    <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[14px]">mail</span> <a href="mailto:${encodeURIComponent(data.email || '')}" class="hover:text-primary transition-colors">${escapeHtml(data.email || 'N/A')}</a></div>
+                    <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[14px]">call</span> ${escapeHtml(data.phone || 'N/A')}</div>
                 </div>
                 <div class="flex items-center justify-between mt-auto pt-4 border-t border-gray-800">
                     ${data.status === 'unread' ?
-                        `<button onclick="window.markRead('${docSnap.id}')" class="text-xs font-medium text-primary hover:text-blue-400 flex items-center gap-1 transition-colors"><span class="material-symbols-outlined text-[16px]">mark_email_read</span> Mark as Read</button>` :
+                        `<button type="button" class="mark-read-btn text-xs font-medium text-primary hover:text-blue-400 flex items-center gap-1 transition-colors"><span class="material-symbols-outlined text-[16px]">mark_email_read</span> Mark as Read</button>` :
                         `<span class="text-xs text-secondary flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">done_all</span> Read</span>`
                     }
-                    <button onclick="window.deleteFeedback('${docSnap.id}')" class="text-xs text-red-400 hover:text-red-300 flex items-center gap-1 transition-colors">
+                    <button type="button" class="delete-feedback-btn text-xs text-red-400 hover:text-red-300 flex items-center gap-1 transition-colors">
                         <span class="material-symbols-outlined text-[16px]">delete</span> Delete
                     </button>
                 </div>
             `;
+
+            const readBtn = card.querySelector('.mark-read-btn');
+            if (readBtn) readBtn.addEventListener('click', () => window.markRead(docSnap.id));
+            card.querySelector('.delete-feedback-btn').addEventListener('click', () => window.deleteFeedback(docSnap.id));
+
             grid.appendChild(card);
         });
+    }, (error) => {
+        console.error("Failed to load feedback:", error);
+        grid.innerHTML = '<div class="col-span-full text-center text-red-500 py-10">Failed to load feedback. Check Firestore permissions.</div>';
     });
 }
 

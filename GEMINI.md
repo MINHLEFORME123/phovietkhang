@@ -2,6 +2,51 @@
 
 ## Modifications
 
+### [2026-06-13] Added Trilingual Support for Cash or Card Payment Description
+- **Changes**:
+  - Added missing `"payment-cod"` and `"payment-cod-desc"` keys to the English (`en`) and Finnish (`fi`) dictionaries in [client.js](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/js/client.js).
+  - This ensures that selecting either language translates the "Cash or Card" method title and subtitle descriptions reactively on the cart checkout page.
+
+### [2026-06-13] Added Trilingual Support to Homepage Signature Creations Tool
+- **Changes**:
+  - Overhauled `updateHomepageSignatureText` in both [ai-chat.js](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/js/admin/ai-chat.js) and [admin.js](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/js/admin.js) to accept six parameters: `titleVi`, `titleEn`, `titleFi`, `descVi`, `descEn`, `descFi`.
+  - Implemented non-destructive partial updates using an object builder to avoid null overwriting of omitted fields when making updates to specific languages.
+  - Documented the trilingual argument signature inside the AI system prompts for both administration script controllers.
+  - Refactored signature dishes rendering logic in [homepage.js](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/js/homepage.js) to dynamically pull and render translated names and descriptions for the selected language, responding reactively to language changes.
+  - Added the `getHomepageConfig()` tool to both [ai-chat.js](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/js/admin/ai-chat.js) and [admin.js](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/js/admin.js) so the AI assistant can query and inspect the active homepage state before executing updates.
+  - Overhauled and upgraded all homepage text editing tools (`updateHomepageHero`, `updateHomepageHeroText`, `updateHomepageStory`, `updateHomepageStoryText`, and `updateHomepageCTA`) in both [ai-chat.js](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/js/admin/ai-chat.js) and [admin.js](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/js/admin.js) to be fully trilingual, taking 3 languages (Vietnamese, English, Finnish).
+  - Refactored [homepage.js](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/js/homepage.js) and the inline hydration script in [index.html](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/index.html) to cache and switch texts reactively across all sections (Hero, Story, Signature Creations, and CTA) matching the customer's active language selection.
+
+### [2026-06-13] Naming Attachment Identifiers Based on Original File Names
+- **Changes**:
+  - Implemented `sanitizeFileName` in [ai-chat.js](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/js/admin/ai-chat.js) to strip accents, spaces, and special characters from uploaded file names.
+  - Updated the attachment ID generation to use the sanitized original file name (e.g. `ATTACHED_IMAGE_hero_bg_542` instead of timestamps like `ATTACHED_IMAGE_171828...`), giving the AI direct semantic context on what each attachment represents.
+
+### [2026-06-13] Split Homepage Hero & Story Tools and Fixed Overwrite Behavior
+- **Changes**:
+  - Split the homepage editing tools to allow editing image and text elements independently:
+    - Added `updateHomepageHeroImage(imageUrl)` & `updateHomepageHeroText(titleVi, descVi)`.
+    - Added `updateHomepageStoryImage(imageUrl)` & `updateHomepageStoryText(labelVi, titleVi, p1Vi, p2Vi)`.
+  - Refactored `updateHomepageHero` and `updateHomepageStory` to check for `undefined` arguments instead of forcing all fields to write `null`, preventing the AI from accidentally overwriting existing values when partial updates are executed.
+  - Documented the new tools in the assistant's system prompt to allow target changes without requiring image uploads when editing text.
+
+### [2026-06-13] Integrated Multi-Attachment UI and Prevented Base64 Token Bloat
+- **Changes**: 
+  - Enabled multi-file upload by adding the `multiple` attribute to `#admin-chat-file`.
+  - Removed base64/text strings from polluting the user message textbox.
+  - Implemented an attachments preview drawer (`#admin-chat-attachments-preview`) with thumbnails for images, file icons for documents, and remove buttons (`×`) to allow reviewing attachments before sending.
+  - Modified `sendMessage` in [ai-chat.js](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/js/admin/ai-chat.js) so that:
+    - Images only transmit short ID placeholders (e.g. `[Ảnh đính kèm: ATTACHED_IMAGE_...]`) in the chat history, keeping base64 tokens out of the LLM context. The base64 content is stored in `window.__uploadedImages` and resolved on-demand when tool execution fires.
+    - Documents (Word/Excel/CSV) have their parsed text appended to the prompt behind the scenes when sending, keeping the input textbox clear.
+
+### [2026-06-13] Fixed AI Admin Image Upload Resolution
+- **Changes**: Refactored the image argument resolution logic in [ai-chat.js](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/js/admin/ai-chat.js) by using a regex (`/ATTACHED_IMAGE_\d+/`) to scan and extract the exact placeholder ID from any string value in `resolvedArgs`. This guarantees that image placeholders embedded inside brackets or with trailing punctuation (e.g., `[Ảnh đính kèm: ATTACHED_IMAGE_xxxx]`) are correctly resolved into their Base64 data URLs from `window.__uploadedImages` before executing homepage config tools like `updateHomepageHero`, `updateHomepageStory`, etc.
+
+### [2026-06-12] Documented Homepage Story, Fixed sendSpins & Added sendEmail Tool
+- **Changes**: Added detailed argument signatures to the system prompt of the admin AI assistant in [ai-chat.js](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/js/admin/ai-chat.js) for `updateHomepageStory` and other homepage config tools. Added argument fallbacks (`storyImg`, `image`, `imgUrl` -> `imageUrl`) and resolution mechanisms to translate attached chat file IDs into base64 strings so that the assistant can seamlessly handle and update homepage story images.
+- **sendSpinsToUser Fix**: Corrected the mapping of spin types (handling Vietnamese/English inputs like "Thường", "Xịn", "VIP", "Normal", "Good"), resolved case sensitivity for email lookups, and properly initialized missing fields on the user document in Firestore to prevent updates from breaking.
+- **sendEmail Tool & Resend Key**: Created the `sendEmail(to, subject, html)` tool function in the admin chat backend, registered it in the tool registry, and documented it in the system prompt. Updated the global Resend API key to `re_AmwxgrXs_217ywFo3uCjBc21UTt7QMBo9` and changed the sender email address ("from") to `noreply@phovietkhang.com` inside [worker.js](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/cloudflare-worker/worker.js) and [paytrail-worker.js](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/js/paytrail-worker.js), and synced changes to GitHub folder.
+
 ### [2026-06-11] Fixed Admin Area Not Loading Firestore Data
 - **Root Cause**: A syntax error was introduced in `js/admin.js` where the `food-add-form` submit handler block header went missing due to an accidental text deletion/comment overwrite, leaving dangling closing brackets (`Uncaught SyntaxError: Unexpected token '}'` at line 1701). Additionally, the `window.deleteFood` function and `btn-clear-menu` handlers were deleted during previous cleanup commits, preventing the admin module script from loading/parsing entirely.
 - **Fix in `js/admin.js`**:

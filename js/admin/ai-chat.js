@@ -1,6 +1,6 @@
-// â”€â”€â”€ FLOATING AI ADMIN CHAT (MESSENGER-STYLE) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── FLOATING AI ADMIN CHAT (MESSENGER-STYLE) ───────────────────────────────
 import { db, auth } from "../firebase-config.js";
-import { collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { callWorker, listAllUsers, computeLoyaltyTier, callOpenRouterWithFallback, stripThinking, initApiKeys, getApiKeysCached } from "./utils.js";
 
 (function() {
@@ -94,6 +94,35 @@ import { callWorker, listAllUsers, computeLoyaltyTier, callOpenRouterWithFallbac
             0%, 80%, 100% { transform: scale(0); }
             40% { transform: scale(1); }
         }
+        .attachment-preview-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: #1e293b;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 4px 8px;
+            font-size: 11px;
+            color: #e5e7eb;
+            position: relative;
+        }
+        .attachment-preview-item img {
+            width: 20px;
+            height: 20px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        .attachment-preview-item .remove-btn {
+            cursor: pointer;
+            color: #ef4444;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 4px;
+            font-size: 14px;
+            line-height: 1;
+        }
     `;
     document.head.appendChild(style);
 
@@ -115,15 +144,16 @@ import { callWorker, listAllUsers, computeLoyaltyTier, callOpenRouterWithFallbac
             </div>
             <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-3" id="admin-chat-messages">
                 <div class="admin-chat-bubble bubble-ai">
-                    Xin chÃ o! TÃ´i lÃ  Trá»£ lÃ½ AI cá»§a Phá»‘ Viá»‡t Khang. TÃ´i cÃ³ thá»ƒ há»— trá»£ báº¡n kiá»ƒm tra Ä‘Æ¡n hÃ ng hÃ´m nay hoáº·c cáº­p nháº­t giÃ¡ cáº£ cÃ¡c mÃ³n Äƒn trá»±c tiáº¿p. Báº¡n cáº§n giÃºp gÃ¬?
+                    Xin chào! Tôi là Trợ lý AI của Phở Việt Khang. Tôi có thể hỗ trợ bạn kiểm tra đơn hàng hôm nay hoặc cập nhật giá cả các món ăn trực tiếp. Bạn cần giúp gì?
                 </div>
             </div>
+            <div id="admin-chat-attachments-preview" class="p-2 bg-[#121824] border-t border-gray-800 flex flex-wrap gap-2 max-h-[80px] overflow-y-auto hidden"></div>
             <div class="p-3 border-t border-gray-800 bg-[#121824] flex gap-2 relative">
-                <input type="file" id="admin-chat-file" accept="image/*,.doc,.docx,.xls,.xlsx,.csv" class="hidden">
-                <button id="admin-chat-attach" class="bg-[#1e293b] hover:bg-gray-700 text-secondary hover:text-white p-2 rounded-xl border border-gray-700 transition-colors flex items-center justify-center" title="ÄÃ­nh kÃ¨m (áº¢nh, Word, Excel)">
+                <input type="file" id="admin-chat-file" accept="image/*,.doc,.docx,.xls,.xlsx,.csv" class="hidden" multiple>
+                <button id="admin-chat-attach" class="bg-[#1e293b] hover:bg-gray-700 text-secondary hover:text-white p-2 rounded-xl border border-gray-700 transition-colors flex items-center justify-center" title="Đính kèm (Ảnh, Word, Excel)">
                     <span class="material-symbols-outlined text-[18px]">attach_file</span>
                 </button>
-                <input type="text" id="admin-chat-input" placeholder="Há»i vá» Ä‘Æ¡n hÃ ng, chá»‰nh giÃ¡ sá»‘t..." class="flex-1 bg-[#0b0f19] border border-gray-700 rounded-xl text-white px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary">
+                <input type="text" id="admin-chat-input" placeholder="Hỏi về đơn hàng, chỉnh giá..." class="flex-1 bg-[#0b0f19] border border-gray-700 rounded-xl text-white px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary">
                 <button id="admin-chat-send" class="bg-primary hover:bg-blue-600 text-white p-2 rounded-xl transition-colors flex items-center justify-center">
                     <span class="material-symbols-outlined text-[18px]">send</span>
                 </button>
@@ -141,8 +171,37 @@ import { callWorker, listAllUsers, computeLoyaltyTier, callOpenRouterWithFallbac
     const chatIcon = document.getElementById('chat-icon');
     const attachBtn = document.getElementById('admin-chat-attach');
     const fileInput = document.getElementById('admin-chat-file');
+    const attachmentsPreview = document.getElementById('admin-chat-attachments-preview');
 
-    const apiKeys = initApiKeys();
+    window.__currentAttachments = [];
+
+    function renderAttachmentsPreview() {
+        if (!attachmentsPreview) return;
+        if (window.__currentAttachments.length === 0) {
+            attachmentsPreview.classList.add('hidden');
+            attachmentsPreview.innerHTML = '';
+            return;
+        }
+        attachmentsPreview.classList.remove('hidden');
+        attachmentsPreview.innerHTML = window.__currentAttachments.map((att, idx) => {
+            const isImg = att.type === 'image';
+            const icon = isImg ? `<img src="${att.content}" alt="thumbnail">` : `<span class="material-symbols-outlined text-[16px] text-blue-400">description</span>`;
+            return `
+                <div class="attachment-preview-item" data-index="${idx}">
+                    ${icon}
+                    <span class="truncate max-w-[80px]" title="${att.name}">${att.name}</span>
+                    <span class="remove-btn" onclick="window.__removeAdminChatAttachment(${idx})">×</span>
+                </div>
+            `;
+        }).join('');
+    }
+
+    window.__removeAdminChatAttachment = (index) => {
+        window.__currentAttachments.splice(index, 1);
+        renderAttachmentsPreview();
+    };
+
+    initApiKeys();
 
     function loadScript(url) {
         return new Promise((resolve, reject) => {
@@ -157,72 +216,99 @@ import { callWorker, listAllUsers, computeLoyaltyTier, callOpenRouterWithFallbac
 
     attachBtn.addEventListener('click', () => fileInput.click());
 
+    const sanitizeFileName = (name) => {
+        const extIndex = name.lastIndexOf('.');
+        const baseName = extIndex !== -1 ? name.substring(0, extIndex) : name;
+        return baseName
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "") // remove accents
+            .replace(/[^a-z0-9_]/g, '_')     // replace non-alphanumeric with underscore
+            .replace(/_+/g, '_')             // dedup underscores
+            .replace(/^_+|_+$/g, '');        // trim underscores
+    };
+
     fileInput.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
+        const files = Array.from(e.target.files);
+        if (files.length === 0) return;
         const attachIcon = attachBtn.querySelector('span');
         const originalIcon = attachIcon.textContent;
         attachIcon.textContent = 'hourglass_empty';
         attachIcon.classList.add('animate-spin');
-        chatInput.placeholder = 'Äang xá»­ lÃ½ file...';
+        chatInput.placeholder = 'Đang xử lý file...';
         chatInput.disabled = true;
         try {
-            const ext = file.name.split('.').pop().toLowerCase();
-            if (['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(ext)) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        const MAX_WIDTH = 480, MAX_HEIGHT = 480;
-                        let width = img.width, height = img.height;
-                        if (width > height) {
-                            if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
-                        } else {
-                            if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
-                        }
-                        canvas.width = width; canvas.height = height;
-                        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-                        const dataUrl = canvas.toDataURL('image/jpeg', 0.78);
-                        window.__uploadedImages = window.__uploadedImages || {};
-                        const imgId = "ATTACHED_IMAGE_" + Date.now();
-                        window.__uploadedImages[imgId] = dataUrl;
-                        chatInput.value += (chatInput.value ? ' ' : '') + `[áº¢nh Ä‘Ã­nh kÃ¨m: ${imgId}] `;
-                        attachIcon.classList.remove('animate-spin');
-                        attachIcon.textContent = originalIcon;
-                        chatInput.placeholder = 'Há»i vá» Ä‘Æ¡n hÃ ng, chá»‰nh giÃ¡ sá»‘t...';
-                        chatInput.disabled = false;
-                        chatInput.focus();
-                        fileInput.value = '';
-                    };
-                    img.src = event.target.result;
-                };
-                reader.readAsDataURL(file);
-                return;
-            } else if (ext === 'docx' || ext === 'doc') {
-                await loadScript('https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js');
-                const arrayBuffer = await file.arrayBuffer();
-                const result = await mammoth.extractRawText({ arrayBuffer });
-                chatInput.value += (chatInput.value ? '\n' : '') + `[Ná»™i dung file Word ${file.name}:\n${result.value}]\n`;
-            } else if (['xlsx', 'xls', 'csv'].includes(ext)) {
-                await loadScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
-                const arrayBuffer = await file.arrayBuffer();
-                const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-                const csvStr = XLSX.utils.sheet_to_csv(workbook.Sheets[workbook.SheetNames[0]]);
-                chatInput.value += (chatInput.value ? '\n' : '') + `[Ná»™i dung file Excel ${file.name}:\n${csvStr}]\n`;
-            } else {
-                alert('Äá»‹nh dáº¡ng file khÃ´ng Ä‘Æ°á»£c há»— trá»£!');
+            for (const file of files) {
+                const ext = file.name.split('.').pop().toLowerCase();
+                const cleanName = sanitizeFileName(file.name);
+                if (['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(ext)) {
+                    await new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            const img = new Image();
+                            img.onload = () => {
+                                const canvas = document.createElement('canvas');
+                                const MAX_WIDTH = 480, MAX_HEIGHT = 480;
+                                let width = img.width, height = img.height;
+                                if (width > height) {
+                                    if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                                } else {
+                                    if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+                                }
+                                canvas.width = width; canvas.height = height;
+                                canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                                const dataUrl = canvas.toDataURL('image/jpeg', 0.78);
+                                const imgId = "ATTACHED_IMAGE_" + cleanName + "_" + Math.floor(Math.random()*1000);
+                                window.__currentAttachments.push({
+                                    id: imgId,
+                                    name: file.name,
+                                    type: 'image',
+                                    content: dataUrl
+                                });
+                                resolve();
+                            };
+                            img.src = event.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                } else if (ext === 'docx' || ext === 'doc') {
+                    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js');
+                    const arrayBuffer = await file.arrayBuffer();
+                    const result = await mammoth.extractRawText({ arrayBuffer });
+                    const fileId = "ATTACHED_FILE_" + cleanName + "_" + Math.floor(Math.random()*1000);
+                    window.__currentAttachments.push({
+                        id: fileId,
+                        name: file.name,
+                        type: 'document',
+                        content: result.value
+                    });
+                } else if (['xlsx', 'xls', 'csv'].includes(ext)) {
+                    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
+                    const arrayBuffer = await file.arrayBuffer();
+                    const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+                    const csvStr = XLSX.utils.sheet_to_csv(workbook.Sheets[workbook.SheetNames[0]]);
+                    const fileId = "ATTACHED_FILE_" + cleanName + "_" + Math.floor(Math.random()*1000);
+                    window.__currentAttachments.push({
+                        id: fileId,
+                        name: file.name,
+                        type: 'document',
+                        content: csvStr
+                    });
+                } else {
+                    alert(`Định dạng file ${file.name} không được hỗ trợ!`);
+                }
             }
+            renderAttachmentsPreview();
         } catch (err) {
             console.error(err);
-            alert('Lá»—i xá»­ lÃ½ file: ' + err.message);
+            alert('Lỗi xử lý file: ' + err.message);
         } finally {
             attachIcon.classList.remove('animate-spin');
             attachIcon.textContent = originalIcon;
-            chatInput.placeholder = 'Há»i vá» Ä‘Æ¡n hÃ ng, chá»‰nh giÃ¡ sá»‘t...';
+            chatInput.placeholder = 'Hỏi về đơn hàng, chỉnh giá...';
             chatInput.disabled = false;
-            chatInput.focus();
             fileInput.value = '';
+            chatInput.focus();
         }
     });
 
@@ -248,7 +334,7 @@ import { callWorker, listAllUsers, computeLoyaltyTier, callOpenRouterWithFallbac
 
     const chatMessages = [{
         role: 'system',
-        content: `You are a helpful Vietnamese restaurant AI Admin Assistant for Phá»Ÿ Viá»‡t Khang restaurant.
+        content: `You are a helpful Vietnamese restaurant AI Admin Assistant for Phở Việt Khang restaurant.
 You have full access to Firebase tools that can manage orders, food menu, AND Firebase Auth user accounts with real admin privileges.
 You MUST answer in Vietnamese.
 
@@ -263,15 +349,38 @@ Rules:
 - When outputting tool calls, output ONLY the <tool_call> blocks.
 - After receiving tool results, formulate your final Vietnamese response.
 
+⚠️ MENU LOOKUP STRATEGY (MANDATORY):
+Do NOT use listAllFoodItems (it returns everything and wastes tokens).
+Instead, follow this 2-step approach:
+1. Call listAllCategories() first → get category list with item summaries (id, name, price only).
+2. If you need details (options, description, etc.) for specific items, call getFoodItemById(dishId) for each.
+3. If you need all items in one category, call searchFoodByCategory(categoryVi).
+This saves tokens and is much faster.
+
 TOOLS AVAILABLE:
 - Orders: getOrdersSoldToday, getOrdersByStatus, updateOrderStatus, deleteOrder
-- Menu: listAllFoodItems, updateMenuPrice, createMenuItem, setOptionChoicePrice, addMenuOptionGroup, removeMenuOptionGroup, addChoiceToOptionGroup, removeChoiceFromOptionGroup, updateMenuOptionGroup, updateChoiceInOptionGroup, updateMenuName, updateMenuDescription, updateMenuCategory, updateMenuAvailability, uploadMenuImage, removeMenuImage, updateMenuPreparationTime, updateMenuNutritionInfo, addMenuTag, removeMenuTag, reorderMenuItems, duplicateMenuItem, deleteMenuItem, updateMenuCustomFields
+- Menu Browse: listAllCategories, searchFoodByCategory, getFoodItemById
+- Menu Edit: updateMenuPrice, createMenuItem, setOptionChoicePrice, addMenuOptionGroup, removeMenuOptionGroup, addChoiceToOptionGroup, removeChoiceFromOptionGroup, updateMenuOptionGroup, updateChoiceInOptionGroup, updateMenuName, updateMenuDescription, updateMenuCategory, updateMenuAvailability, uploadMenuImage, removeMenuImage, updateMenuPreparationTime, updateMenuNutritionInfo, addMenuTag, removeMenuTag, reorderMenuItems, duplicateMenuItem, deleteMenuItem, updateMenuCustomFields
 - Users: listAllUsers, getUserLoyalty, addLoyaltyProgressByOrderId, changeUserRole, createUserAccount, sendPasswordReset, sendSpinsToUser, createCustomVoucher, markVoucherUsed, removeVoucher, listAllVouchers
 - Auth: adminListAuthUsers, adminDeleteAuthUser, adminDisableUser, adminEnableUser, adminChangeUserPassword, adminChangeUserEmail, adminVerifyUserEmail, adminSetCustomClaims, adminGetUserInfo, adminRevokeUserTokens, adminUpdateDisplayName, adminGenerateCustomToken
-- Self: changeCurrentAdminPassword, updateCurrentAdminEmail, updateCurrentAdminProfile
-- Homepage: updateHomepageHero, updateHomepageSignatures, updateHomepageSignatureText, updateHomepageStory, updateHomepageCTA, getWheelGuarantee, updateWheelGuarantee, updateHomepageReviews, updateReviewImageUrl
+- Homepage Tools details:
+  * getHomepageConfig() -> Fetches the current homepage configuration document (contains heroBgUrl, signatureDishIds, storyImg, etc.).
+  * updateHomepageHero(imageUrl, titleVi, descVi) -> Updates the Hero section (can omit parameters).
+  * updateHomepageHeroImage(imageUrl) -> Updates only the Hero background image.
+  * updateHomepageHeroText(titleVi, titleEn, titleFi, descVi, descEn, descFi) -> Updates only the Hero title and description text (supports Vietnamese, English, Finnish).
+  * updateHomepageSignatures(dishIdArray)
+  * updateHomepageSignatureText(titleVi, titleEn, titleFi, descVi, descEn, descFi) -> Updates the Signature Creations section title and description text (supports Vietnamese, English, Finnish).
+  * updateHomepageStory(imageUrl, labelVi, titleVi, p1Vi, p2Vi) -> Updates the Heritage section (Di sản của chúng tôi) (can omit parameters).
+  * updateHomepageStoryImage(imageUrl) -> Updates only the Heritage section story image.
+  * updateHomepageStoryText(labelVi, labelEn, labelFi, titleVi, titleEn, titleFi, p1Vi, p1En, p1Fi, p2Vi, p2En, p2Fi) -> Updates only the Heritage/Story text contents (supports Vietnamese, English, Finnish).
+  * updateHomepageCTA(titleVi, titleEn, titleFi, descVi, descEn, descFi) -> Updates the Call to Action section (supports Vietnamese, English, Finnish).
+  * getWheelGuarantee()
+  * updateWheelGuarantee(next20, next50, next100)
+  * updateHomepageReviews(reviews)
+  * updateReviewImageUrl(index, imageUrl)
 - Web: webSearch, browseWebUrl
-- Messages: sendGlobalAnnouncement`
+- Messages: sendGlobalAnnouncement
+- Email: sendEmail(to, subject, html) -> Sends a custom transactional email to a recipient email address using Resend API.`
     }];
 
     // Tool Implementations
@@ -317,90 +426,117 @@ TOOLS AVAILABLE:
         catch (e) { return { error: e.message }; }
     }
 
-    async function listAllFoodItems() {
+    async function listAllCategories() {
+        try {
+            const qSnap = await getDocs(collection(db, "menu"));
+            const catMap = {};
+            qSnap.forEach(docSnap => {
+                const data = docSnap.data();
+                const catVi = data.categoryVi || data.category || 'Khác';
+                if (!catMap[catVi]) catMap[catVi] = { categoryVi: catVi, categoryEn: data.categoryEn || '', categoryFi: data.categoryFi || '', items: [] };
+                catMap[catVi].items.push({ id: docSnap.id, nameVi: data.nameVi || '', nameEn: data.nameEn || '', price: data.price, isAvailable: data.isAvailable !== false });
+            });
+            return Object.values(catMap).map(c => ({ ...c, itemCount: c.items.length }));
+        } catch (e) { return { error: e.message }; }
+    }
+
+    async function searchFoodByCategory(categoryVi) {
         try {
             const qSnap = await getDocs(collection(db, "menu"));
             const items = [];
+            const catLower = (categoryVi || '').toLowerCase();
             qSnap.forEach(docSnap => {
                 const data = docSnap.data();
-                items.push({ id: docSnap.id, nameVi: data.nameVi || '', nameEn: data.nameEn || '', nameFi: data.nameFi || '', category: data.category || '', categoryVi: data.categoryVi || '', categoryEn: data.categoryEn || '', categoryFi: data.categoryFi || '', price: data.price, options: data.options || [] });
+                const itemCat = (data.categoryVi || data.category || '').toLowerCase();
+                if (itemCat === catLower) {
+                    items.push({ id: docSnap.id, nameVi: data.nameVi || '', nameEn: data.nameEn || '', nameFi: data.nameFi || '', price: data.price, isAvailable: data.isAvailable !== false, options: (data.options || []).map(o => ({ name: o.nameVi || o.name, choiceCount: (o.choices || []).length })) });
+                }
             });
             return items;
         } catch (e) { return { error: e.message }; }
     }
 
+    async function getFoodItemById(dishId) {
+        try {
+            const snap = await getDoc(doc(db, "menu", dishId));
+            if (!snap.exists()) return { error: 'Không tìm thấy món.' };
+            const data = snap.data();
+            return { id: snap.id, nameVi: data.nameVi || '', nameEn: data.nameEn || '', nameFi: data.nameFi || '', categoryVi: data.categoryVi || data.category || '', categoryEn: data.categoryEn || '', categoryFi: data.categoryFi || '', price: data.price, isAvailable: data.isAvailable !== false, image: data.image || '', descVi: data.descVi || '', descEn: data.descEn || '', descFi: data.descFi || '', preparationTime: data.preparationTime || 0, nutrition: data.nutrition || {}, tags: data.tags || [], options: data.options || [] };
+        } catch (e) { return { error: e.message }; }
+    }
+
     async function updateMenuPrice(dishId, newPrice) {
-        try { await updateDoc(doc(db, "menu", dishId), { price: parseFloat(newPrice) }); if (window.loadFood) window.loadFood(); return { success: true, message: `ÄÃ£ cáº­p nháº­t giÃ¡ mÃ³n thÃ nh cÃ´ng.` }; }
+        try { await updateDoc(doc(db, "menu", dishId), { price: parseFloat(newPrice) }); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã cập nhật giá món thành công.` }; }
         catch (e) { return { error: e.message }; }
     }
 
     async function updateMenuName(dishId, nameVi, nameEn, nameFi) {
-        try { const u = {}; if (nameVi !== undefined) u.nameVi = nameVi; if (nameEn !== undefined) u.nameEn = nameEn; if (nameFi !== undefined) u.nameFi = nameFi; await updateDoc(doc(db, "menu", dishId), u); if (window.loadFood) window.loadFood(); return { success: true, message: `ÄÃ£ cáº­p nháº­t tÃªn mÃ³n.` }; }
+        try { const u = {}; if (nameVi !== undefined) u.nameVi = nameVi; if (nameEn !== undefined) u.nameEn = nameEn; if (nameFi !== undefined) u.nameFi = nameFi; await updateDoc(doc(db, "menu", dishId), u); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã cập nhật tên món.` }; }
         catch (e) { return { error: e.message }; }
     }
 
     async function updateMenuDescription(dishId, descVi, descEn, descFi) {
-        try { const u = {}; if (descVi !== undefined) u.descVi = descVi; if (descEn !== undefined) u.descEn = descEn; if (descFi !== undefined) u.descFi = descFi; await updateDoc(doc(db, "menu", dishId), u); if (window.loadFood) window.loadFood(); return { success: true, message: `ÄÃ£ cáº­p nháº­t mÃ´ táº£.` }; }
+        try { const u = {}; if (descVi !== undefined) u.descVi = descVi; if (descEn !== undefined) u.descEn = descEn; if (descFi !== undefined) u.descFi = descFi; await updateDoc(doc(db, "menu", dishId), u); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã cập nhật mô tả.` }; }
         catch (e) { return { error: e.message }; }
     }
 
     async function updateMenuCategory(dishId, categoryVi, categoryEn, categoryFi) {
-        try { const u = {}; if (categoryVi !== undefined) { u.category = categoryVi; u.categoryVi = categoryVi; } if (categoryEn !== undefined) u.categoryEn = categoryEn; if (categoryFi !== undefined) u.categoryFi = categoryFi; await updateDoc(doc(db, "menu", dishId), u); if (window.loadFood) window.loadFood(); return { success: true, message: `ÄÃ£ cáº­p nháº­t danh má»¥c.` }; }
+        try { const u = {}; if (categoryVi !== undefined) { u.category = categoryVi; u.categoryVi = categoryVi; } if (categoryEn !== undefined) u.categoryEn = categoryEn; if (categoryFi !== undefined) u.categoryFi = categoryFi; await updateDoc(doc(db, "menu", dishId), u); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã cập nhật danh mừc.` }; }
         catch (e) { return { error: e.message }; }
     }
 
     async function updateMenuAvailability(dishId, isAvailable) {
-        try { await updateDoc(doc(db, "menu", dishId), { isAvailable: !!isAvailable }); if (window.loadFood) window.loadFood(); return { success: true, message: `ÄÃ£ cáº­p nháº­t tráº¡ng thÃ¡i.` }; }
+        try { await updateDoc(doc(db, "menu", dishId), { isAvailable: !!isAvailable }); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã cập nhật trảng thái.` }; }
         catch (e) { return { error: e.message }; }
     }
 
     async function uploadMenuImage(dishId, imageUrl) {
-        try { await updateDoc(doc(db, "menu", dishId), { image: imageUrl }); if (window.loadFood) window.loadFood(); return { success: true, message: `ÄÃ£ cáº­p nháº­t áº£nh.` }; }
+        try { await updateDoc(doc(db, "menu", dishId), { image: imageUrl }); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã cập nhật ảnh.` }; }
         catch (e) { return { error: e.message }; }
     }
 
     async function removeMenuImage(dishId) {
-        try { await updateDoc(doc(db, "menu", dishId), { image: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=500' }); if (window.loadFood) window.loadFood(); return { success: true, message: `ÄÃ£ xoÃ¡ áº£nh.` }; }
+        try { await updateDoc(doc(db, "menu", dishId), { image: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=500' }); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã xoá ảnh.` }; }
         catch (e) { return { error: e.message }; }
     }
 
     async function updateMenuPreparationTime(dishId, minutes) {
-        try { await updateDoc(doc(db, "menu", dishId), { preparationTime: parseInt(minutes) || 0 }); return { success: true, message: `ÄÃ£ cáº­p nháº­t thá»i gian chuáº©n bá»‹.` }; }
+        try { await updateDoc(doc(db, "menu", dishId), { preparationTime: parseInt(minutes) || 0 }); return { success: true, message: `Đã cập nhật thời gian chuẩn bị.` }; }
         catch (e) { return { error: e.message }; }
     }
 
     async function updateMenuNutritionInfo(dishId, calories, protein, fat, carbs) {
-        try { await updateDoc(doc(db, "menu", dishId), { nutrition: { calories: parseFloat(calories) || 0, protein: parseFloat(protein) || 0, fat: parseFloat(fat) || 0, carbs: parseFloat(carbs) || 0 } }); return { success: true, message: `ÄÃ£ cáº­p nháº­t dinh dÆ°á»¡ng.` }; }
+        try { await updateDoc(doc(db, "menu", dishId), { nutrition: { calories: parseFloat(calories) || 0, protein: parseFloat(protein) || 0, fat: parseFloat(fat) || 0, carbs: parseFloat(carbs) || 0 } }); return { success: true, message: `Đã cập nhật dinh dưỡng.` }; }
         catch (e) { return { error: e.message }; }
     }
 
     async function addMenuTag(dishId, tagLabelVi, tagLabelEn, tagLabelFi) {
-        try { const snap = await getDoc(doc(db, "menu", dishId)); if (!snap.exists()) return { error: "KhÃ´ng tÃ¬m tháº¥y mÃ³n." }; const tags = snap.data().tags || []; const lVi = tagLabelVi || '', lEn = tagLabelEn || lVi, lFi = tagLabelFi || lVi; if (!tags.some(t => (t.labelVi||'').toLowerCase() === lVi.toLowerCase())) tags.push({ labelVi: lVi, labelEn: lEn, labelFi: lFi }); await updateDoc(doc(db, "menu", dishId), { tags }); return { success: true, message: `ÄÃ£ thÃªm tag "${lVi}".` }; }
+        try { const snap = await getDoc(doc(db, "menu", dishId)); if (!snap.exists()) return { error: "Không tìm thấy món." }; const tags = snap.data().tags || []; const lVi = tagLabelVi || '', lEn = tagLabelEn || lVi, lFi = tagLabelFi || lVi; if (!tags.some(t => (t.labelVi||'').toLowerCase() === lVi.toLowerCase())) tags.push({ labelVi: lVi, labelEn: lEn, labelFi: lFi }); await updateDoc(doc(db, "menu", dishId), { tags }); return { success: true, message: `Đã thêm tag "${lVi}".` }; }
         catch (e) { return { error: e.message }; }
     }
 
     async function removeMenuTag(dishId, tagLabel) {
-        try { const snap = await getDoc(doc(db, "menu", dishId)); if (!snap.exists()) return { error: "KhÃ´ng tÃ¬m tháº¥y mÃ³n." }; const tags = snap.data().tags || []; const newTags = tags.filter(t => (t.labelVi||'').toLowerCase() !== tagLabel.toLowerCase() && (t.labelEn||'').toLowerCase() !== tagLabel.toLowerCase() && (t.labelFi||'').toLowerCase() !== tagLabel.toLowerCase()); if (tags.length === newTags.length) return { error: `KhÃ´ng tÃ¬m tháº¥y tag "${tagLabel}".` }; await updateDoc(doc(db, "menu", dishId), { tags: newTags }); return { success: true, message: `ÄÃ£ xoÃ¡ tag.` }; }
+        try { const snap = await getDoc(doc(db, "menu", dishId)); if (!snap.exists()) return { error: "Không tìm thấy món." }; const tags = snap.data().tags || []; const newTags = tags.filter(t => (t.labelVi||'').toLowerCase() !== tagLabel.toLowerCase() && (t.labelEn||'').toLowerCase() !== tagLabel.toLowerCase() && (t.labelFi||'').toLowerCase() !== tagLabel.toLowerCase()); if (tags.length === newTags.length) return { error: `Không tìm thấy tag "${tagLabel}".` }; await updateDoc(doc(db, "menu", dishId), { tags: newTags }); return { success: true, message: `Đã xoá tag.` }; }
         catch (e) { return { error: e.message }; }
     }
 
     async function reorderMenuItems(orderedDishIds) {
-        try { for (let i = 0; i < orderedDishIds.length; i++) await updateDoc(doc(db, "menu", orderedDishIds[i]), { sortOrder: i }); return { success: true, message: "ÄÃ£ sáº¯p xáº¿p láº¡i." }; }
+        try { for (let i = 0; i < orderedDishIds.length; i++) await updateDoc(doc(db, "menu", orderedDishIds[i]), { sortOrder: i }); return { success: true, message: "Đã sắp xếp lải." }; }
         catch (e) { return { error: e.message }; }
     }
 
     async function duplicateMenuItem(dishId) {
-        try { const snap = await getDoc(doc(db, "menu", dishId)); if (!snap.exists()) return { error: "KhÃ´ng tÃ¬m tháº¥y mÃ³n." }; const newRef = await addDoc(collection(db, "menu"), { ...snap.data(), nameVi: (snap.data().nameVi || "") + " (Báº£n sao)", createdAt: new Date() }); if (window.loadFood) window.loadFood(); return { success: true, message: `ÄÃ£ nhÃ¢n báº£n vá»›i ID: ${newRef.id}` }; }
+        try { const snap = await getDoc(doc(db, "menu", dishId)); if (!snap.exists()) return { error: "Không tìm thấy món." }; const newRef = await addDoc(collection(db, "menu"), { ...snap.data(), nameVi: (snap.data().nameVi || "") + " (Bản sao)", createdAt: new Date() }); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã nhân bản với ID: ${newRef.id}` }; }
         catch (e) { return { error: e.message }; }
     }
 
     async function deleteMenuItem(dishId) {
-        try { await deleteDoc(doc(db, "menu", dishId)); if (window.loadFood) window.loadFood(); if (window.loadCategories) window.loadCategories(); return { success: true, message: `ÄÃ£ xoÃ¡ mÃ³n.` }; }
+        try { await deleteDoc(doc(db, "menu", dishId)); if (window.loadFood) window.loadFood(); if (window.loadCategories) window.loadCategories(); return { success: true, message: `Đã xoá món.` }; }
         catch (e) { return { error: e.message }; }
     }
 
     async function updateMenuCustomFields(dishId, customFields) {
-        try { await updateDoc(doc(db, "menu", dishId), customFields); if (window.loadFood) window.loadFood(); return { success: true, message: `ÄÃ£ cáº­p nháº­t trÆ°á»ng tuá»³ chá»‰nh.` }; }
+        try { await updateDoc(doc(db, "menu", dishId), customFields); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã cập nhật trường tuỳ chỉnh.` }; }
         catch (e) { return { error: e.message }; }
     }
 
@@ -417,82 +553,124 @@ TOOLS AVAILABLE:
             }) : [];
             await updateDoc(doc(db, "menu", dishId), { options });
             if (window.loadFood) window.loadFood();
-            return { success: true, message: `ÄÃ£ cáº­p nháº­t giÃ¡ ${choiceLabel} thÃ nh ${newPrice}â‚¬.` };
+            return { success: true, message: `Đã cập nhật giá ${choiceLabel} thành ${newPrice}€.` };
         } catch (e) { return { error: e.message }; }
     }
 
     async function addMenuOptionGroup(dishId, optionNameVi, optionNameEn, optionNameFi, optionType, choices) {
-        try { const snap = await getDoc(doc(db, "menu", dishId)); if (!snap.exists()) return { error: "KhÃ´ng tÃ¬m tháº¥y mÃ³n." }; const options = snap.data().options || []; options.push({ name: optionNameEn || optionNameVi, nameVi: optionNameVi, nameEn: optionNameEn || optionNameVi, nameFi: optionNameFi || optionNameVi, type: optionType || 'toggle', choices: (choices||[]).map(c => ({ label: c.labelEn || c.labelVi, labelVi: c.labelVi, labelEn: c.labelEn || c.labelVi, labelFi: c.labelFi || c.labelVi, price: parseFloat(c.price)||0 })) }); await updateDoc(doc(db, "menu", dishId), { options }); if (window.loadFood) window.loadFood(); return { success: true, message: `ÄÃ£ thÃªm nhÃ³m option.` }; }
+        try { const snap = await getDoc(doc(db, "menu", dishId)); if (!snap.exists()) return { error: "Không tìm thấy món." }; const options = snap.data().options || []; options.push({ name: optionNameEn || optionNameVi, nameVi: optionNameVi, nameEn: optionNameEn || optionNameVi, nameFi: optionNameFi || optionNameVi, type: optionType || 'toggle', choices: (choices||[]).map(c => ({ label: c.labelEn || c.labelVi, labelVi: c.labelVi, labelEn: c.labelEn || c.labelVi, labelFi: c.labelFi || c.labelVi, price: parseFloat(c.price)||0 })) }); await updateDoc(doc(db, "menu", dishId), { options }); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã thêm nhóm option.` }; }
         catch (e) { return { error: e.message }; }
     }
 
     async function removeMenuOptionGroup(dishId, optionName) {
-        try { const snap = await getDoc(doc(db, "menu", dishId)); if (!snap.exists()) return { error: "KhÃ´ng tÃ¬m tháº¥y mÃ³n." }; const options = (snap.data().options || []).filter(opt => ![opt.name, opt.nameVi, opt.nameEn, opt.nameFi].some(n => (n||'').toLowerCase() === optionName.toLowerCase())); await updateDoc(doc(db, "menu", dishId), { options }); if (window.loadFood) window.loadFood(); return { success: true, message: `ÄÃ£ xoÃ¡ nhÃ³m option.` }; }
+        try { const snap = await getDoc(doc(db, "menu", dishId)); if (!snap.exists()) return { error: "Không tìm thấy món." }; const options = (snap.data().options || []).filter(opt => ![opt.name, opt.nameVi, opt.nameEn, opt.nameFi].some(n => (n||'').toLowerCase() === optionName.toLowerCase())); await updateDoc(doc(db, "menu", dishId), { options }); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã xoá nhóm option.` }; }
         catch (e) { return { error: e.message }; }
     }
 
     async function addChoiceToOptionGroup(dishId, optionName, choiceLabelVi, choiceLabelEn, choiceLabelFi, choicePrice) {
-        try { const snap = await getDoc(doc(db, "menu", dishId)); if (!snap.exists()) return { error: "KhÃ´ng tÃ¬m tháº¥y mÃ³n." }; let updated = false; const options = (snap.data().options || []).map(opt => { if ([opt.name, opt.nameVi, opt.nameEn, opt.nameFi].some(n => (n||'').toLowerCase() === optionName.toLowerCase())) { opt.choices.push({ label: choiceLabelEn || choiceLabelVi, labelVi: choiceLabelVi, labelEn: choiceLabelEn || choiceLabelVi, labelFi: choiceLabelFi || choiceLabelVi, price: parseFloat(choicePrice)||0 }); updated = true; } return opt; }); if (!updated) return { error: "KhÃ´ng tÃ¬m tháº¥y nhÃ³m option." }; await updateDoc(doc(db, "menu", dishId), { options }); if (window.loadFood) window.loadFood(); return { success: true, message: `ÄÃ£ thÃªm lá»±a chá»n.` }; }
+        try { const snap = await getDoc(doc(db, "menu", dishId)); if (!snap.exists()) return { error: "Không tìm thấy món." }; let updated = false; const options = (snap.data().options || []).map(opt => { if ([opt.name, opt.nameVi, opt.nameEn, opt.nameFi].some(n => (n||'').toLowerCase() === optionName.toLowerCase())) { opt.choices.push({ label: choiceLabelEn || choiceLabelVi, labelVi: choiceLabelVi, labelEn: choiceLabelEn || choiceLabelVi, labelFi: choiceLabelFi || choiceLabelVi, price: parseFloat(choicePrice)||0 }); updated = true; } return opt; }); if (!updated) return { error: "Không tìm thấy nhóm option." }; await updateDoc(doc(db, "menu", dishId), { options }); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã thêm lựa chọn.` }; }
         catch (e) { return { error: e.message }; }
     }
 
     async function removeChoiceFromOptionGroup(dishId, optionName, choiceLabel) {
-        try { const snap = await getDoc(doc(db, "menu", dishId)); if (!snap.exists()) return { error: "KhÃ´ng tÃ¬m tháº¥y mÃ³n." }; let updated = false; const options = (snap.data().options || []).map(opt => { if ([opt.name, opt.nameVi, opt.nameEn, opt.nameFi].some(n => (n||'').toLowerCase() === optionName.toLowerCase())) { const origLen = opt.choices.length; opt.choices = opt.choices.filter(c => ![c.label, c.labelVi, c.labelEn, c.labelFi].some(l => (l||'').toLowerCase() === choiceLabel.toLowerCase())); if (opt.choices.length < origLen) updated = true; } return opt; }); if (!updated) return { error: "KhÃ´ng tÃ¬m tháº¥y." }; await updateDoc(doc(db, "menu", dishId), { options }); if (window.loadFood) window.loadFood(); return { success: true, message: `ÄÃ£ xoÃ¡ lá»±a chá»n.` }; }
+        try { const snap = await getDoc(doc(db, "menu", dishId)); if (!snap.exists()) return { error: "Không tìm thấy món." }; let updated = false; const options = (snap.data().options || []).map(opt => { if ([opt.name, opt.nameVi, opt.nameEn, opt.nameFi].some(n => (n||'').toLowerCase() === optionName.toLowerCase())) { const origLen = opt.choices.length; opt.choices = opt.choices.filter(c => ![c.label, c.labelVi, c.labelEn, c.labelFi].some(l => (l||'').toLowerCase() === choiceLabel.toLowerCase())); if (opt.choices.length < origLen) updated = true; } return opt; }); if (!updated) return { error: "Không tìm thấy." }; await updateDoc(doc(db, "menu", dishId), { options }); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã xoá lựa chọn.` }; }
         catch (e) { return { error: e.message }; }
     }
 
     async function updateMenuOptionGroup(dishId, oldOptionName, newOptionNameVi, newOptionNameEn, newOptionNameFi, newOptionType) {
-        try { const snap = await getDoc(doc(db, "menu", dishId)); if (!snap.exists()) return { error: "KhÃ´ng tÃ¬m tháº¥y mÃ³n." }; let updated = false; const options = (snap.data().options || []).map(opt => { if ([opt.name, opt.nameVi, opt.nameEn, opt.nameFi].some(n => (n||'').toLowerCase() === oldOptionName.toLowerCase())) { if (newOptionNameVi) opt.nameVi = newOptionNameVi; if (newOptionNameEn) { opt.nameEn = newOptionNameEn; opt.name = newOptionNameEn; } if (newOptionNameFi) opt.nameFi = newOptionNameFi; if (newOptionType) opt.type = newOptionType; updated = true; } return opt; }); if (!updated) return { error: "KhÃ´ng tÃ¬m tháº¥y." }; await updateDoc(doc(db, "menu", dishId), { options }); if (window.loadFood) window.loadFood(); return { success: true, message: `ÄÃ£ cáº­p nháº­t nhÃ³m option.` }; }
+        try { const snap = await getDoc(doc(db, "menu", dishId)); if (!snap.exists()) return { error: "Không tìm thấy món." }; let updated = false; const options = (snap.data().options || []).map(opt => { if ([opt.name, opt.nameVi, opt.nameEn, opt.nameFi].some(n => (n||'').toLowerCase() === oldOptionName.toLowerCase())) { if (newOptionNameVi) opt.nameVi = newOptionNameVi; if (newOptionNameEn) { opt.nameEn = newOptionNameEn; opt.name = newOptionNameEn; } if (newOptionNameFi) opt.nameFi = newOptionNameFi; if (newOptionType) opt.type = newOptionType; updated = true; } return opt; }); if (!updated) return { error: "Không tìm thấy." }; await updateDoc(doc(db, "menu", dishId), { options }); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã cập nhật nhóm option.` }; }
         catch (e) { return { error: e.message }; }
     }
 
     async function updateChoiceInOptionGroup(dishId, optionName, oldChoiceLabel, newChoiceLabelVi, newChoiceLabelEn, newChoiceLabelFi, newChoicePrice) {
-        try { const snap = await getDoc(doc(db, "menu", dishId)); if (!snap.exists()) return { error: "KhÃ´ng tÃ¬m tháº¥y mÃ³n." }; let updated = false; const options = (snap.data().options || []).map(opt => { if ([opt.name, opt.nameVi, opt.nameEn, opt.nameFi].some(n => (n||'').toLowerCase() === optionName.toLowerCase())) { opt.choices = opt.choices.map(c => { const matches = [c.label, c.labelVi, c.labelEn, c.labelFi].some(l => (l||'').toLowerCase() === oldChoiceLabel.toLowerCase()); if (matches) { if (newChoiceLabelVi) c.labelVi = newChoiceLabelVi; if (newChoiceLabelEn) { c.labelEn = newChoiceLabelEn; c.label = newChoiceLabelEn; } if (newChoiceLabelFi) c.labelFi = newChoiceLabelFi; if (newChoicePrice !== undefined && newChoicePrice !== null) c.price = parseFloat(newChoicePrice); updated = true; } return c; }); } return opt; }); if (!updated) return { error: "KhÃ´ng tÃ¬m tháº¥y." }; await updateDoc(doc(db, "menu", dishId), { options }); if (window.loadFood) window.loadFood(); return { success: true, message: `ÄÃ£ cáº­p nháº­t lá»±a chá»n.` }; }
+        try { const snap = await getDoc(doc(db, "menu", dishId)); if (!snap.exists()) return { error: "Không tìm thấy món." }; let updated = false; const options = (snap.data().options || []).map(opt => { if ([opt.name, opt.nameVi, opt.nameEn, opt.nameFi].some(n => (n||'').toLowerCase() === optionName.toLowerCase())) { opt.choices = opt.choices.map(c => { const matches = [c.label, c.labelVi, c.labelEn, c.labelFi].some(l => (l||'').toLowerCase() === oldChoiceLabel.toLowerCase()); if (matches) { if (newChoiceLabelVi) c.labelVi = newChoiceLabelVi; if (newChoiceLabelEn) { c.labelEn = newChoiceLabelEn; c.label = newChoiceLabelEn; } if (newChoiceLabelFi) c.labelFi = newChoiceLabelFi; if (newChoicePrice !== undefined && newChoicePrice !== null) c.price = parseFloat(newChoicePrice); updated = true; } return c; }); } return opt; }); if (!updated) return { error: "Không tìm thấy." }; await updateDoc(doc(db, "menu", dishId), { options }); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã cập nhật lựa chọn.` }; }
         catch (e) { return { error: e.message }; }
     }
 
     async function createMenuItem(nameVi, price, categoryVi, descriptionVi, imageUrl) {
-        try { const ref = await addDoc(collection(db, "menu"), { nameVi: nameVi||"", nameEn: "", nameFi: "", price: parseFloat(price)||0, categoryVi: categoryVi||"", categoryEn: "", categoryFi: "", descVi: descriptionVi||"", descEn: "", descFi: "", image: imageUrl||"", isAvailable: true, preparationTime: 15, nutrition: { calories: 0, protein: 0, fat: 0, carbs: 0 }, tags: [] }); if (window.loadFood) window.loadFood(); return { success: true, message: `ÄÃ£ táº¡o mÃ³n vá»›i ID: ${ref.id}` }; }
+        try { const ref = await addDoc(collection(db, "menu"), { nameVi: nameVi||"", nameEn: "", nameFi: "", price: parseFloat(price)||0, categoryVi: categoryVi||"", categoryEn: "", categoryFi: "", descVi: descriptionVi||"", descEn: "", descFi: "", image: imageUrl||"", isAvailable: true, preparationTime: 15, nutrition: { calories: 0, protein: 0, fat: 0, carbs: 0 }, tags: [] }); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã tạo món với ID: ${ref.id}` }; }
         catch (e) { return { error: e.message }; }
     }
 
     async function changeUserRole(uid, newRole) {
-        try { await updateDoc(doc(db, "users", uid), { role: newRole }); if (window.loadUsers) window.loadUsers(); return { success: true, message: `ÄÃ£ Ä‘á»•i role user ${uid} thÃ nh ${newRole}.` }; }
+        try { await updateDoc(doc(db, "users", uid), { role: newRole }); if (window.loadUsers) window.loadUsers(); return { success: true, message: `Đã đổi role user ${uid} thành ${newRole}.` }; }
         catch (e) { return { error: e.message }; }
     }
 
     async function getUserLoyalty(uid) {
-        try { const snap = await getDoc(doc(db, "users", uid)); if (!snap.exists()) return { error: "KhÃ´ng tÃ¬m tháº¥y user." }; const totalSpent = snap.data().totalSpent||0; const tier = computeLoyaltyTier(totalSpent); return { uid, totalSpent, tier: tier.key, tierLabelVi: tier.labelVi, discountPercent: tier.discountPercent }; }
+        try { const snap = await getDoc(doc(db, "users", uid)); if (!snap.exists()) return { error: "Không tìm thấy user." }; const totalSpent = snap.data().totalSpent||0; const tier = computeLoyaltyTier(totalSpent); return { uid, totalSpent, tier: tier.key, tierLabelVi: tier.labelVi, discountPercent: tier.discountPercent }; }
         catch (e) { return { error: e.message }; }
     }
 
     async function addLoyaltyProgressByOrderId(orderId) {
-        try { const snap = await getDoc(doc(db, "orders", orderId)); if (!snap.exists()) return { error: "KhÃ´ng tÃ¬m tháº¥y Ä‘Æ¡n." }; const order = snap.data(); const userId = order.userId; if (!userId) return { error: "KhÃ´ng cÃ³ userId." }; const EUR_RATE = 25000; const totalEur = +((order.totalPrice||0) / EUR_RATE).toFixed(2); await updateDoc(doc(db, "users", userId), { ...(order.totalSpent ? { totalSpent: Number(((order.totalSpent + totalEur).toFixed(2))) } : { totalSpent: totalEur }) }); return { success: true, message: `ÄÃ£ cá»™ng ${totalEur} EUR loyalty.` }; }
+        try { const snap = await getDoc(doc(db, "orders", orderId)); if (!snap.exists()) return { error: "Không tìm thấy đơn." }; const order = snap.data(); const userId = order.userId; if (!userId) return { error: "Không có userId." }; const EUR_RATE = 25000; const totalEur = +((order.totalPrice||0) / EUR_RATE).toFixed(2); await updateDoc(doc(db, "users", userId), { ...(order.totalSpent ? { totalSpent: Number(((order.totalSpent + totalEur).toFixed(2))) } : { totalSpent: totalEur }) }); return { success: true, message: `Đã cộng ${totalEur} EUR loyalty.` }; }
         catch (e) { return { error: e.message }; }
     }
 
     async function sendPasswordReset(email) {
-        try { await callWorker('sendPasswordReset', { email }); return { success: true, message: `ÄÃ£ gá»­i email reset password tá»›i ${email}.` }; }
+        try { await callWorker('sendPasswordReset', { email }); return { success: true, message: `Đã gửi email reset password tới ${email}.` }; }
         catch (e) { return { error: e.message }; }
     }
 
     async function sendSpinsToUser(uidOrEmail, spinType, count) {
-        try { const type = (spinType||'deu').toLowerCase(); if (!['deu','xin','vip'].includes(type)) return { error: "Loáº¡i khÃ´ng há»£p lá»‡." }; const qty = parseInt(count,10)||1; let uid = uidOrEmail; if (uidOrEmail.includes('@')) { const q = query(collection(db, "users"), where("email", "==", uidOrEmail.trim())); const snap = await getDocs(q); if (snap.empty) return { error: `KhÃ´ng tÃ¬m tháº¥y user.` }; uid = snap.docs[0].id; } const userSnap = await getDoc(doc(db, "users", uid)); if (!userSnap.exists()) return { error: "KhÃ´ng tÃ¬m tháº¥y user." }; const data = userSnap.data(); const spins = data.spins || { deu: 0, xin: 0, vip: 0 }; spins[type] = (spins[type]||0)+qty; await updateDoc(doc(db, "users", uid), { spins }); return { success: true, message: `ÄÃ£ táº·ng ${qty} lÆ°á»£t quay ${type}.` }; }
+        try {
+            if (!uidOrEmail) return { error: "Thiếu uidOrEmail." };
+            let type = String(spinType || 'deu').trim().toLowerCase();
+            if (['thuong', 'thường', 'normal', 'standard', 'deu'].includes(type)) type = 'deu';
+            else if (['xin', 'xịn', 'good', 'super'].includes(type)) type = 'xin';
+            else if (['vip'].includes(type)) type = 'vip';
+            
+            if (!['deu','xin','vip'].includes(type)) {
+                return { error: `Loại spinType "${spinType}" không hợp lệ. Phải là: Thường (deu), Xịn (xin), hoặc VIP (vip).` };
+            }
+            const qty = parseInt(count, 10) || 1;
+            let uid = String(uidOrEmail).trim();
+            if (uid.includes('@')) {
+                const emailLower = uid.toLowerCase();
+                const q = query(collection(db, "users"), where("email", "==", emailLower));
+                let snap = await getDocs(q);
+                if (snap.empty) {
+                    const q2 = query(collection(db, "users"), where("email", "==", uid));
+                    snap = await getDocs(q2);
+                }
+                if (snap.empty) return { error: `Không tìm thấy user với email: ${uid}` };
+                uid = snap.docs[0].id;
+            }
+            const userSnap = await getDoc(doc(db, "users", uid));
+            if (!userSnap.exists()) return { error: `Không tìm thấy user profile với UID: ${uid}` };
+            const data = userSnap.data();
+            const spins = data.spins || { deu: 0, xin: 0, vip: 0 };
+            spins.deu = parseInt(spins.deu, 10) || 0;
+            spins.xin = parseInt(spins.xin, 10) || 0;
+            spins.vip = parseInt(spins.vip, 10) || 0;
+            spins[type] += qty;
+            await updateDoc(doc(db, "users", uid), { spins });
+            return { success: true, message: `Đã tặng thành công ${qty} lượt quay hạng "${type}" cho user ${uid}.` };
+        }
         catch (e) { return { error: e.message }; }
     }
 
+    async function sendEmail(to, subject, html) {
+        try {
+            const r = await callWorker('sendEmail', { to, subject, html });
+            return r;
+        } catch (e) {
+            return { error: e.message };
+        }
+    }
+
     async function createCustomVoucher(email, discountPercent, expiryDays, allowedTypes) {
-        try { const code = `PROMO${discountPercent}-${Math.random().toString(36).substring(2,6).toUpperCase()}`; let expiryDate = null; if (expiryDays && expiryDays !== 'never') { expiryDate = new Date(); expiryDate.setDate(expiryDate.getDate() + parseInt(expiryDays)); } await setDoc(doc(db, "vouchers", code), { code, discountPercent: parseInt(discountPercent)||10, email: (email||'').trim(), used: false, allowedOrderTypes: allowedTypes||[], expiryDate, createdAt: new Date() }); return { success: true, message: `ÄÃ£ táº¡o voucher ${code} (${discountPercent}% OFF).` }; }
+        try { const code = `PROMO${discountPercent}-${Math.random().toString(36).substring(2,6).toUpperCase()}`; let expiryDate = null; if (expiryDays && expiryDays !== 'never') { expiryDate = new Date(); expiryDate.setDate(expiryDate.getDate() + parseInt(expiryDays)); } await setDoc(doc(db, "vouchers", code), { code, discountPercent: parseInt(discountPercent)||10, email: (email||'').trim(), used: false, allowedOrderTypes: allowedTypes||[], expiryDate, createdAt: new Date() }); return { success: true, message: `Đã tạo voucher ${code} (${discountPercent}% OFF).` }; }
         catch (e) { return { error: e.message }; }
     }
 
     async function markVoucherUsed(voucherCode) {
-        try { const code = (voucherCode||'').trim().toUpperCase(); if (!code) return { error: 'Required.' }; const snap = await getDoc(doc(db, "vouchers", code)); if (!snap.exists()) return { error: `KhÃ´ng tÃ¬m tháº¥y voucher.` }; await updateDoc(doc(db, "vouchers", code), { used: true }); return { success: true, message: `ÄÃ£ Ä‘Ã¡nh dáº¥u Ä‘Ã£ dÃ¹ng.` }; }
+        try { const code = (voucherCode||'').trim().toUpperCase(); if (!code) return { error: 'Required.' }; const snap = await getDoc(doc(db, "vouchers", code)); if (!snap.exists()) return { error: `Không tìm thấy voucher.` }; await updateDoc(doc(db, "vouchers", code), { used: true }); return { success: true, message: `Đã đánh dấu đã dùng.` }; }
         catch (e) { return { error: e.message }; }
     }
 
     async function removeVoucher(voucherCode) {
-        try { const code = (voucherCode||'').trim().toUpperCase(); if (!code) return { error: 'Required.' }; const snap = await getDoc(doc(db, "vouchers", code)); if (!snap.exists()) return { error: `KhÃ´ng tÃ¬m tháº¥y.` }; await deleteDoc(doc(db, "vouchers", code)); return { success: true, message: `ÄÃ£ xoÃ¡ voucher.` }; }
+        try { const code = (voucherCode||'').trim().toUpperCase(); if (!code) return { error: 'Required.' }; const snap = await getDoc(doc(db, "vouchers", code)); if (!snap.exists()) return { error: `Không tìm thấy.` }; await deleteDoc(doc(db, "vouchers", code)); return { success: true, message: `Đã xoá voucher.` }; }
         catch (e) { return { error: e.message }; }
     }
 
@@ -502,7 +680,7 @@ TOOLS AVAILABLE:
     }
 
     async function sendGlobalAnnouncement(title, text, imageUrl) {
-        try { await addDoc(collection(db, "messages"), { title: title||"", text: text||"", imageUrl: imageUrl||null, voucherCode: null, giftSpins: null, recipientId: 'all', readBy: [], createdAt: new Date() }); return { success: true, message: "ÄÃ£ gá»­i thÃ´ng bÃ¡o tá»›i táº¥t cáº£ user." }; }
+        try { await addDoc(collection(db, "messages"), { title: title||"", text: text||"", imageUrl: imageUrl||null, voucherCode: null, giftSpins: null, recipientId: 'all', readBy: [], createdAt: new Date() }); return { success: true, message: "Đã gửi thông báo tới tất cả user." }; }
         catch (e) { return { error: e.message }; }
     }
 
@@ -517,7 +695,7 @@ TOOLS AVAILABLE:
 
     // Auth admin tools via worker
     async function adminListAuthUsers() { try { return await callWorker('listAuthUsers'); } catch (e) { return { error: e.message }; } }
-    async function adminDeleteAuthUser(uid) { try { await callWorker('deleteAuthUser', { uid }); try { await deleteDoc(doc(db, 'users', uid)); } catch(_) {} if (window.loadUsers) window.loadUsers(); return { success: true, message: `ÄÃ£ xoÃ¡ user.` }; } catch (e) { return { error: e.message }; } }
+    async function adminDeleteAuthUser(uid) { try { await callWorker('deleteAuthUser', { uid }); try { await deleteDoc(doc(db, 'users', uid)); } catch(_) {} if (window.loadUsers) window.loadUsers(); return { success: true, message: `Đã xoá user.` }; } catch (e) { return { error: e.message }; } }
     async function adminDisableUser(uid) { try { return await callWorker('disableUser', { uid }); } catch (e) { return { error: e.message }; } }
     async function adminEnableUser(uid) { try { return await callWorker('enableUser', { uid }); } catch (e) { return { error: e.message }; } }
     async function adminChangeUserPassword(uid, newPassword) { try { return await callWorker('changeUserPassword', { uid, newPassword }); } catch (e) { return { error: e.message }; } }
@@ -527,29 +705,122 @@ TOOLS AVAILABLE:
     async function adminGetUserInfo(uid, email) { try { return await callWorker('getUserInfo', { uid, email }); } catch (e) { return { error: e.message }; } }
     async function adminRevokeUserTokens(uid) { try { return await callWorker('revokeUserTokens', { uid }); } catch (e) { return { error: e.message }; } }
     async function adminUpdateDisplayName(uid, displayName) { try { const r = await callWorker('updateDisplayName', { uid, displayName }); try { await updateDoc(doc(db, 'users', uid), { name: displayName }); } catch(_) {} return r; } catch (e) { return { error: e.message }; } }
-    async function adminGenerateCustomToken(uid) { return { success: false, message: "Cáº§n Firebase Admin SDK (Blaze Plan)." }; }
+    async function adminGenerateCustomToken(uid) { return { success: false, message: "Cần Firebase Admin SDK (Blaze Plan)." }; }
 
-    // Homepage tools
+    async function getHomepageConfig() {
+        try {
+            const snap = await getDoc(doc(db, "config", "homepage"));
+            return snap.exists() ? snap.data() : {};
+        } catch (e) { return { error: e.message }; }
+    }
     async function updateHomepageHero(imageUrl, titleVi, descVi) {
-        try { await setDoc(doc(db, "config", "homepage"), { heroBgUrl: imageUrl||null, heroTitleVi: titleVi||null, heroDescVi: descVi||null }, { merge: true }); return { success: true, message: "Hero updated." }; }
+        try {
+            const u = {};
+            if (imageUrl !== undefined && imageUrl !== null) u.heroBgUrl = imageUrl;
+            if (titleVi !== undefined && titleVi !== null) u.heroTitleVi = titleVi;
+            if (descVi !== undefined && descVi !== null) u.heroDescVi = descVi;
+            await setDoc(doc(db, "config", "homepage"), u, { merge: true });
+            return { success: true, message: "Hero updated." };
+        }
         catch (e) { return { error: e.message }; }
     }
+    async function updateHomepageHeroImage(imageUrl) {
+        try {
+            await setDoc(doc(db, "config", "homepage"), { heroBgUrl: imageUrl||null }, { merge: true });
+            return { success: true, message: "Hero background image updated." };
+        } catch (e) { return { error: e.message }; }
+    }
+    async function updateHomepageHeroText(titleVi, titleEn, titleFi, descVi, descEn, descFi) {
+        try {
+            const u = {};
+            if (titleVi !== undefined && titleVi !== null) u.heroTitleVi = titleVi;
+            if (titleEn !== undefined && titleEn !== null) u.heroTitleEn = titleEn;
+            if (titleFi !== undefined && titleFi !== null) u.heroTitleFi = titleFi;
+            if (descVi !== undefined && descVi !== null) u.heroDescVi = descVi;
+            if (descEn !== undefined && descEn !== null) u.heroDescEn = descEn;
+            if (descFi !== undefined && descFi !== null) u.heroDescFi = descFi;
+            await setDoc(doc(db, "config", "homepage"), u, { merge: true });
+            return { success: true, message: "Hero text updated." };
+        } catch (e) { return { error: e.message }; }
+    }
     async function updateHomepageSignatures(dishIdArray) {
-        if (!Array.isArray(dishIdArray)) return { error: "dishIdArray must be array" };
+        if (typeof dishIdArray === 'string') {
+            try {
+                const parsed = JSON.parse(dishIdArray);
+                if (Array.isArray(parsed)) dishIdArray = parsed;
+                else dishIdArray = dishIdArray.split(',').map(s => s.trim()).filter(Boolean);
+            } catch (e) {
+                dishIdArray = dishIdArray.split(',').map(s => s.trim()).filter(Boolean);
+            }
+        }
+        if (!Array.isArray(dishIdArray)) return { error: "dishIdArray must be an array" };
         try { await setDoc(doc(db, "config", "homepage"), { signatureDishIds: dishIdArray }, { merge: true }); return { success: true, message: "Signatures updated." }; }
         catch (e) { return { error: e.message }; }
     }
-    async function updateHomepageSignatureText(titleVi, descVi) {
-        try { await setDoc(doc(db, "config", "homepage"), { signatureTitleVi: titleVi||null, signatureDescVi: descVi||null }, { merge: true }); return { success: true, message: "Signature text updated." }; }
+    async function updateHomepageSignatureText(titleVi, titleEn, titleFi, descVi, descEn, descFi) {
+        try {
+            const u = {};
+            if (titleVi !== undefined && titleVi !== null) u.signatureTitleVi = titleVi;
+            if (titleEn !== undefined && titleEn !== null) u.signatureTitleEn = titleEn;
+            if (titleFi !== undefined && titleFi !== null) u.signatureTitleFi = titleFi;
+            if (descVi !== undefined && descVi !== null) u.signatureDescVi = descVi;
+            if (descEn !== undefined && descEn !== null) u.signatureDescEn = descEn;
+            if (descFi !== undefined && descFi !== null) u.signatureDescFi = descFi;
+            await setDoc(doc(db, "config", "homepage"), u, { merge: true });
+            return { success: true, message: "Signature text updated." };
+        }
         catch (e) { return { error: e.message }; }
     }
     async function updateHomepageStory(imageUrl, labelVi, titleVi, p1Vi, p2Vi) {
-        try { await setDoc(doc(db, "config", "homepage"), { storyImg: imageUrl||null, storyLabelVi: labelVi||null, storyTitleVi: titleVi||null, storyP1Vi: p1Vi||null, storyP2Vi: p2Vi||null }, { merge: true }); return { success: true, message: "Story updated." }; }
+        try {
+            const u = {};
+            if (imageUrl !== undefined && imageUrl !== null) u.storyImg = imageUrl;
+            if (labelVi !== undefined && labelVi !== null) u.storyLabelVi = labelVi;
+            if (titleVi !== undefined && titleVi !== null) u.storyTitleVi = titleVi;
+            if (p1Vi !== undefined && p1Vi !== null) u.storyP1Vi = p1Vi;
+            if (p2Vi !== undefined && p2Vi !== null) u.storyP2Vi = p2Vi;
+            await setDoc(doc(db, "config", "homepage"), u, { merge: true });
+            return { success: true, message: "Story updated." };
+        }
         catch (e) { return { error: e.message }; }
     }
-    async function updateHomepageCTA(titleVi, descVi) {
-        try { await setDoc(doc(db, "config", "homepage"), { ctaTitleVi: titleVi||null, ctaDescVi: descVi||null }, { merge: true }); return { success: true, message: "CTA updated." }; }
-        catch (e) { return { error: e.message }; }
+    async function updateHomepageStoryImage(imageUrl) {
+        try {
+            await setDoc(doc(db, "config", "homepage"), { storyImg: imageUrl||null }, { merge: true });
+            return { success: true, message: "Story image updated." };
+        } catch (e) { return { error: e.message }; }
+    }
+    async function updateHomepageStoryText(labelVi, labelEn, labelFi, titleVi, titleEn, titleFi, p1Vi, p1En, p1Fi, p2Vi, p2En, p2Fi) {
+        try {
+            const u = {};
+            if (labelVi !== undefined && labelVi !== null) u.storyLabelVi = labelVi;
+            if (labelEn !== undefined && labelEn !== null) u.storyLabelEn = labelEn;
+            if (labelFi !== undefined && labelFi !== null) u.storyLabelFi = labelFi;
+            if (titleVi !== undefined && titleVi !== null) u.storyTitleVi = titleVi;
+            if (titleEn !== undefined && titleEn !== null) u.storyTitleEn = titleEn;
+            if (titleFi !== undefined && titleFi !== null) u.storyTitleFi = titleFi;
+            if (p1Vi !== undefined && p1Vi !== null) u.storyP1Vi = p1Vi;
+            if (p1En !== undefined && p1En !== null) u.storyP1En = p1En;
+            if (p1Fi !== undefined && p1Fi !== null) u.storyP1Fi = p1Fi;
+            if (p2Vi !== undefined && p2Vi !== null) u.storyP2Vi = p2Vi;
+            if (p2En !== undefined && p2En !== null) u.storyP2En = p2En;
+            if (p2Fi !== undefined && p2Fi !== null) u.storyP2Fi = p2Fi;
+            await setDoc(doc(db, "config", "homepage"), u, { merge: true });
+            return { success: true, message: "Story text updated." };
+        } catch (e) { return { error: e.message }; }
+    }
+    async function updateHomepageCTA(titleVi, titleEn, titleFi, descVi, descEn, descFi) {
+        try {
+            const u = {};
+            if (titleVi !== undefined && titleVi !== null) u.ctaTitleVi = titleVi;
+            if (titleEn !== undefined && titleEn !== null) u.ctaTitleEn = titleEn;
+            if (titleFi !== undefined && titleFi !== null) u.ctaTitleFi = titleFi;
+            if (descVi !== undefined && descVi !== null) u.ctaDescVi = descVi;
+            if (descEn !== undefined && descEn !== null) u.ctaDescEn = descEn;
+            if (descFi !== undefined && descFi !== null) u.ctaDescFi = descFi;
+            await setDoc(doc(db, "config", "homepage"), u, { merge: true });
+            return { success: true, message: "CTA updated." };
+        } catch (e) { return { error: e.message }; }
     }
     async function getWheelGuarantee() {
         try { const snap = await getDoc(doc(db, "config", "luckyWheel")); const g = snap.exists() ? (snap.data().guarantee||{}) : {}; return { totalSpins: g.totalSpins??0, next20: g.next20??20, next50: g.next50??50, next100: g.next100??100 }; }
@@ -564,34 +835,91 @@ TOOLS AVAILABLE:
         catch (e) { return { error: e.message }; }
     }
     async function updateReviewImageUrl(index, imageUrl) {
-        try { const snap = await getDoc(doc(db, "config", "homepage")); const reviews = snap.exists() ? (snap.data().customReviews||[]) : []; if (index < 0 || index >= reviews.length) return { error: `Index ${index} khÃ´ng há»£p lá»‡.` }; reviews[index] = { ...reviews[index], avatar: imageUrl||reviews[index].avatar }; await setDoc(doc(db, "config", "homepage"), { customReviews: reviews }, { merge: true }); return { success: true, message: `ÄÃ£ cáº­p nháº­t áº£nh review.` }; }
+        try { const snap = await getDoc(doc(db, "config", "homepage")); const reviews = snap.exists() ? (snap.data().customReviews||[]) : []; if (index < 0 || index >= reviews.length) return { error: `Index ${index} không hợp lệ.` }; reviews[index] = { ...reviews[index], avatar: imageUrl||reviews[index].avatar }; await setDoc(doc(db, "config", "homepage"), { customReviews: reviews }, { merge: true }); return { success: true, message: `Đã cập nhật ảnh review.` }; }
         catch (e) { return { error: e.message }; }
     }
     async function webSearch(query) { try { return await callWorker('webSearch', { query }); } catch (e) { return { error: e.message }; } }
     async function browseWebUrl(url) { try { return await callWorker('browseWebUrl', { url }); } catch (e) { return { error: e.message }; } }
 
-    const toolMap = {
-        getOrdersSoldToday, getOrdersByStatus, updateOrderStatus, deleteOrder,
-        listAllFoodItems, updateMenuPrice, setOptionChoicePrice, addMenuOptionGroup,
-        removeMenuOptionGroup, addChoiceToOptionGroup, removeChoiceFromOptionGroup,
-        updateMenuOptionGroup, updateChoiceInOptionGroup, updateMenuName, updateMenuDescription,
-        updateMenuCategory, updateMenuAvailability, uploadMenuImage, removeMenuImage,
-        updateMenuPreparationTime, updateMenuNutritionInfo, addMenuTag, removeMenuTag,
-        reorderMenuItems, duplicateMenuItem, deleteMenuItem, updateMenuCustomFields,
-        createMenuItem, listAllUsers: () => listAllUsers(),
-        changeUserRole, getUserLoyalty, addLoyaltyProgressByOrderId, createUserAccount,
-        sendPasswordReset, sendSpinsToUser, createCustomVoucher, markVoucherUsed, removeVoucher,
-        listAllVouchers, sendGlobalAnnouncement, changeCurrentAdminPassword, updateCurrentAdminEmail,
-        updateCurrentAdminProfile, adminListAuthUsers, adminDeleteAuthUser, adminDisableUser,
-        adminEnableUser, adminChangeUserPassword, adminChangeUserEmail, adminVerifyUserEmail,
-        adminSetCustomClaims, adminGetUserInfo, adminRevokeUserTokens, adminUpdateDisplayName,
-        adminGenerateCustomToken, webSearch, browseWebUrl,
-        updateHomepageHero, updateHomepageSignatures, updateHomepageSignatureText,
-        updateHomepageStory, updateHomepageCTA, getWheelGuarantee, updateWheelGuarantee,
-        updateHomepageReviews, updateReviewImageUrl
+    // Tool registry: each value is { fn, params } for safe named-arg dispatch
+    const toolRegistry = {
+        getOrdersSoldToday:       { fn: getOrdersSoldToday, params: [] },
+        getOrdersByStatus:        { fn: getOrdersByStatus, params: ['status'] },
+        updateOrderStatus:        { fn: updateOrderStatus, params: ['orderId', 'newStatus'] },
+        deleteOrder:              { fn: deleteOrder, params: ['orderId'] },
+        listAllCategories:        { fn: listAllCategories, params: [] },
+        searchFoodByCategory:     { fn: searchFoodByCategory, params: ['categoryVi'] },
+        getFoodItemById:          { fn: getFoodItemById, params: ['dishId'] },
+        updateMenuPrice:          { fn: updateMenuPrice, params: ['dishId', 'newPrice'] },
+        setOptionChoicePrice:     { fn: setOptionChoicePrice, params: ['dishId', 'optionName', 'choiceLabel', 'newPrice'] },
+        addMenuOptionGroup:       { fn: addMenuOptionGroup, params: ['dishId', 'optionNameVi', 'optionNameEn', 'optionNameFi', 'optionType', 'choices'] },
+        removeMenuOptionGroup:    { fn: removeMenuOptionGroup, params: ['dishId', 'optionName'] },
+        addChoiceToOptionGroup:   { fn: addChoiceToOptionGroup, params: ['dishId', 'optionName', 'choiceLabelVi', 'choiceLabelEn', 'choiceLabelFi', 'choicePrice'] },
+        removeChoiceFromOptionGroup: { fn: removeChoiceFromOptionGroup, params: ['dishId', 'optionName', 'choiceLabel'] },
+        updateMenuOptionGroup:    { fn: updateMenuOptionGroup, params: ['dishId', 'oldOptionName', 'newOptionNameVi', 'newOptionNameEn', 'newOptionNameFi', 'newOptionType'] },
+        updateChoiceInOptionGroup:{ fn: updateChoiceInOptionGroup, params: ['dishId', 'optionName', 'oldChoiceLabel', 'newChoiceLabelVi', 'newChoiceLabelEn', 'newChoiceLabelFi', 'newChoicePrice'] },
+        updateMenuName:           { fn: updateMenuName, params: ['dishId', 'nameVi', 'nameEn', 'nameFi'] },
+        updateMenuDescription:    { fn: updateMenuDescription, params: ['dishId', 'descVi', 'descEn', 'descFi'] },
+        updateMenuCategory:       { fn: updateMenuCategory, params: ['dishId', 'categoryVi', 'categoryEn', 'categoryFi'] },
+        updateMenuAvailability:   { fn: updateMenuAvailability, params: ['dishId', 'isAvailable'] },
+        uploadMenuImage:          { fn: uploadMenuImage, params: ['dishId', 'imageUrl'] },
+        removeMenuImage:          { fn: removeMenuImage, params: ['dishId'] },
+        updateMenuPreparationTime:{ fn: updateMenuPreparationTime, params: ['dishId', 'minutes'] },
+        updateMenuNutritionInfo:  { fn: updateMenuNutritionInfo, params: ['dishId', 'calories', 'protein', 'fat', 'carbs'] },
+        addMenuTag:               { fn: addMenuTag, params: ['dishId', 'tagLabelVi', 'tagLabelEn', 'tagLabelFi'] },
+        removeMenuTag:            { fn: removeMenuTag, params: ['dishId', 'tagLabel'] },
+        reorderMenuItems:         { fn: reorderMenuItems, params: ['orderedDishIds'] },
+        duplicateMenuItem:        { fn: duplicateMenuItem, params: ['dishId'] },
+        deleteMenuItem:           { fn: deleteMenuItem, params: ['dishId'] },
+        updateMenuCustomFields:   { fn: updateMenuCustomFields, params: ['dishId', 'customFields'] },
+        createMenuItem:           { fn: createMenuItem, params: ['nameVi', 'price', 'categoryVi', 'descriptionVi', 'imageUrl'] },
+        listAllUsers:             { fn: () => listAllUsers(), params: [] },
+        changeUserRole:           { fn: changeUserRole, params: ['uid', 'newRole'] },
+        getUserLoyalty:           { fn: getUserLoyalty, params: ['uid'] },
+        addLoyaltyProgressByOrderId: { fn: addLoyaltyProgressByOrderId, params: ['orderId'] },
+        createUserAccount:        { fn: createUserAccount, params: ['email', 'password', 'name', 'role'] },
+        sendPasswordReset:        { fn: sendPasswordReset, params: ['email'] },
+        sendSpinsToUser:          { fn: sendSpinsToUser, params: ['uidOrEmail', 'spinType', 'count'] },
+        createCustomVoucher:      { fn: createCustomVoucher, params: ['email', 'discountPercent', 'expiryDays', 'allowedTypes'] },
+        markVoucherUsed:          { fn: markVoucherUsed, params: ['voucherCode'] },
+        removeVoucher:            { fn: removeVoucher, params: ['voucherCode'] },
+        listAllVouchers:          { fn: listAllVouchers, params: [] },
+        sendGlobalAnnouncement:   { fn: sendGlobalAnnouncement, params: ['title', 'text', 'imageUrl'] },
+        changeCurrentAdminPassword: { fn: changeCurrentAdminPassword, params: ['newPassword'] },
+        updateCurrentAdminEmail:  { fn: updateCurrentAdminEmail, params: ['newEmail'] },
+        updateCurrentAdminProfile:{ fn: updateCurrentAdminProfile, params: ['name'] },
+        adminListAuthUsers:       { fn: adminListAuthUsers, params: [] },
+        adminDeleteAuthUser:      { fn: adminDeleteAuthUser, params: ['uid'] },
+        adminDisableUser:         { fn: adminDisableUser, params: ['uid'] },
+        adminEnableUser:          { fn: adminEnableUser, params: ['uid'] },
+        adminChangeUserPassword:  { fn: adminChangeUserPassword, params: ['uid', 'newPassword'] },
+        adminChangeUserEmail:     { fn: adminChangeUserEmail, params: ['uid', 'newEmail'] },
+        adminVerifyUserEmail:     { fn: adminVerifyUserEmail, params: ['uid'] },
+        adminSetCustomClaims:     { fn: adminSetCustomClaims, params: ['uid', 'claims'] },
+        adminGetUserInfo:         { fn: adminGetUserInfo, params: ['uid', 'email'] },
+        adminRevokeUserTokens:    { fn: adminRevokeUserTokens, params: ['uid'] },
+        adminUpdateDisplayName:   { fn: adminUpdateDisplayName, params: ['uid', 'displayName'] },
+        adminGenerateCustomToken: { fn: adminGenerateCustomToken, params: ['uid'] },
+        webSearch:                { fn: webSearch, params: ['query'] },
+        browseWebUrl:             { fn: browseWebUrl, params: ['url'] },
+        getHomepageConfig:        { fn: getHomepageConfig, params: [] },
+        updateHomepageHero:       { fn: updateHomepageHero, params: ['imageUrl', 'titleVi', 'descVi'] },
+        updateHomepageHeroImage:  { fn: updateHomepageHeroImage, params: ['imageUrl'] },
+        updateHomepageHeroText:   { fn: updateHomepageHeroText, params: ['titleVi', 'titleEn', 'titleFi', 'descVi', 'descEn', 'descFi'] },
+        updateHomepageSignatures: { fn: updateHomepageSignatures, params: ['dishIdArray'] },
+        updateHomepageSignatureText: { fn: updateHomepageSignatureText, params: ['titleVi', 'titleEn', 'titleFi', 'descVi', 'descEn', 'descFi'] },
+        updateHomepageStory:      { fn: updateHomepageStory, params: ['imageUrl', 'labelVi', 'titleVi', 'p1Vi', 'p2Vi'] },
+        updateHomepageStoryImage: { fn: updateHomepageStoryImage, params: ['imageUrl'] },
+        updateHomepageStoryText:  { fn: updateHomepageStoryText, params: ['labelVi', 'labelEn', 'labelFi', 'titleVi', 'titleEn', 'titleFi', 'p1Vi', 'p1En', 'p1Fi', 'p2Vi', 'p2En', 'p2Fi'] },
+        updateHomepageCTA:        { fn: updateHomepageCTA, params: ['titleVi', 'titleEn', 'titleFi', 'descVi', 'descEn', 'descFi'] },
+        getWheelGuarantee:        { fn: getWheelGuarantee, params: [] },
+        updateWheelGuarantee:     { fn: updateWheelGuarantee, params: ['next20', 'next50', 'next100'] },
+        updateHomepageReviews:    { fn: updateHomepageReviews, params: ['reviews'] },
+        updateReviewImageUrl:     { fn: updateReviewImageUrl, params: ['index', 'imageUrl'] },
+        sendEmail:                { fn: sendEmail, params: ['to', 'subject', 'html'] }
     };
 
-    const KNOWN_TOOLS = new Set(Object.keys(toolMap));
+    const KNOWN_TOOLS = new Set(Object.keys(toolRegistry));
 
     function tryParseToolJson(str) { try { const o = JSON.parse(str); if (o && o.tool && typeof o.tool === 'string') return o; } catch(e) {} return null; }
 
@@ -644,7 +972,7 @@ TOOLS AVAILABLE:
             toolCallCount++;
             if (toolCallCount > 5) {
                 removeLoadingBubble();
-                appendBubble("Há»‡ thá»‘ng: PhÃ¡t hiá»‡n nguy cÆ¡ láº·p gá»i cÃ´ng cá»¥ vÃ´ háº¡n. AI Ä‘Ã£ dá»«ng láº¡i.", 'ai');
+                appendBubble("Hệ thống: Phát hiện nguy cơ lập gọi công cừ vô hạn. AI đã dừng lại.", 'ai');
                 return;
             }
             const progressBubbleEl = msgArea.lastElementChild;
@@ -656,27 +984,86 @@ TOOLS AVAILABLE:
                 const tool = payload.tool;
                 const args = payload.args || {};
                 if (progressBubbleEl && msgArea.contains(progressBubbleEl) && progressBubbleEl.classList.contains('admin-chat-bubble')) {
-                    progressBubbleEl.textContent = `Há»‡ thá»‘ng: Äang thá»±c hiá»‡n ${i+1}/${toolCalls.length} (${tool})... (OK: ${successCount}, Lá»—i: ${failCount})`;
+                    progressBubbleEl.textContent = `Hệ thống: Đang thực hiện ${i+1}/${toolCalls.length} (${tool})... (OK: ${successCount}, Lỗi: ${failCount})`;
                 }
                 let result;
                 try {
-                    const fn = toolMap[tool];
-                    if (!fn) { result = { error: `Tool "${tool}" khÃ´ng tá»“n táº¡i.` }; }
+                    const entry = toolRegistry[tool];
+                    if (!entry) { result = { error: `Tool "${tool}" không tồn tại.` }; }
                     else {
-                        let imgFixedArgs = { ...args };
-                        if (imgFixedArgs.imageUrl && window.__uploadedImages && window.__uploadedImages[imgFixedArgs.imageUrl]) {
-                            imgFixedArgs.imageUrl = window.__uploadedImages[imgFixedArgs.imageUrl];
+                        // Resolve attached image placeholders
+                        let resolvedArgs = { ...args };
+                        
+                        const extractAttachedImageId = (str) => {
+                            if (typeof str !== 'string') return null;
+                            const match = str.match(/ATTACHED_IMAGE_[0-9_]+/);
+                            return match ? match[0] : null;
+                        };
+
+                        // Scan and resolve all arguments containing ATTACHED_IMAGE_ placeholders
+                        for (const key in resolvedArgs) {
+                            if (typeof resolvedArgs[key] === 'string') {
+                                const imgId = extractAttachedImageId(resolvedArgs[key]);
+                                if (imgId && window.__uploadedImages && window.__uploadedImages[imgId]) {
+                                    resolvedArgs[key] = window.__uploadedImages[imgId];
+                                }
+                            }
                         }
-                        result = await fn(...Object.values(imgFixedArgs));
+
+                        if (resolvedArgs.storyImg && !resolvedArgs.imageUrl) resolvedArgs.imageUrl = resolvedArgs.storyImg;
+                        if (resolvedArgs.image && !resolvedArgs.imageUrl) resolvedArgs.imageUrl = resolvedArgs.image;
+                        if (resolvedArgs.imgUrl && !resolvedArgs.imageUrl) resolvedArgs.imageUrl = resolvedArgs.imgUrl;
+                        if (resolvedArgs.storyImageUrl && !resolvedArgs.imageUrl) resolvedArgs.imageUrl = resolvedArgs.storyImageUrl;
+                        if (resolvedArgs.heroBgUrl && !resolvedArgs.imageUrl) resolvedArgs.imageUrl = resolvedArgs.heroBgUrl;
+                        // Handle alternative arg names the AI might use
+                        if (resolvedArgs.dishIds && !resolvedArgs.dishIdArray) resolvedArgs.dishIdArray = resolvedArgs.dishIds;
+                        if (resolvedArgs.dishIdList && !resolvedArgs.dishIdArray) resolvedArgs.dishIdArray = resolvedArgs.dishIdList;
+                        if (resolvedArgs.dishes && !resolvedArgs.dishIdArray) resolvedArgs.dishIdArray = resolvedArgs.dishes;
+                        if (resolvedArgs.categoryId && !resolvedArgs.categoryVi) resolvedArgs.categoryVi = resolvedArgs.categoryId;
+                        if (resolvedArgs.newCategoryId && !resolvedArgs.categoryVi) resolvedArgs.categoryVi = resolvedArgs.newCategoryId;
+                        if (resolvedArgs.customFieldsObject && !resolvedArgs.customFields) resolvedArgs.customFields = resolvedArgs.customFieldsObject;
+                        if (resolvedArgs.optionName && !resolvedArgs.optionNameVi) resolvedArgs.optionNameVi = resolvedArgs.optionName;
+                        if (resolvedArgs.choiceLabel && !resolvedArgs.choiceLabelVi) resolvedArgs.choiceLabelVi = resolvedArgs.choiceLabel;
+                        if ((resolvedArgs.uid || resolvedArgs.email) && !resolvedArgs.uidOrEmail) resolvedArgs.uidOrEmail = resolvedArgs.uid || resolvedArgs.email;
+                        if (resolvedArgs.title && !resolvedArgs.titleVi) resolvedArgs.titleVi = resolvedArgs.title;
+                        if (resolvedArgs.desc && !resolvedArgs.descVi) resolvedArgs.descVi = resolvedArgs.desc;
+                        if (resolvedArgs.description && !resolvedArgs.descVi) resolvedArgs.descVi = resolvedArgs.description;
+                        if (resolvedArgs.descriptionVi && !resolvedArgs.descVi) resolvedArgs.descVi = resolvedArgs.descriptionVi;
+                        if (resolvedArgs.descriptionEn && !resolvedArgs.descEn) resolvedArgs.descEn = resolvedArgs.descriptionEn;
+                        if (resolvedArgs.descriptionFi && !resolvedArgs.descFi) resolvedArgs.descFi = resolvedArgs.descriptionFi;
+                        
+                        // Normalizations for trilingual inputs (snake_case/alternative to camelCase)
+                        if (resolvedArgs.title_vi && !resolvedArgs.titleVi) resolvedArgs.titleVi = resolvedArgs.title_vi;
+                        if (resolvedArgs.title_en && !resolvedArgs.titleEn) resolvedArgs.titleEn = resolvedArgs.title_en;
+                        if (resolvedArgs.title_fi && !resolvedArgs.titleFi) resolvedArgs.titleFi = resolvedArgs.title_fi;
+                        if (resolvedArgs.desc_vi && !resolvedArgs.descVi) resolvedArgs.descVi = resolvedArgs.desc_vi;
+                        if (resolvedArgs.desc_en && !resolvedArgs.descEn) resolvedArgs.descEn = resolvedArgs.desc_en;
+                        if (resolvedArgs.desc_fi && !resolvedArgs.descFi) resolvedArgs.descFi = resolvedArgs.desc_fi;
+                        if (resolvedArgs.description_vi && !resolvedArgs.descVi) resolvedArgs.descVi = resolvedArgs.description_vi;
+                        if (resolvedArgs.description_en && !resolvedArgs.descEn) resolvedArgs.descEn = resolvedArgs.description_en;
+                        if (resolvedArgs.description_fi && !resolvedArgs.descFi) resolvedArgs.descFi = resolvedArgs.description_fi;
+                        
+                        if (resolvedArgs.label_vi && !resolvedArgs.labelVi) resolvedArgs.labelVi = resolvedArgs.label_vi;
+                        if (resolvedArgs.label_en && !resolvedArgs.labelEn) resolvedArgs.labelEn = resolvedArgs.label_en;
+                        if (resolvedArgs.label_fi && !resolvedArgs.labelFi) resolvedArgs.labelFi = resolvedArgs.label_fi;
+                        if (resolvedArgs.p1_vi && !resolvedArgs.p1Vi) resolvedArgs.p1Vi = resolvedArgs.p1_vi;
+                        if (resolvedArgs.p1_en && !resolvedArgs.p1En) resolvedArgs.p1En = resolvedArgs.p1_en;
+                        if (resolvedArgs.p1_fi && !resolvedArgs.p1Fi) resolvedArgs.p1Fi = resolvedArgs.p1_fi;
+                        if (resolvedArgs.p2_vi && !resolvedArgs.p2Vi) resolvedArgs.p2Vi = resolvedArgs.p2_vi;
+                        if (resolvedArgs.p2_en && !resolvedArgs.p2En) resolvedArgs.p2En = resolvedArgs.p2_en;
+                        if (resolvedArgs.p2_fi && !resolvedArgs.p2Fi) resolvedArgs.p2Fi = resolvedArgs.p2_fi;
+                        // Dispatch with correct positional args based on param list
+                        const orderedArgs = entry.params.map(p => resolvedArgs[p]);
+                        result = await entry.fn(...orderedArgs);
                     }
                 } catch (err) { result = { error: err.message }; }
                 if (result && typeof result === 'object' && result.error) { results.push({ tool, success: false, error: result.error }); failCount++; }
                 else { results.push({ tool, success: true, result }); successCount++; }
             }
 
-            const summaryHeader = `[Káº¾T QUáº¢ THá»°C THI]:\n- Tá»•ng: ${toolCalls.length}\n- ThÃ nh cÃ´ng: ${successCount}\n- Tháº¥t báº¡i: ${failCount}\n\n`;
+            const summaryHeader = `[KẾT QUẢ THỰC THI]:\n- Tổng: ${toolCalls.length}\n- Thành công: ${successCount}\n- Thất bại: ${failCount}\n\n`;
             const feedbackContent = results.map((r, idx) => `[KQ ${idx+1} - ${r.tool}]:\n${r.success ? JSON.stringify(r.result) : r.error}`).join('\n\n');
-            chatMessages.push({ role: 'user', content: `Káº¿t quáº£ thá»±c thi:\n\n${summaryHeader}${feedbackContent}\n\nHÃ£y tá»•ng há»£p cho user báº±ng Tiáº¿ng Viá»‡t.` });
+            chatMessages.push({ role: 'user', content: `Kết quả thỹc thi:\n\n${summaryHeader}${feedbackContent}\n\nHãy tổng hợp cho user bằng Tiếng Việt.` });
             await fetchAiResponse();
         } else {
             removeLoadingBubble();
@@ -734,9 +1121,22 @@ TOOLS AVAILABLE:
                     });
                     if (!response.ok) throw new Error(`HTTP ${response.status}`);
                     data = await response.json();
-                } catch (backupErr) {
-                    const payload = { model: 'nex-agi/nex-n2-pro:free', messages: chatMessages };
-                    data = await callOpenRouterWithFallback(payload);
+                } catch (cerebrasBackupErr) {
+                    try {
+                        console.log('[AI Chat] Cerebras failed. Trying Google Gemini...');
+                        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', {
+                            method: 'POST',
+                            headers: { 'Authorization': 'Bearer AQ.Ab8RN6I93QG9VviMo41jUgFhmXI0MWkk_FYMcOhdlXpPR-yVfg', 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ model: 'gemini-2.5-flash-lite', messages: chatMessages })
+                        });
+                        if (!response.ok) throw new Error(`Gemini HTTP ${response.status}`);
+                        data = await response.json();
+                        console.log('[AI Chat] Google Gemini success.');
+                    } catch (geminiErr) {
+                        console.warn('[AI Chat] Gemini failed. Falling back to OpenRouter...', geminiErr.message);
+                        const payload = { model: 'nex-agi/nex-n2-pro:free', messages: chatMessages };
+                        data = await callOpenRouterWithFallback(payload);
+                    }
                 }
             }
             const responseText = data.choices[0].message.content;
@@ -744,16 +1144,45 @@ TOOLS AVAILABLE:
             await handleAgentResponse(responseText);
         } catch (err) {
             removeLoadingBubble();
-            appendBubble(`Lá»—i káº¿t ná»‘i AI: ${err.message}`, 'ai');
+            appendBubble(`Lỗi kết nối AI: ${err.message}`, 'ai');
         }
     }
 
     async function sendMessage() {
         const val = chatInput.value.trim();
-        if (!val) return;
+        if (!val && (!window.__currentAttachments || window.__currentAttachments.length === 0)) return;
         chatInput.value = '';
-        appendBubble(val, 'user');
-        chatMessages.push({ role: 'user', content: val });
+        
+        // Build the message user sees (only text + a clean list of filenames for UX)
+        let displayMsg = val;
+        if (window.__currentAttachments && window.__currentAttachments.length > 0) {
+            const listNames = window.__currentAttachments.map(a => a.name).join(', ');
+            displayMsg += (displayMsg ? '\n' : '') + `📎 [Đính kèm: ${listNames}]`;
+        }
+        appendBubble(displayMsg, 'user');
+        
+        // Build the actual message sent to AI
+        let messageToSend = val;
+        if (window.__currentAttachments && window.__currentAttachments.length > 0) {
+            for (const att of window.__currentAttachments) {
+                if (att.type === 'image') {
+                    // Save base64 to global window.__uploadedImages for the tool executor to resolve later
+                    window.__uploadedImages = window.__uploadedImages || {};
+                    window.__uploadedImages[att.id] = att.content;
+                    messageToSend += `\n[Ảnh đính kèm: ${att.id}]`;
+                } else {
+                    // Documents: append text content so the AI can read
+                    messageToSend += `\n[Nội dung file đính kèm ${att.name}:\n${att.content}]`;
+                }
+            }
+        }
+        
+        chatMessages.push({ role: 'user', content: messageToSend });
+        
+        // Clear attachments
+        window.__currentAttachments = [];
+        renderAttachmentsPreview();
+        
         toolCallCount = 0;
         appendLoadingBubble();
         await fetchAiResponse();

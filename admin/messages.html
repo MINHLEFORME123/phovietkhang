@@ -76,11 +76,11 @@
     <!-- Main Content -->
     <main class="flex-1 flex flex-col h-screen overflow-y-auto">
         <header class="h-20 bg-surface border-b border-gray-800 flex items-center justify-between px-8 flex-shrink-0">
-            <h2 class="text-2xl font-semibold text-white font-['Inter']">Gá»­i tin nháº¯n & Khuyáº¿n mÃ£i</h2>
+            <h2 class="text-2xl font-semibold text-white font-['Inter']">Gửi tin nhắn & Khuyến mãi</h2>
             <div class="flex items-center space-x-4">
                 <button onclick="window.exportTableToExcel('messages-table', 'messages_history.xlsx')" class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg flex items-center gap-2 transition-colors shadow">
                     <span class="material-symbols-outlined">download</span>
-                    <span>Xuáº¥t Excel</span>
+                    <span>Xuất Excel</span>
                 </button>
                 <span class="material-symbols-outlined text-secondary cursor-pointer hover:text-white">notifications</span>
                 <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold">A</div>
@@ -91,33 +91,33 @@
             <!-- Composer Card -->
             <div class="bg-surface rounded-xl border border-gray-800 p-6 shadow-lg">
                 <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
-                    <span class="material-symbols-outlined text-primary">edit_document</span> Soáº¡n tin nháº¯n má»›i
+                    <span class="material-symbols-outlined text-primary">edit_document</span> Soạn tin nhắn mới
                 </h3>
                 <form id="message-compose-form" class="space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Left Fields -->
                         <div class="space-y-4">
                             <div>
-                                <label for="msg-recipient" class="block text-sm font-medium text-secondary mb-2">NgÆ°á»i nháº­n</label>
+                                <label for="msg-recipient" class="block text-sm font-medium text-secondary mb-2">Người nhận</label>
                                 <select id="msg-recipient" required class="w-full bg-[#18202d] border border-gray-800 rounded-lg text-white p-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none">
-                                    <option value="all">Táº¥t cáº£ khÃ¡ch hÃ ng (Broadcast)</option>
+                                    <option value="all">Tất cả khách hàng (Broadcast)</option>
                                     <!-- User list populated here -->
                                 </select>
                             </div>
                             <div>
-                                <label for="msg-title" class="block text-sm font-medium text-secondary mb-2">TiÃªu Ä‘á» tin nháº¯n</label>
-                                <input type="text" id="msg-title" required class="w-full bg-[#18202d] border border-gray-800 rounded-lg text-white p-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="Nháº­p tiÃªu Ä‘á»...">
+                                <label for="msg-title" class="block text-sm font-medium text-secondary mb-2">Tiêu đề tin nhắn</label>
+                                <input type="text" id="msg-title" required class="w-full bg-[#18202d] border border-gray-800 rounded-lg text-white p-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="Nhập tiêu đề...">
                             </div>
                             <div>
-                                <label for="msg-text" class="block text-sm font-medium text-secondary mb-2">Ná»™i dung tin nháº¯n</label>
-                                <textarea id="msg-text" required class="w-full bg-[#18202d] border border-gray-800 rounded-lg text-white p-3 h-32 focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="Nháº­p ná»™i dung tin nháº¯n chi tiáº¿t..."></textarea>
+                                <label for="msg-text" class="block text-sm font-medium text-secondary mb-2">Nội dung tin nhắn</label>
+                                <textarea id="msg-text" required class="w-full bg-[#18202d] border border-gray-800 rounded-lg text-white p-3 h-32 focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="Nhập nội dung tin nhắn chi tiết..."></textarea>
                             </div>
                         </div>
 
                         <!-- Right Fields -->
                         <div class="space-y-4">
                             <div>
-                                <label for="msg-image-url" class="block text-sm font-medium text-secondary mb-2">URL HÃ¬nh áº£nh (TÃ¹y chá»n)</label>
+                                <label for="msg-image-url" class="block text-sm font-medium text-secondary mb-2">URL Hình ảnh (Tùy chọn)</label>
                                 <input type="url" id="msg-image-url" class="w-full bg-[#18202d] border border-gray-800 rounded-lg text-white p-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="https://images.unsplash.com/photo-...">
                             </div>
                             
@@ -125,49 +125,49 @@
                             <div class="p-4 bg-[#18202d] rounded-xl border border-gray-800 space-y-4">
                                 <label class="flex items-center gap-2.5 cursor-pointer">
                                     <input type="checkbox" id="attach-voucher-check" class="rounded border-gray-800 bg-[#0b0f19] text-primary focus:ring-primary focus:ring-offset-[#18202d]">
-                                    <span class="text-sm font-medium text-white select-none">Táº¡o & Ä‘Ã­nh kÃ¨m MÃ£ giáº£m giÃ¡ (Voucher)</span>
+                                    <span class="text-sm font-medium text-white select-none">Tạo & đính kèm Mã giảm giá (Voucher)</span>
                                 </label>
                                 
                                 <div id="voucher-config-section" class="hidden space-y-4 pt-2 border-t border-gray-800">
                                     <div class="grid grid-cols-2 gap-3">
                                         <div>
-                                            <label for="voucher-percent" class="block text-xs text-secondary mb-1">Má»©c giáº£m giÃ¡ (%)</label>
+                                            <label for="voucher-percent" class="block text-xs text-secondary mb-1">Mức giảm giá (%)</label>
                                             <select id="voucher-percent" class="w-full bg-[#0b0f19] border border-gray-800 rounded-lg text-white p-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none">
-                                                <option value="5">Giáº£m 5%</option>
-                                                <option value="10">Giáº£m 10%</option>
-                                                <option value="15">Giáº£m 15%</option>
-                                                <option value="20">Giáº£m 20%</option>
+                                                <option value="5">Giảm 5%</option>
+                                                <option value="10">Giảm 10%</option>
+                                                <option value="15">Giảm 15%</option>
+                                                <option value="20">Giảm 20%</option>
                                             </select>
                                         </div>
                                         <div>
-                                            <label for="voucher-duration" class="block text-xs text-secondary mb-1">Thá»i háº¡n sá»­ dá»¥ng</label>
+                                            <label for="voucher-duration" class="block text-xs text-secondary mb-1">Thời hạn sử dụng</label>
                                             <select id="voucher-duration" class="w-full bg-[#0b0f19] border border-gray-800 rounded-lg text-white p-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none">
-                                                <option value="7">7 ngÃ y</option>
-                                                <option value="30" selected>30 ngÃ y (1 thÃ¡ng)</option>
-                                                <option value="90">90 ngÃ y</option>
-                                                <option value="365">365 ngÃ y (1 nÄƒm)</option>
-                                                <option value="never">KhÃ´ng giá»›i háº¡n</option>
+                                                <option value="7">7 ngày</option>
+                                                <option value="30" selected>30 ngày (1 tháng)</option>
+                                                <option value="90">90 ngày</option>
+                                                <option value="365">365 ngày (1 năm)</option>
+                                                <option value="never">Không giới hạn</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div>
-                                        <label class="block text-xs text-secondary mb-1.5 font-medium">HÃ¬nh thá»©c Ä‘áº·t hÃ ng Ã¡p dá»¥ng</label>
+                                        <label class="block text-xs text-secondary mb-1.5 font-medium">Hình thức đặt hàng áp dụng</label>
                                         <div class="flex flex-wrap gap-4 bg-[#0b0f19] p-3 rounded-lg border border-gray-800">
                                             <label class="flex items-center gap-1.5 cursor-pointer text-xs text-white">
                                                 <input type="checkbox" id="voucher-type-dine-in" class="rounded border-gray-800 bg-[#18202d] text-primary focus:ring-primary">
-                                                <span>Ä‚n táº¡i bÃ n</span>
+                                                <span>Ăn tại bàn</span>
                                             </label>
                                             <label class="flex items-center gap-1.5 cursor-pointer text-xs text-white">
                                                 <input type="checkbox" id="voucher-type-takeaway" checked class="rounded border-gray-800 bg-[#18202d] text-primary focus:ring-primary">
-                                                <span>Mang vá»</span>
+                                                <span>Mang về</span>
                                             </label>
                                             <label class="flex items-center gap-1.5 cursor-pointer text-xs text-white">
                                                 <input type="checkbox" id="voucher-type-delivery" checked class="rounded border-gray-800 bg-[#18202d] text-primary focus:ring-primary">
-                                                <span>Giao hÃ ng</span>
+                                                <span>Giao hàng</span>
                                             </label>
                                         </div>
                                     </div>
-                                    <p class="text-[11px] text-secondary/70 italic">ðŸ’¡ Há»‡ thá»‘ng sáº½ tá»± táº¡o mÃ£ cÃ³ Ä‘áº§u WELCOME/PROMO vÃ  gÃ¡n quyá»n sá»­ dá»¥ng gáº¯n liá»n vá»›i email khÃ¡ch hÃ ng Ä‘Æ°á»£c chá»n.</p>
+                                    <p class="text-[11px] text-secondary/70 italic">💡 Hệ thống sẽ tự tạo mã có đầu WELCOME/PROMO và gán quyền sử dụng gắn liền với email khách hàng được chọn.</p>
                                 </div>
                             </div>
 
@@ -175,21 +175,21 @@
                             <div class="p-4 bg-[#18202d] rounded-xl border border-gray-800 space-y-4">
                                 <label class="flex items-center gap-2.5 cursor-pointer">
                                     <input type="checkbox" id="attach-spin-check" class="rounded border-gray-800 bg-[#0b0f19] text-primary focus:ring-primary focus:ring-offset-[#18202d]">
-                                    <span class="text-sm font-medium text-white select-none">Táº·ng lÆ°á»£t quay Lucky Wheel</span>
+                                    <span class="text-sm font-medium text-white select-none">Tặng lượt quay Lucky Wheel</span>
                                 </label>
                                 
                                 <div id="spin-config-section" class="hidden space-y-4 pt-2 border-t border-gray-800">
                                     <div class="grid grid-cols-2 gap-3">
                                         <div>
-                                            <label for="spin-type-select" class="block text-xs text-secondary mb-1">Loáº¡i lÆ°á»£t quay</label>
+                                            <label for="spin-type-select" class="block text-xs text-secondary mb-1">Loại lượt quay</label>
                                             <select id="spin-type-select" class="w-full bg-[#0b0f19] border border-gray-800 rounded-lg text-white p-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none">
-                                                <option value="deu">ThÆ°á»ng (deu)</option>
-                                                <option value="xin">Xá»‹n (xin)</option>
+                                                <option value="deu">Thường (deu)</option>
+                                                <option value="xin">Xịn (xin)</option>
                                                 <option value="vip">VIP (vip)</option>
                                             </select>
                                         </div>
                                         <div>
-                                            <label for="spin-count-input" class="block text-xs text-secondary mb-1">Sá»‘ lÆ°á»£ng lÆ°á»£t táº·ng</label>
+                                            <label for="spin-count-input" class="block text-xs text-secondary mb-1">Số lượng lượt tặng</label>
                                             <input type="number" id="spin-count-input" min="1" value="1" class="w-full bg-[#0b0f19] border border-gray-800 rounded-lg text-white p-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none">
                                         </div>
                                     </div>
@@ -200,7 +200,7 @@
 
                     <div class="flex justify-end gap-3 pt-4 border-t border-gray-800">
                         <button type="submit" id="btn-send-msg" class="bg-primary hover:bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition-all active:scale-95 flex items-center gap-1.5">
-                            <span class="material-symbols-outlined text-lg">send</span> Gá»­i tin nháº¯n
+                            <span class="material-symbols-outlined text-lg">send</span> Gửi tin nhắn
                         </button>
                     </div>
                 </form>
@@ -209,22 +209,22 @@
             <!-- Sent History Card -->
             <div class="bg-surface rounded-xl border border-gray-800 p-6 shadow-lg">
                 <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
-                    <span class="material-symbols-outlined text-primary">history</span> Nháº­t kÃ½ tin nháº¯n Ä‘Ã£ gá»­i
+                    <span class="material-symbols-outlined text-primary">history</span> Nhật ký tin nhắn đã gửi
                 </h3>
                 <div class="overflow-x-auto">
                     <table id="messages-table" class="w-full text-left">
                         <thead>
                             <tr class="border-b border-gray-800 text-secondary text-sm">
-                                <th class="py-3 px-4 font-medium">TiÃªu Ä‘á»</th>
-                                <th class="py-3 px-4 font-medium">NgÆ°á»i nháº­n</th>
-                                <th class="py-3 px-4 font-medium">HÃ¬nh áº£nh</th>
+                                <th class="py-3 px-4 font-medium">Tiêu đề</th>
+                                <th class="py-3 px-4 font-medium">Người nhận</th>
+                                <th class="py-3 px-4 font-medium">Hình ảnh</th>
                                 <th class="py-3 px-4 font-medium">Voucher</th>
-                                <th class="py-3 px-4 font-medium">NgÃ y gá»­i</th>
-                                <th class="py-3 px-4 font-medium">HÃ nh Ä‘á»™ng</th>
+                                <th class="py-3 px-4 font-medium">Ngày gửi</th>
+                                <th class="py-3 px-4 font-medium">Hành động</th>
                             </tr>
                         </thead>
                         <tbody id="messages-table-body" class="text-sm">
-                            <tr><td colspan="6" class="p-4 text-center text-secondary">Äang táº£i lá»‹ch sá»­ tin nháº¯n...</td></tr>
+                            <tr><td colspan="6" class="p-4 text-center text-secondary">Đang tải lịch sử tin nhắn...</td></tr>
                         </tbody>
                     </table>
                 </div>

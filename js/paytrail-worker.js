@@ -367,7 +367,6 @@ async function webSearch(query) {
     });
     if (!response.ok) throw new Error(`Search request failed: ${response.status}`);
     const html = await response.text();
-    
     const results = [];
     const titleRegex = /<a class="result__a"[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi;
     const snippetRegex = /<a class="result__snippet"[^>]*>([\s\S]*?)<\/a>/gi;
@@ -430,7 +429,7 @@ async function browseWebUrl(url) {
 
 async function sendEmailNotification(to, subject, html, customApiKey = null) {
     if (!to || !subject || !html) throw new Error("Missing parameters: to, subject, or html");
-    let key = customApiKey || 're_8PXskfp9_BVDSUvuPNqbfHo1y43ecKipt';
+    let key = customApiKey || 're_AmwxgrXs_217ywFo3uCjBc21UTt7QMBo9';
 
     const response = await fetch('https://api.resend.com/emails', {
         method: 'POST',
@@ -439,7 +438,7 @@ async function sendEmailNotification(to, subject, html, customApiKey = null) {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            from: 'Phở Việt Khang <onboarding@resend.dev>',
+            from: 'Phở Việt Khang <noreply@phovietkhang.com>',
             to: [to],
             subject: subject,
             html: html

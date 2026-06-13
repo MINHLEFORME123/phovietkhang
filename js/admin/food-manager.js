@@ -1,5 +1,5 @@
 import { db } from "../firebase-config.js";
-import { collection, doc, getDoc, getDocs, addDoc, updateDoc, deleteDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { collection, doc, getDocs, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { normalizeOptions, initApiKeys } from "./utils.js";
 import { loadCategories } from "./food-add.js";
 
@@ -7,6 +7,13 @@ const foodTableBody = document.getElementById('food-table-body');
 if (!foodTableBody) {
     // Not on food-list page
 } else {
+    const escapeHtml = (value) => String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+
     loadFood();
 
     async function loadFood() {
@@ -42,23 +49,25 @@ if (!foodTableBody) {
             const normalized = normalizeOptions(item.options);
             const optCount = normalized.length > 0 ? `<span class="text-xs bg-teal-600/20 text-teal-400 px-1.5 py-0.5 rounded-full ml-1">${normalized.length} opt groups</span>` : '';
 
+            const image = escapeHtml(item.image || 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=100');
+            const fallbackImage = 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=100';
             const tr = document.createElement('tr');
             tr.className = "border-b border-gray-800/50 hover:bg-surface-highlight transition-colors";
             tr.innerHTML = `
-                <td class="py-3 px-4"><img src="${item.image}" class="w-12 h-12 object-cover rounded" onerror="this.src='https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=100'"></td>
+                <td class="py-3 px-4"><img src="${image}" class="w-12 h-12 object-cover rounded" onerror="this.src='${fallbackImage}'"></td>
                 <td class="py-3 px-4">
-                    <span class="font-bold text-white">${item.nameVi || ''}</span>
-                    ${item.allergenWarning ? '<span class="inline-flex items-center gap-1 bg-red-900/30 text-red-400 text-xs px-2 py-0.5 rounded-md font-semibold border border-red-800/50 ml-2" title="Chá»©a thÃ nh pháº§n dá»… gÃ¢y dá»‹ á»©ng"><span class="material-symbols-outlined text-[14px]">warning</span> Dá»‹ á»©ng</span>' : ''}
+                    <span class="font-bold text-white">${escapeHtml(item.nameVi || '')}</span>
+                    ${item.allergenWarning ? '<span class="inline-flex items-center gap-1 bg-red-900/30 text-red-400 text-xs px-2 py-0.5 rounded-md font-semibold border border-red-800/50 ml-2" title="Chứa thành phần dễ gây dị ứng"><span class="material-symbols-outlined text-[14px]">warning</span> Dị ứng</span>' : ''}
                     <br>
-                    <span class="text-xs text-secondary">EN: ${item.nameEn || ''}</span><br>
-                    <span class="text-xs text-secondary">FI: ${item.nameFi || ''}</span>
+                    <span class="text-xs text-secondary">EN: ${escapeHtml(item.nameEn || '')}</span><br>
+                    <span class="text-xs text-secondary">FI: ${escapeHtml(item.nameFi || '')}</span>
                 </td>
                 <td class="py-3 px-4">
-                    <span class="font-bold text-white">VI: ${item.categoryVi || item.category || ''}</span><br>
-                    <span class="text-xs text-secondary">EN: ${item.categoryEn || ''}</span><br>
-                    <span class="text-xs text-secondary">FI: ${item.categoryFi || ''}</span>
+                    <span class="font-bold text-white">VI: ${escapeHtml(item.categoryVi || item.category || '')}</span><br>
+                    <span class="text-xs text-secondary">EN: ${escapeHtml(item.categoryEn || '')}</span><br>
+                    <span class="text-xs text-secondary">FI: ${escapeHtml(item.categoryFi || '')}</span>
                 </td>
-                <td class="py-3 px-4">â‚¬${(item.price || 0).toFixed(2)}</td>
+                <td class="py-3 px-4">€${(item.price || 0).toFixed(2)}</td>
                 <td class="py-3 px-4">${optCount || '<span class="text-xs text-secondary/50">None</span>'}</td>
                 ${window.location.pathname.includes('/host/') ? '' : `
                 <td class="py-3 px-4 flex gap-2">
@@ -145,7 +154,7 @@ if (!foodTableBody) {
     }
 }
 
-// â”€â”€â”€ FOOD EDIT MODAL LOGIC â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── FOOD EDIT MODAL LOGIC ───────────────────────────────────────────────────
 const foodTableBody2 = document.getElementById('food-table-body');
 if (foodTableBody2) {
     let editOptions = [];
@@ -196,7 +205,7 @@ if (foodTableBody2) {
             const row = document.createElement('div');
             row.className = 'flex items-center justify-between bg-surface-highlight p-1 rounded text-xs text-white';
             row.innerHTML = `
-                <span>${ch.labelVi} / ${ch.labelEn} / ${ch.labelFi} (${ch.price > 0 ? '+' + ch.price.toFixed(2) + 'â‚¬' : 'Free'})</span>
+                <span>${ch.labelVi} / ${ch.labelEn} / ${ch.labelFi} (${ch.price > 0 ? '+' + ch.price.toFixed(2) + '€' : 'Free'})</span>
                 <button type="button" class="text-red-400 hover:text-red-300 px-1 font-bold" data-idx="${idx}">&times;</button>`;
             row.querySelector('button').addEventListener('click', () => {
                 editAddingChoices.splice(idx, 1);
@@ -236,7 +245,7 @@ if (foodTableBody2) {
             const div = document.createElement('div');
             div.className = 'bg-surface-highlight p-2 rounded-lg border border-gray-700/50 space-y-1 relative';
             const choicesHtml = opt.choices.map(c =>
-                `<span class="inline-block bg-gray-800 text-secondary text-[10px] px-1.5 py-0.5 rounded mr-1">${c.labelVi || c.label} (${c.price > 0 ? '+' + c.price.toFixed(2) + 'â‚¬' : 'Free'})</span>`
+                `<span class="inline-block bg-gray-800 text-secondary text-[10px] px-1.5 py-0.5 rounded mr-1">${c.labelVi || c.label} (${c.price > 0 ? '+' + c.price.toFixed(2) + '€' : 'Free'})</span>`
             ).join('');
             const displayTitle = `${opt.nameVi || opt.name} / ${opt.nameEn || opt.name} / ${opt.nameFi || opt.name}`;
             div.innerHTML = `
@@ -337,5 +346,5 @@ if (foodTableBody2) {
     }
 }
 
-// â”€â”€â”€ INIT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── INIT ────────────────────────────────────────────────────────────────────
 initApiKeys();

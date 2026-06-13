@@ -434,36 +434,42 @@
 <!-- Content Hydration Script to prevent FOUC (Consolidated) -->
 <script>
     (function(){
+        const cachedLang = localStorage.getItem('selectedLanguage') || 'en';
+
         // Hero Section
         const cachedBg = localStorage.getItem('cachedHeroBg');
-        if (cachedBg) document.getElementById('hero-bg').src = cachedBg;
-        const cachedTitle = localStorage.getItem('cachedHeroTitle');
-        if (cachedTitle) document.getElementById('hero-title').textContent = cachedTitle;
-        const cachedDesc = localStorage.getItem('cachedHeroDesc');
-        if (cachedDesc) document.getElementById('hero-desc').textContent = cachedDesc;
+        if (cachedBg && (cachedBg.startsWith('http') || cachedBg.startsWith('data:'))) {
+            document.getElementById('hero-bg').src = cachedBg;
+        }
+        const cachedHeroTitle = localStorage.getItem('cachedHeroTitle_' + cachedLang) || localStorage.getItem('cachedHeroTitle_vi');
+        if (cachedHeroTitle) document.getElementById('hero-title').textContent = cachedHeroTitle;
+        const cachedHeroDesc = localStorage.getItem('cachedHeroDesc_' + cachedLang) || localStorage.getItem('cachedHeroDesc_vi');
+        if (cachedHeroDesc) document.getElementById('hero-desc').textContent = cachedHeroDesc;
 
         // Story Section
         const cachedStoryImg = localStorage.getItem('cachedStoryImg');
-        if (cachedStoryImg) document.getElementById('story-img').src = cachedStoryImg;
-        const cachedStoryLabel = localStorage.getItem('cachedStoryLabel');
+        if (cachedStoryImg && (cachedStoryImg.startsWith('http') || cachedStoryImg.startsWith('data:'))) {
+            document.getElementById('story-img').src = cachedStoryImg;
+        }
+        const cachedStoryLabel = localStorage.getItem('cachedStoryLabel_' + cachedLang) || localStorage.getItem('cachedStoryLabel_vi');
         if (cachedStoryLabel) document.getElementById('story-label').textContent = cachedStoryLabel;
-        const cachedStoryTitle = localStorage.getItem('cachedStoryTitle');
+        const cachedStoryTitle = localStorage.getItem('cachedStoryTitle_' + cachedLang) || localStorage.getItem('cachedStoryTitle_vi');
         if (cachedStoryTitle) document.getElementById('story-title').textContent = cachedStoryTitle;
-        const cachedStoryP1 = localStorage.getItem('cachedStoryP1');
+        const cachedStoryP1 = localStorage.getItem('cachedStoryP1_' + cachedLang) || localStorage.getItem('cachedStoryP1_vi');
         if (cachedStoryP1) document.getElementById('story-p1').textContent = cachedStoryP1;
-        const cachedStoryP2 = localStorage.getItem('cachedStoryP2');
+        const cachedStoryP2 = localStorage.getItem('cachedStoryP2_' + cachedLang) || localStorage.getItem('cachedStoryP2_vi');
         if (cachedStoryP2) document.getElementById('story-p2').textContent = cachedStoryP2;
 
-        // Signature Section
-        const cachedSigTitle = localStorage.getItem('cachedSignatureTitle');
+        // Signature Section (Trilingual Hydration)
+        const cachedSigTitle = localStorage.getItem('cachedSignatureTitle_' + cachedLang) || localStorage.getItem('cachedSignatureTitle_vi');
         if (cachedSigTitle) document.getElementById('signature-title').textContent = cachedSigTitle;
-        const cachedSigDesc = localStorage.getItem('cachedSignatureDesc');
+        const cachedSigDesc = localStorage.getItem('cachedSignatureDesc_' + cachedLang) || localStorage.getItem('cachedSignatureDesc_vi');
         if (cachedSigDesc) document.getElementById('signature-desc').textContent = cachedSigDesc;
 
         // CTA Section
-        const cachedCtaTitle = localStorage.getItem('cachedCtaTitle');
+        const cachedCtaTitle = localStorage.getItem('cachedCtaTitle_' + cachedLang) || localStorage.getItem('cachedCtaTitle_vi');
         if (cachedCtaTitle) document.getElementById('cta-title').textContent = cachedCtaTitle;
-        const cachedCtaDesc = localStorage.getItem('cachedCtaDesc');
+        const cachedCtaDesc = localStorage.getItem('cachedCtaDesc_' + cachedLang) || localStorage.getItem('cachedCtaDesc_vi');
         if (cachedCtaDesc) document.getElementById('cta-desc').textContent = cachedCtaDesc;
     })();
 </script>

@@ -1,11 +1,19 @@
 import { db } from "../firebase-config.js";
-import { collection, doc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { collection, doc, updateDoc, deleteDoc, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { formatOrderDate, getOrderTimeAlert, callWorker } from "./utils.js";
 
 const container = document.getElementById('order-manager-container');
 if (!container) {
     // Not on order manager page
 } else {
+    const formatMoney = (value) => `${(Number(value) || 0).toFixed(2)}€`;
+    const escapeHtml = (value) => String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    const safeId = (id) => String(id || '').substring(0, 8).toUpperCase();
     let currentFilter = 'all';
     let searchQuery = '';
     let allOrders = [];
@@ -53,24 +61,32 @@ if (!container) {
             modalAddressBlock.classList.add('hidden');
         }
 
+        const items = Array.isArray(order.items) ? order.items : [];
         modalOrderItems.innerHTML = '';
-        order.items.forEach(item => {
+        if (items.length === 0) {
             const tr = document.createElement('tr');
             tr.className = "border-b border-gray-800/30 text-white text-xs";
-            let optsText = '';
-            if (item.selectedOptions && item.selectedOptions.length > 0) {
-                optsText = `<div class="text-[10px] text-secondary mt-0.5">Options: ${item.selectedOptions.map(o => o.choiceLabel || o.label).join(', ')}</div>`;
-            }
-            tr.innerHTML = `
-                <td class="py-2 px-3">
-                    <div class="font-semibold">${item.name}</div>
-                    ${optsText}
-                </td>
-                <td class="py-2 px-3 text-center">${item.qty}</td>
-                <td class="py-2 px-3 text-right font-medium">${(item.price * item.qty).toFixed(2)}â‚¬</td>
-            `;
+            tr.innerHTML = '<td class="py-2 px-3 text-secondary" colspan="3">No items found.</td>';
             modalOrderItems.appendChild(tr);
-        });
+        } else {
+            items.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-gray-800/30 text-white text-xs";
+                let optsText = '';
+                if (item.selectedOptions && item.selectedOptions.length > 0) {
+                    optsText = `<div class="text-[10px] text-secondary mt-0.5">Options: ${item.selectedOptions.map(o => escapeHtml(o.choiceLabel || o.label)).join(', ')}</div>`;
+                }
+                tr.innerHTML = `
+                    <td class="py-2 px-3">
+                        <div class="font-semibold">${escapeHtml(item.name)}</div>
+                        ${optsText}
+                    </td>
+                    <td class="py-2 px-3 text-center">${Number(item.qty) || 0}</td>
+                    <td class="py-2 px-3 text-right font-medium">${formatMoney((Number(item.price) || 0) * (Number(item.qty) || 0))}</td>
+                `;
+                modalOrderItems.appendChild(tr);
+            });
+        }
 
         if (order.notes) {
             modalNotesBlock.classList.remove('hidden');
@@ -79,7 +95,7 @@ if (!container) {
             modalNotesBlock.classList.add('hidden');
         }
 
-        modalTotalPrice.textContent = order.totalPrice.toFixed(2) + 'â‚¬';
+        modalTotalPrice.textContent = formatMoney(order.totalPrice);
         detailModal.classList.remove('hidden');
     };
 
@@ -107,45 +123,46 @@ if (!container) {
                     const orderLang = order.language || 'en';
                     const readyTranslations = {
                         vi: {
-                            subject: `[Phá»Ÿ Viá»‡t Khang] ÄÆ¡n hÃ ng cá»§a báº¡n Ä‘Ã£ sáºµn sÃ ng! - #${orderId.substring(0, 8).toUpperCase()}`,
-                            title: "ÄÆ N HÃ€NG ÄÃƒ Sáº´N SÃ€NG",
-                            intro: `Xin chÃ o <strong>${order.customerName || 'QuÃ½ khÃ¡ch'}</strong>,<br><br>Tin vui! ÄÆ¡n hÃ ng cá»§a báº¡n táº¡i Phá»Ÿ Viá»‡t Khang Ä‘Ã£ Ä‘Æ°á»£c cháº¿ biáº¿n xong vÃ  sáºµn sÃ ng phá»¥c vá»¥.`,
-                            summaryHeader: "Chi tiáº¿t Ä‘Æ¡n hÃ ng:",
-                            totalLabel: "Tá»•ng cá»™ng",
-                            serviceType: "HÃ¬nh thá»©c",
-                            orderId: "MÃ£ Ä‘Æ¡n hÃ ng",
-                            footer: "Cáº£m Æ¡n quÃ½ khÃ¡ch Ä‘Ã£ á»§ng há»™ nhÃ  hÃ ng. Phá»Ÿ Viá»‡t Khang Â© 2026."
+                            subject: `[Phở Việt Khang] Đơn hàng của bạn đã sẵn sàng! - #${orderId.substring(0, 8).toUpperCase()}`,
+                            title: "ĐƠN HÀNG ĐÃ SẴN SÀNG",
+                            intro: `Xin chào <strong>${order.customerName || 'Quý khách'}</strong>,<br><br>Tin vui! Đơn hàng của bạn tại Phở Việt Khang đã được chế biến xong và sẵn sàng phục vụ.`,
+                            summaryHeader: "Chi tiết đơn hàng:",
+                            totalLabel: "Tổng cộng",
+                            serviceType: "Hình thức",
+                            orderId: "Mã đơn hàng",
+                            footer: "Cảm ơn quý khách đã ủng hộ nhà hàng. Phở Việt Khang © 2026."
                         },
                         en: {
-                            subject: `[Phá»Ÿ Viá»‡t Khang] Your Order is Ready! - #${orderId.substring(0, 8).toUpperCase()}`,
+                            subject: `[Phở Việt Khang] Your Order is Ready! - #${orderId.substring(0, 8).toUpperCase()}`,
                             title: "YOUR ORDER IS READY",
-                            intro: `Hi <strong>${order.customerName || 'Customer'}</strong>,<br><br>Great news! Your order at Phá»Ÿ Viá»‡t Khang is ready and waiting for you.`,
+                            intro: `Hi <strong>${order.customerName || 'Customer'}</strong>,<br><br>Great news! Your order at Phở Việt Khang is ready and waiting for you.`,
                             summaryHeader: "Here is a summary of your order:",
                             totalLabel: "Total Price",
                             serviceType: "Service Type",
                             orderId: "Order ID",
-                            footer: "Thank you for dining with us! Phá»Ÿ Viá»‡t Khang Â© 2026."
+                            footer: "Thank you for dining with us! Phở Việt Khang © 2026."
                         },
                         fi: {
-                            subject: `[Phá»Ÿ Viá»‡t Khang] Tilauksesi on valmis! - #${orderId.substring(0, 8).toUpperCase()}`,
+                            subject: `[Phở Việt Khang] Tilauksesi on valmis! - #${orderId.substring(0, 8).toUpperCase()}`,
                             title: "TILAUKSESI ON VALMIS",
-                            intro: `Hei <strong>${order.customerName || 'Asiakas'}</strong>,<br><br>Hienoja uutisia! Tilauksesi Phá»Ÿ Viá»‡t Khangissa on valmis ja odottaa sinua.`,
-                            summaryHeader: "TÃ¤ssÃ¤ on yhteenveto tilauksestasi:",
-                            totalLabel: "YhteensÃ¤",
+                            intro: `Hei <strong>${order.customerName || 'Asiakas'}</strong>,<br><br>Hienoja uutisia! Tilauksesi Phở Việt Khangissa on valmis ja odottaa sinua.`,
+                            summaryHeader: "Tässä on yhteenveto tilauksestasi:",
+                            totalLabel: "Yhteensä",
                             serviceType: "Palvelutyyppi",
                             orderId: "Tilaustunnus",
-                            footer: "Kiitos asioinnistasi kanssamme! Phá»Ÿ Viá»‡t Khang Â© 2026."
+                            footer: "Kiitos asioinnistasi kanssamme! Phở Việt Khang © 2026."
                         }
                     };
                     const rData = readyTranslations[orderLang] || readyTranslations['en'];
-                    const itemsHtml = (order.items || []).map(i => `<li style="margin-bottom: 5px;"><strong>${i.qty}x</strong> ${i.name}</li>`).join('');
+                    const items = Array.isArray(order.items) ? order.items : [];
+                    const itemsHtml = items.map(i => `<li style="margin-bottom: 5px;"><strong>${escapeHtml(i.qty ?? 1)}x</strong> ${escapeHtml(i.name || 'Item')}</li>`).join('');
                     const emailHtml = `
                         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
                             <h2 style="color: #10b981; text-align: center; border-bottom: 2px solid #10b981; padding-bottom: 15px; margin-bottom: 20px;">${rData.title}</h2>
                             <p>${rData.intro}</p>
                             <p><strong>${rData.summaryHeader}</strong></p>
                             <ul style="padding-left: 20px; margin: 15px 0;">${itemsHtml}</ul>
-                            <p style="font-size: 1.1em;"><strong>${rData.totalLabel}:</strong> <span style="color: #10b981; font-weight: bold;">${(order.totalPrice || 0).toFixed(2)}â‚¬</span></p>
+                            <p style="font-size: 1.1em;"><strong>${rData.totalLabel}:</strong> <span style="color: #10b981; font-weight: bold;">${(Number(order.totalPrice) || 0).toFixed(2)}€</span></p>
                             <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 20px; border: 1px solid #e9ecef;">
                                 <p style="margin: 0; font-size: 0.9em; color: #555;"><strong>${rData.serviceType}:</strong> ${order.orderType === 'dine-in' ? `Dine-in (Table ${order.tableNumber || 'N/A'})` : order.orderType === 'delivery' ? 'Delivery' : 'Takeaway'}</p>
                                 <p style="margin: 5px 0 0 0; font-size: 0.9em; color: #555;"><strong>${rData.orderId}:</strong> #${orderId.toUpperCase()}</p>
@@ -205,9 +222,10 @@ if (!container) {
         }
 
         filtered.forEach(order => {
+            const totalPrice = Number(order.totalPrice) || 0;
             const statusBadge = order.emailConfirmed === false
-                ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">Chá» email</span>`
-                : `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-${(() => { if (order.status === 'pending') return 'red'; if (['cooking','preparing'].includes(order.status)) return 'yellow'; if (order.status === 'ready') return 'blue'; if (order.status === 'completed') return 'green'; return 'gray'; })()}-500/10 text-${(() => { if (order.status === 'pending') return 'red'; if (['cooking','preparing'].includes(order.status)) return 'yellow'; if (order.status === 'ready') return 'blue'; if (order.status === 'completed') return 'green'; return 'gray'; })()}-400 border border-${(() => { if (order.status === 'pending') return 'red'; if (['cooking','preparing'].includes(order.status)) return 'yellow'; if (order.status === 'ready') return 'blue'; if (order.status === 'completed') return 'green'; return 'gray'; })()}-500/20">${order.status}</span>`;
+                ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">Chờ email</span>`
+                : `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-${(() => { if (order.status === 'pending') return 'red'; if (['cooking','preparing'].includes(order.status)) return 'yellow'; if (order.status === 'ready') return 'blue'; if (order.status === 'completed') return 'green'; return 'gray'; })()}-500/10 text-${(() => { if (order.status === 'pending') return 'red'; if (['cooking','preparing'].includes(order.status)) return 'yellow'; if (order.status === 'ready') return 'blue'; if (order.status === 'completed') return 'green'; return 'gray'; })()}-400 border border-${(() => { if (order.status === 'pending') return 'red'; if (['cooking','preparing'].includes(order.status)) return 'yellow'; if (order.status === 'ready') return 'blue'; if (order.status === 'completed') return 'green'; return 'gray'; })()}-500/20">${escapeHtml(order.status)}</span>`;
 
             if (tableBody) {
                 const tr = document.createElement('tr');
@@ -215,19 +233,19 @@ if (!container) {
                 const timeAlert = getOrderTimeAlert(order.createdAt, order.completedAt, order.status);
                 const dateString = formatOrderDate(order.createdAt);
                 tr.innerHTML = `
-                    <td class="py-3.5 px-4 font-mono text-primary font-medium">#${order.id.substring(0, 8).toUpperCase()}</td>
+                    <td class="py-3.5 px-4 font-mono text-primary font-medium">#${escapeHtml(safeId(order.id))}</td>
                     <td class="py-3.5 px-4">
                         <div class="text-secondary">${dateString}</div>
                         <div class="text-[10px] text-${timeAlert.color}-400 font-semibold mt-0.5">${timeAlert.label}</div>
                     </td>
                     <td class="py-3.5 px-4">
-                        <div class="font-semibold">${order.customerName || 'Guest'}</div>
-                        <div class="text-xs text-secondary mt-0.5">${order.customerPhone || 'N/A'}</div>
+                        <div class="font-semibold">${escapeHtml(order.customerName || 'Guest')}</div>
+                        <div class="text-xs text-secondary mt-0.5">${escapeHtml(order.customerPhone || 'N/A')}</div>
                     </td>
                     <td class="py-3.5 px-4">
-                        <span class="capitalize font-medium">${order.orderType === 'dine-in' ? `Dine-In (Table ${order.tableNumber || 'N/A'})` : order.orderType}</span>
+                        <span class="capitalize font-medium">${escapeHtml(order.orderType === 'dine-in' ? `Dine-In (Table ${order.tableNumber || 'N/A'})` : order.orderType)}</span>
                     </td>
-                    <td class="py-3.5 px-4 text-green-400 font-semibold">${order.totalPrice.toFixed(2)}â‚¬</td>
+                    <td class="py-3.5 px-4 text-green-400 font-semibold">${formatMoney(totalPrice)}</td>
                     <td class="py-3.5 px-4">${statusBadge}</td>
                     <td class="py-3.5 px-4">
                         <div class="flex items-center gap-2">
@@ -254,9 +272,9 @@ if (!container) {
                 const tr = document.createElement('tr');
                 tr.className = "border-b border-gray-800/50 hover:bg-surface-highlight transition-colors text-white";
                 tr.innerHTML = `
-                    <td class="py-2 px-2 text-[11px] font-mono text-primary font-medium">#${order.id.substring(0, 6).toUpperCase()}</td>
-                    <td class="py-2 px-2 text-[11px] font-medium">${order.customerName || 'Guest'}</td>
-                    <td class="py-2 px-2 text-[11px] text-green-400 font-semibold">${order.totalPrice.toFixed(2)}â‚¬</td>
+                    <td class="py-2 px-2 text-[11px] font-mono text-primary font-medium">#${escapeHtml(String(order.id || '').substring(0, 6).toUpperCase())}</td>
+                    <td class="py-2 px-2 text-[11px] font-medium">${escapeHtml(order.customerName || 'Guest')}</td>
+                    <td class="py-2 px-2 text-[11px] text-green-400 font-semibold">${formatMoney(totalPrice)}</td>
                     <td class="py-2 px-2">${statusBadge}</td>
                     <td class="py-2 px-2">
                         <div class="flex items-center gap-1">
@@ -294,8 +312,14 @@ if (!container) {
             }
             allOrders.push({ ...data, id: docSnap.id, createdAt: date });
         });
-        allOrders.sort((a, b) => b.createdAt - a.createdAt);
+        allOrders.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
         renderOrders();
+    }, (error) => {
+        console.error("Error loading orders:", error);
+        const tableBody = document.getElementById('orders-table-body');
+        const mobileBody = document.getElementById('orders-table-body-mobile');
+        if (tableBody) tableBody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-red-500">Failed to load orders. Check Firestore permissions.</td></tr>';
+        if (mobileBody) mobileBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-red-500">Failed to load orders.</td></tr>';
     });
 
     const sidebarToggle = document.getElementById('sidebar-toggle');

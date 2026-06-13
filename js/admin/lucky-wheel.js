@@ -1,5 +1,8 @@
 import { db } from "../firebase-config.js";
 import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { ensureAdminNotification } from "./utils.js";
+
+ensureAdminNotification();
 
 window.loadLuckyWheelSettings = async function () {
     try {
@@ -28,10 +31,10 @@ window.luckyWheelAdmin = {
                     next100: 100
                 }
             }, { merge: true });
-            window.showNotification("ÄÃ£ reset bá»™ Ä‘áº¿m guarantee vá» 0.", "success");
+            window.showNotification("Đã reset bộ đếm guarantee về 0.", "success");
             await window.loadLuckyWheelSettings();
         } catch (e) {
-            window.showNotification("Lá»—i reset: " + e.message, "error");
+            window.showNotification("Lỗi reset: " + e.message, "error");
         }
     }
 };

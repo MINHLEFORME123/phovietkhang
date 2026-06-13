@@ -9,6 +9,13 @@ const dashboardContainer = document.getElementById('dashboard-container');
 if (!dashboardContainer) {
     // Not on dashboard page - skip
 } else {
+    const escapeHtml = (value) => String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+
     initDashboard();
     const sidebarToggle = document.getElementById('sidebar-toggle');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
@@ -80,19 +87,19 @@ async function initDashboard() {
             allOrders.push({
                 id: orderId, date: orderDate, completedAt: completedDate,
                 customerName: data.customerName || 'Guest',
-                totalPrice: data.totalPrice || 0, status: data.status || 'pending',
-                orderType: data.orderType || 'takeaway', items: data.items || []
+                totalPrice: Number(data.totalPrice) || 0, status: data.status || 'pending',
+                orderType: data.orderType || 'takeaway', items: Array.isArray(data.items) ? data.items : []
             });
 
             if (orderDate >= today) {
-                if (data.status !== 'cancelled') todayRevenue += data.totalPrice || 0;
+                if (data.status !== 'cancelled') todayRevenue += Number(data.totalPrice) || 0;
                 if (['pending', 'cooking', 'ready'].includes(data.status)) activeCount++;
                 if (data.status === 'completed') completedTodayCount++;
             }
 
             const dateKey = orderDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
             if (last7Days.hasOwnProperty(dateKey) && data.status !== 'cancelled') {
-                last7Days[dateKey] += data.totalPrice || 0;
+                last7Days[dateKey] += Number(data.totalPrice) || 0;
             }
 
             const t = (data.orderType || 'takeaway').toLowerCase();
@@ -100,7 +107,7 @@ async function initDashboard() {
         });
 
         const statRevEl = document.getElementById('stat-revenue');
-        if (statRevEl) statRevEl.textContent = todayRevenue.toFixed(2) + 'â‚¬';
+        if (statRevEl) statRevEl.textContent = todayRevenue.toFixed(2) + '€';
         const statActEl = document.getElementById('stat-active');
         if (statActEl) statActEl.textContent = activeCount;
         const statCompEl = document.getElementById('stat-completed');
@@ -125,19 +132,22 @@ async function initDashboard() {
 
                     const timeAlert = getOrderTimeAlert(order.date, order.completedAt, order.status);
                     const dateString = formatOrderDate(order.date);
-                    const itemsText = order.items.map(i => `${i.name} (x${i.qty})`).join(', ');
+                    const safeOrderId = String(order.id || '').substring(0, 5).toUpperCase();
+                    const customerName = escapeHtml(order.customerName || 'Guest');
+                    const itemsText = order.items.map(i => `${i.name || ''} (x${i.qty || 0})`).join(', ');
+                    const safeItemsText = escapeHtml(itemsText);
 
                     tr.innerHTML = `
-                        <td class="py-3 px-4 font-mono text-primary font-medium">#${order.id.substring(0, 5).toUpperCase()}</td>
+                        <td class="py-3 px-4 font-mono text-primary font-medium">#${safeOrderId}</td>
                         <td class="py-3 px-4">
                             <div class="text-secondary">${dateString}</div>
                             <div class="text-[10px] text-${timeAlert.color}-400 font-semibold mt-0.5">${timeAlert.label}</div>
                         </td>
-                        <td class="py-3 px-4">${order.customerName}</td>
-                        <td class="py-3 px-4 max-w-[200px] truncate" title="${itemsText}">${itemsText}</td>
-                        <td class="py-3 px-4 text-green-400 font-medium">${order.totalPrice.toFixed(2)}â‚¬</td>
+                        <td class="py-3 px-4">${customerName}</td>
+                        <td class="py-3 px-4 max-w-[200px] truncate" title="${safeItemsText}">${safeItemsText}</td>
+                        <td class="py-3 px-4 text-green-400 font-medium">${escapeHtml(order.totalPrice.toFixed(2))}€</td>
                         <td class="py-3 px-4">
-                            <span class="px-2 py-0.5 rounded text-xs font-bold uppercase bg-${badgeColor}-500/10 text-${badgeColor}-400 border border-${badgeColor}-500/20">${order.status}</span>
+                            <span class="px-2 py-0.5 rounded text-xs font-bold uppercase bg-${badgeColor}-500/10 text-${badgeColor}-400 border border-${badgeColor}-500/20">${escapeHtml(order.status)}</span>
                         </td>
                     `;
                     recentBody.appendChild(tr);
@@ -162,7 +172,7 @@ async function initDashboard() {
                     data: {
                         labels: trendLabels,
                         datasets: [{
-                            label: 'Revenue (â‚¬)',
+                            label: 'Revenue (€)',
                             data: trendData,
                             borderColor: '#3b82f6',
                             backgroundColor: 'rgba(59, 130, 246, 0.1)',
@@ -215,5 +225,9 @@ async function initDashboard() {
                 });
             }
         }
+    }, (error) => {
+        console.error("Error loading dashboard orders:", error);
+        const recentBody = document.getElementById('recent-orders-table-body');
+        if (recentBody) recentBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-red-500">Failed to load orders.</td></tr>';
     });
 }

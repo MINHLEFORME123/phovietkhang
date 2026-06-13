@@ -5,7 +5,7 @@ import { collection, getDocs, getDoc, doc, updateDoc, addDoc, deleteDoc, setDoc,
 window.exportTableToExcel = function(tableId, filename = 'export.xlsx') {
     const table = document.getElementById(tableId);
     if (!table) {
-        if (window.showNotification) window.showNotification('KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y bÃ¡ÂºÂ£ng Ã„â€˜Ã¡Â»Æ’ xuÃ¡ÂºÂ¥t dÃ¡Â»Â¯ liÃ¡Â»â€¡u!', 'error');
+        if (window.showNotification) window.showNotification('Không tìm thấy bảng để xuất dữ liệu!', 'error');
         return;
     }
 
@@ -27,7 +27,7 @@ window.exportTableToExcel = function(tableId, filename = 'export.xlsx') {
                     const lastCell = cells[cells.length - 1];
                     // If the cell contains action text or is empty after cleaning, remove it
                     if (lastCell.textContent.toLowerCase().includes('action') ||
-                        lastCell.textContent.toLowerCase().includes('hÃƒÂ nh Ã„â€˜Ã¡Â»â„¢ng') ||
+                        lastCell.textContent.toLowerCase().includes('hành động') ||
                         lastCell.querySelector('button') ||
                         lastCell.innerHTML.trim() === '') {
                         lastCell.remove();
@@ -37,10 +37,10 @@ window.exportTableToExcel = function(tableId, filename = 'export.xlsx') {
 
             const wb = XLSX.utils.table_to_book(clonedTable, { sheet: "Sheet1" });
             XLSX.writeFile(wb, filename);
-            if (window.showNotification) window.showNotification('XuÃ¡ÂºÂ¥t file Excel thÃƒÂ nh cÃƒÂ´ng!', 'success');
+            if (window.showNotification) window.showNotification('Xuất file Excel thành công!', 'success');
         } catch (error) {
-            console.error('LÃ¡Â»â€”i khi xuÃ¡ÂºÂ¥t file Excel:', error);
-            if (window.showNotification) window.showNotification('LÃ¡Â»â€”i khi xuÃ¡ÂºÂ¥t Excel: ' + error.message, 'error');
+            console.error('Lỗi khi xuất file Excel:', error);
+            if (window.showNotification) window.showNotification('Lỗi khi xuất Excel: ' + error.message, 'error');
         }
     };
 
@@ -49,7 +49,7 @@ window.exportTableToExcel = function(tableId, filename = 'export.xlsx') {
         script.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
         script.onload = proceedExport;
         script.onerror = () => {
-            if (window.showNotification) window.showNotification('KhÃƒÂ´ng thÃ¡Â»Æ’ tÃ¡ÂºÂ£i thÃ†Â° viÃ¡Â»â€¡n XLSX!', 'error');
+            if (window.showNotification) window.showNotification('Không thể tải thư viện XLSX!', 'error');
         };
         document.head.appendChild(script);
     } else {
@@ -59,7 +59,7 @@ window.exportTableToExcel = function(tableId, filename = 'export.xlsx') {
 
 const apiKeys = await getApiKeys();
 
-// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Cloudflare Worker Admin Proxy Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+// ─── Cloudflare Worker Admin Proxy ────────────────────────────────────────────
 // After deploying cloudflare-worker/worker.js, paste your worker URL below:
 const CLOUDFLARE_WORKER_URL = 'https://pvk-admin.minhbeo993.workers.dev'; // Cloudflare Worker URL
 const WORKER_SECRET = apiKeys.workerSecret;
@@ -135,7 +135,7 @@ function formatOrderDate(dateObj) {
 
 function getOrderTimeAlert(createdAt, completedAt, status) {
     if (status === 'cancelled') {
-        return { label: 'Ã„ÂÃƒÂ£ hÃ¡Â»Â§y', color: 'gray', badgeClass: 'bg-gray-500/10 text-gray-400 border border-gray-500/20' };
+        return { label: 'Đã hủy', color: 'gray', badgeClass: 'bg-gray-500/10 text-gray-400 border border-gray-500/20' };
     }
 
     const created = createdAt ? (createdAt instanceof Date ? createdAt : new Date(createdAt)) : null;
@@ -152,39 +152,39 @@ function getOrderTimeAlert(createdAt, completedAt, status) {
         if (completedTime) {
             const diffMin = Math.round((completedTime - created) / (60 * 1000));
             return {
-                label: `HoÃƒÂ n tÃ¡ÂºÂ¥t trong ${diffMin} phÃƒÂºt`,
+                label: `Hoàn tất trong ${diffMin} phút`,
                 color: 'green',
                 badgeClass: 'bg-green-500/10 text-green-400 border border-green-500/20'
             };
         }
-        return { label: 'Ã„ÂÃƒÂ£ hoÃƒÂ n tÃ¡ÂºÂ¥t', color: 'green', badgeClass: 'bg-green-500/10 text-green-400 border border-green-500/20' };
+        return { label: 'Đã hoàn tất', color: 'green', badgeClass: 'bg-green-500/10 text-green-400 border border-green-500/20' };
     }
 
     // Active orders (pending, cooking, ready)
     const diffMin = Math.floor((now - created) / (60 * 1000));
     if (diffMin < 1) {
         return {
-            label: 'VÃ¡Â»Â«a xong',
+            label: 'Vừa xong',
             color: 'green',
             badgeClass: 'bg-green-500/10 text-green-400 border border-green-500/20'
         };
     }
     if (diffMin >= 15) {
         return {
-            label: `${diffMin} phÃƒÂºt trÃ†Â°Ã¡Â»â€ºc`,
+            label: `${diffMin} phút trước`,
             color: 'red',
             badgeClass: 'bg-red-500/10 text-red-400 border border-red-500/20 animate-pulse'
         };
     }
     if (diffMin >= 10) {
         return {
-            label: `${diffMin} phÃƒÂºt trÃ†Â°Ã¡Â»â€ºc`,
+            label: `${diffMin} phút trước`,
             color: 'yellow',
             badgeClass: 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20'
         };
     }
     return {
-        label: `${diffMin} phÃƒÂºt trÃ†Â°Ã¡Â»â€ºc`,
+        label: `${diffMin} phút trước`,
         color: 'green',
         badgeClass: 'bg-green-500/10 text-green-400 border border-green-500/20'
     };
@@ -410,11 +410,11 @@ async function callOpenRouterWithFallback(payload, apiKeys = OPENROUTER_API_KEYS
 // --- LOYALTY TIER COMPUTATION (module scope) ---
 function computeLoyaltyTier(totalSpent) {
     const spent = Number(totalSpent) || 0;
-    if (spent >= 40) return { key: 'kim_cuong', labelVi: 'Kim CÃ†Â°Ã†Â¡ng', color: '#7c3aed', icon: 'diamond', discountPercent: 15 };
-    if (spent >= 20) return { key: 'kim', labelVi: 'VÃƒÂ ng', color: '#eab308', icon: 'workspace_premium', discountPercent: 10 };
-    if (spent >= 8) return { key: 'bac', labelVi: 'BÃ¡ÂºÂ¡c', color: '#9ca3af', icon: 'shield', discountPercent: 5 };
-    if (spent >= 4) return { key: 'vang', labelVi: 'Ã„ÂÃ¡Â»â€œng', color: '#9a3412', icon: 'monetization_on', discountPercent: 0 };
-    return { key: 'dong', labelVi: 'Ã„ÂÃ¡Â»â€œng', color: '#78350f', icon: 'stars', discountPercent: 0 };
+    if (spent >= 40) return { key: 'kim_cuong', labelVi: 'Kim Cương', color: '#7c3aed', icon: 'diamond', discountPercent: 15 };
+    if (spent >= 20) return { key: 'kim', labelVi: 'Vàng', color: '#eab308', icon: 'workspace_premium', discountPercent: 10 };
+    if (spent >= 8) return { key: 'bac', labelVi: 'Bạc', color: '#9ca3af', icon: 'shield', discountPercent: 5 };
+    if (spent >= 4) return { key: 'vang', labelVi: 'Đồng', color: '#9a3412', icon: 'monetization_on', discountPercent: 0 };
+    return { key: 'dong', labelVi: 'Đồng', color: '#78350f', icon: 'stars', discountPercent: 0 };
 }
 
 // --- LIST ALL USERS (module scope) ---
@@ -475,13 +475,13 @@ if (userTableBody) {
                         </select>
                     </td>
                     <td class="py-3 px-4 text-secondary text-sm">
-                        ${totalSpent.toLocaleString('vi-VN')} Ã„â€˜
+                        ${totalSpent.toLocaleString('vi-VN')} Ä'
                     </td>
                     <td class="py-3 px-4">
                         <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold" style="background:${tier.color}22; color:${tier.color}; border:1px solid ${tier.color}44;">
                             <span class="material-symbols-outlined text-[14px]" style="color:${tier.color}">${tier.icon}</span>
                             ${tier.labelVi}
-                            ${tier.discountPercent > 0 ? `(Ã¢Ë†â€™${tier.discountPercent}%)` : ''}
+                            ${tier.discountPercent > 0 ? `(−${tier.discountPercent}%)` : ''}
                         </span>
                     </td>
                 `;
@@ -606,7 +606,7 @@ if (dashboardContainer) {
 
             // Update DOM stats
             const statRevEl = document.getElementById('stat-revenue');
-            if (statRevEl) statRevEl.textContent = todayRevenue.toFixed(2) + 'Ã¢â€šÂ¬';
+            if (statRevEl) statRevEl.textContent = todayRevenue.toFixed(2) + '€';
             const statActEl = document.getElementById('stat-active');
             if (statActEl) statActEl.textContent = activeCount;
             const statCompEl = document.getElementById('stat-completed');
@@ -643,7 +643,7 @@ if (dashboardContainer) {
                             </td>
                             <td class="py-3 px-4">${order.customerName}</td>
                             <td class="py-3 px-4 max-w-[200px] truncate" title="${itemsText}">${itemsText}</td>
-                            <td class="py-3 px-4 text-green-400 font-medium">${order.totalPrice.toFixed(2)}Ã¢â€šÂ¬</td>
+                            <td class="py-3 px-4 text-green-400 font-medium">${order.totalPrice.toFixed(2)}€</td>
                             <td class="py-3 px-4">
                                 <span class="px-2 py-0.5 rounded text-xs font-bold uppercase bg-${badgeColor}-500/10 text-${badgeColor}-400 border border-${badgeColor}-500/20">${order.status}</span>
                             </td>
@@ -670,7 +670,7 @@ if (dashboardContainer) {
                         data: {
                             labels: trendLabels,
                             datasets: [{
-                                label: 'Revenue (Ã¢â€šÂ¬)',
+                                label: 'Revenue (€)',
                                 data: trendData,
                                 borderColor: '#3b82f6',
                                 backgroundColor: 'rgba(59, 130, 246, 0.1)',
@@ -810,7 +810,7 @@ if (orderManagerContainer) {
                     ${optsText}
                 </td>
                 <td class="py-2 px-3 text-center">${item.qty}</td>
-                <td class="py-2 px-3 text-right font-medium">${(item.price * item.qty).toFixed(2)}Ã¢â€šÂ¬</td>
+                <td class="py-2 px-3 text-right font-medium">${(item.price * item.qty).toFixed(2)}€</td>
             `;
             modalOrderItems.appendChild(tr);
         });
@@ -822,7 +822,7 @@ if (orderManagerContainer) {
             modalNotesBlock.classList.add('hidden');
         }
 
-        modalTotalPrice.textContent = order.totalPrice.toFixed(2) + 'Ã¢â€šÂ¬';
+        modalTotalPrice.textContent = order.totalPrice.toFixed(2) + '€';
 
         detailModal.classList.remove('hidden');
     };
@@ -853,34 +853,34 @@ if (orderManagerContainer) {
                     const orderLang = order.language || 'en';
                     const readyTranslations = {
                         vi: {
-                            subject: `[PhÃ¡Â»Å¸ ViÃ¡Â»â€¡t Khang] Ã„ÂÃ†Â¡n hÃƒÂ ng cÃ¡Â»Â§a bÃ¡ÂºÂ¡n Ã„â€˜ÃƒÂ£ sÃ¡ÂºÂµn sÃƒÂ ng! - #${orderId.substring(0, 8).toUpperCase()}`,
-                            title: "Ã„ÂÃ†Â N HÃƒâ‚¬NG Ã„ÂÃƒÆ’ SÃ¡ÂºÂ´N SÃƒâ‚¬NG",
-                            intro: `Xin chÃƒÂ o <strong>${order.customerName || 'QuÃƒÂ½ khÃƒÂ¡ch'}</strong>,<br><br>Tin vui! Ã„ÂÃ†Â¡n hÃƒÂ ng cÃ¡Â»Â§a bÃ¡ÂºÂ¡n tÃ¡ÂºÂ¡i PhÃ¡Â»Å¸ ViÃ¡Â»â€¡t Khang Ã„â€˜ÃƒÂ£ Ã„â€˜Ã†Â°Ã¡Â»Â£c chÃ¡ÂºÂ¿ biÃ¡ÂºÂ¿n xong vÃƒÂ  sÃ¡ÂºÂµn sÃƒÂ ng phÃ¡Â»Â¥c vÃ¡Â»Â¥.`,
-                            summaryHeader: "Chi tiÃ¡ÂºÂ¿t Ã„â€˜Ã†Â¡n hÃƒÂ ng:",
-                            totalLabel: "TÃ¡Â»â€¢ng cÃ¡Â»â„¢ng",
-                            serviceType: "HÃƒÂ¬nh thÃ¡Â»Â©c",
-                            orderId: "MÃƒÂ£ Ã„â€˜Ã†Â¡n hÃƒÂ ng",
-                            footer: "CÃ¡ÂºÂ£m Ã†Â¡n quÃƒÂ½ khÃƒÂ¡ch Ã„â€˜ÃƒÂ£ Ã¡Â»Â§ng hÃ¡Â»â„¢ nhÃƒÂ  hÃƒÂ ng. PhÃ¡Â»Å¸ ViÃ¡Â»â€¡t Khang Ã‚Â© 2026."
+                            subject: `[Phở Việt Khang] Đơn hàng của bạn đã sẵn sàng! - #${orderId.substring(0, 8).toUpperCase()}`,
+                            title: "ĐƠN HÀNG ĐÃ SẴN SÀNG",
+                            intro: `Xin chào <strong>${order.customerName || 'Quý khách'}</strong>,<br><br>Tin vui! Đơn hàng của bạn tại Phở Việt Khang đã được chế biến xong và sẵn sàng phục vụ.`,
+                            summaryHeader: "Chi tiết đơn hàng:",
+                            totalLabel: "Tổng cộng",
+                            serviceType: "Hình thức",
+                            orderId: "Mã đơn hàng",
+                            footer: "Cảm ơn quý khách đã ủng hộ nhà hàng. Phở Việt Khang © 2026."
                         },
                         en: {
-                            subject: `[PhÃ¡Â»Å¸ ViÃ¡Â»â€¡t Khang] Your Order is Ready! - #${orderId.substring(0, 8).toUpperCase()}`,
+                            subject: `[Phở Việt Khang] Your Order is Ready! - #${orderId.substring(0, 8).toUpperCase()}`,
                             title: "YOUR ORDER IS READY",
-                            intro: `Hi <strong>${order.customerName || 'Customer'}</strong>,<br><br>Great news! Your order at PhÃ¡Â»Å¸ ViÃ¡Â»â€¡t Khang is ready and waiting for you.`,
+                            intro: `Hi <strong>${order.customerName || 'Customer'}</strong>,<br><br>Great news! Your order at Phở Việt Khang is ready and waiting for you.`,
                             summaryHeader: "Here is a summary of your order:",
                             totalLabel: "Total Price",
                             serviceType: "Service Type",
                             orderId: "Order ID",
-                            footer: "Thank you for dining with us! PhÃ¡Â»Å¸ ViÃ¡Â»â€¡t Khang Ã‚Â© 2026."
+                            footer: "Thank you for dining with us! Phở Việt Khang © 2026."
                         },
                         fi: {
-                            subject: `[PhÃ¡Â»Å¸ ViÃ¡Â»â€¡t Khang] Tilauksesi on valmis! - #${orderId.substring(0, 8).toUpperCase()}`,
+                            subject: `[Phở Việt Khang] Tilauksesi on valmis! - #${orderId.substring(0, 8).toUpperCase()}`,
                             title: "TILAUKSESI ON VALMIS",
-                            intro: `Hei <strong>${order.customerName || 'Asiakas'}</strong>,<br><br>Hienoja uutisia! Tilauksesi PhÃ¡Â»Å¸ ViÃ¡Â»â€¡t Khangissa on valmis ja odottaa sinua.`,
-                            summaryHeader: "TÃƒÂ¤ssÃƒÂ¤ on yhteenveto tilauksestasi:",
-                            totalLabel: "YhteensÃƒÂ¤",
+                            intro: `Hei <strong>${order.customerName || 'Asiakas'}</strong>,<br><br>Hienoja uutisia! Tilauksesi Phở Việt Khangissa on valmis ja odottaa sinua.`,
+                            summaryHeader: "Tässä on yhteenveto tilauksestasi:",
+                            totalLabel: "Yhteensä",
                             serviceType: "Palvelutyyppi",
                             orderId: "Tilaustunnus",
-                            footer: "Kiitos asioinnistasi kanssamme! PhÃ¡Â»Å¸ ViÃ¡Â»â€¡t Khang Ã‚Â© 2026."
+                            footer: "Kiitos asioinnistasi kanssamme! Phở Việt Khang © 2026."
                         }
                     };
 
@@ -899,7 +899,7 @@ if (orderManagerContainer) {
                                 ${itemsHtml}
                             </ul>
 
-                            <p style="font-size: 1.1em;"><strong>${rData.totalLabel}:</strong> <span style="color: #10b981; font-weight: bold;">${(order.totalPrice || 0).toFixed(2)}Ã¢â€šÂ¬</span></p>
+                            <p style="font-size: 1.1em;"><strong>${rData.totalLabel}:</strong> <span style="color: #10b981; font-weight: bold;">${(order.totalPrice || 0).toFixed(2)}€</span></p>
 
                             <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 20px; border: 1px solid #e9ecef;">
                                 <p style="margin: 0; font-size: 0.9em; color: #555;"><strong>${rData.serviceType}:</strong> ${order.orderType === 'dine-in' ? `Dine-in (Table ${order.tableNumber || 'N/A'})` : order.orderType === 'delivery' ? 'Delivery' : 'Takeaway'}</p>
@@ -989,10 +989,10 @@ if (orderManagerContainer) {
                 <td class="py-3.5 px-4">
                     <span class="capitalize font-medium">${order.orderType === 'dine-in' ? `Dine-In (Table ${order.tableNumber || 'N/A'})` : order.orderType}</span>
                 </td>
-                <td class="py-3.5 px-4 text-green-400 font-semibold">${order.totalPrice.toFixed(2)}Ã¢â€šÂ¬</td>
+                <td class="py-3.5 px-4 text-green-400 font-semibold">${order.totalPrice.toFixed(2)}€</td>
                 <td class="py-3.5 px-4">
                     ${order.emailConfirmed === false ?
-                        `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">ChÃ¡Â»Â email</span>` :
+                        `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">Chờ email</span>` :
                         `<span class="px-2 py-0.5 rounded text-xs font-bold uppercase bg-${badgeColor}-500/10 text-${badgeColor}-400 border border-${badgeColor}-500/20">${order.status}</span>`
                     }
                 </td>
@@ -1150,7 +1150,7 @@ function renderCurrentAddingChoices() {
         const row = document.createElement('div');
         row.className = 'flex items-center justify-between bg-surface-highlight p-1.5 rounded text-xs text-white';
         row.innerHTML = `
-            <span>${ch.labelVi} / ${ch.labelEn} / ${ch.labelFi} (${ch.price > 0 ? '+' + ch.price.toFixed(2) + 'Ã¢â€šÂ¬' : 'Free'})</span>
+            <span>${ch.labelVi} / ${ch.labelEn} / ${ch.labelFi} (${ch.price > 0 ? '+' + ch.price.toFixed(2) + '€' : 'Free'})</span>
             <button type="button" class="text-red-400 hover:text-red-300 px-1 font-bold text-sm" data-idx="${idx}">&times;</button>
         `;
         row.querySelector('button').addEventListener('click', () => {
@@ -1206,7 +1206,7 @@ function renderOptions() {
 
         const choicesHtml = opt.choices.map(c =>
             `<span class="inline-block bg-gray-800 text-secondary text-[11px] px-2 py-0.5 rounded mr-1">
-                ${c.labelVi || c.label} (${c.price > 0 ? '+' + c.price.toFixed(2) + 'Ã¢â€šÂ¬' : 'Free'})
+                ${c.labelVi || c.label} (${c.price > 0 ? '+' + c.price.toFixed(2) + '€' : 'Free'})
              </span>`
         ).join('');
 
@@ -1352,34 +1352,34 @@ if (btnAiScan) {
             For each dish:
             1. Translate name/description to Vietnamese, English, Finnish.
             2. Auto-generate high-quality Vietnamese description if missing, then translate.
-            3. Categorize in three languages (e.g. categoryVi: "PhÃ¡Â»Å¸", categoryEn: "Pho", categoryFi: "Pho"). DO NOT use "MÃƒÂ³n chÃƒÂ­nh".
+            3. Categorize in three languages (e.g. categoryVi: "Phở", categoryEn: "Pho", categoryFi: "Pho"). DO NOT use "Món chính".
             4. Infer options:
                - ONLY add PAID options (price > 0) IF they are EXPLICITLY written. Do NOT hallucinate.
-               - You CAN and SHOULD auto-generate common FREE exclusion options (price = 0) based on the dish type. For example, for "PhÃ¡Â»Å¸" or "BÃƒÂºn", add multiple "toggle" options like "KhÃƒÂ´ng hÃƒÂ nh" (No onions), "KhÃƒÂ´ng rau mÃƒÂ¹i" (No cilantro), "KhÃƒÂ´ng mÃƒÂ¬ chÃƒÂ­nh" (No MSG). For dishes with peanuts, add "KhÃƒÂ´ng lÃ¡ÂºÂ¡c" (No peanuts).
+               - You CAN and SHOULD auto-generate common FREE exclusion options (price = 0) based on the dish type. For example, for "Phở" or "Bún", add multiple "toggle" options like "Không hành" (No onions), "Không rau mùi" (No cilantro), "Không mì chính" (No MSG). For dishes with peanuts, add "Không lạc" (No peanuts).
 
             You MUST return ONLY a JSON object with a single key "items" containing the array of dishes. No markdown blocks.
             JSON Structure:
             {
               "items": [
                 {
-                  "nameVi": "TÃƒÂªn mÃƒÂ³n",
-                  "descVi": "MÃƒÂ´ tÃ¡ÂºÂ£ hÃ¡ÂºÂ¥p dÃ¡ÂºÂ«n",
+                  "nameVi": "Tên món",
+                  "descVi": "Mô tả hấp dẫn",
                   "nameEn": "English name",
                   "descEn": "English desc",
                   "nameFi": "Finnish name",
                   "descFi": "Finnish desc",
                   "price": 12.50,
-                  "categoryVi": "PhÃ¡Â»Å¸",
+                  "categoryVi": "Phở",
                   "categoryEn": "Pho",
                   "categoryFi": "Pho",
                   "options": [
                     {
-                      "nameVi": "CÃ¡ÂºÂ¥p Ã„â€˜Ã¡Â»â„¢ cay",
+                      "nameVi": "Cấp độ cay",
                       "nameEn": "Spicy Level",
                       "nameFi": "Tulisuusaste",
                       "type": "single-select",
                       "choices": [
-                        { "labelVi": "KhÃƒÂ´ng cay", "labelEn": "Not Spicy", "labelFi": "Ei tulinen", "price": 0 },
+                        { "labelVi": "Không cay", "labelEn": "Not Spicy", "labelFi": "Ei tulinen", "price": 0 },
                         { "labelVi": "Cay", "labelEn": "Spicy", "labelFi": "Tulinen", "price": 0 }
                       ]
                     }
@@ -1440,7 +1440,7 @@ if (btnAiScan) {
 
             let successCount = 0;
             for (const item of items) {
-                const catVi = item.categoryVi || item.category || 'PhÃ¡Â»Å¸';
+                const catVi = item.categoryVi || item.category || 'Phở';
                 await addDoc(collection(db, "menu"), {
                     nameVi: item.nameVi || 'Unknown',
                     descVi: item.descVi || '',
@@ -1504,34 +1504,34 @@ if (btnAiExtract) {
             const systemPrompt = `You are an expert data parser. Extract ALL food items from the CSV data.
             1. Translate missing names/descriptions to VI, EN, FI.
             2. Auto-generate appetizing Vietnamese description if missing, then translate.
-            3. Categorize in three languages (e.g. categoryVi: "PhÃ¡Â»Å¸", categoryEn: "Pho", categoryFi: "Pho"). DO NOT use "MÃƒÂ³n chÃƒÂ­nh".
+            3. Categorize in three languages (e.g. categoryVi: "Phở", categoryEn: "Pho", categoryFi: "Pho"). DO NOT use "Món chính".
             4. Infer options:
                - ONLY add PAID options (price > 0) IF they are EXPLICITLY present in the CSV. Do NOT hallucinate paid options.
-               - You CAN and SHOULD auto-generate common FREE exclusion options (price = 0). For example, for "PhÃ¡Â»Å¸" or "BÃƒÂºn", add multiple "toggle" options like "KhÃƒÂ´ng hÃƒÂ nh" (No onions), "KhÃƒÂ´ng rau mÃƒÂ¹i" (No cilantro), "KhÃƒÂ´ng mÃƒÂ¬ chÃƒÂ­nh" (No MSG).
+               - You CAN and SHOULD auto-generate common FREE exclusion options (price = 0). For example, for "Phở" or "Bún", add multiple "toggle" options like "Không hành" (No onions), "Không rau mùi" (No cilantro), "Không mì chính" (No MSG).
 
             You MUST return ONLY a JSON object with a single key "items" containing the array of dishes. No markdown blocks.
             JSON Structure:
             {
               "items": [
                 {
-                  "nameVi": "TÃƒÂªn mÃƒÂ³n",
-                  "descVi": "MÃƒÂ´ tÃ¡ÂºÂ£ hÃ¡ÂºÂ¥p dÃ¡ÂºÂ«n",
+                  "nameVi": "Tên món",
+                  "descVi": "Mô tả hấp dẫn",
                   "nameEn": "English name",
                   "descEn": "English desc",
                   "nameFi": "Finnish name",
                   "descFi": "Finnish desc",
                   "price": 12.50,
-                  "categoryVi": "PhÃ¡Â»Å¸",
+                  "categoryVi": "Phở",
                   "categoryEn": "Pho",
                   "categoryFi": "Pho",
                   "options": [
                     {
-                      "nameVi": "CÃ¡ÂºÂ¥p Ã„â€˜Ã¡Â»â„¢ cay",
+                      "nameVi": "Cấp độ cay",
                       "nameEn": "Spicy Level",
                       "nameFi": "Tulisuusaste",
                       "type": "single-select",
                       "choices": [
-                        { "labelVi": "KhÃƒÂ´ng cay", "labelEn": "Not Spicy", "labelFi": "Ei tulinen", "price": 0 },
+                        { "labelVi": "Không cay", "labelEn": "Not Spicy", "labelFi": "Ei tulinen", "price": 0 },
                         { "labelVi": "Cay", "labelEn": "Spicy", "labelFi": "Tulinen", "price": 0 }
                       ]
                     }
@@ -1594,7 +1594,7 @@ if (btnAiExtract) {
 
             let successCount = 0;
             for (const item of items) {
-                const catVi = item.categoryVi || item.category || 'PhÃ¡Â»Å¸';
+                const catVi = item.categoryVi || item.category || 'Phở';
                 await addDoc(collection(db, "menu"), {
                     nameVi: item.nameVi || 'Unknown',
                     descVi: item.descVi || '',
@@ -1786,7 +1786,7 @@ if (foodTableBody) {
                 <td class="py-3 px-4"><img src="${item.image}" class="w-12 h-12 object-cover rounded" onerror="this.src='https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=100'"></td>
                 <td class="py-3 px-4">
                     <span class="font-bold text-white">${item.nameVi || ''}</span>
-                    ${item.allergenWarning ? '<span class="inline-flex items-center gap-1 bg-red-900/30 text-red-400 text-xs px-2 py-0.5 rounded-md font-semibold border border-red-800/50 ml-2" title="ChÃ¡Â»Â©a thÃƒÂ nh phÃ¡ÂºÂ§n dÃ¡Â»â€¦ gÃƒÂ¢y dÃ¡Â»â€¹ Ã¡Â»Â©ng"><span class="material-symbols-outlined text-[14px]">warning</span> DÃ¡Â»â€¹ Ã¡Â»Â©ng</span>' : ''}
+                    ${item.allergenWarning ? '<span class="inline-flex items-center gap-1 bg-red-900/30 text-red-400 text-xs px-2 py-0.5 rounded-md font-semibold border border-red-800/50 ml-2" title="Chứa thành phần dễ gây dị ứng"><span class="material-symbols-outlined text-[14px]">warning</span> Dị ứng</span>' : ''}
                     <br>
                     <span class="text-xs text-secondary">EN: ${item.nameEn || ''}</span><br>
                     <span class="text-xs text-secondary">FI: ${item.nameFi || ''}</span>
@@ -1796,7 +1796,7 @@ if (foodTableBody) {
                     <span class="text-xs text-secondary">EN: ${item.categoryEn || ''}</span><br>
                     <span class="text-xs text-secondary">FI: ${item.categoryFi || ''}</span>
                 </td>
-                <td class="py-3 px-4">Ã¢â€šÂ¬${(item.price || 0).toFixed(2)}</td>
+                <td class="py-3 px-4">€${(item.price || 0).toFixed(2)}</td>
                 <td class="py-3 px-4">${optCount || '<span class="text-xs text-secondary/50">None</span>'}</td>
                 ${window.location.pathname.includes('/host/') ? '' : `
                 <td class="py-3 px-4 flex gap-2">
@@ -1895,7 +1895,7 @@ if (btnAutoDesc) {
     btnAutoDesc.addEventListener('click', async () => {
         const nameVi = document.getElementById('food-name-vi').value;
         if (!nameVi) {
-            window.showNotification('Vui lÃƒÂ²ng nhÃ¡ÂºÂ­p TÃƒÂªn mÃƒÂ³n (TiÃ¡ÂºÂ¿ng ViÃ¡Â»â€¡t) trÃ†Â°Ã¡Â»â€ºc!', 'info');
+            window.showNotification('Vui lòng nhập Tên món (Tiếng Việt) trước!', 'info');
             return;
         }
 
@@ -1909,11 +1909,11 @@ if (btnAutoDesc) {
                 messages: [
                     {
                         role: 'system',
-                        content: 'BÃ¡ÂºÂ¡n lÃƒÂ  chuyÃƒÂªn gia viÃ¡ÂºÂ¿t content Ã¡ÂºÂ©m thÃ¡Â»Â±c nhÃƒÂ  hÃƒÂ ng ViÃ¡Â»â€¡t Nam cao cÃ¡ÂºÂ¥p. NhiÃ¡Â»â€¡m vÃ¡Â»Â¥ cÃ¡Â»Â§a bÃ¡ÂºÂ¡n lÃƒÂ  viÃ¡ÂºÂ¿t mÃ¡Â»â„¢t Ã„â€˜oÃ¡ÂºÂ¡n mÃƒÂ´ tÃ¡ÂºÂ£ mÃƒÂ³n Ã„Æ’n (Description) bÃ¡ÂºÂ±ng TiÃ¡ÂºÂ¿ng ViÃ¡Â»â€¡t cÃ¡Â»Â±c kÃ¡Â»Â³ hÃ¡ÂºÂ¥p dÃ¡ÂºÂ«n, kÃƒÂ­ch thÃƒÂ­ch vÃ¡Â»â€¹ giÃƒÂ¡c, giÃ¡Â»â€ºi thiÃ¡Â»â€¡u sÃ†Â¡ vÃ¡Â»Â nguyÃƒÂªn liÃ¡Â»â€¡u vÃƒÂ  cÃƒÂ¡ch chÃ¡ÂºÂ¿ biÃ¡ÂºÂ¿n. Ã„ÂoÃ¡ÂºÂ¡n vÃ„Æ’n phÃ¡ÂºÂ£i ngÃ¡ÂºÂ¯n gÃ¡Â»Ân, dÃƒÂ i tÃ¡Â»â€˜i Ã„â€˜a 3 cÃƒÂ¢u. ChÃ¡Â»â€° trÃ¡ÂºÂ£ vÃ¡Â»Â vÃ„Æ’n bÃ¡ÂºÂ£n, khÃƒÂ´ng dÃƒÂ¹ng ngoÃ¡ÂºÂ·c kÃƒÂ©p, khÃƒÂ´ng dÃƒÂ¹ng markdown.'
+                        content: 'Bạn là chuyên gia viết content ẩm thực nhà hàng Việt Nam cao cấp. Nhiệm vụ của bạn là viết một đoạn mô tả món ăn (Description) bằng Tiếng Việt cực kỳ hấp dẫn, kích thích vị giác, giới thiệu sơ về nguyên liệu và cách chế biến. Đoạn văn phải ngắn gọn, dài tối đa 3 câu. Chỉ trả về văn bản, không dùng ngoặc kép, không dùng markdown.'
                     },
                     {
                         role: 'user',
-                        content: `TÃƒÂªn mÃƒÂ³n Ã„Æ’n: ${nameVi}`
+                        content: `Tên món ăn: ${nameVi}`
                     }
                 ]
             };
@@ -1924,7 +1924,7 @@ if (btnAutoDesc) {
 
         } catch (error) {
             console.error('Auto Desc Error:', error);
-            window.showNotification('LÃ¡Â»â€”i khi tÃ¡ÂºÂ¡o mÃƒÂ´ tÃ¡ÂºÂ£. Vui lÃƒÂ²ng thÃ¡Â»Â­ lÃ¡ÂºÂ¡i.', 'error');
+            window.showNotification('Lỗi khi tạo mô tả. Vui lòng thử lại.', 'error');
         } finally {
             btnAutoDesc.innerHTML = originalText;
             btnAutoDesc.disabled = false;
@@ -1984,7 +1984,7 @@ if (foodTableBody2) {
             const row = document.createElement('div');
             row.className = 'flex items-center justify-between bg-surface-highlight p-1 rounded text-xs text-white';
             row.innerHTML = `
-                <span>${ch.labelVi} / ${ch.labelEn} / ${ch.labelFi} (${ch.price > 0 ? '+' + ch.price.toFixed(2) + 'Ã¢â€šÂ¬' : 'Free'})</span>
+                <span>${ch.labelVi} / ${ch.labelEn} / ${ch.labelFi} (${ch.price > 0 ? '+' + ch.price.toFixed(2) + '€' : 'Free'})</span>
                 <button type="button" class="text-red-400 hover:text-red-300 px-1 font-bold" data-idx="${idx}">&times;</button>
             `;
             row.querySelector('button').addEventListener('click', () => {
@@ -2041,7 +2041,7 @@ if (foodTableBody2) {
 
             const choicesHtml = opt.choices.map(c =>
                 `<span class="inline-block bg-gray-800 text-secondary text-[10px] px-1.5 py-0.5 rounded mr-1">
-                    ${c.labelVi || c.label} (${c.price > 0 ? '+' + c.price.toFixed(2) + 'Ã¢â€šÂ¬' : 'Free'})
+                    ${c.labelVi || c.label} (${c.price > 0 ? '+' + c.price.toFixed(2) + '€' : 'Free'})
                  </span>`
             ).join('');
 
@@ -2292,17 +2292,17 @@ if (foodTableBody2) {
             <!-- Message Area -->
             <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-3" id="admin-chat-messages">
                 <div class="admin-chat-bubble bubble-ai">
-                    Xin chÃƒÂ o! TÃƒÂ´i lÃƒÂ  TrÃ¡Â»Â£ lÃƒÂ½ AI cÃ¡Â»Â§a PhÃ¡Â»â€˜ ViÃ¡Â»â€¡t Khang. TÃƒÂ´i cÃƒÂ³ thÃ¡Â»Æ’ hÃ¡Â»â€” trÃ¡Â»Â£ bÃ¡ÂºÂ¡n kiÃ¡Â»Æ’m tra Ã„â€˜Ã†Â¡n hÃƒÂ ng hÃƒÂ´m nay hoÃ¡ÂºÂ·c cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t giÃƒÂ¡ cÃ¡ÂºÂ£ cÃƒÂ¡c mÃƒÂ³n Ã„Æ’n trÃ¡Â»Â±c tiÃ¡ÂºÂ¿p. BÃ¡ÂºÂ¡n cÃ¡ÂºÂ§n giÃƒÂºp gÃƒÂ¬?
+                    Xin chào! Tôi là Trợ lý AI của Phố Việt Khang. Tôi có thể hỗ trợ bạn kiểm tra đơn hàng hôm nay hoặc cập nhật giá cả các món ăn trực tiếp. Bạn cần giúp gì?
                 </div>
             </div>
 
             <!-- Input Bar -->
             <div class="p-3 border-t border-gray-800 bg-[#121824] flex gap-2 relative">
                 <input type="file" id="admin-chat-file" accept="image/*,.doc,.docx,.xls,.xlsx,.csv" class="hidden">
-                <button id="admin-chat-attach" class="bg-[#1e293b] hover:bg-gray-700 text-secondary hover:text-white p-2 rounded-xl border border-gray-700 transition-colors flex items-center justify-center" title="Ã„ÂÃƒÂ­nh kÃƒÂ¨m (Ã¡ÂºÂ¢nh, Word, Excel)">
+                <button id="admin-chat-attach" class="bg-[#1e293b] hover:bg-gray-700 text-secondary hover:text-white p-2 rounded-xl border border-gray-700 transition-colors flex items-center justify-center" title="Đính kèm (Ảnh, Word, Excel)">
                     <span class="material-symbols-outlined text-[18px]">attach_file</span>
                 </button>
-                <input type="text" id="admin-chat-input" placeholder="HÃ¡Â»Âi vÃ¡Â»Â Ã„â€˜Ã†Â¡n hÃƒÂ ng, chÃ¡Â»â€°nh giÃƒÂ¡ sÃ¡Â»â€˜t..." class="flex-1 bg-[#0b0f19] border border-gray-700 rounded-xl text-white px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary">
+                <input type="text" id="admin-chat-input" placeholder="Hỏi về đơn hàng, chỉnh giá sốt..." class="flex-1 bg-[#0b0f19] border border-gray-700 rounded-xl text-white px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary">
                 <button id="admin-chat-send" class="bg-primary hover:bg-blue-600 text-white p-2 rounded-xl transition-colors flex items-center justify-center">
                     <span class="material-symbols-outlined text-[18px]">send</span>
                 </button>
@@ -2346,7 +2346,7 @@ if (foodTableBody2) {
         const originalIcon = attachIcon.textContent;
         attachIcon.textContent = 'hourglass_empty';
         attachIcon.classList.add('animate-spin');
-        chatInput.placeholder = 'Ã„Âang xÃ¡Â»Â­ lÃƒÂ½ file...';
+        chatInput.placeholder = 'Đang xử lý file...';
         chatInput.disabled = true;
 
         try {
@@ -2387,17 +2387,17 @@ if (foodTableBody2) {
                         const imgId = "ATTACHED_IMAGE_" + Date.now();
                         window.__uploadedImages[imgId] = dataUrl;
 
-                        chatInput.value += (chatInput.value ? ' ' : '') + `[Ã¡ÂºÂ¢nh Ã„â€˜ÃƒÂ­nh kÃƒÂ¨m: ${imgId}] `;
+                        chatInput.value += (chatInput.value ? ' ' : '') + `[Ảnh đính kèm: ${imgId}] `;
 
                         attachIcon.classList.remove('animate-spin');
                         attachIcon.textContent = originalIcon;
-                        chatInput.placeholder = 'HÃ¡Â»Âi vÃ¡Â»Â Ã„â€˜Ã†Â¡n hÃƒÂ ng, chÃ¡Â»â€°nh giÃƒÂ¡ sÃ¡Â»â€˜t...';
+                        chatInput.placeholder = 'Hỏi về đơn hàng, chỉnh giá sốt...';
                         chatInput.disabled = false;
                         chatInput.focus();
                         fileInput.value = '';
                     };
                     img.onerror = () => {
-                        alert("LÃ¡Â»â€”i khi Ã„â€˜Ã¡Â»Âc Ã¡ÂºÂ£nh!");
+                        alert("Lỗi khi đọc ảnh!");
                         attachIcon.classList.remove('animate-spin');
                         attachIcon.textContent = originalIcon;
                         chatInput.disabled = false;
@@ -2412,7 +2412,7 @@ if (foodTableBody2) {
                 await loadScript('https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js');
                 const arrayBuffer = await file.arrayBuffer();
                 const result = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
-                chatInput.value += (chatInput.value ? '\\n' : '') + `[NÃ¡Â»â„¢i dung file Word ${file.name}:\\n${result.value}]\\n`;
+                chatInput.value += (chatInput.value ? '\\n' : '') + `[Ná»™i dung file Word ${file.name}:\\n${result.value}]\\n`;
             }
             // 3. Handle Excel (.xlsx, .xls, .csv)
             else if (['xlsx', 'xls', 'csv'].includes(ext)) {
@@ -2422,18 +2422,18 @@ if (foodTableBody2) {
                 const firstSheetName = workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[firstSheetName];
                 const csvStr = XLSX.utils.sheet_to_csv(worksheet);
-                chatInput.value += (chatInput.value ? '\\n' : '') + `[NÃ¡Â»â„¢i dung file Excel ${file.name}:\\n${csvStr}]\\n`;
+                chatInput.value += (chatInput.value ? '\\n' : '') + `[Ná»™i dung file Excel ${file.name}:\\n${csvStr}]\\n`;
             }
             else {
-                alert('Ã„ÂÃ¡Â»â€¹nh dÃ¡ÂºÂ¡ng file khÃƒÂ´ng Ã„â€˜Ã†Â°Ã¡Â»Â£c hÃ¡Â»â€” trÃ¡Â»Â£!');
+                alert('Định dạng file không được hỗ trợ!');
             }
         } catch (err) {
             console.error(err);
-            alert('LÃ¡Â»â€”i xÃ¡Â»Â­ lÃƒÂ½ file: ' + err.message);
+            alert('Lỗi xử lý file: ' + err.message);
         } finally {
             attachIcon.classList.remove('animate-spin');
             attachIcon.textContent = originalIcon;
-            chatInput.placeholder = 'HÃ¡Â»Âi vÃ¡Â»Â Ã„â€˜Ã†Â¡n hÃƒÂ ng, chÃ¡Â»â€°nh giÃƒÂ¡ sÃ¡Â»â€˜t...';
+            chatInput.placeholder = 'Hỏi về đơn hàng, chỉnh giá sốt...';
             chatInput.disabled = false;
             chatInput.focus();
             fileInput.value = ''; // Reset input
@@ -2469,7 +2469,7 @@ if (foodTableBody2) {
     const chatMessages = [
         {
             role: 'system',
-            content: `You are a helpful Vietnamese restaurant AI Admin Assistant for PhÃ¡Â»Å¸ ViÃ¡Â»â€¡t Khang restaurant.
+            content: `You are a helpful Vietnamese restaurant AI Admin Assistant for Phở Việt Khang restaurant.
 You have full access to Firebase tools that can manage orders, food menu, AND Firebase Auth user accounts with real admin privileges.
 You MUST answer in Vietnamese.
 
@@ -2483,14 +2483,14 @@ To call a tool, output a <tool_call> JSON block:
 </tool_call>
 
 Rules:
-- You CAN output multiple <tool_call> blocks in one turn Ã¢â‚¬â€ they run in parallel.
+- You CAN output multiple <tool_call> blocks in one turn — they run in parallel.
 - When outputting tool calls, output ONLY the <tool_call> blocks, nothing else.
 - After receiving tool results, formulate your final Vietnamese response.
 - You MAY call tools again in a subsequent turn if you need more information.
 
-Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
-Ã°Å¸â€œÂ¦ ORDER TOOLS
-Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+═══════════════════════════════════════════════
+📦 ORDER TOOLS
+═══════════════════════════════════════════════
 1. getOrdersSoldToday()
    Args: {}
    Returns today's orders: count, total revenue, and list.
@@ -2507,9 +2507,9 @@ Rules:
    Args: { "orderId": string }
    Permanently deletes an order.
 
-Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
-Ã°Å¸ÂÅ“ MENU TOOLS
-Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+═══════════════════════════════════════════════
+🍜 MENU TOOLS
+═══════════════════════════════════════════════
 5. listAllFoodItems()
    Args: {}
    Returns all food items with IDs, prices, categories, and options.
@@ -2596,7 +2596,7 @@ Rules:
 
 11o. duplicateMenuItem(dishId)
     Args: { "dishId": string }
-    Duplicates a menu item (clones document and appends " (BÃ¡ÂºÂ£n sao)").
+    Duplicates a menu item (clones document and appends " (Bản sao)").
 
 11p. deleteMenuItem(dishId)
     Args: { "dishId": string }
@@ -2606,28 +2606,32 @@ Rules:
     Args: { "dishId": string, "customFields": object }
     Updates any other custom metadata fields in the menu item.
 
-Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
-Ã°Å¸ÂÂ  HOMEPAGE CONFIG TOOLS
-Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
-11r. updateHomepageHero(imageUrl, titleVi, descVi)
-    Args: { "imageUrl": string, "titleVi": string, "descVi": string }
-    Updates the hero background image and text on the main index page. If the user attaches an image, use the provided ID (e.g., "ATTACHED_IMAGE_123456").
+═══════════════════════════════════════════════
+🏠 HOMEPAGE CONFIG TOOLS
+═══════════════════════════════════════════════
+11q2. getHomepageConfig()
+    Args: none
+    Reads the current homepage configuration document (contains heroBgUrl, signatureDishIds, storyImg, etc.).
+
+11r. updateHomepageHero(imageUrl, titleVi, titleEn, titleFi, descVi, descEn, descFi)
+    Args: { "imageUrl": string, "titleVi": string, "titleEn": string, "titleFi": string, "descVi": string, "descEn": string, "descFi": string }
+    Updates the hero background image and text on the main index page (supports Vietnamese, English, Finnish).
 
 11s. updateHomepageSignatures(dishIdArray)
     Args: { "dishIdArray": array of strings }
     Sets the featured signature dishes on the homepage using their dish IDs.
 
-11t. updateHomepageSignatureText(titleVi, descVi)
-    Args: { "titleVi": string, "descVi": string }
-    Updates the title and description text for the Signature Creations section.
+11t. updateHomepageSignatureText(titleVi, titleEn, titleFi, descVi, descEn, descFi)
+    Args: { "titleVi": string, "titleEn": string, "titleFi": string, "descVi": string, "descEn": string, "descFi": string }
+    Updates the title and description text for the Signature Creations section (supports Vietnamese, English, Finnish).
 
-11u. updateHomepageStory(imageUrl, labelVi, titleVi, p1Vi, p2Vi)
-    Args: { "imageUrl": string, "labelVi": string, "titleVi": string, "p1Vi": string, "p2Vi": string }
-    Updates the "Our Heritage" story section on the homepage. If the user attaches an image, use the provided ID.
+11u. updateHomepageStory(imageUrl, labelVi, labelEn, labelFi, titleVi, titleEn, titleFi, p1Vi, p1En, p1Fi, p2Vi, p2En, p2Fi)
+    Args: { "imageUrl": string, "labelVi": string, "labelEn": string, "labelFi": string, "titleVi": string, "titleEn": string, "titleFi": string, "p1Vi": string, "p1En": string, "p1Fi": string, "p2Vi": string, "p2En": string, "p2Fi": string }
+    Updates the "Our Heritage" story section on the homepage (supports Vietnamese, English, Finnish).
 
-11v. updateHomepageCTA(titleVi, descVi)
-    Args: { "titleVi": string, "descVi": string }
-    Updates the "Experience the Full Journey" Call to Action section on the homepage.
+11v. updateHomepageCTA(titleVi, titleEn, titleFi, descVi, descEn, descFi)
+    Args: { "titleVi": string, "titleEn": string, "titleFi": string, "descVi": string, "descEn": string, "descFi": string }
+    Updates the "Experience the Full Journey" Call to Action section on the homepage (supports Vietnamese, English, Finnish).
 
 11w. updateHomepageReviews(reviews)
     Args: { "reviews": array of { name: string, location: string, message: string, rating: number, avatar?: string } }
@@ -2645,9 +2649,9 @@ Rules:
     Args: { "next20": number?, "next50": number?, "next100": number? }
     Updates the Lucky Wheel spin guarantee thresholds. Pass null or omit to leave unchanged.
 
-Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
-Ã°Å¸â€˜Â¥ USER / FIRESTORE TOOLS
-Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+═══════════════════════════════════════════════
+👥 USER / FIRESTORE TOOLS
+═══════════════════════════════════════════════
 12. listAllUsers()
     Args: {}
     Returns all users from Firestore (uid, email, name, role, totalSpent, loyaltyTier).
@@ -2696,9 +2700,9 @@ Rules:
     Args: { "title": string, "text": string, "imageUrl": string }
     Sends a broadcast inbox message to all registered users. Use this for general announcements. If the user attaches an image, use the provided ID.
 
-Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
-Ã°Å¸â€Â¥ FIREBASE ADMIN TOOLS (Real Auth Management)
-Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+═══════════════════════════════════════════════
+🔥 FIREBASE ADMIN TOOLS (Real Auth Management)
+═══════════════════════════════════════════════
 16. adminListAuthUsers()
     Args: {}
     Lists ALL Firebase Auth users with disabled status, email verification, and sign-in time.
@@ -2748,9 +2752,9 @@ Rules:
     Args: { "uid": string }
     Generates a custom sign-in token for testing/impersonation.
 
-Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
-Ã°Å¸â€Â§ CURRENT ADMIN SELF-MANAGEMENT
-Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+═══════════════════════════════════════════════
+🔧 CURRENT ADMIN SELF-MANAGEMENT
+═══════════════════════════════════════════════
 28. changeCurrentAdminPassword(newPassword)
     Args: { "newPassword": string }
     Changes YOUR OWN admin password.
@@ -2763,9 +2767,9 @@ Rules:
     Args: { "name": string }
     Changes YOUR OWN display name.
 
-Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
-Ã°Å¸Å’Â WEB SEARCH & BROWSER TOOLS
-Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+═══════════════════════════════════════════════
+🌐 WEB SEARCH & BROWSER TOOLS
+═══════════════════════════════════════════════
 31. webSearch(query)
     Args: { "query": string }
     Searches the web for news, menu items, or competitor information.
@@ -2777,14 +2781,27 @@ Rules:
         }
     ];
 
-    // Tool Implementations
-    async function updateHomepageHero(imageUrl, titleVi, descVi) {
+    async function getHomepageConfig() {
         try {
-            await setDoc(doc(db, "config", "homepage"), {
-                heroBgUrl: imageUrl || null,
-                heroTitleVi: titleVi || null,
-                heroDescVi: descVi || null
-            }, { merge: true });
+            const snap = await getDoc(doc(db, "config", "homepage"));
+            return snap.exists() ? snap.data() : {};
+        } catch (e) {
+            console.error(e);
+            return { error: e.message };
+        }
+    }
+
+    async function updateHomepageHero(imageUrl, titleVi, titleEn, titleFi, descVi, descEn, descFi) {
+        try {
+            const u = {};
+            if (imageUrl !== undefined && imageUrl !== null) u.heroBgUrl = imageUrl;
+            if (titleVi !== undefined && titleVi !== null) u.heroTitleVi = titleVi;
+            if (titleEn !== undefined && titleEn !== null) u.heroTitleEn = titleEn;
+            if (titleFi !== undefined && titleFi !== null) u.heroTitleFi = titleFi;
+            if (descVi !== undefined && descVi !== null) u.heroDescVi = descVi;
+            if (descEn !== undefined && descEn !== null) u.heroDescEn = descEn;
+            if (descFi !== undefined && descFi !== null) u.heroDescFi = descFi;
+            await setDoc(doc(db, "config", "homepage"), u, { merge: true });
             return { success: true, message: "Homepage hero updated successfully." };
         } catch (e) {
             console.error(e);
@@ -2794,6 +2811,15 @@ Rules:
 
     async function updateHomepageSignatures(dishIdArray) {
         try {
+            if (typeof dishIdArray === 'string') {
+                try {
+                    const parsed = JSON.parse(dishIdArray);
+                    if (Array.isArray(parsed)) dishIdArray = parsed;
+                    else dishIdArray = dishIdArray.split(',').map(s => s.trim()).filter(Boolean);
+                } catch (e) {
+                    dishIdArray = dishIdArray.split(',').map(s => s.trim()).filter(Boolean);
+                }
+            }
             if (!Array.isArray(dishIdArray)) return { error: "dishIdArray must be an array of strings" };
             await setDoc(doc(db, "config", "homepage"), {
                 signatureDishIds: dishIdArray
@@ -2805,12 +2831,16 @@ Rules:
         }
     }
 
-    async function updateHomepageSignatureText(titleVi, descVi) {
+    async function updateHomepageSignatureText(titleVi, titleEn, titleFi, descVi, descEn, descFi) {
         try {
-            await setDoc(doc(db, "config", "homepage"), {
-                signatureTitleVi: titleVi || null,
-                signatureDescVi: descVi || null
-            }, { merge: true });
+            const u = {};
+            if (titleVi !== undefined && titleVi !== null) u.signatureTitleVi = titleVi;
+            if (titleEn !== undefined && titleEn !== null) u.signatureTitleEn = titleEn;
+            if (titleFi !== undefined && titleFi !== null) u.signatureTitleFi = titleFi;
+            if (descVi !== undefined && descVi !== null) u.signatureDescVi = descVi;
+            if (descEn !== undefined && descEn !== null) u.signatureDescEn = descEn;
+            if (descFi !== undefined && descFi !== null) u.signatureDescFi = descFi;
+            await setDoc(doc(db, "config", "homepage"), u, { merge: true });
             return { success: true, message: "Homepage signature text updated successfully. Reload to see." };
         } catch (e) {
             console.error(e);
@@ -2818,15 +2848,23 @@ Rules:
         }
     }
 
-    async function updateHomepageStory(imageUrl, labelVi, titleVi, p1Vi, p2Vi) {
+    async function updateHomepageStory(imageUrl, labelVi, labelEn, labelFi, titleVi, titleEn, titleFi, p1Vi, p1En, p1Fi, p2Vi, p2En, p2Fi) {
         try {
-            await setDoc(doc(db, "config", "homepage"), {
-                storyImg: imageUrl || null,
-                storyLabelVi: labelVi || null,
-                storyTitleVi: titleVi || null,
-                storyP1Vi: p1Vi || null,
-                storyP2Vi: p2Vi || null
-            }, { merge: true });
+            const u = {};
+            if (imageUrl !== undefined && imageUrl !== null) u.storyImg = imageUrl;
+            if (labelVi !== undefined && labelVi !== null) u.storyLabelVi = labelVi;
+            if (labelEn !== undefined && labelEn !== null) u.storyLabelEn = labelEn;
+            if (labelFi !== undefined && labelFi !== null) u.storyLabelFi = labelFi;
+            if (titleVi !== undefined && titleVi !== null) u.storyTitleVi = titleVi;
+            if (titleEn !== undefined && titleEn !== null) u.storyTitleEn = titleEn;
+            if (titleFi !== undefined && titleFi !== null) u.storyTitleFi = titleFi;
+            if (p1Vi !== undefined && p1Vi !== null) u.storyP1Vi = p1Vi;
+            if (p1En !== undefined && p1En !== null) u.storyP1En = p1En;
+            if (p1Fi !== undefined && p1Fi !== null) u.storyP1Fi = p1Fi;
+            if (p2Vi !== undefined && p2Vi !== null) u.storyP2Vi = p2Vi;
+            if (p2En !== undefined && p2En !== null) u.storyP2En = p2En;
+            if (p2Fi !== undefined && p2Fi !== null) u.storyP2Fi = p2Fi;
+            await setDoc(doc(db, "config", "homepage"), u, { merge: true });
             return { success: true, message: "Homepage story section updated successfully. Reload to see." };
         } catch (e) {
             console.error(e);
@@ -2834,12 +2872,16 @@ Rules:
         }
     }
 
-    async function updateHomepageCTA(titleVi, descVi) {
+    async function updateHomepageCTA(titleVi, titleEn, titleFi, descVi, descEn, descFi) {
         try {
-            await setDoc(doc(db, "config", "homepage"), {
-                ctaTitleVi: titleVi || null,
-                ctaDescVi: descVi || null
-            }, { merge: true });
+            const u = {};
+            if (titleVi !== undefined && titleVi !== null) u.ctaTitleVi = titleVi;
+            if (titleEn !== undefined && titleEn !== null) u.ctaTitleEn = titleEn;
+            if (titleFi !== undefined && titleFi !== null) u.ctaTitleFi = titleFi;
+            if (descVi !== undefined && descVi !== null) u.ctaDescVi = descVi;
+            if (descEn !== undefined && descEn !== null) u.ctaDescEn = descEn;
+            if (descFi !== undefined && descFi !== null) u.ctaDescFi = descFi;
+            await setDoc(doc(db, "config", "homepage"), u, { merge: true });
             return { success: true, message: "Homepage CTA section updated successfully. Reload to see." };
         } catch (e) {
             console.error(e);
@@ -2853,14 +2895,14 @@ Rules:
             const data = snap.exists() ? snap.data() : {};
             const reviews = Array.isArray(data.customReviews) ? [...data.customReviews] : [];
             if (index < 0 || index >= reviews.length) {
-                return { error: `Index ${index} khÃƒÂ´ng hÃ¡Â»Â£p lÃ¡Â»â€¡. HiÃ¡Â»â€¡n cÃƒÂ³ ${reviews.length} reviews.` };
+                return { error: `Index ${index} không hợp lệ. Hiện có ${reviews.length} reviews.` };
             }
             reviews[index] = {
                 ...reviews[index],
                 avatar: imageUrl || reviews[index].avatar
             };
             await setDoc(doc(db, "config", "homepage"), { customReviews: reviews }, { merge: true });
-            return { success: true, message: `Ã„ÂÃƒÂ£ cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t Ã¡ÂºÂ£nh review index ${index} thÃƒÂ nh cÃƒÂ´ng.` };
+            return { success: true, message: `Đã cập nhật ảnh review index ${index} thành công.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -2921,7 +2963,7 @@ Rules:
                 guarantee: updates
             }, { merge: true });
 
-            return { success: true, message: `Ã„ÂÃƒÂ£ cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t bÃ¡Â»â„¢ Ã„â€˜Ã¡ÂºÂ¿m Lucky Wheel: next20=${next20 ?? " giÃ¡Â»Â¯ nguyÃƒÂªn"}, next50=${next50 ?? " giÃ¡Â»Â¯ nguyÃƒÂªn"}, next100=${next100 ?? " giÃ¡Â»Â¯ nguyÃƒÂªn"}.` };
+            return { success: true, message: `Đã cập nhật bộ đếm Lucky Wheel: next20=${next20 ?? " giữ nguyên"}, next50=${next50 ?? " giữ nguyên"}, next100=${next100 ?? " giữ nguyên"}.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -2931,7 +2973,7 @@ Rules:
     async function sendGlobalAnnouncement(title, text, imageUrl) {
         try {
             await addDoc(collection(db, "messages"), {
-                title: title || "ThÃƒÂ´ng bÃƒÂ¡o tÃ¡Â»Â« NhÃƒÂ  hÃƒÂ ng",
+                title: title || "Thông báo từ Nhà hàng",
                 text: text || "",
                 imageUrl: imageUrl || null,
                 voucherCode: null,
@@ -3060,7 +3102,7 @@ Rules:
             qSnap.forEach(d => {
                 if (d.id === dishId) targetDoc = d.data();
             });
-            if (!targetDoc) return { error: "KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y mÃƒÂ³n Ã„Æ’n." };
+            if (!targetDoc) return { error: "Không tìm thấy món ăn." };
 
             const nameVi = optionNameVi || '';
             const nameEn = optionNameEn || nameVi;
@@ -3072,7 +3114,7 @@ Rules:
                 (opt.nameVi || '').toLowerCase() === nameVi.toLowerCase() ||
                 (opt.nameEn || '').toLowerCase() === nameEn.toLowerCase()
             );
-            if (exists) return { error: `NhÃƒÂ³m option "${nameVi}" Ã„â€˜ÃƒÂ£ tÃ¡Â»â€œn tÃ¡ÂºÂ¡i.` };
+            if (exists) return { error: `Nhóm option "${nameVi}" đã tồn tại.` };
 
             options.push({
                 name: nameEn,
@@ -3096,7 +3138,7 @@ Rules:
 
             await updateDoc(docRef, { options });
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Ã„ÂÃƒÂ£ thÃƒÂªm nhÃƒÂ³m option "${nameVi}" thÃƒÂ nh cÃƒÂ´ng.` };
+            return { success: true, message: `Đã thêm nhóm option "${nameVi}" thành công.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3111,7 +3153,7 @@ Rules:
             qSnap.forEach(d => {
                 if (d.id === dishId) targetDoc = d.data();
             });
-            if (!targetDoc) return { error: "KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y mÃƒÂ³n Ã„Æ’n." };
+            if (!targetDoc) return { error: "Không tìm thấy món ăn." };
 
             const options = normalizeOptions(targetDoc.options || []);
             const originalLength = options.length;
@@ -3124,12 +3166,12 @@ Rules:
             });
 
             if (originalLength === updatedOptions.length) {
-                return { error: `KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y nhÃƒÂ³m option "${optionName}".` };
+                return { error: `Không tìm thấy nhóm option "${optionName}".` };
             }
 
             await updateDoc(docRef, { options: updatedOptions });
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Ã„ÂÃƒÂ£ xoÃƒÂ¡ nhÃƒÂ³m option "${optionName}" thÃƒÂ nh cÃƒÂ´ng.` };
+            return { success: true, message: `Đã xoá nhóm option "${optionName}" thành công.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3144,7 +3186,7 @@ Rules:
             qSnap.forEach(d => {
                 if (d.id === dishId) targetDoc = d.data();
             });
-            if (!targetDoc) return { error: "KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y mÃƒÂ³n Ã„Æ’n." };
+            if (!targetDoc) return { error: "Không tìm thấy món ăn." };
 
             let updated = false;
             const options = normalizeOptions(targetDoc.options || []).map(opt => {
@@ -3176,11 +3218,11 @@ Rules:
                 return opt;
             });
 
-            if (!updated) return { error: `NhÃƒÂ³m option "${optionName}" khÃƒÂ´ng tÃ¡Â»â€œn tÃ¡ÂºÂ¡i hoÃ¡ÂºÂ·c lÃ¡Â»Â±a chÃ¡Â»Ân "${choiceLabelVi}" Ã„â€˜ÃƒÂ£ cÃƒÂ³ sÃ¡ÂºÂµn.` };
+            if (!updated) return { error: `Nhóm option "${optionName}" không tồn tại hoặc lựa chọn "${choiceLabelVi}" đã có sẵn.` };
 
             await updateDoc(docRef, { options });
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Ã„ÂÃƒÂ£ thÃƒÂªm lÃ¡Â»Â±a chÃ¡Â»Ân "${choiceLabelVi}" vÃƒÂ o nhÃƒÂ³m "${optionName}" thÃƒÂ nh cÃƒÂ´ng.` };
+            return { success: true, message: `Đã thêm lựa chọn "${choiceLabelVi}" vào nhóm "${optionName}" thành công.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3195,7 +3237,7 @@ Rules:
             qSnap.forEach(d => {
                 if (d.id === dishId) targetDoc = d.data();
             });
-            if (!targetDoc) return { error: "KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y mÃƒÂ³n Ã„Æ’n." };
+            if (!targetDoc) return { error: "Không tìm thấy món ăn." };
 
             let updated = false;
             const options = normalizeOptions(targetDoc.options || []).map(opt => {
@@ -3219,11 +3261,11 @@ Rules:
                 return opt;
             });
 
-            if (!updated) return { error: `KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y nhÃƒÂ³m "${optionName}" hoÃ¡ÂºÂ·c lÃ¡Â»Â±a chÃ¡Â»Ân "${choiceLabel}".` };
+            if (!updated) return { error: `Không tìm thấy nhóm "${optionName}" hoặc lựa chọn "${choiceLabel}".` };
 
             await updateDoc(docRef, { options });
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Ã„ÂÃƒÂ£ xoÃƒÂ¡ lÃ¡Â»Â±a chÃ¡Â»Ân "${choiceLabel}" khÃ¡Â»Âi nhÃƒÂ³m "${optionName}" thÃƒÂ nh cÃƒÂ´ng.` };
+            return { success: true, message: `Đã xoá lựa chọn "${choiceLabel}" khỏi nhóm "${optionName}" thành công.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3238,7 +3280,7 @@ Rules:
             qSnap.forEach(d => {
                 if (d.id === dishId) targetDoc = d.data();
             });
-            if (!targetDoc) return { error: "KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y mÃƒÂ³n Ã„Æ’n." };
+            if (!targetDoc) return { error: "Không tìm thấy món ăn." };
 
             let updated = false;
             const options = normalizeOptions(targetDoc.options || []).map(opt => {
@@ -3259,11 +3301,11 @@ Rules:
                 return opt;
             });
 
-            if (!updated) return { error: `KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y nhÃƒÂ³m option "${oldOptionName}".` };
+            if (!updated) return { error: `Không tìm thấy nhóm option "${oldOptionName}".` };
 
             await updateDoc(docRef, { options });
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Ã„ÂÃƒÂ£ cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t nhÃƒÂ³m option "${oldOptionName}" thÃƒÂ nh cÃƒÂ´ng.` };
+            return { success: true, message: `Đã cập nhật nhóm option "${oldOptionName}" thành công.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3278,7 +3320,7 @@ Rules:
             qSnap.forEach(d => {
                 if (d.id === dishId) targetDoc = d.data();
             });
-            if (!targetDoc) return { error: "KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y mÃƒÂ³n Ã„Æ’n." };
+            if (!targetDoc) return { error: "Không tìm thấy món ăn." };
 
             let updated = false;
             const options = normalizeOptions(targetDoc.options || []).map(opt => {
@@ -3308,11 +3350,11 @@ Rules:
                 return opt;
             });
 
-            if (!updated) return { error: `KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y lÃ¡Â»Â±a chÃ¡Â»Ân "${oldChoiceLabel}" trong nhÃƒÂ³m "${optionName}".` };
+            if (!updated) return { error: `Không tìm thấy lựa chọn "${oldChoiceLabel}" trong nhóm "${optionName}".` };
 
             await updateDoc(docRef, { options });
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Ã„ÂÃƒÂ£ cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t lÃ¡Â»Â±a chÃ¡Â»Ân "${oldChoiceLabel}" thÃƒÂ nh cÃƒÂ´ng.` };
+            return { success: true, message: `Đã cập nhật lựa chọn "${oldChoiceLabel}" thành công.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3328,7 +3370,7 @@ Rules:
             if (nameFi !== undefined) updateData.nameFi = nameFi;
             await updateDoc(docRef, updateData);
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Ã„ÂÃƒÂ£ cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t tÃƒÂªn mÃƒÂ³n Ã„Æ’n thÃƒÂ nh cÃƒÂ´ng.` };
+            return { success: true, message: `Đã cập nhật tên món ăn thành công.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3344,7 +3386,7 @@ Rules:
             if (descriptionFi !== undefined) updateData.descFi = descriptionFi;
             await updateDoc(docRef, updateData);
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Ã„ÂÃƒÂ£ cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t mÃƒÂ´ tÃ¡ÂºÂ£ mÃƒÂ³n Ã„Æ’n thÃƒÂ nh cÃƒÂ´ng.` };
+            return { success: true, message: `Đã cập nhật mô tả món ăn thành công.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3365,7 +3407,7 @@ Rules:
             if (categoryFi !== undefined) updateData.categoryFi = categoryFi;
             await updateDoc(docRef, updateData);
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Ã„ÂÃƒÂ£ cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t danh mÃ¡Â»Â¥c mÃƒÂ³n Ã„Æ’n thÃƒÂ nh cÃƒÂ´ng.` };
+            return { success: true, message: `Đã cập nhật danh mục món ăn thành công.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3377,7 +3419,7 @@ Rules:
             const docRef = doc(db, "menu", dishId);
             await updateDoc(docRef, { isAvailable: !!isAvailable });
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Ã„ÂÃƒÂ£ cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t trÃ¡ÂºÂ¡ng thÃƒÂ¡i cÃƒÂ³ sÃ¡ÂºÂµn thÃƒÂ nh cÃƒÂ´ng.` };
+            return { success: true, message: `Đã cập nhật trạng thái có sẵn thành công.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3389,7 +3431,7 @@ Rules:
             const docRef = doc(db, "menu", dishId);
             await updateDoc(docRef, { image: imageUrl });
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Ã„ÂÃƒÂ£ cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t Ã¡ÂºÂ£nh mÃƒÂ³n Ã„Æ’n thÃƒÂ nh cÃƒÂ´ng.` };
+            return { success: true, message: `Đã cập nhật ảnh món ăn thành công.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3402,7 +3444,7 @@ Rules:
             const defaultImg = 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=500';
             await updateDoc(docRef, { image: defaultImg });
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Ã„ÂÃƒÂ£ xoÃƒÂ¡ Ã¡ÂºÂ£nh mÃƒÂ³n Ã„Æ’n thÃƒÂ nh cÃƒÂ´ng.` };
+            return { success: true, message: `Đã xoá ảnh món ăn thành công.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3414,7 +3456,7 @@ Rules:
             const docRef = doc(db, "menu", dishId);
             await updateDoc(docRef, { preparationTime: parseInt(minutes) || 0 });
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Ã„ÂÃƒÂ£ cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t thÃ¡Â»Âi gian chuÃ¡ÂºÂ©n bÃ¡Â»â€¹ thÃƒÂ nh cÃƒÂ´ng.` };
+            return { success: true, message: `Đã cập nhật thời gian chuẩn bị thành công.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3432,7 +3474,7 @@ Rules:
             };
             await updateDoc(docRef, { nutrition });
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Ã„ÂÃƒÂ£ cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t thÃƒÂ´ng tin dinh dÃ†Â°Ã¡Â»Â¡ng thÃƒÂ nh cÃƒÂ´ng.` };
+            return { success: true, message: `Đã cập nhật thông tin dinh dưỡng thành công.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3443,7 +3485,7 @@ Rules:
         try {
             const docRef = doc(db, "menu", dishId);
             const docSnap = await getDoc(docRef);
-            if (!docSnap.exists()) return { error: "KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y mÃƒÂ³n Ã„Æ’n." };
+            if (!docSnap.exists()) return { error: "Không tìm thấy món ăn." };
             const data = docSnap.data();
             const tags = Array.isArray(data.tags) ? data.tags : [];
 
@@ -3460,7 +3502,7 @@ Rules:
                 await updateDoc(docRef, { tags });
             }
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Ã„ÂÃƒÂ£ thÃƒÂªm tag "${lVi}" thÃƒÂ nh cÃƒÂ´ng.` };
+            return { success: true, message: `Đã thêm tag "${lVi}" thành công.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3471,7 +3513,7 @@ Rules:
         try {
             const docRef = doc(db, "menu", dishId);
             const docSnap = await getDoc(docRef);
-            if (!docSnap.exists()) return { error: "KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y mÃƒÂ³n Ã„Æ’n." };
+            if (!docSnap.exists()) return { error: "Không tìm thấy món ăn." };
             const data = docSnap.data();
             const tags = Array.isArray(data.tags) ? data.tags : [];
             const newTags = tags.filter(t =>
@@ -3481,12 +3523,12 @@ Rules:
             );
 
             if (tags.length === newTags.length) {
-                return { error: `KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y tag "${tagLabel}".` };
+                return { error: `Không tìm thấy tag "${tagLabel}".` };
             }
 
             await updateDoc(docRef, { tags: newTags });
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Ã„ÂÃƒÂ£ xoÃƒÂ¡ tag "${tagLabel}" thÃƒÂ nh cÃƒÂ´ng.` };
+            return { success: true, message: `Đã xoá tag "${tagLabel}" thành công.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3495,13 +3537,13 @@ Rules:
 
     async function reorderMenuItems(orderedDishIds) {
         try {
-            if (!Array.isArray(orderedDishIds)) return { error: "orderedDishIds phÃ¡ÂºÂ£i lÃƒÂ  mÃ¡Â»â„¢t mÃ¡ÂºÂ£ng cÃƒÂ¡c IDs." };
+            if (!Array.isArray(orderedDishIds)) return { error: "orderedDishIds phải là một mảng các IDs." };
             for (let i = 0; i < orderedDishIds.length; i++) {
                 const dishId = orderedDishIds[i];
                 await updateDoc(doc(db, "menu", dishId), { sortOrder: i });
             }
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: "Ã„ÂÃƒÂ£ sÃ¡ÂºÂ¯p xÃ¡ÂºÂ¿p lÃ¡ÂºÂ¡i thÃ¡Â»Â© tÃ¡Â»Â± hiÃ¡Â»Æ’n thÃ¡Â»â€¹ mÃƒÂ³n Ã„Æ’n thÃƒÂ nh cÃƒÂ´ng." };
+            return { success: true, message: "Đã sắp xếp lại thứ tự hiển thị món ăn thành công." };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3512,11 +3554,11 @@ Rules:
         try {
             const docRef = doc(db, "menu", dishId);
             const docSnap = await getDoc(docRef);
-            if (!docSnap.exists()) return { error: "KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y mÃƒÂ³n Ã„Æ’n Ã„â€˜Ã¡Â»Æ’ sao chÃƒÂ©p." };
+            if (!docSnap.exists()) return { error: "Không tìm thấy món ăn để sao chép." };
             const data = docSnap.data();
             const newData = {
                 ...data,
-                nameVi: (data.nameVi || "") + " (BÃ¡ÂºÂ£n sao)",
+                nameVi: (data.nameVi || "") + " (Bản sao)",
                 createdAt: new Date()
             };
             let targetId;
@@ -3528,7 +3570,7 @@ Rules:
                 targetId = newDocRef.id;
             }
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Ã„ÂÃƒÂ£ nhÃƒÂ¢n bÃ¡ÂºÂ£n mÃƒÂ³n Ã„Æ’n thÃƒÂ nh cÃƒÂ´ng vÃ¡Â»â€ºi ID mÃ¡Â»â€ºi: ${targetId}` };
+            return { success: true, message: `Đã nhân bản món ăn thành công với ID mới: ${targetId}` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3540,7 +3582,7 @@ Rules:
             await deleteDoc(doc(db, "menu", dishId));
             if (typeof window.loadFood === 'function') window.loadFood();
             if (typeof window.loadCategories === 'function') window.loadCategories();
-            return { success: true, message: `Ã„ÂÃƒÂ£ xoÃƒÂ¡ hoÃƒÂ n toÃƒÂ n mÃƒÂ³n Ã„Æ’n thÃƒÂ nh cÃƒÂ´ng.` };
+            return { success: true, message: `Đã xoá hoàn toàn món ăn thành công.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3551,11 +3593,11 @@ Rules:
         try {
             const docRef = doc(db, "menu", dishId);
             if (typeof customFields !== 'object' || customFields === null) {
-                return { error: "customFields phÃ¡ÂºÂ£i lÃƒÂ  mÃ¡Â»â„¢t object chÃ¡Â»Â©a cÃƒÂ¡c khoÃƒÂ¡ cÃ¡ÂºÂ§n cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t." };
+                return { error: "customFields phải là một object chứa các khoá cần cập nhật." };
             }
             await updateDoc(docRef, customFields);
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Ã„ÂÃƒÂ£ cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t cÃƒÂ¡c trÃ†Â°Ã¡Â»Âng tuÃ¡Â»Â³ chÃ¡Â»â€°nh thÃƒÂ nh cÃƒÂ´ng.` };
+            return { success: true, message: `Đã cập nhật các trường tuỳ chỉnh thành công.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3587,7 +3629,7 @@ Rules:
     async function getUserLoyalty(uid) {
         try {
             const snap = await getDoc(doc(db, "users", uid));
-            if (!snap.exists()) return { error: "KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y user." };
+            if (!snap.exists()) return { error: "Không tìm thấy user." };
             const data = snap.data();
             const totalSpent = data.totalSpent || 0;
             const tier = computeLoyaltyTier(totalSpent);
@@ -3600,19 +3642,19 @@ Rules:
     async function addLoyaltyProgressByOrderId(orderId) {
         try {
             const orderSnap = await getDoc(doc(db, "orders", orderId));
-            if (!orderSnap.exists()) return { error: "KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y Ã„â€˜Ã†Â¡n hÃƒÂ ng." };
+            if (!orderSnap.exists()) return { error: "Không tìm thấy đơn hàng." };
             const order = orderSnap.data();
             const userId = order.userId;
-            if (!userId) return { error: "Ã„ÂÃ†Â¡n hÃƒÂ ng khÃƒÂ´ng cÃƒÂ³ userId." };
+            if (!userId) return { error: "Đơn hàng không có userId." };
             const totalVnd = Number(order.totalPrice || 0);
-            if (totalVnd <= 0) return { error: "GiÃƒÂ¡ trÃ¡Â»â€¹ Ã„â€˜Ã†Â¡n hÃƒÂ ng khÃƒÂ´ng hÃ¡Â»Â£p lÃ¡Â»â€¡." };
+            if (totalVnd <= 0) return { error: "Giá trị đơn hàng không hợp lệ." };
 
             const EUR_RATE = 25000;
             const totalEur = +(totalVnd / EUR_RATE).toFixed(2);
 
             const userRef = doc(db, "users", userId);
             await updateDoc(userRef, { totalSpent: Number(((order.totalSpent || 0) + totalEur).toFixed(2)) });
-            return { success: true, message: `Ã„ÂÃƒÂ£ cÃ¡Â»â„¢ng ${totalEur} EUR vÃƒÂ o loyalty cÃ¡Â»Â§a user ${userId}.` };
+            return { success: true, message: `Đã cộng ${totalEur} EUR vào loyalty của user ${userId}.` };
         } catch (e) {
             return { error: e.message };
         }
@@ -3620,11 +3662,11 @@ Rules:
 
     function computeLoyaltyTier(totalSpent) {
         const spent = Number(totalSpent) || 0;
-        if (spent >= 40) return { key: 'kim_cuong', labelVi: 'Kim CÃ†Â°Ã†Â¡ng', color: '#7c3aed', icon: 'diamond', discountPercent: 15 };
-        if (spent >= 20) return { key: 'kim', labelVi: 'VÃƒÂ ng', color: '#eab308', icon: 'workspace_premium', discountPercent: 10 };
-        if (spent >= 8) return { key: 'bac', labelVi: 'BÃ¡ÂºÂ¡c', color: '#9ca3af', icon: 'shield', discountPercent: 5 };
-        if (spent >= 4) return { key: 'vang', labelVi: 'Ã„ÂÃ¡Â»â€œng', color: '#9a3412', icon: 'monetization_on', discountPercent: 0 };
-        return { key: 'dong', labelVi: 'Ã„ÂÃ¡Â»â€œng', color: '#78350f', icon: 'stars', discountPercent: 0 };
+        if (spent >= 40) return { key: 'kim_cuong', labelVi: 'Kim Cương', color: '#7c3aed', icon: 'diamond', discountPercent: 15 };
+        if (spent >= 20) return { key: 'kim', labelVi: 'Vàng', color: '#eab308', icon: 'workspace_premium', discountPercent: 10 };
+        if (spent >= 8) return { key: 'bac', labelVi: 'Bạc', color: '#9ca3af', icon: 'shield', discountPercent: 5 };
+        if (spent >= 4) return { key: 'vang', labelVi: 'Đồng', color: '#9a3412', icon: 'monetization_on', discountPercent: 0 };
+        return { key: 'dong', labelVi: 'Đồng', color: '#78350f', icon: 'stars', discountPercent: 0 };
     }
 
     async function changeUserRole(uid, newRole) {
@@ -3658,7 +3700,7 @@ Rules:
         try {
             const type = (spinType || 'deu').toLowerCase();
             if (!['deu', 'xin', 'vip'].includes(type)) {
-                return { error: "LoÃ¡ÂºÂ¡i lÃ†Â°Ã¡Â»Â£t quay khÃƒÂ´ng hÃ¡Â»Â£p lÃ¡Â»â€¡. ChÃ¡Â»â€° chÃ¡ÂºÂ¥p nhÃ¡ÂºÂ­n: deu, xin, vip" };
+                return { error: "Loại lượt quay không hợp lệ. Chỉ chấp nhận: deu, xin, vip" };
             }
             const qty = parseInt(count, 10) || 1;
 
@@ -3667,7 +3709,7 @@ Rules:
                 const q = query(collection(db, "users"), where("email", "==", uidOrEmail.trim()));
                 const snap = await getDocs(q);
                 if (snap.empty) {
-                    return { error: `KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y user vÃ¡Â»â€ºi email: ${uidOrEmail}` };
+                    return { error: `Không tìm thấy user với email: ${uidOrEmail}` };
                 }
                 uid = snap.docs[0].id;
             }
@@ -3675,7 +3717,7 @@ Rules:
             const docRef = doc(db, "users", uid);
             const docSnap = await getDoc(docRef);
             if (!docSnap.exists()) {
-                return { error: `KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y user vÃ¡Â»â€ºi UID/Email: ${uidOrEmail}` };
+                return { error: `Không tìm thấy user với UID/Email: ${uidOrEmail}` };
             }
 
             const data = docSnap.data();
@@ -3683,7 +3725,7 @@ Rules:
             spins[type] = (spins[type] || 0) + qty;
 
             await updateDoc(docRef, { spins });
-            return { success: true, message: `Ã„ÂÃƒÂ£ gÃ¡Â»Â­i ${qty} lÃ†Â°Ã¡Â»Â£t quay loÃ¡ÂºÂ¡i "${type}" cho user ${data.name || uid} thÃƒÂ nh cÃƒÂ´ng.` };
+            return { success: true, message: `Đã gửi ${qty} lượt quay loại "${type}" cho user ${data.name || uid} thành công.` };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3950,7 +3992,7 @@ Rules:
         }
     }
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Firebase Admin Tool Implementations (via Cloudflare Worker proxy) Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    // ─── Firebase Admin Tool Implementations (via Cloudflare Worker proxy) ─────
     async function adminListAuthUsers() {
         try {
             return await callWorker('listAuthUsers');
@@ -3968,7 +4010,7 @@ Rules:
             try { await deleteDoc(doc(db, 'users', uid)); } catch (_) {}
             // Refresh list
             if (typeof window.loadUsers === 'function') window.loadUsers();
-            return { ...result, message: result.message + ' + Ã„â€˜ÃƒÂ£ xoÃƒÂ¡ profile Firestore.' };
+            return { ...result, message: result.message + ' + đã xoá profile Firestore.' };
         } catch (e) {
             console.error('[adminDeleteAuthUser]', e);
             return { error: e.message };
@@ -4066,7 +4108,7 @@ Rules:
         // Not supported via REST API without full Admin SDK - return guidance
         return {
             success: false,
-            message: `Custom token generation cÃ¡ÂºÂ§n Firebase Admin SDK (Blaze Plan). HÃƒÂ£y dÃƒÂ¹ng Firebase Console nÃ¡ÂºÂ¿u cÃ¡ÂºÂ§n.`
+            message: `Custom token generation cần Firebase Admin SDK (Blaze Plan). Hãy dùng Firebase Console nếu cần.`
         };
     }
 
@@ -4109,7 +4151,7 @@ Rules:
         return results;
     }
 
-    const KNOWN_TOOLS = new Set(['getOrdersSoldToday','listAllFoodItems','setOptionChoicePrice','updateMenuPrice','addMenuOptionGroup','removeMenuOptionGroup','addChoiceToOptionGroup','removeChoiceFromOptionGroup','updateMenuOptionGroup','updateChoiceInOptionGroup','updateMenuName','updateMenuDescription','updateMenuCategory','updateMenuAvailability','uploadMenuImage','removeMenuImage','updateMenuPreparationTime','updateMenuNutritionInfo','addMenuTag','removeMenuTag','reorderMenuItems','duplicateMenuItem','deleteMenuItem','updateMenuCustomFields','listAllUsers','getUserLoyalty','addLoyaltyProgressByOrderId','changeUserRole','deleteUserAccount','createUserAccount','sendPasswordReset','sendSpinsToUser','sendGlobalAnnouncement','createCustomVoucher','markVoucherUsed','removeVoucher','listAllVouchers','updateOrderStatus','deleteOrder','getOrdersByStatus','changeCurrentAdminPassword','updateCurrentAdminEmail','updateCurrentAdminProfile','adminListAuthUsers','adminDeleteAuthUser','adminDisableUser','adminEnableUser','adminChangeUserPassword','adminChangeUserEmail','adminVerifyUserEmail','adminSetCustomClaims','adminGetUserInfo','adminRevokeUserTokens','adminUpdateDisplayName','adminGenerateCustomToken','webSearch','browseWebUrl','updateHomepageHero','updateHomepageSignatures','updateHomepageSignatureText','updateHomepageStory','updateHomepageCTA','getWheelGuarantee','updateWheelGuarantee','updateHomepageReviews','updateReviewImageUrl']);
+    const KNOWN_TOOLS = new Set(['getOrdersSoldToday','listAllFoodItems','setOptionChoicePrice','updateMenuPrice','addMenuOptionGroup','removeMenuOptionGroup','addChoiceToOptionGroup','removeChoiceFromOptionGroup','updateMenuOptionGroup','updateChoiceInOptionGroup','updateMenuName','updateMenuDescription','updateMenuCategory','updateMenuAvailability','uploadMenuImage','removeMenuImage','updateMenuPreparationTime','updateMenuNutritionInfo','addMenuTag','removeMenuTag','reorderMenuItems','duplicateMenuItem','deleteMenuItem','updateMenuCustomFields','listAllUsers','getUserLoyalty','addLoyaltyProgressByOrderId','changeUserRole','deleteUserAccount','createUserAccount','sendPasswordReset','sendSpinsToUser','sendGlobalAnnouncement','createCustomVoucher','markVoucherUsed','removeVoucher','listAllVouchers','updateOrderStatus','deleteOrder','getOrdersByStatus','changeCurrentAdminPassword','updateCurrentAdminEmail','updateCurrentAdminProfile','adminListAuthUsers','adminDeleteAuthUser','adminDisableUser','adminEnableUser','adminChangeUserPassword','adminChangeUserEmail','adminVerifyUserEmail','adminSetCustomClaims','adminGetUserInfo','adminRevokeUserTokens','adminUpdateDisplayName','adminGenerateCustomToken','webSearch','browseWebUrl','getHomepageConfig','updateHomepageHero','updateHomepageSignatures','updateHomepageSignatureText','updateHomepageStory','updateHomepageCTA','getWheelGuarantee','updateWheelGuarantee','updateHomepageReviews','updateReviewImageUrl']);
 
     function extractToolCalls(text) {
         const results = [];
@@ -4153,17 +4195,17 @@ Rules:
             toolCallCount++;
             if (toolCallCount > 5) {
                 removeLoadingBubble();
-                appendBubble("HÃ¡Â»â€¡ thÃ¡Â»â€˜ng: PhÃƒÂ¡t hiÃ¡Â»â€¡n nguy cÃ†Â¡ lÃ¡ÂºÂ·p gÃ¡Â»Âi cÃƒÂ´ng cÃ¡Â»Â¥ vÃƒÂ´ hÃ¡ÂºÂ¡n. AI Ã„â€˜ÃƒÂ£ dÃ¡Â»Â«ng lÃ¡ÂºÂ¡i Ã„â€˜Ã¡Â»Æ’ bÃ¡ÂºÂ£o vÃ¡Â»â€¡ hÃ¡ÂºÂ¡n ngÃ¡ÂºÂ¡ch API.", 'ai');
+                appendBubble("Hệ thống: Phát hiện nguy cơ lặp gọi công cụ vô hạn. AI đã dừng lại để bảo vệ hạn ngạch API.", 'ai');
                 return;
             }
 
             if (toolCallCount === 1 && toolCalls.length === 1) {
                 const single = toolCalls[0];
                 if (KNOWN_TOOLS.has(single.tool)) {
-                    appendBubble(`HÃ¡Â»â€¡ thÃ¡Â»â€˜ng: Ã„Âang thÃ¡Â»Â±c hiÃ¡Â»â€¡n yÃƒÂªu cÃ¡ÂºÂ§u (${single.tool})...`, 'ai');
+                    appendBubble(`Hệ thống: Đang thực hiện yêu cầu (${single.tool})...`, 'ai');
                 }
             } else {
-                appendBubble(`HÃ¡Â»â€¡ thÃ¡Â»â€˜ng: Ã„Âang thÃ¡Â»Â±c hiÃ¡Â»â€¡n ${toolCalls.length} yÃƒÂªu cÃ¡ÂºÂ§u dÃ¡Â»Â¯ liÃ¡Â»â€¡u/thay Ã„â€˜Ã¡Â»â€¢i...`, 'ai');
+                appendBubble(`Hệ thống: Đang thực hiện ${toolCalls.length} yêu cầu dữ liệu/thay đổi...`, 'ai');
             }
 
             const progressBubbleEl = msgArea.lastElementChild;
@@ -4178,7 +4220,7 @@ Rules:
                 const toolName = tool;
 
                 if (progressBubbleEl && msgArea.contains(progressBubbleEl) && progressBubbleEl.classList.contains('admin-chat-bubble')) {
-                    progressBubbleEl.textContent = `HÃ¡Â»â€¡ thÃ¡Â»â€˜ng: Ã„Âang thÃ¡Â»Â±c hiÃ¡Â»â€¡n ${i + 1}/${toolCalls.length} (${toolName})... (ThÃƒÂ nh cÃƒÂ´ng: ${successCount}, ThÃ¡ÂºÂ¥t bÃ¡ÂºÂ¡i: ${failCount})`;
+                    progressBubbleEl.textContent = `Hệ thống: Đang thực hiện ${i + 1}/${toolCalls.length} (${toolName})... (Thành công: ${successCount}, Thất bại: ${failCount})`;
                 }
 
                 let result;
@@ -4329,24 +4371,29 @@ Rules:
                     result = await webSearch(args.query);
                 } else if (tool === 'browseWebUrl') {
                     result = await browseWebUrl(args.url);
+                } else if (tool === 'getHomepageConfig') {
+                    result = await getHomepageConfig();
                 } else if (tool === 'updateHomepageHero') {
                     let finalImageUrl = args.imageUrl;
                     if (finalImageUrl && window.__uploadedImages && window.__uploadedImages[finalImageUrl]) {
                         finalImageUrl = window.__uploadedImages[finalImageUrl];
                     }
-                    result = await updateHomepageHero(finalImageUrl, args.titleVi, args.descVi);
+                    result = await updateHomepageHero(finalImageUrl, args.titleVi, args.titleEn, args.titleFi, args.descVi, args.descEn, args.descFi);
                 } else if (tool === 'updateHomepageSignatures') {
-                    result = await updateHomepageSignatures(args.dishIdArray);
+                    const dishArray = args.dishIdArray || args.dishIds || args.dishIdList || args.dishes;
+                    result = await updateHomepageSignatures(dishArray);
                 } else if (tool === 'updateHomepageSignatureText') {
-                    result = await updateHomepageSignatureText(args.titleVi, args.descVi);
+                    const titleVi = args.titleVi || args.title;
+                    const descVi = args.descVi || args.desc || args.description || args.descriptionVi;
+                    result = await updateHomepageSignatureText(titleVi, args.titleEn, args.titleFi, descVi, args.descEn, args.descFi);
                 } else if (tool === 'updateHomepageStory') {
                     let finalImageUrl = args.imageUrl;
                     if (finalImageUrl && window.__uploadedImages && window.__uploadedImages[finalImageUrl]) {
                         finalImageUrl = window.__uploadedImages[finalImageUrl];
                     }
-                    result = await updateHomepageStory(finalImageUrl, args.labelVi, args.titleVi, args.p1Vi, args.p2Vi);
+                    result = await updateHomepageStory(finalImageUrl, args.labelVi, args.labelEn, args.labelFi, args.titleVi, args.titleEn, args.titleFi, args.p1Vi, args.p1En, args.p1Fi, args.p2Vi, args.p2En, args.p2Fi);
                 } else if (tool === 'updateHomepageCTA') {
-                    result = await updateHomepageCTA(args.titleVi, args.descVi);
+                    result = await updateHomepageCTA(args.titleVi, args.titleEn, args.titleFi, args.descVi, args.descEn, args.descFi);
                 } else if (tool === 'getWheelGuarantee') {
                     result = await getWheelGuarantee();
                 } else if (tool === 'updateWheelGuarantee') {
@@ -4356,7 +4403,7 @@ Rules:
                 } else if (tool === 'updateReviewImageUrl') {
                     result = await updateReviewImageUrl(args.index, args.imageUrl);
                 } else {
-                    result = { error: `Tool "${tool}" khÃƒÂ´ng tÃ¡Â»â€œn tÃ¡ÂºÂ¡i.` };
+                    result = { error: `Tool "${tool}" không tồn tại.` };
                 }
 
                 if (result && typeof result === 'object' && result !== null && result.hasOwnProperty('error')) {
@@ -4368,29 +4415,29 @@ Rules:
                 }
 
                 if (progressBubbleEl && msgArea.contains(progressBubbleEl) && progressBubbleEl.classList.contains('admin-chat-bubble')) {
-                    progressBubbleEl.textContent = `HÃ¡Â»â€¡ thÃ¡Â»â€˜ng: Ã„Âang thÃ¡Â»Â±c hiÃ¡Â»â€¡n ${i + 1}/${toolCalls.length} (${toolName})... (ThÃƒÂ nh cÃƒÂ´ng: ${successCount}, ThÃ¡ÂºÂ¥t bÃ¡ÂºÂ¡i: ${failCount})`;
+                    progressBubbleEl.textContent = `Hệ thống: Đang thực hiện ${i + 1}/${toolCalls.length} (${toolName})... (Thành công: ${successCount}, Thất bại: ${failCount})`;
                 }
 
                 await new Promise(r => setTimeout(r, 40));
             }
 
             // Feed all results back in a single feedback message
-            const summaryHeader = `[TÃ¡Â»â€NG HÃ¡Â»Â¢P KÃ¡ÂºÂ¾T QUÃ¡ÂºÂ¢ THÃ¡Â»Â°C THI]:\n- TÃ¡Â»â€¢ng sÃ¡Â»â€˜ yÃƒÂªu cÃ¡ÂºÂ§u: ${toolCalls.length}\n- ThÃƒÂ nh cÃƒÂ´ng: ${successCount}\n- ThÃ¡ÂºÂ¥t bÃ¡ÂºÂ¡i: ${failCount}\n\n`;
+            const summaryHeader = `[TỔNG HỢP KẾT QUẢ THỰC THI]:\n- Tổng số yêu cầu: ${toolCalls.length}\n- Thành công: ${successCount}\n- Thất bại: ${failCount}\n\n`;
 
             const feedbackContent = results.map((r, idx) => {
                 const body = r.success ? r.result : { error: r.error };
                 const safeStr = typeof body === 'string' ? body : JSON.stringify(body);
-                return `[KÃ¡ÂºÂ¿t quÃ¡ÂºÂ£ YÃƒÂªu cÃ¡ÂºÂ§u ${idx + 1} - ${r.tool}]:\n${safeStr}`;
+                return `[Kết quả Yêu cầu ${idx + 1} - ${r.tool}]:\n${safeStr}`;
             }).join('\n\n');
 
             chatMessages.push({
                 role: 'user',
-                content: `DÃ†Â°Ã¡Â»â€ºi Ã„â€˜ÃƒÂ¢y lÃƒÂ  kÃ¡ÂºÂ¿t quÃ¡ÂºÂ£ thÃ¡Â»Â±c thi cÃƒÂ¡c cÃƒÂ´ng cÃ¡Â»Â¥ bÃ¡ÂºÂ¡n yÃƒÂªu cÃ¡ÂºÂ§u:\n\n${summaryHeader}${feedbackContent}\n\nHÃƒÂ£y tÃ¡Â»â€¢ng hÃ¡Â»Â£p cÃƒÂ¡c kÃ¡ÂºÂ¿t quÃ¡ÂºÂ£ trÃƒÂªn vÃƒÂ  trÃ¡ÂºÂ£ lÃ¡Â»Âi trÃ¡Â»Â±c tiÃ¡ÂºÂ¿p cho ngÃ†Â°Ã¡Â»Âi dÃƒÂ¹ng bÃ¡ÂºÂ±ng TiÃ¡ÂºÂ¿ng ViÃ¡Â»â€¡t. ChÃƒÂº ÃƒÂ½ chÃ¡Â»â€° ra rÃƒÂµ nhÃ¡Â»Â¯ng yÃƒÂªu cÃ¡ÂºÂ§u nÃƒÂ o Ã„â€˜ÃƒÂ£ THÃƒâ‚¬NH CÃƒâ€NG vÃƒÂ  nhÃ¡Â»Â¯ng yÃƒÂªu cÃ¡ÂºÂ§u nÃƒÂ o THÃ¡ÂºÂ¤T BÃ¡ÂºÂ I (kÃƒÂ¨m theo lÃ¡Â»â€”i tÃ†Â°Ã†Â¡ng Ã¡Â»Â©ng).`
+                content: `Dưới đây là kết quả thực thi các công cụ bạn yêu cầu:\n\n${summaryHeader}${feedbackContent}\n\nHãy tổng hợp các kết quả trên và trả lời trực tiếp cho người dùng bằng Tiếng Việt. Chú ý chỉ ra rõ những yêu cầu nào đã THÀNH CÔNG và những yêu cầu nào THẤT BẠI (kèm theo lỗi tương ứng).`
             });
 
             chatMessages.push({
                 role: 'user',
-                content: `DÃ†Â°Ã¡Â»â€ºi Ã„â€˜ÃƒÂ¢y lÃƒÂ  kÃ¡ÂºÂ¿t quÃ¡ÂºÂ£ thÃ¡Â»Â±c thi cÃƒÂ¡c cÃƒÂ´ng cÃ¡Â»Â¥ bÃ¡ÂºÂ¡n yÃƒÂªu cÃ¡ÂºÂ§u:\n\n${summaryHeader}${feedbackContent}\n\nHÃƒÂ£y tÃ¡Â»â€¢ng hÃ¡Â»Â£p cÃƒÂ¡c kÃ¡ÂºÂ¿t quÃ¡ÂºÂ£ trÃƒÂªn vÃƒÂ  trÃ¡ÂºÂ£ lÃ¡Â»Âi trÃ¡Â»Â±c tiÃ¡ÂºÂ¿p cho ngÃ†Â°Ã¡Â»Âi dÃƒÂ¹ng bÃ¡ÂºÂ±ng TiÃ¡ÂºÂ¿ng ViÃ¡Â»â€¡t. ChÃƒÂº ÃƒÂ½ chÃ¡Â»â€° ra rÃƒÂµ nhÃ¡Â»Â¯ng yÃƒÂªu cÃ¡ÂºÂ§u nÃƒÂ o Ã„â€˜ÃƒÂ£ THÃƒâ‚¬NH CÃƒâ€NG vÃƒÂ  nhÃ¡Â»Â¯ng yÃƒÂªu cÃ¡ÂºÂ§u nÃƒÂ o THÃ¡ÂºÂ¤T BÃ¡ÂºÂ I (kÃƒÂ¨m theo lÃ¡Â»â€”i tÃ†Â°Ã†Â¡ng Ã¡Â»Â©ng). NÃ¡ÂºÂ¿u bÃ¡ÂºÂ¡n cÃ¡ÂºÂ§n thÃƒÂªm thÃƒÂ´ng tin hoÃ¡ÂºÂ·c cÃ¡ÂºÂ§n thÃ¡Â»Â±c hiÃ¡Â»â€¡n thÃƒÂªm thao tÃƒÂ¡c, hÃƒÂ£y tiÃ¡ÂºÂ¿p tÃ¡Â»Â¥c gÃ¡Â»Âi tool. NÃ¡ÂºÂ¿u Ã„â€˜ÃƒÂ£ Ã„â€˜Ã¡Â»Â§ thÃƒÂ´ng tin thÃƒÂ¬ trÃ¡ÂºÂ£ lÃ¡Â»Âi ngay.`
+                content: `Dưới đây là kết quả thực thi các công cụ bạn yêu cầu:\n\n${summaryHeader}${feedbackContent}\n\nHãy tổng hợp các kết quả trên và trả lời trực tiếp cho người dùng bằng Tiếng Việt. Chú ý chỉ ra rõ những yêu cầu nào đã THÀNH CÔNG và những yêu cầu nào THẤT BẠI (kèm theo lỗi tương ứng). Nếu bạn cần thêm thông tin hoặc cần thực hiện thêm thao tác, hãy tiếp tục gọi tool. Nếu đã đủ thông tin thì trả lời ngay.`
             });
 
             // Call API once for the final response
@@ -4502,7 +4549,7 @@ Rules:
             await handleAgentResponse(responseText);
         } catch (err) {
             removeLoadingBubble();
-            appendBubble(`LÃ¡Â»â€”i kÃ¡ÂºÂ¿t nÃ¡Â»â€˜i AI: ${err.message}`, 'ai');
+            appendBubble(`Lỗi kết nối AI: ${err.message}`, 'ai');
         }
     }
 

@@ -309,7 +309,7 @@ async function sendEmailNotification(to, subject, html, customApiKey = null) {
         key = RESEND_API_KEY;
     }
     if (!key) {
-        key = 're_8PXskfp9_BVDSUvuPNqbfHo1y43ecKipt';
+        key = 're_AmwxgrXs_217ywFo3uCjBc21UTt7QMBo9';
     }
 
     const response = await fetch('https://api.resend.com/emails', {
@@ -319,7 +319,7 @@ async function sendEmailNotification(to, subject, html, customApiKey = null) {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            from: 'Phở Việt Khang <onboarding@resend.dev>',
+            from: 'Phở Việt Khang <noreply@phovietkhang.com>',
             to: [to],
             subject: subject,
             html: html
