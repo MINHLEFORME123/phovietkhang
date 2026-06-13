@@ -2,6 +2,11 @@
 
 ## Modifications
 
+### [2026-06-13] Fixed False Redemption Failures by Isolating UI Refreshes
+- **Changes**:
+  - Isolated the `loadUserProfile()` UI update call inside a safe `try-catch` block after the Firestore database transaction commits successfully.
+  - This prevents post-commit queries (such as `pointTransactions` queries which require custom composite indexes or suffer transient network dropouts) from throwing errors inside the transaction's main `try` block, which previously caused the client UI to trigger a false "Đổi quà thất bại" error toast even when the points were successfully deducted and rewards created on the server.
+
 ### [2026-06-13] Added User Points & Rank Management Tools to AI Admin Assistant
 - **Changes**:
   - Implemented `updateUserLoyaltyPoints(uidOrEmail, pointsAmount, isRelative)` to allow the AI Admin Assistant to add, subtract, or set a user's loyalty points in Firestore.
