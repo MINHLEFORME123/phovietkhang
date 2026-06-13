@@ -543,6 +543,7 @@
         window.confirmRedeem = async function() {
             if (!currentUser || !pendingReward) return;
             const userRef = doc(db, "users", currentUser.uid);
+            const lang = localStorage.getItem('selectedLanguage') || 'en';
             try {
                 await runTransaction(db, async (tx) => {
                     const snap = await tx.get(userRef);
@@ -575,38 +576,45 @@
                         });
                     }
 
-                    const rewardOrderRef = doc(collection(db, "orders"));
-                    tx.set(rewardOrderRef, {
-                        customerName: userData.name || currentUser.displayName || 'Member',
-                        customerEmail: currentUser.email || '',
-                        customerPhone: userData.phone || '',
-                        orderType: 'redeem',
-                        paymentMethod: 'cod',
-                        paymentMethodLabel: 'Reward Store',
-                        paymentStatus: 'cod_pending',
-                        status: 'pending',
-                        totalPrice: 0,
-                        discountAmount: 0,
-                        tableNumber: '',
-                        address: '',
-                        distance: 0,
-                        deliveryFee: 0,
-                        notes: `Đổi thưởng: ${pendingReward.nameVi}`,
-                        items: [{ id: pendingReward.id, name: pendingReward.nameVi, price: 0, qty: 1, options: [] }],
-                        userId: currentUser.uid,
-                        rewardRedeemedId: pendingReward.id,
-                        rewardPointsUsed: cost,
-                        remainingPoints: updatedPoints,
-                        language: localStorage.getItem('selectedLanguage') || 'en',
-                        createdAt: new Date()
-                    });
+                    const needsOrder = pendingReward.id !== 'voucher_15' && pendingReward.id !== 'lucky_spin_1' && pendingReward.id !== 'shrimp_chips_bag';
+                    let orderIdVal = null;
 
-                    // Only generate voucher document if it's a discount coupon
-                    if (pendingReward.discountPercent > 0) {
+                    if (needsOrder) {
+                        const rewardOrderRef = doc(collection(db, "orders"));
+                        orderIdVal = rewardOrderRef.id;
+                        tx.set(rewardOrderRef, {
+                            customerName: userData.name || currentUser.displayName || 'Member',
+                            customerEmail: currentUser.email || '',
+                            customerPhone: userData.phone || '',
+                            orderType: 'redeem',
+                            paymentMethod: 'cod',
+                            paymentMethodLabel: 'Reward Store',
+                            paymentStatus: 'cod_pending',
+                            status: 'pending',
+                            totalPrice: 0,
+                            discountAmount: 0,
+                            tableNumber: '',
+                            address: '',
+                            distance: 0,
+                            deliveryFee: 0,
+                            notes: `Đổi thưởng: ${pendingReward.nameVi}`,
+                            items: [{ id: pendingReward.id, name: pendingReward.nameVi, price: 0, qty: 1, options: [] }],
+                            userId: currentUser.uid,
+                            rewardRedeemedId: pendingReward.id,
+                            rewardPointsUsed: cost,
+                            remainingPoints: updatedPoints,
+                            language: lang,
+                            createdAt: new Date()
+                        });
+                    }
+
+                    // For voucher_15 and shrimp_chips_bag, create a voucher and send it to user's inbox
+                    if (pendingReward.id === 'voucher_15' || pendingReward.id === 'shrimp_chips_bag') {
                         tx.set(doc(db, "vouchers", promoCode), {
                             code: promoCode,
                             discountPercent: pendingReward.discountPercent || 0,
                             isFreeMeal: false,
+                            giftItem: pendingReward.id === 'shrimp_chips_bag' ? 'Bánh phồng tôm' : null,
                             email: currentUser.email,
                             used: false,
                             allowedOrderTypes: ['takeaway','delivery','dine-in'],
@@ -614,6 +622,32 @@
                             createdAt: new Date(),
                             source: 'reward_store',
                             rewardId: pendingReward.id
+                        });
+
+                        const msgRef = doc(collection(db, "messages"));
+                        const msgTitleVi = pendingReward.id === 'shrimp_chips_bag' ? 'Mã Nhận Quà: Bánh Phồng Tôm 🎁' : 'Mã Voucher Giảm Giá 15% 🎁';
+                        const msgTitleEn = pendingReward.id === 'shrimp_chips_bag' ? 'Gift Code: Shrimp Chips 🎁' : '15% Off Discount Voucher 🎁';
+                        const msgTitleFi = pendingReward.id === 'shrimp_chips_bag' ? 'Lahjakoodi: Katkarapusipsit 🎁' : '15% Alennuskuponki 🎁';
+
+                        const msgTextVi = pendingReward.id === 'shrimp_chips_bag'
+                            ? `Cảm ơn bạn đã đổi điểm! Dưới đây là mã nhận quà 1 túi Bánh Phồng Tôm của bạn. Vui lòng xuất trình mã này cho nhân viên tại quầy hoặc nhập khi đặt hàng để nhận quà.`
+                            : `Cảm ơn bạn đã đổi điểm! Dưới đây là mã voucher giảm giá 15% của bạn. Vui lòng sao chép và áp dụng mã này tại trang thanh toán khi đặt hàng.`;
+                        
+                        const msgTextEn = pendingReward.id === 'shrimp_chips_bag'
+                            ? `Thank you for redeeming! Here is your gift code for 1 bag of Shrimp Chips. Please present this code to our staff at the counter to claim your gift.`
+                            : `Thank you for redeeming! Here is your 15% discount voucher. Please copy and apply this code during checkout on your next order.`;
+
+                        const msgTextFi = pendingReward.id === 'shrimp_chips_bag'
+                            ? `Kiitos lunastuksesta! Tässä on lahjakoodisi 1 pussille Katkarapusipsejä. Näytä tämä koodi henkilökunnalle lunastaaksesi lahjasi.`
+                            : `Kiitos lunastuksesta! Tässä on 15% alennuskuponkisi. Kopioi ja käytä tämä koodi kassalla seuraavan tilauksesi yhteydessä.`;
+
+                        tx.set(msgRef, {
+                            title: lang === 'vi' ? msgTitleVi : (lang === 'fi' ? msgTitleFi : msgTitleEn),
+                            text: lang === 'vi' ? msgTextVi : (lang === 'fi' ? msgTextFi : msgTextEn),
+                            recipientId: currentUser.uid,
+                            read: false,
+                            voucherCode: promoCode,
+                            createdAt: new Date()
                         });
                     }
 
@@ -624,26 +658,37 @@
                         amount: -cost,
                         balanceAfter: updatedPoints,
                         rewardId: pendingReward.id,
-                        orderId: rewardOrderRef.id,
+                        orderId: orderIdVal,
                         note: `Đổi ${pendingReward.nameVi}`,
                         createdAt: new Date()
                     });
                 });
 
-                const lang = localStorage.getItem('selectedLanguage') || 'en';
                 let successMsg = '';
                 if (lang === 'vi') {
-                    successMsg = pendingReward.id === 'lucky_spin_1' 
-                        ? `Bạn đã đổi thành công 1 Lượt quay Lucky Wheel. Lượt quay đã được cộng trực tiếp vào tài khoản của bạn!`
-                        : `Bạn đã đổi thành công "${pendingReward.nameVi}". Đơn quà đã được chuyển đến quầy/bếp để phục vụ!`;
+                    if (pendingReward.id === 'lucky_spin_1') {
+                        successMsg = `Bạn đã đổi thành công 1 Lượt quay Lucky Wheel. Lượt quay đã được cộng trực tiếp vào tài khoản của bạn!`;
+                    } else if (pendingReward.id === 'voucher_15' || pendingReward.id === 'shrimp_chips_bag') {
+                        successMsg = `Bạn đã đổi thành công "${pendingReward.nameVi}". Mã nhận quà đã được gửi vào Hộp thư (Inbox) của bạn!`;
+                    } else {
+                        successMsg = `Bạn đã đổi thành công "${pendingReward.nameVi}". Đơn quà đã được chuyển đến quầy/bếp để phục vụ!`;
+                    }
                 } else if (lang === 'fi') {
-                    successMsg = pendingReward.id === 'lucky_spin_1'
-                        ? `Olet lunastanut 1 onnenpyörän pyöräytyksen. Se on lisätty profiiliisi!`
-                        : `Olet lunastanut palkinnon "${pendingReward.nameFi}". Palkintotilaus on lähetetty ravintolaan!`;
+                    if (pendingReward.id === 'lucky_spin_1') {
+                        successMsg = `Olet lunastanut 1 onnenpyörän pyöräytyksen. Se on lisätty profiiliisi!`;
+                    } else if (pendingReward.id === 'voucher_15' || pendingReward.id === 'shrimp_chips_bag') {
+                        successMsg = `Olet lunastanut palkinnon "${pendingReward.nameFi}". Lahjakorttikoodi on lähetetty Hộp thư (Inbox)-kansioosi!`;
+                    } else {
+                        successMsg = `Olet lunastanut palkinnon "${pendingReward.nameFi}". Palkintotilaus on lähetetty ravintolaan!`;
+                    }
                 } else {
-                    successMsg = pendingReward.id === 'lucky_spin_1'
-                        ? `You have successfully redeemed 1 Lucky Wheel Spin. The spin has been added directly to your profile!`
-                        : `You have successfully redeemed "${pendingReward.nameEn}". The reward order has been sent to the restaurant!`;
+                    if (pendingReward.id === 'lucky_spin_1') {
+                        successMsg = `You have successfully redeemed 1 Lucky Wheel Spin. The spin has been added directly to your profile!`;
+                    } else if (pendingReward.id === 'voucher_15' || pendingReward.id === 'shrimp_chips_bag') {
+                        successMsg = `You have successfully redeemed "${pendingReward.nameEn}". The reward code has been sent to your Inbox!`;
+                    } else {
+                        successMsg = `You have successfully redeemed "${pendingReward.nameEn}". The reward order has been sent to the restaurant!`;
+                    }
                 }
 
                 document.getElementById('redeem-modal').classList.add('hidden');
