@@ -689,6 +689,13 @@
             }, 50);
         }
 
+        window.closeRewardModal = function() {
+            const modal = document.getElementById('lucky-reward-modal');
+            if (modal) {
+                modal.remove();
+            }
+        };
+
         window.userProfileDocData = null;
 
         function renderLoyaltyInfo() {
