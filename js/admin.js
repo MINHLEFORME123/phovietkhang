@@ -2909,25 +2909,29 @@ Rules:
         }
     }
 
-    async function createMenuItem(nameVi, price, categoryVi, descriptionVi, imageUrl) {
+    async function createMenuItem(nameVi, nameEn, nameFi, price, categoryVi, categoryEn, categoryFi, descVi, descEn, descFi, imageUrl) {
         try {
             const newItemRef = doc(collection(db, "menu"));
             await setDoc(newItemRef, {
                 nameVi: nameVi || "",
-                nameEn: "",
-                nameFi: "",
+                nameEn: nameEn || "",
+                nameFi: nameFi || "",
                 price: parseFloat(price) || 0,
                 categoryVi: categoryVi || "",
-                categoryEn: "",
-                categoryFi: "",
-                descriptionVi: descriptionVi || "",
-                descriptionEn: "",
-                descriptionFi: "",
+                categoryEn: categoryEn || "",
+                categoryFi: categoryFi || "",
+                descVi: descVi || "",
+                descEn: descEn || "",
+                descFi: descFi || "",
+                descriptionVi: descVi || "", // for legacy compatibility
+                descriptionEn: descEn || "",
+                descriptionFi: descFi || "",
                 image: imageUrl || "",
                 isAvailable: true,
                 preparationTime: 15,
                 nutrition: { calories: 0, protein: 0, fat: 0, carbs: 0 },
-                tags: []
+                tags: [],
+                options: []
             });
             return { success: true, message: `Menu item created successfully with ID: ${newItemRef.id}` };
         } catch (e) {
@@ -4232,6 +4236,24 @@ Rules:
                     result = await setOptionChoicePrice(args.dishId, args.optionName, args.choiceLabel, args.newPrice);
                 } else if (tool === 'updateMenuPrice') {
                     result = await updateMenuPrice(args.dishId, args.newPrice);
+                } else if (tool === 'createMenuItem') {
+                    let finalImageUrl = args.imageUrl;
+                    if (finalImageUrl && window.__uploadedImages && window.__uploadedImages[finalImageUrl]) {
+                        finalImageUrl = window.__uploadedImages[finalImageUrl];
+                    }
+                    result = await createMenuItem(
+                        args.nameVi,
+                        args.nameEn,
+                        args.nameFi,
+                        args.price,
+                        args.categoryVi || args.category,
+                        args.categoryEn,
+                        args.categoryFi,
+                        args.descVi || args.descriptionVi || args.description,
+                        args.descEn || args.descriptionEn,
+                        args.descFi || args.descriptionFi,
+                        finalImageUrl
+                    );
                 } else if (tool === 'addMenuOptionGroup') {
                     result = await addMenuOptionGroup(
                         args.dishId,

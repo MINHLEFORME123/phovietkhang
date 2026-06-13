@@ -587,8 +587,8 @@ TOOLS AVAILABLE:
         catch (e) { return { error: e.message }; }
     }
 
-    async function createMenuItem(nameVi, price, categoryVi, descriptionVi, imageUrl) {
-        try { const ref = await addDoc(collection(db, "menu"), { nameVi: nameVi||"", nameEn: "", nameFi: "", price: parseFloat(price)||0, categoryVi: categoryVi||"", categoryEn: "", categoryFi: "", descVi: descriptionVi||"", descEn: "", descFi: "", image: imageUrl||"", isAvailable: true, preparationTime: 15, nutrition: { calories: 0, protein: 0, fat: 0, carbs: 0 }, tags: [] }); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã tạo món với ID: ${ref.id}` }; }
+    async function createMenuItem(nameVi, nameEn, nameFi, price, categoryVi, categoryEn, categoryFi, descVi, descEn, descFi, imageUrl) {
+        try { const ref = await addDoc(collection(db, "menu"), { nameVi: nameVi||"", nameEn: nameEn||"", nameFi: nameFi||"", price: parseFloat(price)||0, categoryVi: categoryVi||"", categoryEn: categoryEn||"", categoryFi: categoryFi||"", descVi: descVi||"", descEn: descEn||"", descFi: descFi||"", image: imageUrl||"", isAvailable: true, preparationTime: 15, nutrition: { calories: 0, protein: 0, fat: 0, carbs: 0 }, tags: [], options: [] }); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã tạo món với ID: ${ref.id}` }; }
         catch (e) { return { error: e.message }; }
     }
 
@@ -986,7 +986,7 @@ TOOLS AVAILABLE:
         duplicateMenuItem:        { fn: duplicateMenuItem, params: ['dishId'] },
         deleteMenuItem:           { fn: deleteMenuItem, params: ['dishId'] },
         updateMenuCustomFields:   { fn: updateMenuCustomFields, params: ['dishId', 'customFields'] },
-        createMenuItem:           { fn: createMenuItem, params: ['nameVi', 'price', 'categoryVi', 'descriptionVi', 'imageUrl'] },
+        createMenuItem:           { fn: createMenuItem, params: ['nameVi', 'nameEn', 'nameFi', 'price', 'categoryVi', 'categoryEn', 'categoryFi', 'descVi', 'descEn', 'descFi', 'imageUrl'] },
         listAllUsers:             { fn: () => listAllUsers(), params: [] },
         changeUserRole:           { fn: changeUserRole, params: ['uid', 'newRole'] },
         getUserLoyalty:           { fn: getUserLoyalty, params: ['uid'] },
@@ -1138,6 +1138,8 @@ TOOLS AVAILABLE:
                         if (resolvedArgs.dishes && !resolvedArgs.dishIdArray) resolvedArgs.dishIdArray = resolvedArgs.dishes;
                         if (resolvedArgs.categoryId && !resolvedArgs.categoryVi) resolvedArgs.categoryVi = resolvedArgs.categoryId;
                         if (resolvedArgs.newCategoryId && !resolvedArgs.categoryVi) resolvedArgs.categoryVi = resolvedArgs.newCategoryId;
+                        if (resolvedArgs.name && !resolvedArgs.nameVi) resolvedArgs.nameVi = resolvedArgs.name;
+                        if (resolvedArgs.category && !resolvedArgs.categoryVi) resolvedArgs.categoryVi = resolvedArgs.category;
                         if (resolvedArgs.customFieldsObject && !resolvedArgs.customFields) resolvedArgs.customFields = resolvedArgs.customFieldsObject;
                         if (resolvedArgs.optionName && !resolvedArgs.optionNameVi) resolvedArgs.optionNameVi = resolvedArgs.optionName;
                         if (resolvedArgs.choiceLabel && !resolvedArgs.choiceLabelVi) resolvedArgs.choiceLabelVi = resolvedArgs.choiceLabel;
