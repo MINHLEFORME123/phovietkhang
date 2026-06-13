@@ -10,6 +10,7 @@
   - Fixed a SyntaxError in `rewards-store.html` caused by a duplicate declaration of the `lang` variable in the same scope.
   - Restored `closeRewardModal` in `profile.html` which was accidentally removed during refactoring.
   - Transformed both `voucher_15` (15% discount voucher) and `shrimp_chips_bag` (1 bag of shrimp chips) rewards into vouchers that are generated in Firestore (`vouchers` collection) and sent to the user's Inbox (`messages` collection) upon points redemption, allowing users to copy the codes or present them to restaurant staff. Changed success dialog messages to reflect this.
+  - Upgraded the AI Admin Assistant's `createMenuItem` tool in both [ai-chat.js](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/js/admin/ai-chat.js) and [admin.js](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/js/admin.js) to accept 11 parameters (Vietnamese, English, Finnish fields for name, category, and description), allowing the AI to create fully translated menu items in Firestore. Added parameter resolvers in `ai-chat.js` for fallback names.
 
 ### [2026-06-13] Fixed False Redemption Failures by Isolating UI Refreshes
 - **Changes**:
