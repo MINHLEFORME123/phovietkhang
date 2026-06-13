@@ -2,6 +2,12 @@
 
 ## Modifications
 
+### [2026-06-13] Implemented Reactive Multi-Language Support for User Ranks & Loyalty Points
+- **Changes**:
+  - Implemented event listeners for `languageChanged` in [profile.html](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/profile.html) and [rewards-store.html](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/rewards-store.html).
+  - Stored user profile documents in state (`window.userProfileDocData`) to dynamically re-render loyalty ranks (Đồng/Bronze/Pronssi, Bạc/Silver/Hopea, etc.) and loyalty points text instantly when language flags are clicked.
+  - Fixed a ReferenceError in `rewards-store.html` where `totalSpent` was not defined inside the `loadUserProfile` scope.
+
 ### [2026-06-13] Fixed False Redemption Failures by Isolating UI Refreshes
 - **Changes**:
   - Isolated the `loadUserProfile()` UI update call inside a safe `try-catch` block after the Firestore database transaction commits successfully.
