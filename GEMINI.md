@@ -2,6 +2,13 @@
 
 ## Modifications
 
+### [2026-06-13] Added User Points & Rank Management Tools to AI Admin Assistant
+- **Changes**:
+  - Implemented `updateUserLoyaltyPoints(uidOrEmail, pointsAmount, isRelative)` to allow the AI Admin Assistant to add, subtract, or set a user's loyalty points in Firestore.
+  - Implemented `updateUserRank(uidOrEmail, targetRank)` to allow changing a user's rank/tier (Đồng, Bạc, Vàng, Bạch Kim, Kim Cương) by updating their Firestore `totalSpent` threshold.
+  - Implemented `updateUserTotalSpent(uidOrEmail, totalSpentAmount, isRelative)` for direct manipulation of the accumulated spending database field.
+  - Documented the three new tools in the assistant's system prompt inside [ai-chat.js](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/js/admin/ai-chat.js) and configured parameter resolver mappings for robustness against variable casing or abbreviations.
+
 ### [2026-06-13] Completed and Polished Rewards Store (Shop Đổi Quà) UI
 - **Changes**:
   - Overhauled [rewards-store.html](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/rewards-store.html) to incorporate the unified top navigation bar (matching [index.html](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/index.html) with Home, Menu, Locations, Contact, Inbox, Register, Reservations, Cart, and Profile links).

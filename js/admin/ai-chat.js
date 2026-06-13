@@ -361,7 +361,7 @@ TOOLS AVAILABLE:
 - Orders: getOrdersSoldToday, getOrdersByStatus, updateOrderStatus, deleteOrder
 - Menu Browse: listAllCategories, searchFoodByCategory, getFoodItemById
 - Menu Edit: updateMenuPrice, createMenuItem, setOptionChoicePrice, addMenuOptionGroup, removeMenuOptionGroup, addChoiceToOptionGroup, removeChoiceFromOptionGroup, updateMenuOptionGroup, updateChoiceInOptionGroup, updateMenuName, updateMenuDescription, updateMenuCategory, updateMenuAvailability, uploadMenuImage, removeMenuImage, updateMenuPreparationTime, updateMenuNutritionInfo, addMenuTag, removeMenuTag, reorderMenuItems, duplicateMenuItem, deleteMenuItem, updateMenuCustomFields
-- Users: listAllUsers, getUserLoyalty, addLoyaltyProgressByOrderId, changeUserRole, createUserAccount, sendPasswordReset, sendSpinsToUser, createCustomVoucher, markVoucherUsed, removeVoucher, listAllVouchers
+- Users: listAllUsers, getUserLoyalty, addLoyaltyProgressByOrderId, changeUserRole, createUserAccount, sendPasswordReset, sendSpinsToUser, createCustomVoucher, markVoucherUsed, removeVoucher, listAllVouchers, updateUserLoyaltyPoints(uidOrEmail, pointsAmount, isRelative), updateUserRank(uidOrEmail, targetRank), updateUserTotalSpent(uidOrEmail, totalSpentAmount, isRelative)
 - Auth: adminListAuthUsers, adminDeleteAuthUser, adminDisableUser, adminEnableUser, adminChangeUserPassword, adminChangeUserEmail, adminVerifyUserEmail, adminSetCustomClaims, adminGetUserInfo, adminRevokeUserTokens, adminUpdateDisplayName, adminGenerateCustomToken
 - Homepage Tools details:
   * getHomepageConfig() -> Fetches the current homepage configuration document (contains heroBgUrl, signatureDishIds, storyImg, etc.).
@@ -650,6 +650,120 @@ TOOLS AVAILABLE:
         catch (e) { return { error: e.message }; }
     }
 
+    async function updateUserLoyaltyPoints(uidOrEmail, pointsAmount, isRelative) {
+        try {
+            if (!uidOrEmail) return { error: "Thiếu uidOrEmail." };
+            let uid = String(uidOrEmail).trim();
+            if (uid.includes('@')) {
+                const emailLower = uid.toLowerCase();
+                const q = query(collection(db, "users"), where("email", "==", emailLower));
+                let snap = await getDocs(q);
+                if (snap.empty) {
+                    const q2 = query(collection(db, "users"), where("email", "==", uid));
+                    snap = await getDocs(q2);
+                }
+                if (snap.empty) return { error: `Không tìm thấy user với email: ${uid}` };
+                uid = snap.docs[0].id;
+            }
+            const userRef = doc(db, "users", uid);
+            const userSnap = await getDoc(userRef);
+            if (!userSnap.exists()) return { error: `Không tìm thấy user profile với UID: ${uid}` };
+            
+            const currentPoints = Number(userSnap.data().loyaltyPoints || 0);
+            const amount = Number(pointsAmount) || 0;
+            const updatedPoints = isRelative ? currentPoints + amount : amount;
+            
+            await updateDoc(userRef, { 
+                loyaltyPoints: updatedPoints,
+                updatedAt: new Date()
+            });
+            if (window.loadUsers) window.loadUsers();
+            return { success: true, message: `Đã cập nhật điểm tích lũy của user ${uid} thành ${updatedPoints} điểm (Trước đó: ${currentPoints}).` };
+        } catch (e) { return { error: e.message }; }
+    }
+
+    async function updateUserRank(uidOrEmail, targetRank) {
+        try {
+            if (!uidOrEmail) return { error: "Thiếu uidOrEmail." };
+            if (!targetRank) return { error: "Thiếu hạng/rank muốn thay đổi." };
+            let uid = String(uidOrEmail).trim();
+            if (uid.includes('@')) {
+                const emailLower = uid.toLowerCase();
+                const q = query(collection(db, "users"), where("email", "==", emailLower));
+                let snap = await getDocs(q);
+                if (snap.empty) {
+                    const q2 = query(collection(db, "users"), where("email", "==", uid));
+                    snap = await getDocs(q2);
+                }
+                if (snap.empty) return { error: `Không tìm thấy user với email: ${uid}` };
+                uid = snap.docs[0].id;
+            }
+            const userRef = doc(db, "users", uid);
+            const userSnap = await getDoc(userRef);
+            if (!userSnap.exists()) return { error: `Không tìm thấy user profile với UID: ${uid}` };
+            
+            const rankClean = String(targetRank).trim().toLowerCase();
+            let newSpent = 0;
+            let rankLabel = "";
+            
+            if (['kim_cuong', 'kim cuong', 'diamond', 'kim cương'].includes(rankClean)) {
+                newSpent = 1000000;
+                rankLabel = "Kim Cương (Diamond)";
+            } else if (['platinum', 'bạch kim', 'bach kim'].includes(rankClean)) {
+                newSpent = 500000;
+                rankLabel = "Bạch Kim (Platinum)";
+            } else if (['gold', 'vang', 'vàng', 'kim'].includes(rankClean)) {
+                newSpent = 200000;
+                rankLabel = "Vàng (Gold)";
+            } else if (['silver', 'bac', 'bạc'].includes(rankClean)) {
+                newSpent = 100000;
+                rankLabel = "Bạc (Silver)";
+            } else {
+                newSpent = 0;
+                rankLabel = "Đồng (Bronze)";
+            }
+            
+            await updateDoc(userRef, { 
+                totalSpent: newSpent,
+                updatedAt: new Date()
+            });
+            if (window.loadUsers) window.loadUsers();
+            return { success: true, message: `Đã cập nhật rank của user ${uid} thành "${rankLabel}" (totalSpent đặt thành ${newSpent}).` };
+        } catch (e) { return { error: e.message }; }
+    }
+
+    async function updateUserTotalSpent(uidOrEmail, totalSpentAmount, isRelative) {
+        try {
+            if (!uidOrEmail) return { error: "Thiếu uidOrEmail." };
+            let uid = String(uidOrEmail).trim();
+            if (uid.includes('@')) {
+                const emailLower = uid.toLowerCase();
+                const q = query(collection(db, "users"), where("email", "==", emailLower));
+                let snap = await getDocs(q);
+                if (snap.empty) {
+                    const q2 = query(collection(db, "users"), where("email", "==", uid));
+                    snap = await getDocs(q2);
+                }
+                if (snap.empty) return { error: `Không tìm thấy user với email: ${uid}` };
+                uid = snap.docs[0].id;
+            }
+            const userRef = doc(db, "users", uid);
+            const userSnap = await getDoc(userRef);
+            if (!userSnap.exists()) return { error: `Không tìm thấy user profile với UID: ${uid}` };
+            
+            const currentSpent = Number(userSnap.data().totalSpent || 0);
+            const amt = Number(totalSpentAmount) || 0;
+            const updatedSpent = isRelative ? currentSpent + amt : amt;
+            
+            await updateDoc(userRef, { 
+                totalSpent: updatedSpent,
+                updatedAt: new Date()
+            });
+            if (window.loadUsers) window.loadUsers();
+            return { success: true, message: `Đã cập nhật doanh thu tích lũy (totalSpent) của user ${uid} thành ${updatedSpent} (Trước đó: ${currentSpent}).` };
+        } catch (e) { return { error: e.message }; }
+    }
+
     async function sendEmail(to, subject, html) {
         try {
             const r = await callWorker('sendEmail', { to, subject, html });
@@ -916,7 +1030,10 @@ TOOLS AVAILABLE:
         updateWheelGuarantee:     { fn: updateWheelGuarantee, params: ['next20', 'next50', 'next100'] },
         updateHomepageReviews:    { fn: updateHomepageReviews, params: ['reviews'] },
         updateReviewImageUrl:     { fn: updateReviewImageUrl, params: ['index', 'imageUrl'] },
-        sendEmail:                { fn: sendEmail, params: ['to', 'subject', 'html'] }
+        sendEmail:                { fn: sendEmail, params: ['to', 'subject', 'html'] },
+        updateUserLoyaltyPoints:  { fn: updateUserLoyaltyPoints, params: ['uidOrEmail', 'pointsAmount', 'isRelative'] },
+        updateUserRank:           { fn: updateUserRank, params: ['uidOrEmail', 'targetRank'] },
+        updateUserTotalSpent:     { fn: updateUserTotalSpent, params: ['uidOrEmail', 'totalSpentAmount', 'isRelative'] }
     };
 
     const KNOWN_TOOLS = new Set(Object.keys(toolRegistry));
@@ -1025,6 +1142,14 @@ TOOLS AVAILABLE:
                         if (resolvedArgs.optionName && !resolvedArgs.optionNameVi) resolvedArgs.optionNameVi = resolvedArgs.optionName;
                         if (resolvedArgs.choiceLabel && !resolvedArgs.choiceLabelVi) resolvedArgs.choiceLabelVi = resolvedArgs.choiceLabel;
                         if ((resolvedArgs.uid || resolvedArgs.email) && !resolvedArgs.uidOrEmail) resolvedArgs.uidOrEmail = resolvedArgs.uid || resolvedArgs.email;
+                        if (resolvedArgs.points && !resolvedArgs.pointsAmount) resolvedArgs.pointsAmount = resolvedArgs.points;
+                        if (resolvedArgs.points_amount && !resolvedArgs.pointsAmount) resolvedArgs.pointsAmount = resolvedArgs.points_amount;
+                        if (resolvedArgs.rank && !resolvedArgs.targetRank) resolvedArgs.targetRank = resolvedArgs.rank;
+                        if (resolvedArgs.tier && !resolvedArgs.targetRank) resolvedArgs.targetRank = resolvedArgs.tier;
+                        if (resolvedArgs.totalSpent && !resolvedArgs.totalSpentAmount) resolvedArgs.totalSpentAmount = resolvedArgs.totalSpent;
+                        if (resolvedArgs.spent && !resolvedArgs.totalSpentAmount) resolvedArgs.totalSpentAmount = resolvedArgs.spent;
+                        if (resolvedArgs.spent_amount && !resolvedArgs.totalSpentAmount) resolvedArgs.totalSpentAmount = resolvedArgs.spent_amount;
+                        if (resolvedArgs.totalSpentAmount && !resolvedArgs.totalSpentAmount) resolvedArgs.totalSpentAmount = resolvedArgs.totalSpentAmount;
                         if (resolvedArgs.title && !resolvedArgs.titleVi) resolvedArgs.titleVi = resolvedArgs.title;
                         if (resolvedArgs.desc && !resolvedArgs.descVi) resolvedArgs.descVi = resolvedArgs.desc;
                         if (resolvedArgs.description && !resolvedArgs.descVi) resolvedArgs.descVi = resolvedArgs.description;
