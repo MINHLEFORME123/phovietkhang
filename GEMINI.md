@@ -9,6 +9,7 @@
   - Fixed a ReferenceError in `rewards-store.html` where `totalSpent` was not defined inside the `loadUserProfile` scope.
   - Fixed a SyntaxError in `rewards-store.html` caused by a duplicate declaration of the `lang` variable in the same scope.
   - Restored `closeRewardModal` in `profile.html` which was accidentally removed during refactoring.
+  - Transformed both `voucher_15` (15% discount voucher) and `shrimp_chips_bag` (1 bag of shrimp chips) rewards into vouchers that are generated in Firestore (`vouchers` collection) and sent to the user's Inbox (`messages` collection) upon points redemption, allowing users to copy the codes or present them to restaurant staff. Changed success dialog messages to reflect this.
 
 ### [2026-06-13] Fixed False Redemption Failures by Isolating UI Refreshes
 - **Changes**:
