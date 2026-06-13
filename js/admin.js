@@ -3891,6 +3891,156 @@ Rules:
         }
     }
 
+    async function listAllReservations() {
+        try {
+            const qSnap = await getDocs(collection(db, "reservations"));
+            const list = [];
+            qSnap.forEach(docSnap => {
+                list.push({ id: docSnap.id, ...docSnap.data() });
+            });
+            return list;
+        } catch (e) {
+            console.error(e);
+            return { error: e.message };
+        }
+    }
+
+    async function createReservation(name, phone, email, date, time, guests, location, notes) {
+        try {
+            const locLabel = (location || '').toLowerCase() === 'easton' ? 'Easton Helsinki' : 'Pengerkatu';
+            const ref = await addDoc(collection(db, "reservations"), {
+                name: name || "",
+                phone: phone || "",
+                email: email || "",
+                date: date || "",
+                time: time || "",
+                guests: parseInt(guests, 10) || 2,
+                location: locLabel,
+                notes: notes || "",
+                status: 'pending',
+                createdAt: new Date()
+            });
+            return { success: true, message: `Created reservation successfully with ID: ${ref.id}` };
+        } catch (e) {
+            console.error(e);
+            return { error: e.message };
+        }
+    }
+
+    async function updateReservationStatus(id, status) {
+        try {
+            await updateDoc(doc(db, "reservations", id), { status: status });
+            return { success: true, message: `Reservation status updated to: ${status}` };
+        } catch (e) {
+            console.error(e);
+            return { error: e.message };
+        }
+    }
+
+    async function deleteReservation(id) {
+        try {
+            await deleteDoc(doc(db, "reservations", id));
+            return { success: true, message: `Reservation deleted successfully.` };
+        } catch (e) {
+            console.error(e);
+            return { error: e.message };
+        }
+    }
+
+    async function listAllFeedbacks() {
+        try {
+            const qSnap = await getDocs(collection(db, "feedback"));
+            const list = [];
+            qSnap.forEach(docSnap => {
+                list.push({ id: docSnap.id, ...docSnap.data() });
+            });
+            return list;
+        } catch (e) {
+            console.error(e);
+            return { error: e.message };
+        }
+    }
+
+    async function replyToFeedback(id, replyText) {
+        try {
+            const feedbackRef = doc(db, "feedback", id);
+            const snap = await getDoc(feedbackRef);
+            if (!snap.exists()) return { error: "Feedback not found." };
+            const data = snap.data();
+            
+            if (data.email) {
+                const html = `
+                    <div style="font-family:sans-serif; padding:20px; line-height:1.6;">
+                        <h2 style="color:#3b82f6;">Phở Việt Khang - Phản hồi thư liên hệ</h2>
+                        <p>Xin chào <strong>${data.name || 'Quý khách'}</strong>,</p>
+                        <p>Chúng tôi đã nhận được thông điệp của bạn: <em>"${data.message}"</em>.</p>
+                        <hr style="border:0; border-top:1px solid #eee; margin:20px 0;">
+                        <p><strong>Câu trả lời từ chúng tôi:</strong></p>
+                        <p style="background:#f9fafb; padding:15px; border-left:4px solid #3b82f6; font-style:italic;">${replyText}</p>
+                        <hr style="border:0; border-top:1px solid #eee; margin:20px 0;">
+                        <p>Trân trọng cảm ơn quý khách!</p>
+                        <p><strong>Phở Việt Khang Team</strong></p>
+                    </div>
+                `;
+                await callWorker('sendEmail', { to: data.email, subject: 'Phản hồi từ Phở Việt Khang', html });
+            }
+            
+            await updateDoc(feedbackRef, { status: 'read', reply: replyText });
+            return { success: true, message: `Sent email reply to feedback successfully.` };
+        } catch (e) {
+            console.error(e);
+            return { error: e.message };
+        }
+    }
+
+    async function deleteFeedback(id) {
+        try {
+            await deleteDoc(doc(db, "feedback", id));
+            return { success: true, message: `Feedback deleted successfully.` };
+        } catch (e) {
+            console.error(e);
+            return { error: e.message };
+        }
+    }
+
+    async function updateVoucher(code, discountPercent, email, expiryDays, allowedTypes) {
+        try {
+            const cleanCode = (code || '').trim().toUpperCase();
+            if (!cleanCode) return { error: 'Voucher code is required.' };
+            const ref = doc(db, "vouchers", cleanCode);
+            const snap = await getDoc(ref);
+            if (!snap.exists()) return { error: `Voucher "${cleanCode}" not found.` };
+            
+            const updates = {};
+            if (discountPercent !== undefined && discountPercent !== null) {
+                updates.discountPercent = parseInt(discountPercent, 10);
+            }
+            if (email !== undefined) {
+                updates.email = (email || '').trim().toLowerCase() || null;
+            }
+            if (expiryDays !== undefined && expiryDays !== null) {
+                const expiry = new Date();
+                expiry.setDate(expiry.getDate() + parseInt(expiryDays, 10));
+                updates.expiryDate = expiry;
+            }
+            if (allowedTypes !== undefined) {
+                let allowedOrderTypes = ['takeaway', 'delivery', 'dine-in'];
+                if (Array.isArray(allowedTypes)) {
+                    allowedOrderTypes = allowedTypes;
+                } else if (typeof allowedTypes === 'string') {
+                    allowedOrderTypes = allowedTypes.split(',').map(t => t.trim()).filter(Boolean);
+                }
+                updates.allowedOrderTypes = allowedOrderTypes;
+            }
+            
+            await updateDoc(ref, updates);
+            return { success: true, message: `Voucher "${cleanCode}" updated successfully.` };
+        } catch (e) {
+            console.error(e);
+            return { error: e.message };
+        }
+    }
+
     async function updateOrderStatus(orderId, newStatus) {
         try {
             const docRef = doc(db, "orders", orderId);
@@ -4424,6 +4574,22 @@ Rules:
                     result = await updateHomepageReviews(args.reviews);
                 } else if (tool === 'updateReviewImageUrl') {
                     result = await updateReviewImageUrl(args.index, args.imageUrl);
+                } else if (tool === 'listAllReservations') {
+                    result = await listAllReservations();
+                } else if (tool === 'createReservation') {
+                    result = await createReservation(args.name, args.phone, args.email, args.date, args.time, args.guests, args.location, args.notes);
+                } else if (tool === 'updateReservationStatus') {
+                    result = await updateReservationStatus(args.id, args.status);
+                } else if (tool === 'deleteReservation') {
+                    result = await deleteReservation(args.id);
+                } else if (tool === 'listAllFeedbacks') {
+                    result = await listAllFeedbacks();
+                } else if (tool === 'replyToFeedback') {
+                    result = await replyToFeedback(args.id, args.replyText);
+                } else if (tool === 'deleteFeedback') {
+                    result = await deleteFeedback(args.id);
+                } else if (tool === 'updateVoucher') {
+                    result = await updateVoucher(args.code, args.discountPercent, args.email, args.expiryDays, args.allowedTypes);
                 } else {
                     result = { error: `Tool "${tool}" không tồn tại.` };
                 }
