@@ -689,12 +689,61 @@
             }, 50);
         }
 
-        window.closeRewardModal = function() {
-            const modal = document.getElementById('lucky-reward-modal');
-            if (modal) {
-                modal.remove();
+        window.userProfileDocData = null;
+
+        function renderLoyaltyInfo() {
+            if (!window.userProfileDocData) return;
+            const totalSpent = window.userProfileDocData.totalSpent || 0;
+            const loyaltyPoints = window.userProfileDocData.loyaltyPoints || 0;
+            const tier = getLoyaltyTier(totalSpent);
+            const lang = localStorage.getItem('selectedLanguage') || 'vi';
+
+            const tierLabels = {
+                vi: { bronze: 'Đồng', silver: 'Bạc', gold: 'Vàng', platinum: 'Bạch Kim', diamond: 'Kim Cương' },
+                en: { bronze: 'Bronze', silver: 'Silver', gold: 'Gold', platinum: 'Platinum', diamond: 'Diamond' },
+                fi: { bronze: 'Pronssi', silver: 'Hopea', gold: 'Kulta', platinum: 'Platina', diamond: 'Timantti' }
+            };
+            const pointsLabels = {
+                vi: 'điểm',
+                en: 'points',
+                fi: 'pistettä'
+            };
+            const earnLabels = {
+                vi: 'Tích',
+                en: 'Earn',
+                fi: 'Ansaitse'
+            };
+
+            const currentLabels = tierLabels[lang] || tierLabels.vi;
+            const currentPointsLabel = pointsLabels[lang] || pointsLabels.vi;
+            const currentEarnLabel = earnLabels[lang] || earnLabels.vi;
+
+            const tierConfig = {
+                bronze: { label: currentLabels.bronze, color: '#9a3412', colorBg: '#9a341222', icon: 'shield', discount: '0%', rate: '1%' },
+                silver: { label: currentLabels.silver, color: '#9ca3af', colorBg: '#9ca3af22', icon: 'shield', discount: '5%', rate: '1.5%' },
+                gold: { label: currentLabels.gold, color: '#eab308', colorBg: '#eab30822', icon: 'workspaces_premium', discount: '10%', rate: '2.5%' },
+                platinum: { label: currentLabels.platinum, color: '#06b6d4', colorBg: '#06b6d422', icon: 'diamond', discount: '15%', rate: '4%' },
+                diamond: { label: currentLabels.diamond, color: '#7c3aed', colorBg: '#7c3aed22', icon: 'diamond', discount: '20%', rate: '5%' }
+            }[tier] || { label: currentLabels.bronze, color: '#78350f', colorBg: '#78350f22', icon: 'shield', discount: '0%', rate: '1%' };
+
+            const loyaltyBadge = `
+                <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold" style="background:${tierConfig.colorBg}; color:${tierConfig.color}; border:1px solid ${tierConfig.color}44;">
+                    <span class="material-symbols-outlined text-[14px]" style="color:${tierConfig.color}">${tierConfig.icon}</span>
+                    ${tierConfig.label} -${tierConfig.discount} (${currentEarnLabel} ${tierConfig.rate})
+                </span>
+                <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-primary/15 text-primary border border-primary/30 ml-2">
+                    <span class="material-symbols-outlined text-[14px]">stars</span>
+                    ${loyaltyPoints} ${currentPointsLabel}
+                </span>`;
+            const container = document.getElementById('loyalty-tier-container');
+            if (container) {
+                container.innerHTML = loyaltyBadge;
             }
-        };
+        }
+
+        window.addEventListener('languageChanged', () => {
+            renderLoyaltyInfo();
+        });
 
         // Load profile data from Firestore
         async function loadProfile(user) {
@@ -722,27 +771,8 @@
 
                     originalData = { name, phone, address };
                     
-                    const totalSpent = data.totalSpent || 0;
-                    const loyaltyPoints = data.loyaltyPoints || 0;
-                    const tier = getLoyaltyTier(totalSpent);
-                    const rate = getLoyaltyRate(totalSpent);
-                    const tierConfig = {
-                        bronze: { label: 'Đồng', color: '#9a3412', colorBg: '#9a341222', icon: 'shield', discount: '0%', rate: '1%' },
-                        silver: { label: 'Bạc', color: '#9ca3af', colorBg: '#9ca3af22', icon: 'shield', discount: '5%', rate: '1.5%' },
-                        gold: { label: 'Vàng', color: '#eab308', colorBg: '#eab30822', icon: 'workspaces_premium', discount: '10%', rate: '2.5%' },
-                        platinum: { label: 'Bạch Kim', color: '#06b6d4', colorBg: '#06b6d422', icon: 'diamond', discount: '15%', rate: '4%' },
-                        diamond: { label: 'Kim Cương', color: '#7c3aed', colorBg: '#7c3aed22', icon: 'diamond', discount: '20%', rate: '5%' }
-                    }[tier] || { label: 'Đồng', color: '#78350f', colorBg: '#78350f22', icon: 'shield', discount: '0%', rate: '1%' };
-                    const loyaltyBadge = `
-                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold" style="background:${tierConfig.colorBg}; color:${tierConfig.color}; border:1px solid ${tierConfig.color}44;">
-                            <span class="material-symbols-outlined text-[14px]" style="color:${tierConfig.color}">${tierConfig.icon}</span>
-                            ${tierConfig.label} -${tierConfig.discount} (Tích ${tierConfig.rate})
-                        </span>
-                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-primary/15 text-primary border border-primary/30 ml-2">
-                            <span class="material-symbols-outlined text-[14px]">stars</span>
-                            ${loyaltyPoints} điểm
-                        </span>`;
-                    document.getElementById('loyalty-tier-container').innerHTML = loyaltyBadge;
+                    window.userProfileDocData = data;
+                    renderLoyaltyInfo();
                     
                     // Spins data loading
                     userSpins = data.spins || { deu: 0, xin: 0, vip: 0 };

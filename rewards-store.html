@@ -682,8 +682,14 @@
             const data = userSnap.exists() ? userSnap.data() : {};
             const points = Number(data.loyaltyPoints || 0);
             const totalSpent = Number(data.totalSpent || 0);
+            const lang = localStorage.getItem('selectedLanguage') || 'en';
+            const tierLabels = {
+                vi: { bronze: 'Đồng', silver: 'Bạc', gold: 'Vàng', diamond: 'Kim Cương', platinum: 'Bạch Kim' },
+                en: { bronze: 'Bronze', silver: 'Silver', gold: 'Gold', diamond: 'Diamond', platinum: 'Platinum' },
+                fi: { bronze: 'Pronssi', silver: 'Hopea', gold: 'Kulta', diamond: 'Timantti', platinum: 'Platina' }
+            };
             const tier = getLoyaltyTier(totalSpent);
-            const tierLabel = { bronze: 'Đồng', silver: 'Bạc', gold: 'Vàng', diamond: 'Kim Cương', platinum: 'Bạch Kim' }[tier] || 'Đồng';
+            const tierLabel = (tierLabels[lang] || tierLabels.en)[tier] || (tierLabels[lang] || tierLabels.en)['bronze'];
 
             document.getElementById('user-points').textContent = points;
             document.getElementById('user-tier').textContent = tierLabel;
@@ -716,6 +722,10 @@
                 historyEl.innerHTML = items.join('');
             }
         }
+
+        window.addEventListener('languageChanged', () => {
+            loadUserProfile();
+        });
 
         onAuthStateChanged(authInstance, async (user) => {
             currentUser = user;
