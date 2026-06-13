@@ -7,6 +7,7 @@
   - Implemented event listeners for `languageChanged` in [profile.html](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/profile.html) and [rewards-store.html](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/rewards-store.html).
   - Stored user profile documents in state (`window.userProfileDocData`) to dynamically re-render loyalty ranks (Đồng/Bronze/Pronssi, Bạc/Silver/Hopea, etc.) and loyalty points text instantly when language flags are clicked.
   - Fixed a ReferenceError in `rewards-store.html` where `totalSpent` was not defined inside the `loadUserProfile` scope.
+  - Fixed a SyntaxError in `rewards-store.html` caused by a duplicate declaration of the `lang` variable in the same scope.
 
 ### [2026-06-13] Fixed False Redemption Failures by Isolating UI Refreshes
 - **Changes**:
