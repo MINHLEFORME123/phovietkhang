@@ -650,7 +650,12 @@
                 document.getElementById('redeem-success-msg').textContent = successMsg;
                 document.getElementById('redeem-success').classList.remove('hidden');
                 pendingReward = null;
-                await loadUserProfile();
+                
+                try {
+                    await loadUserProfile();
+                } catch (loadErr) {
+                    console.warn('Failed to refresh user profile details:', loadErr);
+                }
             } catch (err) {
                 console.error('Redeem failed:', err);
                 if (err.message === 'NOT_ENOUGH_POINTS') {
