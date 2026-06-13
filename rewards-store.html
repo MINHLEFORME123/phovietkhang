@@ -10,7 +10,8 @@
     <link crossorigin href="https://fonts.gstatic.com" rel="preconnect"/>
     <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    <script src="https://cdn.tailwindcss?plugins=forms,container-queries"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script>
         tailwind.config = {
             darkMode: "class",
@@ -26,6 +27,13 @@
         }
     </script>
     <style>
+        .bg-pattern-dark {
+            background-color: #07182b !important;
+            background-image: url('assets/pattern-dark.svg') !important;
+            background-repeat: repeat;
+            background-size: 80px 40px;
+            background-attachment: fixed;
+        }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
@@ -41,7 +49,6 @@
         .reward-grid .reward-card:nth-child(1) { animation-delay: 0.05s; }
         .reward-grid .reward-card:nth-child(2) { animation-delay: 0.1s; }
         .reward-grid .reward-card:nth-child(3) { animation-delay: 0.15s; }
-        .reward-grid .reward-card:nth-child(4) { animation-delay: 0.2s; }
         @keyframes modalIn {
             from { opacity: 0; transform: scale(0.94) translateY(10px); }
             to { opacity: 1; transform: scale(1) translateY(0); }
@@ -71,95 +78,189 @@
         .redeem-btn:active {
             transform: scale(0.97);
         }
-        </style>
+    </style>
 </head>
-<body class="bg-background text-on-surface font-['Inter'] min-h-screen flex flex-col antialiased">
+<body class="bg-pattern-dark text-on-surface font-['Inter'] min-h-screen flex flex-col antialiased">
+    <!-- TopNavBar Component (Styled like index page) -->
     <nav class="fixed top-0 w-full z-50 bg-[#0a1019]/95 backdrop-blur-md border-b border-white/5">
         <div class="flex justify-between items-center max-w-7xl mx-auto px-4 md:px-16 h-20">
             <a class="flex items-center gap-2.5 shrink-0" href="index.html">
                 <span class="material-symbols-outlined text-[32px] text-white">ramen_dining</span>
                 <span class="text-white font-bold text-xl tracking-wide" style="font-family:'EB Garamond',serif;">PHỞ VIỆT KHANG</span>
             </a>
+            <div class="hidden lg:flex items-center space-x-8 font-medium text-[15px] tracking-wide">
+                <a class="text-gray-400 hover:text-white transition-colors duration-200" href="index.html" data-i18n="nav-home">Home</a>
+                <a class="text-gray-400 hover:text-white transition-colors duration-200" href="menu.html" data-i18n="nav-menu">Menu</a>
+                <a class="text-gray-400 hover:text-white transition-colors duration-200" href="locations.html" data-i18n="nav-locations">Locations</a>
+                <a class="text-gray-400 hover:text-white transition-colors duration-200" href="contact.html" data-i18n="nav-contact">Contact</a>
+                <a class="text-gray-400 hover:text-white transition-colors duration-200 relative flex items-center gap-1.5" href="inbox.html" id="nav-inbox-link">
+                    <span data-i18n="nav-inbox">Inbox</span>
+                    <span id="inbox-badge-nav" class="hidden w-2 h-2 bg-red-500 rounded-full animate-ping"></span>
+                </a>
+            </div>
             <div class="flex items-center gap-3">
-                <a href="profile.html" class="text-white hover:text-gray-300 transition-colors p-1">
-                    <span class="material-symbols-outlined text-[22px]">arrow_back</span>
+                <div class="hidden lg:flex items-center gap-1.5">
+                    <button class="w-8 h-8 flex items-center justify-center rounded-full overflow-hidden hover:opacity-80 transition-all duration-200 ring-2 ring-transparent hover:ring-white/30" aria-label="Tiếng Việt" onclick="changeLanguage('vi')">
+                        <img id="lang-vi" src="https://hatscripts.github.io/circle-flags/flags/vn.svg" alt="VN" class="w-full h-full object-cover">
+                    </button>
+                    <button class="w-8 h-8 flex items-center justify-center rounded-full overflow-hidden hover:opacity-80 transition-all duration-200 ring-2 ring-transparent hover:ring-white/30" aria-label="English" onclick="changeLanguage('en')">
+                        <img id="lang-en" src="https://hatscripts.github.io/circle-flags/flags/gb.svg" alt="UK" class="w-full h-full object-cover">
+                    </button>
+                    <button class="w-8 h-8 flex items-center justify-center rounded-full overflow-hidden hover:opacity-80 transition-all duration-200 ring-2 ring-transparent hover:ring-white/30" aria-label="Suomi" onclick="changeLanguage('fi')">
+                        <img id="lang-fi" src="https://hatscripts.github.io/circle-flags/flags/fi.svg" alt="FI" class="w-full h-full object-cover">
+                    </button>
+                </div>
+                <a id="nav-register-btn" class="hidden lg:inline-flex border-2 border-white/20 text-white text-sm font-semibold px-5 py-2 rounded-xl hover:bg-white hover:text-black transition-all duration-200" href="register.html" data-i18n="nav-register">Register</a>
+                <a class="hidden lg:inline-flex bg-white text-black text-sm font-semibold px-5 py-2 rounded-xl hover:bg-gray-100 transition-all duration-200" href="reservations.html" data-i18n="nav-reservations">Reservations</a>
+                <a href="cart.html" class="nav-cart-btn relative text-white hover:text-gray-300 transition-colors p-1" title="View Cart">
+                    <span class="material-symbols-outlined text-[22px]">shopping_cart</span>
+                    <span id="cart-count" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">0</span>
                 </a>
                 <a id="nav-user-btn" href="login.html" class="text-white hover:text-gray-300 transition-colors">
                     <span class="material-symbols-outlined text-[22px]">account_circle</span>
                 </a>
+                <button class="lg:hidden text-white p-2 rounded-lg hover:bg-white/10 transition-colors" onclick="toggleMobileMenu()" aria-label="Toggle Menu" aria-expanded="false">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+            </div>
+        </div>
+        <div id="mobile-menu" class="hidden lg:hidden bg-[#0a1019] border-t border-white/5 px-4 py-4 space-y-1 font-medium text-sm max-h-[80vh] overflow-y-auto">
+            <a class="block text-gray-300 hover:text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors" href="index.html" data-i18n="nav-home">Home</a>
+            <a class="block text-gray-300 hover:text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors" href="menu.html" data-i18n="nav-menu">Menu</a>
+            <a class="block text-gray-300 hover:text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors" href="locations.html" data-i18n="nav-locations">Locations</a>
+            <a class="block text-gray-300 hover:text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors" href="contact.html" data-i18n="nav-contact">Contact</a>
+            <a class="block text-gray-300 hover:text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors flex items-center gap-2" href="inbox.html">
+                <span data-i18n="nav-inbox">Inbox</span>
+                <span id="inbox-badge-nav-mobile" class="hidden w-2 h-2 bg-red-500 rounded-full animate-ping"></span>
+            </a>
+            <div class="flex items-center gap-2 px-4 py-3 border-t border-white/5 mt-2">
+                <button class="w-8 h-8 flex items-center justify-center rounded-full overflow-hidden hover:opacity-80 transition-all ring-2 ring-transparent hover:ring-white/30" onclick="changeLanguage('vi')">
+                    <img id="lang-vi-mobile" src="https://hatscripts.github.io/circle-flags/flags/vn.svg" alt="VN" class="w-full h-full object-cover">
+                </button>
+                <button class="w-8 h-8 flex items-center justify-center rounded-full overflow-hidden hover:opacity-80 transition-all ring-2 ring-transparent hover:ring-white/30" onclick="changeLanguage('en')">
+                    <img id="lang-en-mobile" src="https://hatscripts.github.io/circle-flags/flags/gb.svg" alt="UK" class="w-full h-full object-cover">
+                </button>
+                <button class="w-8 h-8 flex items-center justify-center rounded-full overflow-hidden hover:opacity-80 transition-all ring-2 ring-transparent hover:ring-white/30" onclick="changeLanguage('fi')">
+                    <img id="lang-fi-mobile" src="https://hatscripts.github.io/circle-flags/flags/fi.svg" alt="FI" class="w-full h-full object-cover">
+                </button>
+            </div>
+            <div class="flex flex-col gap-2 px-4 pt-3 border-t border-white/5">
+                <a id="nav-register-btn-mobile" class="w-full text-center border-2 border-white/20 text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-white hover:text-black transition-all" href="register.html" data-i18n="nav-register">Register</a>
+                <a class="w-full text-center bg-white text-black text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-gray-100 transition-all" href="reservations.html" data-i18n="nav-reservations">Reservations</a>
             </div>
         </div>
     </nav>
+    <script>
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (mobileMenu) {
+                mobileMenu.classList.toggle('hidden');
+            }
+        }
+    </script>
 
     <main class="flex-grow pt-32 pb-20">
         <div class="max-w-5xl mx-auto px-4 md:px-16">
-            <div class="bg-surface/90 backdrop-blur-sm rounded-2xl border border-outline-variant p-6 shadow-lg mb-8">
-                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div class="bg-surface/90 backdrop-blur-sm rounded-2xl border border-white/5 p-8 shadow-xl mb-8">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                     <div>
-                        <h1 class="font-['EB_Garamond'] text-3xl text-white">Reward Store</h1>
-                        <p class="text-secondary text-sm mt-1">Đổi điểm thành voucher ưu đãi độc quyền từ Phở Việt Khang.</p>
+                        <h1 class="font-['EB_Garamond'] text-4xl text-white font-bold" data-i18n="rewards-title">Reward Store</h1>
+                        <p class="text-secondary text-sm mt-2" data-i18n="rewards-subtitle">Đổi điểm thành voucher ưu đãi độc quyền từ Phở Việt Khang.</p>
                     </div>
                     <div class="flex items-center gap-4">
-                        <div class="bg-[#18202d] px-4 py-2 rounded-xl border border-outline-variant">
-                            <div class="text-xs text-secondary uppercase tracking-wider">Hiện có</div>
-                            <div class="text-2xl font-black text-amber-400" id="user-points">0</div>
-                            <div class="text-xs text-secondary">điểm</div>
+                        <div class="bg-[#18202d]/80 px-5 py-3 rounded-xl border border-white/5 shadow-inner text-center min-w-[100px]">
+                            <div class="text-[10px] text-secondary uppercase tracking-widest" data-i18n="rewards-available">Hiện có</div>
+                            <div class="text-3xl font-black text-amber-400 my-0.5" id="user-points">0</div>
+                            <div class="text-[10px] text-secondary" data-i18n="rewards-points">điểm</div>
                         </div>
-                        <div class="bg-[#18202d] px-4 py-2 rounded-xl border border-outline-variant">
-                            <div class="text-xs text-secondary uppercase tracking-wider">Tier</div>
-                            <div class="text-lg font-black text-primary" id="user-tier">-</div>
+                        <div class="bg-[#18202d]/80 px-5 py-3 rounded-xl border border-white/5 shadow-inner text-center min-w-[100px]">
+                            <div class="text-[10px] text-secondary uppercase tracking-widest">Tier</div>
+                            <div class="text-xl font-black text-primary my-1.5" id="user-tier">-</div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="rewards-grid">
-                <div class="col-span-full text-center text-secondary py-12">Đang tải danh sách quà tặng...</div>
+                <div class="col-span-full text-center text-secondary py-12" data-i18n="rewards-loading">Đang tải danh sách quà tặng...</div>
             </div>
 
             <div class="mt-12">
-                <h2 class="font-['EB_Garamond'] text-2xl text-white mb-4">Lịch sử đổi quà</h2>
-                <div class="bg-surface/90 rounded-2xl border border-outline-variant p-6">
-                    <div id="redemption-history" class="text-secondary text-sm text-center py-6">Chưa có giao dịch nào.</div>
+                <h2 class="font-['EB_Garamond'] text-2xl text-white mb-4 font-semibold" data-i18n="rewards-history-title">Lịch sử đổi quà</h2>
+                <div class="bg-surface/90 backdrop-blur-sm rounded-2xl border border-white/5 p-6 shadow-xl">
+                    <div id="redemption-history" class="text-secondary text-sm text-center py-6" data-i18n="rewards-history-empty">Chưa có giao dịch nào.</div>
                 </div>
             </div>
         </div>
     </main>
 
+    <!-- Footer Component -->
+    <footer class="w-full pt-20 pb-10 bg-tertiary/90 footer-pattern">
+        <div class="relative z-10 max-w-max-width mx-auto px-margin-desktop grid grid-cols-1 md:grid-cols-4 gap-gutter">
+            <!-- Brand -->
+            <div class="md:col-span-1 mb-10 md:mb-0">
+                <a class="font-headline-md text-headline-md text-white flex items-center gap-2 mb-4 drop-shadow-md" href="index.html">
+                    <span class="material-symbols-outlined text-5xl" aria-hidden="true">ramen_dining</span>
+                    <span>PHO VIET KHANG</span>
+                </a>
+                <p class="font-body-sm text-body-sm text-tertiary-fixed-dim drop-shadow-sm" data-i18n="footer-desc">
+                    The Art of Asian Gastronomy.
+                </p>
+            </div>
+            <!-- Links Container -->
+            <div class="md:col-span-3 flex flex-wrap gap-8 md:justify-end items-start font-body-sm text-body-sm">
+                <a class="text-tertiary-fixed-dim hover:text-on-tertiary transition-colors hover:underline decoration-1 underline-offset-4 duration-300 ease-in-out drop-shadow-sm" href="privacy.html" data-i18n="footer-privacy">Privacy Policy</a>
+                <a class="text-tertiary-fixed-dim hover:text-on-tertiary transition-colors hover:underline decoration-1 underline-offset-4 duration-300 ease-in-out drop-shadow-sm" href="terms.html" data-i18n="footer-terms">Terms of Service</a>
+                <a class="text-tertiary-fixed-dim hover:text-on-tertiary transition-colors hover:underline decoration-1 underline-offset-4 duration-300 ease-in-out drop-shadow-sm" href="careers.html" data-i18n="footer-careers">Careers</a>
+                <a class="text-tertiary-fixed-dim hover:text-on-tertiary transition-colors hover:underline decoration-1 underline-offset-4 duration-300 ease-in-out drop-shadow-sm" href="press.html" data-i18n="footer-press">Press Kit</a>
+            </div>
+        </div>
+        <!-- Copyright -->
+        <div class="relative z-10 max-w-max-width mx-auto px-margin-desktop mt-16 pt-8 border-t border-outline-variant/20">
+            <p class="font-body-sm text-body-sm text-tertiary-fixed-dim text-center md:text-left drop-shadow-sm">© 2026 PHO VIET KHANG. ALL RIGHTS RESERVED.</p>
+        </div>
+    </footer>
+
+    <!-- Confirm Modal -->
     <div id="redeem-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
-        <div class="bg-[#121824] max-w-md w-full rounded-2xl border border-white/10 p-6 space-y-4">
+        <div class="bg-[#121824] max-w-md w-full rounded-2xl border border-white/10 p-6 space-y-4 modal-panel shadow-2xl">
             <div class="flex items-center justify-between">
-                <h3 class="text-xl font-bold text-white font-['EB_Garamond']">Xác nhận đổi quà</h3>
+                <h3 class="text-xl font-bold text-white font-['EB_Garamond']" data-i18n="rewards-confirm-title">Xác nhận đổi quà</h3>
                 <button onclick="closeRedeemModal()" class="text-secondary hover:text-white transition-colors">
                     <span class="material-symbols-outlined">close</span>
                 </button>
             </div>
             <p class="text-secondary text-sm" id="redeem-modal-desc"></p>
-            <div class="bg-[#18202d] px-4 py-3 rounded-xl border border-outline-variant flex justify-between items-center">
-                <span class="text-secondary text-sm">Phí thay đổi</span>
+            <div class="bg-[#18202d] px-4 py-3 rounded-xl border border-white/5 flex justify-between items-center">
+                <span class="text-secondary text-sm" data-i18n="rewards-cost">Phí đổi</span>
                 <span class="text-amber-400 font-bold" id="redeem-modal-cost">0 điểm</span>
             </div>
-            <div class="bg-[#18202d] px-4 py-3 rounded-xl border border-outline-variant flex justify-between items-center">
-                <span class="text-secondary text-sm">Số dư sau đổi</span>
+            <div class="bg-[#18202d] px-4 py-3 rounded-xl border border-white/5 flex justify-between items-center">
+                <span class="text-secondary text-sm" data-i18n="rewards-balance">Số dư còn lại</span>
                 <span class="text-white font-bold" id="redeem-modal-balance">0 điểm</span>
             </div>
-            <button id="btn-confirm-redeem" class="w-full bg-primary hover:bg-blue-600 text-white font-bold py-3 rounded-xl transition-all active:scale-95">
-                <span class="material-symbols-outlined text-[20px] align-middle mr-1">check</span>Xác nhận
+            <button id="btn-confirm-redeem" class="w-full bg-primary hover:bg-blue-600 text-white font-bold py-3.5 rounded-xl transition-all active:scale-95 shadow-md flex items-center justify-center gap-1.5">
+                <span class="material-symbols-outlined text-[20px] align-middle">check</span>
+                <span data-i18n="rewards-btn-confirm">Xác nhận</span>
             </button>
         </div>
     </div>
 
+    <!-- Success Modal -->
     <div id="redeem-success" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
-        <div class="bg-[#121824] max-w-md w-full rounded-2xl border border-white/10 p-6 text-center space-y-4">
+        <div class="bg-[#121824] max-w-md w-full rounded-2xl border border-white/10 p-6 text-center space-y-4 success-panel shadow-2xl">
             <span class="material-symbols-outlined text-[48px] text-green-400">check_circle</span>
-            <h3 class="text-xl font-bold text-white font-['EB_Garamond']">Đổi quà thành công!</h3>
-            <p class="text-secondary text-sm" id="redeem-success-msg"></p>
+            <h3 class="text-2xl font-bold text-white font-['EB_Garamond']" data-i18n="rewards-success-title">Đổi quà thành công!</h3>
+            <p class="text-secondary text-sm leading-relaxed" id="redeem-success-msg"></p>
             <button onclick="closeSuccessModal()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl transition-all active:scale-95">
-                Đóng
+                <span data-i18n="rewards-btn-close">Đóng</span>
             </button>
         </div>
     </div>
 
+    <!-- Core Scripts -->
+    <script src="js/client.js"></script>
+    <script src="js/cart.js"></script>
     <script src="js/firebase-config.js"></script>
     <script type="module">
         import { auth, db } from "./js/firebase-config.js";
@@ -174,30 +275,43 @@
         let rewardItems = [];
         let pendingReward = null;
 
+        // Trilingual Reward Items definition requested by user
         const REWARD_DEFINITIONS = [
             {
-                id: 'voucher_5',
-                name: 'Voucher Giảm 5%',
-                description: 'Giảm 5% đơn hàng tiếp theo.',
-                pointsCost: 100,
-                discountPercent: 5,
-                image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&q=80&w=500'
-            },
-            {
-                id: 'voucher_10',
-                name: 'Voucher Giảm 10%',
-                description: 'Giảm 10% cho đơn hàng.',
-                pointsCost: 180,
-                discountPercent: 10,
-                image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&q=80&w=500'
-            },
-            {
-                id: 'free_drink',
-                name: '1 Đồ Uống Miễn Phí',
-                description: 'Áp dụng cho đồ uống trong menu.',
-                pointsCost: 250,
+                id: 'voucher_15',
+                nameVi: 'Phiếu Giảm Giá 15%',
+                nameEn: '15% Discount Voucher',
+                nameFi: '15% Alennuskuponki',
+                descVi: 'Giảm 15% cho tổng hóa đơn đặt hàng tiếp theo.',
+                descEn: '15% discount on your next total order.',
+                descFi: '15% alennus seuraavasta tilauksestasi.',
+                pointsCost: 200,
                 discountPercent: 15,
-                image: 'https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&q=80&w=500'
+                image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&q=80&w=500'
+            },
+            {
+                id: 'lucky_spin_1',
+                nameVi: '1 Lượt Quay Lucky Wheel',
+                nameEn: '1 Lucky Wheel Spin',
+                nameFi: '1 Lucky Wheel Pyöräytys',
+                descVi: 'Nhận 1 lượt quay vòng quay may mắn tại trang cá nhân để trúng voucher lớn.',
+                descEn: 'Get 1 free spin on the Lucky Wheel in your profile to win big vouchers.',
+                descFi: 'Saat 1 ilmaisen pyöräytyksen profiilisi onnenpyörään voittaaksesi suuria kuponkeja.',
+                pointsCost: 50,
+                discountPercent: 0,
+                image: 'https://images.unsplash.com/photo-1595769816263-9b910be24d5f?auto=format&fit=crop&q=80&w=500'
+            },
+            {
+                id: 'shrimp_chips_bag',
+                nameVi: '1 Túi Bánh Phồng Tôm',
+                nameEn: '1 Bag of Shrimp Chips',
+                nameFi: '1 Pussi Katkarapusipsejä',
+                descVi: 'Bánh phồng tôm chiên giòn rụm thơm ngon ăn kèm món chính.',
+                descEn: 'Crispy and delicious fried shrimp chips, perfect as an appetizer.',
+                descFi: 'Rapeat ja herkulliset paistetut katkarapusipsit, täydellinen alkupala.',
+                pointsCost: 80,
+                discountPercent: 0,
+                image: 'https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?auto=format&fit=crop&q=80&w=500'
             }
         ];
 
@@ -205,24 +319,37 @@
             const grid = document.getElementById('rewards-grid');
             if (!grid) return;
             if (rewardItems.length === 0) {
-                grid.innerHTML = '<div class="col-span-full text-center text-secondary py-12">Chưa có quà tặng nào hiện tại.</div>';
+                const lang = localStorage.getItem('selectedLanguage') || 'en';
+                const emptyMsg = lang === 'vi' ? 'Chưa có quà tặng nào.' : (lang === 'fi' ? 'Ei palkintoja saatavilla.' : 'No rewards available.');
+                grid.innerHTML = `<div class="col-span-full text-center text-secondary py-12">${emptyMsg}</div>`;
                 return;
             }
-            grid.innerHTML = rewardItems.map(item => `
-                <div class="reward-card bg-surface/90 rounded-2xl border border-outline-variant overflow-hidden flex flex-col">
-                    <img src="${item.image}" class="w-full h-40 object-cover" onerror="this.src='https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&q=80&w=500'">
+            const lang = localStorage.getItem('selectedLanguage') || 'en';
+            const langCap = lang.charAt(0).toUpperCase() + lang.slice(1);
+            const btnText = lang === 'vi' ? 'Đổi ngay' : (lang === 'fi' ? 'Lunasta' : 'Redeem');
+            const pointsText = lang === 'vi' ? 'điểm' : (lang === 'fi' ? 'pistettä' : 'points');
+
+            grid.innerHTML = rewardItems.map(item => {
+                const name = item['name' + langCap] || item.nameVi || item.name || '';
+                const desc = item['desc' + langCap] || item.descVi || item.description || '';
+                return `
+                <div class="reward-card bg-surface/90 rounded-2xl border border-white/5 overflow-hidden flex flex-col shadow-lg">
+                    <div class="relative h-40 overflow-hidden">
+                        <img src="${item.image}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&q=80&w=500'">
+                    </div>
                     <div class="p-5 flex flex-col flex-1">
-                        <h3 class="font-bold text-white text-lg mb-1">${item.name}</h3>
-                        <p class="text-secondary text-xs mb-3 flex-1">${item.description}</p>
-                        <div class="flex items-center justify-between">
-                            <span class="text-amber-400 font-black text-lg">${item.pointsCost} <span class="text-xs font-medium">điểm</span></span>
-                            <button onclick="initRedeem('${item.id}')" class="bg-primary hover:bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-all active:scale-95">
-                                Đổi ngay
+                        <h3 class="font-bold text-white text-lg mb-1 leading-tight font-['EB_Garamond']">${name}</h3>
+                        <p class="text-secondary text-xs mb-4 flex-1 leading-relaxed">${desc}</p>
+                        <div class="flex items-center justify-between pt-2 border-t border-white/5 mt-auto">
+                            <span class="text-amber-400 font-black text-lg">${item.pointsCost} <span class="text-[10px] font-medium text-secondary">${pointsText}</span></span>
+                            <button onclick="initRedeem('${item.id}')" class="bg-primary hover:bg-blue-600 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-all active:scale-95">
+                                ${btnText}
                             </button>
                         </div>
                     </div>
                 </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         window.initRedeem = async function(rewardId) {
@@ -239,9 +366,18 @@
             const points = data.loyaltyPoints || 0;
             const balance = points - reward.pointsCost;
 
-            document.getElementById('redeem-modal-desc').textContent = `Bạn sắp đổi "${reward.name}".`;
-            document.getElementById('redeem-modal-cost').textContent = `${reward.pointsCost} điểm`;
-            document.getElementById('redeem-modal-balance').textContent = `${balance} điểm`;
+            const lang = localStorage.getItem('selectedLanguage') || 'en';
+            const langCap = lang.charAt(0).toUpperCase() + lang.slice(1);
+            const rewardName = reward['name' + langCap] || reward.nameVi;
+            const pointsText = lang === 'vi' ? 'điểm' : (lang === 'fi' ? 'pistettä' : 'points');
+
+            const descText = lang === 'vi' 
+                ? `Bạn sắp đổi "${rewardName}".` 
+                : (lang === 'fi' ? `Olet lunastamassa palkintoa "${rewardName}".` : `You are about to redeem "${rewardName}".`);
+
+            document.getElementById('redeem-modal-desc').textContent = descText;
+            document.getElementById('redeem-modal-cost').textContent = `${reward.pointsCost} ${pointsText}`;
+            document.getElementById('redeem-modal-balance').textContent = `${balance} ${pointsText}`;
             document.getElementById('redeem-modal').classList.remove('hidden');
         };
 
@@ -253,7 +389,6 @@
         window.confirmRedeem = async function() {
             if (!currentUser || !pendingReward) return;
             const userRef = doc(db, "users", currentUser.uid);
-            const orderRef = doc(collection(db, "orders"));
             try {
                 await runTransaction(db, async (tx) => {
                     const snap = await tx.get(userRef);
@@ -269,10 +404,22 @@
                     expiry.setMonth(expiry.getMonth() + 1);
 
                     const updatedPoints = points - cost;
-                    tx.update(userRef, {
-                        loyaltyPoints: updatedPoints,
-                        updatedAt: serverTimestamp ? serverTimestamp() : new Date()
-                    });
+                    
+                    // Increment Lucky Wheel spins directly if rewarding lucky_spin_1
+                    if (pendingReward.id === 'lucky_spin_1') {
+                        const spins = userData.spins || { deu: 0, xin: 0, vip: 0 };
+                        spins.deu = (spins.deu || 0) + 1;
+                        tx.update(userRef, {
+                            spins: spins,
+                            loyaltyPoints: updatedPoints,
+                            updatedAt: serverTimestamp ? serverTimestamp() : new Date()
+                        });
+                    } else {
+                        tx.update(userRef, {
+                            loyaltyPoints: updatedPoints,
+                            updatedAt: serverTimestamp ? serverTimestamp() : new Date()
+                        });
+                    }
 
                     const rewardOrderRef = doc(collection(db, "orders"));
                     tx.set(rewardOrderRef, {
@@ -290,8 +437,8 @@
                         address: '',
                         distance: 0,
                         deliveryFee: 0,
-                        notes: 'Reward redemption - Trừ điểm quà tặng',
-                        items: [{ id: pendingReward.id, name: pendingReward.name, price: 0, qty: 1, options: [] }],
+                        notes: `Đổi thưởng: ${pendingReward.nameVi}`,
+                        items: [{ id: pendingReward.id, name: pendingReward.nameVi, price: 0, qty: 1, options: [] }],
                         userId: currentUser.uid,
                         rewardRedeemedId: pendingReward.id,
                         rewardPointsUsed: cost,
@@ -300,42 +447,64 @@
                         createdAt: new Date()
                     });
 
-                    tx.set(doc(db, "vouchers", promoCode), {
-                        code: promoCode,
-                        discountPercent: pendingReward.discountPercent || 0,
-                        isFreeMeal: pendingReward.discountPercent === 0,
-                        email: currentUser.email,
-                        used: false,
-                        allowedOrderTypes: ['takeaway','delivery','dine-in'],
-                        expiryDate: expiry,
-                        createdAt: new Date(),
-                        source: 'reward_store',
-                        rewardId: pendingReward.id
-                    });
+                    // Only generate voucher document if it's a discount coupon
+                    if (pendingReward.discountPercent > 0) {
+                        tx.set(doc(db, "vouchers", promoCode), {
+                            code: promoCode,
+                            discountPercent: pendingReward.discountPercent || 0,
+                            isFreeMeal: false,
+                            email: currentUser.email,
+                            used: false,
+                            allowedOrderTypes: ['takeaway','delivery','dine-in'],
+                            expiryDate: expiry,
+                            createdAt: new Date(),
+                            source: 'reward_store',
+                            rewardId: pendingReward.id
+                        });
+                    }
 
-                    tx.set(doc(db, "pointTransactions"), {
+                    // Log point transaction
+                    tx.set(doc(collection(db, "pointTransactions")), {
                         uid: currentUser.uid,
                         type: 'redeem',
                         amount: -cost,
                         balanceAfter: updatedPoints,
                         rewardId: pendingReward.id,
                         orderId: rewardOrderRef.id,
-                        note: `Đổi ${pendingReward.name}`,
+                        note: `Đổi ${pendingReward.nameVi}`,
                         createdAt: new Date()
                     });
                 });
 
+                const lang = localStorage.getItem('selectedLanguage') || 'en';
+                let successMsg = '';
+                if (lang === 'vi') {
+                    successMsg = pendingReward.id === 'lucky_spin_1' 
+                        ? `Bạn đã đổi thành công 1 Lượt quay Lucky Wheel. Lượt quay đã được cộng trực tiếp vào tài khoản của bạn!`
+                        : `Bạn đã đổi thành công "${pendingReward.nameVi}". Đơn quà đã được chuyển đến quầy/bếp để phục vụ!`;
+                } else if (lang === 'fi') {
+                    successMsg = pendingReward.id === 'lucky_spin_1'
+                        ? `Olet lunastanut 1 onnenpyörän pyöräytyksen. Se on lisätty profiiliisi!`
+                        : `Olet lunastanut palkinnon "${pendingReward.nameFi}". Palkintotilaus on lähetetty ravintolaan!`;
+                } else {
+                    successMsg = pendingReward.id === 'lucky_spin_1'
+                        ? `You have successfully redeemed 1 Lucky Wheel Spin. The spin has been added directly to your profile!`
+                        : `You have successfully redeemed "${pendingReward.nameEn}". The reward order has been sent to the restaurant!`;
+                }
+
                 document.getElementById('redeem-modal').classList.add('hidden');
-                document.getElementById('redeem-success-msg').textContent = `Bạn đã đổi "${pendingReward.name}" với ${pendingReward.pointsCost} điểm. Mã voucher đã được gửi vào hộp thư của bạn.`;
+                document.getElementById('redeem-success-msg').textContent = successMsg;
                 document.getElementById('redeem-success').classList.remove('hidden');
                 pendingReward = null;
                 await loadUserProfile();
             } catch (err) {
                 console.error('Redeem failed:', err);
                 if (err.message === 'NOT_ENOUGH_POINTS') {
-                    window.showNotification('Không đủ điểm để đổi quà này.', 'error');
+                    const errorMsg = localStorage.getItem('selectedLanguage') === 'vi' ? 'Không đủ điểm để đổi quà này.' : (localStorage.getItem('selectedLanguage') === 'fi' ? 'Ei tarpeeksi pisteitä.' : 'Not enough points for this reward.');
+                    window.showNotification && window.showNotification(errorMsg, 'error');
                 } else {
-                    window.showNotification('Đổi quà thất bại. Vui lòng thử lại.', 'error');
+                    const errorMsg = localStorage.getItem('selectedLanguage') === 'vi' ? 'Đổi quà thất bại. Vui lòng thử lại.' : (localStorage.getItem('selectedLanguage') === 'fi' ? 'Lunastus epäonnistui.' : 'Redemption failed. Please try again.');
+                    window.showNotification && window.showNotification(errorMsg, 'error');
                 }
             }
         };
@@ -363,13 +532,13 @@
             const txQuery = query(
                 collection(db, "pointTransactions"),
                 where("uid", "==", currentUser.uid),
-                orderBy("createdAt", "desc"),
-                { limit: 10 }
+                orderBy("createdAt", "desc")
             );
             const snap = await getDocs(txQuery);
             const historyEl = document.getElementById('redemption-history');
+            const lang = localStorage.getItem('selectedLanguage') || 'en';
             if (snap.empty) {
-                historyEl.innerHTML = 'Chưa có giao dịch nào.';
+                historyEl.innerHTML = lang === 'vi' ? 'Chưa có giao dịch nào.' : (lang === 'fi' ? 'Ei aiempia lunastuksia.' : 'No transactions found.');
             } else {
                 const items = [];
                 snap.forEach(docSnap => {
@@ -377,10 +546,12 @@
                     const amount = Number(d.amount || 0);
                     const isPositive = amount > 0;
                     const timeStr = d.createdAt && d.createdAt.toDate ? d.createdAt.toDate().toLocaleString() : new Date().toLocaleString();
-                    items.push(`<div class="flex justify-between text-sm py-2 border-b border-outline-variant last:border-0">
-                        <span>${d.note || 'Giao dịch'}</span>
-                        <span class="${isPositive ? 'text-green-400' : 'text-red-400'} font-medium">${isPositive ? '+' : ''}${amount}</span>
-                        <span class="text-secondary text-xs">${timeStr}</span>
+                    items.push(`<div class="flex justify-between items-center text-sm py-3 border-b border-white/5 last:border-0">
+                        <span class="text-white">${d.note || 'Giao dịch'}</span>
+                        <div class="flex items-center gap-4">
+                            <span class="${isPositive ? 'text-green-400' : 'text-amber-400'} font-bold">${isPositive ? '+' : ''}${amount}</span>
+                            <span class="text-secondary text-[11px]">${timeStr}</span>
+                        </div>
                     </div>`);
                 });
                 historyEl.innerHTML = items.join('');
@@ -410,6 +581,12 @@
 
         document.getElementById('btn-confirm-redeem').addEventListener('click', () => {
             window.confirmRedeem();
+        });
+
+        // Trigger updates when languageChanged fires
+        window.addEventListener('languageChanged', () => {
+            renderRewardsGrid();
+            loadUserProfile();
         });
     </script>
 </body>

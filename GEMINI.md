@@ -2,6 +2,14 @@
 
 ## Modifications
 
+### [2026-06-13] Completed and Polished Rewards Store (Shop Đổi Quà) UI
+- **Changes**:
+  - Overhauled [rewards-store.html](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/rewards-store.html) to incorporate the unified top navigation bar (matching [index.html](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/index.html) with Home, Menu, Locations, Contact, Inbox, Register, Reservations, Cart, and Profile links).
+  - Integrated the standard footer component at the bottom of the page.
+  - Loaded `js/client.js` and `js/cart.js` scripts, ensuring language translation event listeners, the custom beautiful toast notification system, and the cart badge count update function correctly.
+  - Implemented the three requested reward items (15% discount voucher for 200 points, 1 Lucky Wheel spin for 50 points, and 1 bag of shrimp chips for 80 points) with trilingual Vietnamese, English, and Finnish translation structures.
+  - Verified logic for directly incrementing Lucky Wheel spins (`spins.deu` on the user profile document in Firestore) and generating zero-price orders/vouchers.
+
 ### [2026-06-13] Added Trilingual Support for Cash or Card Payment Description
 - **Changes**:
   - Added missing `"payment-cod"` and `"payment-cod-desc"` keys to the English (`en`) and Finnish (`fi`) dictionaries in [client.js](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/js/client.js).
