@@ -701,7 +701,6 @@
             );
             const snap = await getDocs(txQuery);
             const historyEl = document.getElementById('redemption-history');
-            const lang = localStorage.getItem('selectedLanguage') || 'en';
             if (snap.empty) {
                 historyEl.innerHTML = lang === 'vi' ? 'Chưa có giao dịch nào.' : (lang === 'fi' ? 'Ei aiempia lunastuksia.' : 'No transactions found.');
             } else {
