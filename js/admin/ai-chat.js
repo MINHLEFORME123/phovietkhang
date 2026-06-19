@@ -1,6 +1,6 @@
 // ─── FLOATING AI ADMIN CHAT (MESSENGER-STYLE) ───────────────────────────────
 import { db, auth } from "../firebase-config.js";
-import { collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc, deleteDoc, query, where, limit } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { callWorker, listAllUsers, computeLoyaltyTier, callOpenRouterWithFallback, stripThinking, initApiKeys, getApiKeysCached } from "./utils.js";
 
 (function() {
@@ -339,9 +339,9 @@ You have full access to Firebase tools that can manage orders, food menu, AND Fi
 You MUST answer in Vietnamese.
 
 IMPORTANT: Whenever you need data or need to make changes, you MUST call the appropriate tool(s). Do NOT make up data.
-To call a tool, output a <tool_call> JSON block:
+To call a tool, output a <tool_call> JSON block using the short code (e.g., "1A"):
 <tool_call>
-{ "tool": "tool_name", "args": { "arg1": "value1" } }
+{ "tool": "1A", "args": { "arg1": "value1" } }
 </tool_call>
 
 Rules:
@@ -358,32 +358,65 @@ Instead, follow this 2-step approach:
 This saves tokens and is much faster.
 
 TOOLS AVAILABLE:
-- Orders: getOrdersSoldToday, getOrdersByStatus, updateOrderStatus, deleteOrder
-- Menu Browse: listAllCategories, searchFoodByCategory, getFoodItemById
-- Menu Edit: updateMenuPrice, createMenuItem, setOptionChoicePrice, addMenuOptionGroup, removeMenuOptionGroup, addChoiceToOptionGroup, removeChoiceFromOptionGroup, updateMenuOptionGroup, updateChoiceInOptionGroup, updateMenuName, updateMenuDescription, updateMenuCategory, updateMenuAvailability, uploadMenuImage, removeMenuImage, updateMenuPreparationTime, updateMenuNutritionInfo, addMenuTag, removeMenuTag, reorderMenuItems, duplicateMenuItem, deleteMenuItem, updateMenuCustomFields
-- Users: listAllUsers, getUserLoyalty, addLoyaltyProgressByOrderId, changeUserRole, createUserAccount, sendPasswordReset, sendSpinsToUser, createCustomVoucher, markVoucherUsed, removeVoucher, listAllVouchers, updateUserLoyaltyPoints(uidOrEmail, pointsAmount, isRelative), updateUserRank(uidOrEmail, targetRank), updateUserTotalSpent(uidOrEmail, totalSpentAmount, isRelative)
-- Auth: adminListAuthUsers, adminDeleteAuthUser, adminDisableUser, adminEnableUser, adminChangeUserPassword, adminChangeUserEmail, adminVerifyUserEmail, adminSetCustomClaims, adminGetUserInfo, adminRevokeUserTokens, adminUpdateDisplayName, adminGenerateCustomToken
-- Reservations: listAllReservations, createReservation(name, phone, email, date, time, guests, location, notes), updateReservationStatus(id, status), deleteReservation(id)
-- Feedbacks & Contact Messages: listAllFeedbacks, replyToFeedback(id, replyText), deleteFeedback(id)
-- Vouchers Management: updateVoucher(code, discountPercent, email, expiryDays, allowedTypes)
+- Orders: 1A(getOrdersSoldToday), 2A(getOrdersByStatus), 3A(updateOrderStatus), 4A(deleteOrder), 5A(adminCreateTestOrder)
+- Menu Browse: 1B(listAllCategories), 2B(searchFoodByCategory), 3B(getFoodItemById)
+- Menu Edit: 1C(updateMenuPrice), 2C(createMenuItem), 3C(setOptionChoicePrice), 4C(addMenuOptionGroup), 5C(removeMenuOptionGroup), 6C(addChoiceToOptionGroup), 7C(removeChoiceFromOptionGroup), 8C(updateMenuOptionGroup), 9C(updateChoiceInOptionGroup), 10C(updateMenuName), 11C(updateMenuDescription), 12C(updateMenuCategory), 13C(updateMenuAvailability), 14C(uploadMenuImage), 15C(removeMenuImage), 16C(updateMenuPreparationTime), 17C(updateMenuNutritionInfo), 18C(addMenuTag), 19C(removeMenuTag), 20C(reorderMenuItems), 21C(duplicateMenuItem), 22C(deleteMenuItem), 23C(updateMenuCustomFields), 24C(updateMenuCategoryOrder(orderedCategoriesArray))
+- Users: 1D(listAllUsers), 2D(getUserLoyalty), 3D(addLoyaltyProgressByOrderId), 4D(changeUserRole), 5D(createUserAccount), 6D(sendPasswordReset), 7D(sendSpinsToUser), 8D(createCustomVoucher), 9D(markVoucherUsed), 10D(removeVoucher), 11D(listAllVouchers), 12D(updateUserLoyaltyPoints(uidOrEmail, pointsAmount, isRelative)), 13D(updateUserRank(uidOrEmail, targetRank)), 14D(updateUserTotalSpent(uidOrEmail, totalSpentAmount, isRelative))
+- Auth: 15D(adminListAuthUsers), 16D(adminDeleteAuthUser), 17D(adminDisableUser), 18D(adminEnableUser), 19D(adminChangeUserPassword), 20D(adminChangeUserEmail), 21D(adminVerifyUserEmail), 22D(adminSetCustomClaims), 23D(adminGetUserInfo), 24D(adminRevokeUserTokens), 25D(adminUpdateDisplayName), 26D(adminGenerateCustomToken)
+- Reservations: 1E(listAllReservations), 2E(createReservation(name, phone, email, date, time, guests, location, notes)), 3E(updateReservationStatus(id, status)), 4E(deleteReservation(id)), 5E(adminCreateTestReservation)
+- Feedbacks & Contact Messages: 1F(listAllFeedbacks), 2F(replyToFeedback(id, replyText)), 3F(deleteFeedback(id))
+- Vouchers Management: 1G(updateVoucher(code, discountPercent, email, expiryDays, allowedTypes))
 - Homepage Tools details:
-  * getHomepageConfig() -> Fetches the current homepage configuration document (contains heroBgUrl, signatureDishIds, storyImg, etc.).
-  * updateHomepageHero(imageUrl, titleVi, descVi) -> Updates the Hero section (can omit parameters).
-  * updateHomepageHeroImage(imageUrl) -> Updates only the Hero background image.
-  * updateHomepageHeroText(titleVi, titleEn, titleFi, descVi, descEn, descFi) -> Updates only the Hero title and description text (supports Vietnamese, English, Finnish).
-  * updateHomepageSignatures(dishIdArray)
-  * updateHomepageSignatureText(titleVi, titleEn, titleFi, descVi, descEn, descFi) -> Updates the Signature Creations section title and description text (supports Vietnamese, English, Finnish).
-  * updateHomepageStory(imageUrl, labelVi, titleVi, p1Vi, p2Vi) -> Updates the Heritage section (Di sản của chúng tôi) (can omit parameters).
-  * updateHomepageStoryImage(imageUrl) -> Updates only the Heritage section story image.
-  * updateHomepageStoryText(labelVi, labelEn, labelFi, titleVi, titleEn, titleFi, p1Vi, p1En, p1Fi, p2Vi, p2En, p2Fi) -> Updates only the Heritage/Story text contents (supports Vietnamese, English, Finnish).
-  * updateHomepageCTA(titleVi, titleEn, titleFi, descVi, descEn, descFi) -> Updates the Call to Action section (supports Vietnamese, English, Finnish).
-  * getWheelGuarantee()
-  * updateWheelGuarantee(next20, next50, next100)
-  * updateHomepageReviews(reviews)
-  * updateReviewImageUrl(index, imageUrl)
-- Web: webSearch, browseWebUrl
-- Messages: sendGlobalAnnouncement
-- Email: sendEmail(to, subject, html) -> Sends a custom transactional email to a recipient email address using Resend API.`
+  * 1H: getHomepageConfig() -> Fetches the current homepage configuration document (contains heroBgUrl, signatureDishIds, storyImg, etc.).
+  * 2H: updateHomepageHero(imageUrl, titleVi, descVi) -> Updates the Hero section (can omit parameters).
+  * 3H: updateHomepageHeroImage(imageUrl) -> Updates only the Hero background image.
+  * 4H: updateHomepageHeroText(titleVi, titleEn, titleFi, titleSv, descVi, descEn, descFi, descSv) -> Updates only the Hero title and description text (supports Vietnamese, English, Finnish, Swedish).
+  * 5H: updateHomepageSignatures(dishIdArray)
+  * 6H: updateHomepageSignatureText(titleVi, titleEn, titleFi, titleSv, descVi, descEn, descFi, descSv) -> Updates the Signature Creations section title and description text (supports Vietnamese, English, Finnish, Swedish).
+  * 7H: updateHomepageStory(imageUrl, labelVi, titleVi, p1Vi, p2Vi) -> Updates the Heritage section (Di sản của chúng tôi) (can omit parameters).
+  * 8H: updateHomepageStoryImage(imageUrl) -> Updates only the Heritage section story image.
+  * 9H: updateHomepageStoryText(labelVi, labelEn, labelFi, labelSv, titleVi, titleEn, titleFi, titleSv, p1Vi, p1En, p1Fi, p1Sv, p2Vi, p2En, p2Fi, p2Sv) -> Updates only the Heritage/Story text contents (supports Vietnamese, English, Finnish, Swedish).
+  * 10H: updateHomepageCTA(titleVi, titleEn, titleFi, titleSv, descVi, descEn, descFi, descSv) -> Updates the Call to Action section (supports Vietnamese, English, Finnish, Swedish).
+  * 11H: getWheelGuarantee()
+  * 12H: updateWheelGuarantee(next20, next50, next100)
+  * 13H: updateHomepageReviews(reviews)
+  * 14H: updateReviewImageUrl(index, imageUrl)
+- Web: 1I(webSearch), 2I(browseWebUrl)
+- Messages: 3I(sendGlobalAnnouncement)
+- Email: 4I(sendEmail(to, subject, html)) -> Sends a custom transactional email to a recipient email address using Resend API.
+- Super-Admin System & Database (Extremely High Privilege):
+  * 1S: adminListAllCollections() -> Returns names of Firestore collections.
+  * 2S: adminGetCollectionStats(collectionName) -> Gets size and schema sample for a collection.
+  * 3S: adminExecuteQuery(collectionName, whereField, operator, value, limitCount) -> Runs precise Firestore queries.
+  * 4S: adminCreateDocument(collectionName, data) -> Adds document to any collection (data is JSON object or string).
+  * 5S: adminUpdateDocument(collectionName, docId, data) -> Updates document (data is JSON object or string).
+  * 6S: adminDeleteDocument(collectionName, docId) -> Deletes document in any collection.
+  * 7S: adminBackupCollection(collectionName) -> Exports a collection's documents.
+  * 8S: adminRestoreCollection(collectionName, dataJsonString) -> Restores a collection from JSON backup data.
+  * 9S: adminGetSystemSettings() -> Fetches site-wide settings.
+  * 10S: adminUpdateSystemSettings(settingsObject) -> Sets site-wide settings (merge: true).
+  * 11S: adminToggleMaintenanceMode(isEnabled) -> Puts restaurant website on/off maintenance.
+  * 12S: adminGetSystemLogs(limitCount) -> Fetches audit logs.
+  * 13S: adminClearSystemLogs() -> Purges audit logs.
+  * 14S: adminGetRevenueReport(startDate, endDate) -> Aggregates revenue stats.
+  * 15S: adminGetPopularDishesReport(limitCount) -> Identifies bestselling items.
+  * 16S: adminGetLoyaltyUsersReport(limitCount) -> Ranks top customers by spending.
+  * 17S: adminGetFeedbackSummary() -> Summarizes customer messages and reviews.
+  * 18S: adminBulkUpdateUserPoints(uidOrEmailArray, pointsAmount, isRelative) -> Bulk updates loyalty points (comma-separated or array of UIDs/emails).
+  * 19S: adminBulkCreateVouchers(count, prefix, discountPercent, expiryDays) -> Generates batches of promotional codes.
+  * 20S: adminSendCustomInboxMessage(uidOrEmail, title, messageText, voucherCode, giftSpins) -> Sends direct HTML messages to a user's Inbox.
+  * 21S: adminDeleteAllVouchers(onlyExpiredOrUsed) -> Cleans up promo database.
+  * 22S: adminBanUser(uidOrEmail) -> Suspends a user account in Firestore.
+  * 23S: adminUnbanUser(uidOrEmail) -> Reactivates a suspended user account.
+  * 24S: adminBulkUpdateMenuPrices(categoryVi, percentageChange) -> Adjusts menu prices in bulk by percent (e.g. 5 or -10).
+  * 25S: adminBulkToggleMenuAvailability(categoryVi, isAvailable) -> Bulk toggles category items availability.
+  * 26S: adminGetInventoryAlerts() -> Lists out of stock menu items.
+  * 27S: adminAddMultipleDishes(dishesJsonArray) -> Mass imports new items.
+  * 28S: adminBulkUpdateReservationsStatus(idsArray, status) -> Updates reservation statuses in bulk.
+   * 29S: adminGetReservationsByDate(date) -> Lists all reservations for a specific date (YYYY-MM-DD).
+   * 30S: adminSendWebhook(url, payload) -> Sends a custom webhook POST request.
+   * 31S: adminBulkTranslateMenuToSwedish() -> Auto-translates all menu items' name/desc/category/options/tags from VI/EN/FI to Swedish. Use this when user asks 'thêm tiếng Thụy', 'dịch menu sang tiếng Thụy', or 'bổ sung Swedish for all dishes'.
+   * 32S: updateHomepageSignatureDishDescription(dishId, descVi, descEn, descFi, descSv) -> Updates description of a specific signature dish on homepage.`
     }];
 
     // Tool Implementations
@@ -400,32 +433,46 @@ TOOLS AVAILABLE:
                 else if (data.createdAt) orderDate = new Date(data.createdAt);
                 if (orderDate && orderDate >= today) {
                     count++; totalRevenue += data.totalPrice || 0;
-                    list.push({ id: docSnap.id, customerName: data.customerName, totalPrice: data.totalPrice, items: data.items ? data.items.map(i => `${i.name} (x${i.qty})`).join(', ') : '', status: data.status, time: orderDate.toLocaleTimeString() });
+                    list.push({ id: docSnap.id, customerName: data.customerName, totalPrice: data.totalPrice, items: data.items ? data.items.map(i => `${i.name} (x${i.qty})`).join(', ') : '', status: data.status, time: orderDate.toLocaleTimeString(), dateObj: orderDate });
                 }
             });
-            return { count, totalRevenue, orders: list };
+            list.sort((a, b) => (b.dateObj || 0) - (a.dateObj || 0));
+            return { count, totalRevenue, orders: list.map(item => ({ id: item.id, customerName: item.customerName, totalPrice: item.totalPrice, items: item.items, status: item.status, time: item.time })).slice(0, 20) };
         } catch (e) { return { error: e.message }; }
     }
 
     async function getOrdersByStatus(status) {
         try {
-            const qSnap = await getDocs(collection(db, "orders"));
+            const q = query(collection(db, "orders"), where("status", "==", status));
+            const qSnap = await getDocs(q);
             const list = [];
             qSnap.forEach(docSnap => {
                 const data = docSnap.data();
-                if (data.status === status) list.push({ id: docSnap.id, customerName: data.customerName, totalPrice: data.totalPrice, items: data.items ? data.items.map(i => `${i.name} (x${i.qty})`).join(', ') : '', status: data.status, createdAt: data.createdAt ? (typeof data.createdAt.toDate === 'function' ? data.createdAt.toDate().toLocaleString() : new Date(data.createdAt).toLocaleString()) : 'N/A' });
+                let orderDate = null;
+                if (data.createdAt && typeof data.createdAt.toDate === 'function') orderDate = data.createdAt.toDate();
+                else if (data.createdAt) orderDate = new Date(data.createdAt);
+                list.push({ id: docSnap.id, customerName: data.customerName, totalPrice: data.totalPrice, items: data.items ? data.items.map(i => `${i.name} (x${i.qty})`).join(', ') : '', status: data.status, createdAt: orderDate ? orderDate.toLocaleString() : 'N/A', dateObj: orderDate });
             });
-            return list;
+            list.sort((a, b) => (b.dateObj || 0) - (a.dateObj || 0));
+            return list.map(item => ({ id: item.id, customerName: item.customerName, totalPrice: item.totalPrice, items: item.items, status: item.status, createdAt: item.createdAt })).slice(0, 20);
         } catch (e) { return { error: e.message }; }
     }
 
-    async function updateOrderStatus(orderId, newStatus) {
-        try { await updateDoc(doc(db, "orders", orderId), { status: newStatus }); return { success: true, message: `Updated status of order ${orderId} to "${newStatus}".` }; }
+    async function updateOrderStatus(orderIds, newStatus) {
+        try { 
+            const ids = Array.isArray(orderIds) ? orderIds : String(orderIds).split(',').map(s => s.trim()).filter(Boolean);
+            for (const id of ids) await updateDoc(doc(db, "orders", id), { status: newStatus }); 
+            return { success: true, message: `Updated status of ${ids.length} order(s) to "${newStatus}".` }; 
+        }
         catch (e) { return { error: e.message }; }
     }
 
-    async function deleteOrder(orderId) {
-        try { await deleteDoc(doc(db, "orders", orderId)); return { success: true, message: `Deleted order ${orderId}.` }; }
+    async function deleteOrder(orderIds) {
+        try { 
+            const ids = Array.isArray(orderIds) ? orderIds : String(orderIds).split(',').map(s => s.trim()).filter(Boolean);
+            for (const id of ids) await deleteDoc(doc(db, "orders", id)); 
+            return { success: true, message: `Deleted ${ids.length} order(s).` }; 
+        }
         catch (e) { return { error: e.message }; }
     }
 
@@ -436,7 +483,7 @@ TOOLS AVAILABLE:
             qSnap.forEach(docSnap => {
                 const data = docSnap.data();
                 const catVi = data.categoryVi || data.category || 'Khác';
-                if (!catMap[catVi]) catMap[catVi] = { categoryVi: catVi, categoryEn: data.categoryEn || '', categoryFi: data.categoryFi || '', items: [] };
+                if (!catMap[catVi]) catMap[catVi] = { categoryVi: catVi, categoryEn: data.categoryEn || '', categoryFi: data.categoryFi || '', categorySv: data.categorySv || '', items: [] };
                 catMap[catVi].items.push({ id: docSnap.id, nameVi: data.nameVi || '', nameEn: data.nameEn || '', price: data.price, isAvailable: data.isAvailable !== false });
             });
             return Object.values(catMap).map(c => ({ ...c, itemCount: c.items.length }));
@@ -452,7 +499,7 @@ TOOLS AVAILABLE:
                 const data = docSnap.data();
                 const itemCat = (data.categoryVi || data.category || '').toLowerCase();
                 if (itemCat === catLower) {
-                    items.push({ id: docSnap.id, nameVi: data.nameVi || '', nameEn: data.nameEn || '', nameFi: data.nameFi || '', price: data.price, isAvailable: data.isAvailable !== false, options: (data.options || []).map(o => ({ name: o.nameVi || o.name, choiceCount: (o.choices || []).length })) });
+                    items.push({ id: docSnap.id, nameVi: data.nameVi || '', nameEn: data.nameEn || '', nameFi: data.nameFi || '', nameSv: data.nameSv || '', price: data.price, isAvailable: data.isAvailable !== false, options: (data.options || []).map(o => ({ name: o.nameVi || o.name, choiceCount: (o.choices || []).length })) });
                 }
             });
             return items;
@@ -464,32 +511,42 @@ TOOLS AVAILABLE:
             const snap = await getDoc(doc(db, "menu", dishId));
             if (!snap.exists()) return { error: 'Không tìm thấy món.' };
             const data = snap.data();
-            return { id: snap.id, nameVi: data.nameVi || '', nameEn: data.nameEn || '', nameFi: data.nameFi || '', categoryVi: data.categoryVi || data.category || '', categoryEn: data.categoryEn || '', categoryFi: data.categoryFi || '', price: data.price, isAvailable: data.isAvailable !== false, image: data.image || '', descVi: data.descVi || '', descEn: data.descEn || '', descFi: data.descFi || '', preparationTime: data.preparationTime || 0, nutrition: data.nutrition || {}, tags: data.tags || [], options: data.options || [] };
+            return { id: snap.id, nameVi: data.nameVi || '', nameEn: data.nameEn || '', nameFi: data.nameFi || '', nameSv: data.nameSv || '', categoryVi: data.categoryVi || data.category || '', categoryEn: data.categoryEn || '', categoryFi: data.categoryFi || '', categorySv: data.categorySv || '', price: data.price, isAvailable: data.isAvailable !== false, image: data.image || '', descVi: data.descVi || '', descEn: data.descEn || '', descFi: data.descFi || '', descSv: data.descSv || '', preparationTime: data.preparationTime || 0, nutrition: data.nutrition || {}, tags: data.tags || [], options: data.options || [] };
         } catch (e) { return { error: e.message }; }
     }
 
-    async function updateMenuPrice(dishId, newPrice) {
-        try { await updateDoc(doc(db, "menu", dishId), { price: parseFloat(newPrice) }); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã cập nhật giá món thành công.` }; }
+    async function updateMenuPrice(dishIds, newPrice) {
+        try { 
+            const ids = Array.isArray(dishIds) ? dishIds : String(dishIds).split(',').map(s => s.trim()).filter(Boolean);
+            for (const id of ids) await updateDoc(doc(db, "menu", id), { price: parseFloat(newPrice) }); 
+            if (window.loadFood) window.loadFood(); 
+            return { success: true, message: `Đã cập nhật giá cho ${ids.length} món thành công.` }; 
+        }
         catch (e) { return { error: e.message }; }
     }
 
-    async function updateMenuName(dishId, nameVi, nameEn, nameFi) {
-        try { const u = {}; if (nameVi !== undefined) u.nameVi = nameVi; if (nameEn !== undefined) u.nameEn = nameEn; if (nameFi !== undefined) u.nameFi = nameFi; await updateDoc(doc(db, "menu", dishId), u); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã cập nhật tên món.` }; }
+    async function updateMenuName(dishId, nameVi, nameEn, nameFi, nameSv) {
+        try { const u = {}; if (nameVi !== undefined) u.nameVi = nameVi; if (nameEn !== undefined) u.nameEn = nameEn; if (nameFi !== undefined) u.nameFi = nameFi; if (nameSv !== undefined) u.nameSv = nameSv; await updateDoc(doc(db, "menu", dishId), u); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã cập nhật tên món.` }; }
         catch (e) { return { error: e.message }; }
     }
 
-    async function updateMenuDescription(dishId, descVi, descEn, descFi) {
-        try { const u = {}; if (descVi !== undefined) u.descVi = descVi; if (descEn !== undefined) u.descEn = descEn; if (descFi !== undefined) u.descFi = descFi; await updateDoc(doc(db, "menu", dishId), u); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã cập nhật mô tả.` }; }
+    async function updateMenuDescription(dishId, descVi, descEn, descFi, descSv) {
+        try { const u = {}; if (descVi !== undefined) u.descVi = descVi; if (descEn !== undefined) u.descEn = descEn; if (descFi !== undefined) u.descFi = descFi; if (descSv !== undefined) u.descSv = descSv; await updateDoc(doc(db, "menu", dishId), u); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã cập nhật mô tả.` }; }
         catch (e) { return { error: e.message }; }
     }
 
-    async function updateMenuCategory(dishId, categoryVi, categoryEn, categoryFi) {
-        try { const u = {}; if (categoryVi !== undefined) { u.category = categoryVi; u.categoryVi = categoryVi; } if (categoryEn !== undefined) u.categoryEn = categoryEn; if (categoryFi !== undefined) u.categoryFi = categoryFi; await updateDoc(doc(db, "menu", dishId), u); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã cập nhật danh mừc.` }; }
+    async function updateMenuCategory(dishId, categoryVi, categoryEn, categoryFi, categorySv) {
+        try { const u = {}; if (categoryVi !== undefined) { u.category = categoryVi; u.categoryVi = categoryVi; } if (categoryEn !== undefined) u.categoryEn = categoryEn; if (categoryFi !== undefined) u.categoryFi = categoryFi; if (categorySv !== undefined) u.categorySv = categorySv; await updateDoc(doc(db, "menu", dishId), u); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã cập nhật danh mừc.` }; }
         catch (e) { return { error: e.message }; }
     }
 
-    async function updateMenuAvailability(dishId, isAvailable) {
-        try { await updateDoc(doc(db, "menu", dishId), { isAvailable: !!isAvailable }); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã cập nhật trảng thái.` }; }
+    async function updateMenuAvailability(dishIds, isAvailable) {
+        try { 
+            const ids = Array.isArray(dishIds) ? dishIds : String(dishIds).split(',').map(s => s.trim()).filter(Boolean);
+            for (const id of ids) await updateDoc(doc(db, "menu", id), { isAvailable: !!isAvailable }); 
+            if (window.loadFood) window.loadFood(); 
+            return { success: true, message: `Đã cập nhật trạng thái cho ${ids.length} món.` }; 
+        }
         catch (e) { return { error: e.message }; }
     }
 
@@ -513,13 +570,13 @@ TOOLS AVAILABLE:
         catch (e) { return { error: e.message }; }
     }
 
-    async function addMenuTag(dishId, tagLabelVi, tagLabelEn, tagLabelFi) {
-        try { const snap = await getDoc(doc(db, "menu", dishId)); if (!snap.exists()) return { error: "Không tìm thấy món." }; const tags = snap.data().tags || []; const lVi = tagLabelVi || '', lEn = tagLabelEn || lVi, lFi = tagLabelFi || lVi; if (!tags.some(t => (t.labelVi||'').toLowerCase() === lVi.toLowerCase())) tags.push({ labelVi: lVi, labelEn: lEn, labelFi: lFi }); await updateDoc(doc(db, "menu", dishId), { tags }); return { success: true, message: `Đã thêm tag "${lVi}".` }; }
+    async function addMenuTag(dishId, tagLabelVi, tagLabelEn, tagLabelFi, tagLabelSv) {
+        try { const snap = await getDoc(doc(db, "menu", dishId)); if (!snap.exists()) return { error: "Không tìm thấy món." }; const tags = snap.data().tags || []; const lVi = tagLabelVi || '', lEn = tagLabelEn || lVi, lFi = tagLabelFi || lVi, lSv = tagLabelSv || lVi; if (!tags.some(t => (t.labelVi||'').toLowerCase() === lVi.toLowerCase())) tags.push({ labelVi: lVi, labelEn: lEn, labelFi: lFi, labelSv: lSv }); await updateDoc(doc(db, "menu", dishId), { tags }); return { success: true, message: `Đã thêm tag "${lVi}".` }; }
         catch (e) { return { error: e.message }; }
     }
 
     async function removeMenuTag(dishId, tagLabel) {
-        try { const snap = await getDoc(doc(db, "menu", dishId)); if (!snap.exists()) return { error: "Không tìm thấy món." }; const tags = snap.data().tags || []; const newTags = tags.filter(t => (t.labelVi||'').toLowerCase() !== tagLabel.toLowerCase() && (t.labelEn||'').toLowerCase() !== tagLabel.toLowerCase() && (t.labelFi||'').toLowerCase() !== tagLabel.toLowerCase()); if (tags.length === newTags.length) return { error: `Không tìm thấy tag "${tagLabel}".` }; await updateDoc(doc(db, "menu", dishId), { tags: newTags }); return { success: true, message: `Đã xoá tag.` }; }
+        try { const snap = await getDoc(doc(db, "menu", dishId)); if (!snap.exists()) return { error: "Không tìm thấy món." }; const tags = snap.data().tags || []; const newTags = tags.filter(t => (t.labelVi||'').toLowerCase() !== tagLabel.toLowerCase() && (t.labelEn||'').toLowerCase() !== tagLabel.toLowerCase() && (t.labelFi||'').toLowerCase() !== tagLabel.toLowerCase() && (t.labelSv||'').toLowerCase() !== tagLabel.toLowerCase()); if (tags.length === newTags.length) return { error: `Không tìm thấy tag "${tagLabel}".` }; await updateDoc(doc(db, "menu", dishId), { tags: newTags }); return { success: true, message: `Đã xoá tag.` }; }
         catch (e) { return { error: e.message }; }
     }
 
@@ -533,11 +590,16 @@ TOOLS AVAILABLE:
         catch (e) { return { error: e.message }; }
     }
 
-    async function deleteMenuItem(dishId) {
-        try { await deleteDoc(doc(db, "menu", dishId)); if (window.loadFood) window.loadFood(); if (window.loadCategories) window.loadCategories(); return { success: true, message: `Đã xoá món.` }; }
+    async function deleteMenuItem(dishIds) {
+        try { 
+            const ids = Array.isArray(dishIds) ? dishIds : String(dishIds).split(',').map(s => s.trim()).filter(Boolean);
+            for (const id of ids) await deleteDoc(doc(db, "menu", id)); 
+            if (window.loadFood) window.loadFood(); 
+            if (window.loadCategories) window.loadCategories(); 
+            return { success: true, message: `Đã xoá ${ids.length} món.` }; 
+        }
         catch (e) { return { error: e.message }; }
     }
-
     async function updateMenuCustomFields(dishId, customFields) {
         try { await updateDoc(doc(db, "menu", dishId), customFields); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã cập nhật trường tuỳ chỉnh.` }; }
         catch (e) { return { error: e.message }; }
@@ -545,58 +607,195 @@ TOOLS AVAILABLE:
 
     async function setOptionChoicePrice(dishId, optionName, choiceLabel, newPrice) {
         try {
-            let targetDoc = null;
-            const qSnap = await getDocs(collection(db, "menu"));
-            qSnap.forEach(d => { if (d.id === dishId) targetDoc = d.data(); });
-            if (!targetDoc) return { error: "Dish not found" };
+            const snap = await getDoc(doc(db, "menu", dishId));
+            if (!snap.exists()) return { error: "Không tìm thấy món." };
+            const targetDoc = snap.data();
+            const price = parseFloat(newPrice) || 0;
             const options = targetDoc.options ? targetDoc.options.map(opt => {
-                const matchesOpt = [opt.name, opt.nameVi, opt.nameEn, opt.nameFi].some(n => (n||'').toLowerCase() === optionName.toLowerCase());
-                if (matchesOpt) opt.choices = opt.choices.map(c => { const matchesChoice = [c.label, c.labelVi, c.labelEn, c.labelFi].some(l => (l||'').toLowerCase() === choiceLabel.toLowerCase()); if (matchesChoice) c.price = parseFloat(newPrice); return c; });
+                const matchesOpt = [opt.id, opt.name, opt.nameVi, opt.nameEn, opt.nameFi, opt.nameSv].some(n => (n||'').toLowerCase() === String(optionName||'').toLowerCase());
+                if (matchesOpt) {
+                    if (!opt.choices) opt.choices = [];
+                    opt.choices = opt.choices.map(c => {
+                        const matchesChoice = [c.label, c.labelVi, c.labelEn, c.labelFi, c.labelSv].some(l => (l||'').toLowerCase() === String(choiceLabel||'').toLowerCase());
+                        if (matchesChoice) c.price = price;
+                        return c;
+                    });
+                }
                 return opt;
             }) : [];
             await updateDoc(doc(db, "menu", dishId), { options });
             if (window.loadFood) window.loadFood();
-            return { success: true, message: `Đã cập nhật giá ${choiceLabel} thành ${newPrice}€.` };
+            return { success: true, message: `Đã cập nhật giá ${choiceLabel} thành ${price}€.` };
         } catch (e) { return { error: e.message }; }
     }
 
-    async function addMenuOptionGroup(dishId, optionNameVi, optionNameEn, optionNameFi, optionType, choices) {
-        try { const snap = await getDoc(doc(db, "menu", dishId)); if (!snap.exists()) return { error: "Không tìm thấy món." }; const options = snap.data().options || []; options.push({ name: optionNameEn || optionNameVi, nameVi: optionNameVi, nameEn: optionNameEn || optionNameVi, nameFi: optionNameFi || optionNameVi, type: optionType || 'toggle', choices: (choices||[]).map(c => ({ label: c.labelEn || c.labelVi, labelVi: c.labelVi, labelEn: c.labelEn || c.labelVi, labelFi: c.labelFi || c.labelVi, price: parseFloat(c.price)||0 })) }); await updateDoc(doc(db, "menu", dishId), { options }); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã thêm nhóm option.` }; }
-        catch (e) { return { error: e.message }; }
+    async function addMenuOptionGroup(dishId, optionNameVi, optionNameEn, optionNameFi, optionNameSv, optionType, choices) {
+        try {
+            const snap = await getDoc(doc(db, "menu", dishId));
+            if (!snap.exists()) return { error: "Không tìm thấy món." };
+            let parsedChoices = [];
+            if (choices) {
+                if (typeof choices === 'string') {
+                    try {
+                        parsedChoices = JSON.parse(choices);
+                    } catch (e) {
+                        parsedChoices = choices.split(',').map(item => ({ labelVi: item.trim(), labelEn: item.trim(), price: 0 }));
+                    }
+                } else if (Array.isArray(choices)) {
+                    parsedChoices = choices;
+                }
+            }
+            const options = snap.data().options || [];
+            const groupId = "opt_" + Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+            options.push({
+                id: groupId,
+                name: optionNameEn || optionNameVi || optionNameFi || optionNameSv || "Tùy chọn",
+                nameVi: optionNameVi || optionNameEn || optionNameFi || optionNameSv || "Tùy chọn",
+                nameEn: optionNameEn || optionNameVi || optionNameFi || optionNameSv || "Tùy chọn",
+                nameFi: optionNameFi || optionNameVi || optionNameEn || optionNameSv || "Tùy chọn",
+                nameSv: optionNameSv || optionNameVi || optionNameEn || optionNameFi || "Tùy chọn",
+                type: optionType || 'toggle',
+                choices: parsedChoices.map(c => ({
+                    label: c.labelEn || c.labelVi || c.label || '',
+                    labelVi: c.labelVi || c.label || '',
+                    labelEn: c.labelEn || c.labelVi || c.label || '',
+                    labelFi: c.labelFi || c.labelVi || c.label || '',
+                    labelSv: c.labelSv || c.labelVi || c.label || '',
+                    price: parseFloat(c.price) || 0
+                }))
+            });
+            await updateDoc(doc(db, "menu", dishId), { options });
+            if (window.loadFood) window.loadFood();
+            const createdName = optionNameVi || optionNameEn || optionNameFi || optionNameSv || "Tùy chọn";
+            return { success: true, message: `Đã thêm nhóm option "${createdName}" thành công với ID là: ${groupId}. BẠN CÓ THỂ SỬ DỤNG ID NÀY (thay vì tên) để thêm lựa chọn (lệnh 6C).`, groupId: groupId };
+        } catch (e) { return { error: e.message }; }
     }
 
     async function removeMenuOptionGroup(dishId, optionName) {
-        try { const snap = await getDoc(doc(db, "menu", dishId)); if (!snap.exists()) return { error: "Không tìm thấy món." }; const options = (snap.data().options || []).filter(opt => ![opt.name, opt.nameVi, opt.nameEn, opt.nameFi].some(n => (n||'').toLowerCase() === optionName.toLowerCase())); await updateDoc(doc(db, "menu", dishId), { options }); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã xoá nhóm option.` }; }
-        catch (e) { return { error: e.message }; }
+        try {
+            const snap = await getDoc(doc(db, "menu", dishId));
+            if (!snap.exists()) return { error: "Không tìm thấy món." };
+            const options = (snap.data().options || []).filter(opt => ![opt.id, opt.name, opt.nameVi, opt.nameEn, opt.nameFi, opt.nameSv].some(n => (n||'').toLowerCase() === String(optionName||'').toLowerCase()));
+            await updateDoc(doc(db, "menu", dishId), { options });
+            if (window.loadFood) window.loadFood();
+            return { success: true, message: `Đã xoá nhóm option.` };
+        } catch (e) { return { error: e.message }; }
     }
 
-    async function addChoiceToOptionGroup(dishId, optionName, choiceLabelVi, choiceLabelEn, choiceLabelFi, choicePrice) {
-        try { const snap = await getDoc(doc(db, "menu", dishId)); if (!snap.exists()) return { error: "Không tìm thấy món." }; let updated = false; const options = (snap.data().options || []).map(opt => { if ([opt.name, opt.nameVi, opt.nameEn, opt.nameFi].some(n => (n||'').toLowerCase() === optionName.toLowerCase())) { opt.choices.push({ label: choiceLabelEn || choiceLabelVi, labelVi: choiceLabelVi, labelEn: choiceLabelEn || choiceLabelVi, labelFi: choiceLabelFi || choiceLabelVi, price: parseFloat(choicePrice)||0 }); updated = true; } return opt; }); if (!updated) return { error: "Không tìm thấy nhóm option." }; await updateDoc(doc(db, "menu", dishId), { options }); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã thêm lựa chọn.` }; }
-        catch (e) { return { error: e.message }; }
+    async function addChoiceToOptionGroup(dishId, optionName, choiceLabelVi, choiceLabelEn, choiceLabelFi, choiceLabelSv, choicePrice) {
+        try {
+            const snap = await getDoc(doc(db, "menu", dishId));
+            if (!snap.exists()) return { error: "Không tìm thấy món." };
+            let updated = false;
+            const price = parseFloat(choicePrice) || 0;
+            const options = (snap.data().options || []).map(opt => {
+                if ([opt.id, opt.name, opt.nameVi, opt.nameEn, opt.nameFi, opt.nameSv].some(n => (n||'').toLowerCase() === String(optionName||'').toLowerCase())) {
+                    if (!opt.choices) opt.choices = [];
+                    opt.choices.push({
+                        label: choiceLabelEn || choiceLabelVi || choiceLabelSv || '',
+                        labelVi: choiceLabelVi || '',
+                        labelEn: choiceLabelEn || choiceLabelVi || '',
+                        labelFi: choiceLabelFi || choiceLabelVi || '',
+                        labelSv: choiceLabelSv || choiceLabelVi || '',
+                        price: price
+                    });
+                    updated = true;
+                }
+                return opt;
+            });
+            if (!updated) return { error: "Không tìm thấy nhóm option." };
+            await updateDoc(doc(db, "menu", dishId), { options });
+            if (window.loadFood) window.loadFood();
+            return { success: true, message: `Đã thêm lựa chọn.` };
+        } catch (e) { return { error: e.message }; }
     }
 
     async function removeChoiceFromOptionGroup(dishId, optionName, choiceLabel) {
-        try { const snap = await getDoc(doc(db, "menu", dishId)); if (!snap.exists()) return { error: "Không tìm thấy món." }; let updated = false; const options = (snap.data().options || []).map(opt => { if ([opt.name, opt.nameVi, opt.nameEn, opt.nameFi].some(n => (n||'').toLowerCase() === optionName.toLowerCase())) { const origLen = opt.choices.length; opt.choices = opt.choices.filter(c => ![c.label, c.labelVi, c.labelEn, c.labelFi].some(l => (l||'').toLowerCase() === choiceLabel.toLowerCase())); if (opt.choices.length < origLen) updated = true; } return opt; }); if (!updated) return { error: "Không tìm thấy." }; await updateDoc(doc(db, "menu", dishId), { options }); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã xoá lựa chọn.` }; }
+        try {
+            const snap = await getDoc(doc(db, "menu", dishId));
+            if (!snap.exists()) return { error: "Không tìm thấy món." };
+            let updated = false;
+            const options = (snap.data().options || []).map(opt => {
+                if ([opt.id, opt.name, opt.nameVi, opt.nameEn, opt.nameFi, opt.nameSv].some(n => (n||'').toLowerCase() === String(optionName||'').toLowerCase())) {
+                    if (!opt.choices) opt.choices = [];
+                    const origLen = opt.choices.length;
+                    opt.choices = opt.choices.filter(c => ![c.label, c.labelVi, c.labelEn, c.labelFi, c.labelSv].some(l => (l||'').toLowerCase() === String(choiceLabel||'').toLowerCase()));
+                    if (opt.choices.length < origLen) updated = true;
+                }
+                return opt;
+            });
+            if (!updated) return { error: "Không tìm thấy." };
+            await updateDoc(doc(db, "menu", dishId), { options });
+            if (window.loadFood) window.loadFood();
+            return { success: true, message: `Đã xoá lựa chọn.` };
+        } catch (e) { return { error: e.message }; }
+    }
+
+    async function updateMenuOptionGroup(dishId, oldOptionName, newOptionNameVi, newOptionNameEn, newOptionNameFi, newOptionNameSv, newOptionType) {
+        try {
+            const snap = await getDoc(doc(db, "menu", dishId));
+            if (!snap.exists()) return { error: "Không tìm thấy món." };
+            let updated = false;
+            const options = (snap.data().options || []).map(opt => {
+                if ([opt.id, opt.name, opt.nameVi, opt.nameEn, opt.nameFi, opt.nameSv].some(n => (n||'').toLowerCase() === String(oldOptionName||'').toLowerCase())) {
+                    if (newOptionNameVi !== undefined) { opt.nameVi = newOptionNameVi; opt.name = newOptionNameVi; }
+                    if (newOptionNameEn !== undefined) { opt.nameEn = newOptionNameEn; opt.name = newOptionNameEn; }
+                    if (newOptionNameFi !== undefined) opt.nameFi = newOptionNameFi;
+                    if (newOptionNameSv !== undefined) opt.nameSv = newOptionNameSv;
+                    if (newOptionType !== undefined) opt.type = newOptionType;
+                    updated = true;
+                }
+                return opt;
+            });
+            if (!updated) return { error: "Không tìm thấy nhóm option." };
+            await updateDoc(doc(db, "menu", dishId), { options });
+            if (window.loadFood) window.loadFood();
+            return { success: true, message: `Đã cập nhật nhóm option.` };
+        } catch (e) { return { error: e.message }; }
+    }
+
+    async function updateChoiceInOptionGroup(dishId, optionName, oldChoiceLabel, newChoiceLabelVi, newChoiceLabelEn, newChoiceLabelFi, newChoiceLabelSv, newChoicePrice) {
+        try {
+            const snap = await getDoc(doc(db, "menu", dishId));
+            if (!snap.exists()) return { error: "Không tìm thấy món." };
+            let updated = false;
+            const price = newChoicePrice !== undefined && newChoicePrice !== null ? parseFloat(newChoicePrice) : null;
+            const options = (snap.data().options || []).map(opt => {
+                if ([opt.name, opt.nameVi, opt.nameEn, opt.nameFi, opt.nameSv].some(n => (n||'').toLowerCase() === optionName.toLowerCase())) {
+                    opt.choices = opt.choices.map(c => {
+                        const matches = [c.label, c.labelVi, c.labelEn, c.labelFi, c.labelSv].some(l => (l||'').toLowerCase() === oldChoiceLabel.toLowerCase());
+                        if (matches) {
+                            if (newChoiceLabelVi) c.labelVi = newChoiceLabelVi;
+                            if (newChoiceLabelEn) { c.labelEn = newChoiceLabelEn; c.label = newChoiceLabelEn; }
+                            if (newChoiceLabelFi) c.labelFi = newChoiceLabelFi;
+                            if (newChoiceLabelSv) c.labelSv = newChoiceLabelSv;
+                            if (price !== null) c.price = price;
+                            updated = true;
+                        }
+                        return c;
+                    });
+                }
+                return opt;
+            });
+            if (!updated) return { error: "Không tìm thấy." };
+            await updateDoc(doc(db, "menu", dishId), { options });
+            if (window.loadFood) window.loadFood();
+            return { success: true, message: `Đã cập nhật lựa chọn.` };
+        } catch (e) { return { error: e.message }; }
+    }
+
+    async function createMenuItem(nameVi, nameEn, nameFi, nameSv, price, categoryVi, categoryEn, categoryFi, categorySv, descVi, descEn, descFi, descSv, imageUrl) {
+        try { const ref = await addDoc(collection(db, "menu"), { nameVi: nameVi||"", nameEn: nameEn||"", nameFi: nameFi||"", nameSv: nameSv||"", price: parseFloat(price)||0, categoryVi: categoryVi||"", categoryEn: categoryEn||"", categoryFi: categoryFi||"", categorySv: categorySv||"", descVi: descVi||"", descEn: descEn||"", descFi: descFi||"", descSv: descSv||"", image: imageUrl||"", isAvailable: true, preparationTime: 15, nutrition: { calories: 0, protein: 0, fat: 0, carbs: 0 }, tags: [], options: [] }); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã tạo món với ID: ${ref.id}` }; }
         catch (e) { return { error: e.message }; }
     }
 
-    async function updateMenuOptionGroup(dishId, oldOptionName, newOptionNameVi, newOptionNameEn, newOptionNameFi, newOptionType) {
-        try { const snap = await getDoc(doc(db, "menu", dishId)); if (!snap.exists()) return { error: "Không tìm thấy món." }; let updated = false; const options = (snap.data().options || []).map(opt => { if ([opt.name, opt.nameVi, opt.nameEn, opt.nameFi].some(n => (n||'').toLowerCase() === oldOptionName.toLowerCase())) { if (newOptionNameVi) opt.nameVi = newOptionNameVi; if (newOptionNameEn) { opt.nameEn = newOptionNameEn; opt.name = newOptionNameEn; } if (newOptionNameFi) opt.nameFi = newOptionNameFi; if (newOptionType) opt.type = newOptionType; updated = true; } return opt; }); if (!updated) return { error: "Không tìm thấy." }; await updateDoc(doc(db, "menu", dishId), { options }); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã cập nhật nhóm option.` }; }
-        catch (e) { return { error: e.message }; }
-    }
-
-    async function updateChoiceInOptionGroup(dishId, optionName, oldChoiceLabel, newChoiceLabelVi, newChoiceLabelEn, newChoiceLabelFi, newChoicePrice) {
-        try { const snap = await getDoc(doc(db, "menu", dishId)); if (!snap.exists()) return { error: "Không tìm thấy món." }; let updated = false; const options = (snap.data().options || []).map(opt => { if ([opt.name, opt.nameVi, opt.nameEn, opt.nameFi].some(n => (n||'').toLowerCase() === optionName.toLowerCase())) { opt.choices = opt.choices.map(c => { const matches = [c.label, c.labelVi, c.labelEn, c.labelFi].some(l => (l||'').toLowerCase() === oldChoiceLabel.toLowerCase()); if (matches) { if (newChoiceLabelVi) c.labelVi = newChoiceLabelVi; if (newChoiceLabelEn) { c.labelEn = newChoiceLabelEn; c.label = newChoiceLabelEn; } if (newChoiceLabelFi) c.labelFi = newChoiceLabelFi; if (newChoicePrice !== undefined && newChoicePrice !== null) c.price = parseFloat(newChoicePrice); updated = true; } return c; }); } return opt; }); if (!updated) return { error: "Không tìm thấy." }; await updateDoc(doc(db, "menu", dishId), { options }); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã cập nhật lựa chọn.` }; }
-        catch (e) { return { error: e.message }; }
-    }
-
-    async function createMenuItem(nameVi, nameEn, nameFi, price, categoryVi, categoryEn, categoryFi, descVi, descEn, descFi, imageUrl) {
-        try { const ref = await addDoc(collection(db, "menu"), { nameVi: nameVi||"", nameEn: nameEn||"", nameFi: nameFi||"", price: parseFloat(price)||0, categoryVi: categoryVi||"", categoryEn: categoryEn||"", categoryFi: categoryFi||"", descVi: descVi||"", descEn: descEn||"", descFi: descFi||"", image: imageUrl||"", isAvailable: true, preparationTime: 15, nutrition: { calories: 0, protein: 0, fat: 0, carbs: 0 }, tags: [], options: [] }); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã tạo món với ID: ${ref.id}` }; }
-        catch (e) { return { error: e.message }; }
-    }
-
-    async function changeUserRole(uid, newRole) {
-        try { await updateDoc(doc(db, "users", uid), { role: newRole }); if (window.loadUsers) window.loadUsers(); return { success: true, message: `Đã đổi role user ${uid} thành ${newRole}.` }; }
+    async function changeUserRole(uids, newRole) {
+        try { 
+            const ids = Array.isArray(uids) ? uids : String(uids).split(',').map(s => s.trim()).filter(Boolean);
+            for (const uid of ids) await updateDoc(doc(db, "users", uid), { role: newRole }); 
+            if (window.loadUsers) window.loadUsers(); 
+            return { success: true, message: `Đã đổi role thành ${newRole} cho ${ids.length} user(s).` }; 
+        }
         catch (e) { return { error: e.message }; }
     }
 
@@ -710,17 +909,20 @@ TOOLS AVAILABLE:
             let rankLabel = "";
             
             if (['kim_cuong', 'kim cuong', 'diamond', 'kim cương'].includes(rankClean)) {
-                newSpent = 1000000;
-                rankLabel = "Kim Cương (Diamond)";
-            } else if (['platinum', 'bạch kim', 'bach kim'].includes(rankClean)) {
-                newSpent = 500000;
-                rankLabel = "Bạch Kim (Platinum)";
-            } else if (['gold', 'vang', 'vàng', 'kim'].includes(rankClean)) {
-                newSpent = 200000;
-                rankLabel = "Vàng (Gold)";
-            } else if (['silver', 'bac', 'bạc'].includes(rankClean)) {
-                newSpent = 100000;
-                rankLabel = "Bạc (Silver)";
+                newSpent = 500;
+                rankLabel = "Kim Cương";
+            } else if (['bach_kim', 'bach kim', 'platinum', 'bạch kim'].includes(rankClean)) {
+                newSpent = 150;
+                rankLabel = "Bạch Kim";
+            } else if (['vang', 'gold', 'vàng'].includes(rankClean)) {
+                newSpent = 85;
+                rankLabel = "Vàng";
+            } else if (['bac', 'silver', 'bạc'].includes(rankClean)) {
+                newSpent = 35;
+                rankLabel = "Bạc";
+            } else if (['dong', 'bronze', 'đồng'].includes(rankClean)) {
+                newSpent = 0;
+                rankLabel = "Đồng";
             } else {
                 newSpent = 0;
                 rankLabel = "Đồng (Bronze)";
@@ -786,14 +988,27 @@ TOOLS AVAILABLE:
         catch (e) { return { error: e.message }; }
     }
 
-    async function removeVoucher(voucherCode) {
-        try { const code = (voucherCode||'').trim().toUpperCase(); if (!code) return { error: 'Required.' }; const snap = await getDoc(doc(db, "vouchers", code)); if (!snap.exists()) return { error: `Không tìm thấy.` }; await deleteDoc(doc(db, "vouchers", code)); return { success: true, message: `Đã xoá voucher.` }; }
+    async function removeVoucher(voucherCodes) {
+        try { 
+            const codes = Array.isArray(voucherCodes) ? voucherCodes : String(voucherCodes).split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+            if (!codes.length) return { error: 'Required.' }; 
+            for (const code of codes) await deleteDoc(doc(db, "vouchers", code)); 
+            return { success: true, message: `Đã xoá ${codes.length} voucher(s).` }; 
+        }
         catch (e) { return { error: e.message }; }
     }
 
     async function listAllVouchers() {
-        try { const qSnap = await getDocs(collection(db, "vouchers")); const vouchers = []; qSnap.forEach(d => { const data = d.data(); vouchers.push({ code: d.id, discountPercent: data.discountPercent, email: data.email||'', used: data.used||false, expiryDate: data.expiryDate ? data.expiryDate.toDate().toISOString() : null, allowedOrderTypes: data.allowedOrderTypes||[] }); }); return vouchers; }
-        catch (e) { return { error: e.message }; }
+        try {
+            const qSnap = await getDocs(collection(db, "vouchers"));
+            const vouchers = [];
+            qSnap.forEach(d => {
+                const data = d.data();
+                vouchers.push({ code: d.id, discountPercent: data.discountPercent, email: data.email||'', used: data.used||false, expiryDate: data.expiryDate ? (data.expiryDate.toDate ? data.expiryDate.toDate().toISOString() : new Date(data.expiryDate).toISOString()) : null });
+            });
+            vouchers.sort((a, b) => (a.used === b.used) ? b.discountPercent - a.discountPercent : (a.used ? 1 : -1));
+            return vouchers.slice(0, 30);
+        } catch (e) { return { error: e.message }; }
     }
 
     async function sendGlobalAnnouncement(title, text, imageUrl) {
@@ -812,9 +1027,31 @@ TOOLS AVAILABLE:
 
     // Auth admin tools via worker
     async function adminListAuthUsers() { try { return await callWorker('listAuthUsers'); } catch (e) { return { error: e.message }; } }
-    async function adminDeleteAuthUser(uid) { try { await callWorker('deleteAuthUser', { uid }); try { await deleteDoc(doc(db, 'users', uid)); } catch(_) {} if (window.loadUsers) window.loadUsers(); return { success: true, message: `Đã xoá user.` }; } catch (e) { return { error: e.message }; } }
-    async function adminDisableUser(uid) { try { return await callWorker('disableUser', { uid }); } catch (e) { return { error: e.message }; } }
-    async function adminEnableUser(uid) { try { return await callWorker('enableUser', { uid }); } catch (e) { return { error: e.message }; } }
+    async function adminDeleteAuthUser(uids) {
+        try { 
+            const ids = Array.isArray(uids) ? uids : String(uids).split(',').map(s => s.trim()).filter(Boolean);
+            for (const uid of ids) {
+                await callWorker('deleteAuthUser', { uid }); 
+                try { await deleteDoc(doc(db, 'users', uid)); } catch(_) {} 
+            }
+            if (window.loadUsers) window.loadUsers(); 
+            return { success: true, message: `Đã xoá ${ids.length} user(s).` }; 
+        } catch (e) { return { error: e.message }; } 
+    }
+    async function adminDisableUser(uids) {
+        try { 
+            const ids = Array.isArray(uids) ? uids : String(uids).split(',').map(s => s.trim()).filter(Boolean);
+            for (const uid of ids) await callWorker('disableUser', { uid });
+            return { success: true, message: `Đã vô hiệu hoá ${ids.length} user(s).` };
+        } catch (e) { return { error: e.message }; } 
+    }
+    async function adminEnableUser(uids) {
+        try { 
+            const ids = Array.isArray(uids) ? uids : String(uids).split(',').map(s => s.trim()).filter(Boolean);
+            for (const uid of ids) await callWorker('enableUser', { uid });
+            return { success: true, message: `Đã kích hoạt ${ids.length} user(s).` };
+        } catch (e) { return { error: e.message }; } 
+    }
     async function adminChangeUserPassword(uid, newPassword) { try { return await callWorker('changeUserPassword', { uid, newPassword }); } catch (e) { return { error: e.message }; } }
     async function adminChangeUserEmail(uid, newEmail) { try { const r = await callWorker('changeUserEmail', { uid, newEmail }); try { await updateDoc(doc(db, 'users', uid), { email: newEmail }); } catch(_) {} return r; } catch (e) { return { error: e.message }; } }
     async function adminVerifyUserEmail(uid) { try { return await callWorker('verifyUserEmail', { uid }); } catch (e) { return { error: e.message }; } }
@@ -829,9 +1066,14 @@ TOOLS AVAILABLE:
             const qSnap = await getDocs(collection(db, "reservations"));
             const list = [];
             qSnap.forEach(docSnap => {
-                list.push({ id: docSnap.id, ...docSnap.data() });
+                const data = docSnap.data();
+                let created = null;
+                if (data.createdAt && typeof data.createdAt.toDate === 'function') created = data.createdAt.toDate();
+                else if (data.createdAt) created = new Date(data.createdAt);
+                list.push({ id: docSnap.id, name: data.name, phone: data.phone, email: data.email, date: data.date, time: data.time, guests: data.guests, location: data.location, notes: data.notes, status: data.status, dateObj: created });
             });
-            return list;
+            list.sort((a, b) => (b.dateObj || 0) - (a.dateObj || 0));
+            return list.map(item => ({ id: item.id, name: item.name, phone: item.phone, email: item.email, date: item.date, time: item.time, guests: item.guests, location: item.location, notes: item.notes, status: item.status, createdAt: item.dateObj ? item.dateObj.toLocaleString() : 'N/A' })).slice(0, 30);
         } catch (e) { return { error: e.message }; }
     }
 
@@ -861,10 +1103,55 @@ TOOLS AVAILABLE:
         } catch (e) { return { error: e.message }; }
     }
 
-    async function deleteReservation(id) {
+    async function deleteReservation(idsArray) {
         try {
-            await deleteDoc(doc(db, "reservations", id));
-            return { success: true, message: `Đã xoá đặt bàn ${id}.` };
+            const ids = Array.isArray(idsArray) ? idsArray : String(idsArray).split(',').map(s => s.trim()).filter(Boolean);
+            for (const id of ids) await deleteDoc(doc(db, "reservations", id));
+            return { success: true, message: `Đã xoá ${ids.length} đặt bàn.` };
+        } catch (e) { return { error: e.message }; }
+    }
+
+
+    async function adminCreateTestOrder() {
+        try {
+            const orderId = "TEST_" + Date.now().toString().slice(-6);
+            const ref = await addDoc(collection(db, "orders"), {
+                orderId: orderId,
+                status: "pending",
+                items: [{ id: "test_pho", nameVi: "Phở Bò (Test)", price: 15.9, qty: 1 }],
+                total: 15.9,
+                method: "pickup",
+                customerInfo: { name: "Test User", phone: "0123456789", email: "test@example.com" },
+                createdAt: new Date()
+            });
+            return { success: true, message: `Đã tạo Test Order: ${orderId} (Doc ID: ${ref.id})` };
+        } catch (e) { return { error: e.message }; }
+    }
+
+    async function adminCreateTestReservation() {
+        try {
+            const ref = await addDoc(collection(db, "reservations"), {
+                name: "Test Reservation",
+                phone: "0123456789",
+                email: "test@example.com",
+                date: new Date().toISOString().split('T')[0],
+                time: "18:00",
+                guests: 2,
+                location: "Easton Helsinki",
+                notes: "Test reservation via AI.",
+                status: "pending",
+                createdAt: new Date()
+            });
+            return { success: true, message: `Đã tạo Test Reservation: ${ref.id}` };
+        } catch (e) { return { error: e.message }; }
+    }
+
+
+    async function updateMenuCategoryOrder(orderedCategories) {
+        try {
+            const arr = Array.isArray(orderedCategories) ? orderedCategories : String(orderedCategories).split(',').map(s => s.trim()).filter(Boolean);
+            await setDoc(doc(db, "config", "menu"), { categoryOrder: arr }, { merge: true });
+            return { success: true, message: `Đã cập nhật thứ tự danh mục: ${arr.join(', ')}` };
         } catch (e) { return { error: e.message }; }
     }
 
@@ -873,9 +1160,14 @@ TOOLS AVAILABLE:
             const qSnap = await getDocs(collection(db, "feedback"));
             const list = [];
             qSnap.forEach(docSnap => {
-                list.push({ id: docSnap.id, ...docSnap.data() });
+                const data = docSnap.data();
+                let created = null;
+                if (data.createdAt && typeof data.createdAt.toDate === 'function') created = data.createdAt.toDate();
+                else if (data.createdAt) created = new Date(data.createdAt);
+                list.push({ id: docSnap.id, name: data.name, email: data.email, message: data.message, status: data.status, dateObj: created });
             });
-            return list;
+            list.sort((a, b) => (b.dateObj || 0) - (a.dateObj || 0));
+            return list.map(item => ({ id: item.id, name: item.name, email: item.email, message: item.message, status: item.status, createdAt: item.dateObj ? item.dateObj.toLocaleString() : 'N/A' })).slice(0, 20);
         } catch (e) { return { error: e.message }; }
     }
 
@@ -908,10 +1200,11 @@ TOOLS AVAILABLE:
         } catch (e) { return { error: e.message }; }
     }
 
-    async function deleteFeedback(id) {
+    async function deleteFeedback(idsArray) {
         try {
-            await deleteDoc(doc(db, "feedback", id));
-            return { success: true, message: `Đã xoá phản hồi ${id}.` };
+            const ids = Array.isArray(idsArray) ? idsArray : String(idsArray).split(',').map(s => s.trim()).filter(Boolean);
+            for (const id of ids) await deleteDoc(doc(db, "feedback", id));
+            return { success: true, message: `Đã xoá ${ids.length} phản hồi.` };
         } catch (e) { return { error: e.message }; }
     }
 
@@ -950,6 +1243,455 @@ TOOLS AVAILABLE:
         } catch (e) { return { error: e.message }; }
     }
 
+    // --- 30 NEW SUPER-ADMIN PRIVILEGED TOOLS ---
+    async function adminListAllCollections() {
+        return { success: true, collections: ["users", "menu", "orders", "vouchers", "messages", "reservations", "feedback", "config", "settings", "audit_logs"] };
+    }
+
+    async function adminGetCollectionStats(collectionName) {
+        try {
+            const qSnap = await getDocs(collection(db, collectionName));
+            let docCount = qSnap.size;
+            let sampleFields = [];
+            if (!qSnap.empty) {
+                sampleFields = Object.keys(qSnap.docs[0].data());
+            }
+            return { success: true, collection: collectionName, documentCount: docCount, sampleFields };
+        } catch (e) { return { error: e.message }; }
+    }
+
+    async function adminExecuteQuery(collectionName, whereField, operator, value, limitCount) {
+        try {
+            let q = collection(db, collectionName);
+            if (whereField && operator && value !== undefined) {
+                let val = value;
+                if (value === "true") val = true;
+                else if (value === "false") val = false;
+                else if (!isNaN(value) && typeof value === 'string' && value.trim() !== '') val = Number(value);
+                
+                q = query(q, where(whereField, operator, val));
+            }
+            if (limitCount) {
+                q = query(q, limit(parseInt(limitCount, 10)));
+            } else {
+                q = query(q, limit(50));
+            }
+            const qSnap = await getDocs(q);
+            const list = [];
+            qSnap.forEach(d => {
+                list.push({ id: d.id, ...d.data() });
+            });
+            return { success: true, results: list };
+        } catch (e) { return { error: e.message }; }
+    }
+
+    async function adminCreateDocument(collectionName, data) {
+        try {
+            let dataObj = typeof data === 'string' ? JSON.parse(data) : data;
+            const ref = await addDoc(collection(db, collectionName), { ...dataObj, createdAt: new Date() });
+            return { success: true, message: `Created doc in ${collectionName} with ID: ${ref.id}`, id: ref.id };
+        } catch (e) { return { error: e.message }; }
+    }
+
+    async function adminUpdateDocument(collectionName, docId, data) {
+        try {
+            let dataObj = typeof data === 'string' ? JSON.parse(data) : data;
+            await updateDoc(doc(db, collectionName, docId), { ...dataObj, updatedAt: new Date() });
+            return { success: true, message: `Updated doc ${docId} in ${collectionName}` };
+        } catch (e) { return { error: e.message }; }
+    }
+
+    async function adminDeleteDocument(collectionName, docId) {
+        try {
+            await deleteDoc(doc(db, collectionName, docId));
+            return { success: true, message: `Deleted doc ${docId} from ${collectionName}` };
+        } catch (e) { return { error: e.message }; }
+    }
+
+    async function adminBackupCollection(collectionName) {
+        try {
+            const qSnap = await getDocs(collection(db, collectionName));
+            const data = {};
+            qSnap.forEach(d => {
+                data[d.id] = d.data();
+            });
+            return { success: true, collection: collectionName, backup: data };
+        } catch (e) { return { error: e.message }; }
+    }
+
+    async function adminRestoreCollection(collectionName, dataJsonString) {
+        try {
+            const backup = typeof dataJsonString === 'string' ? JSON.parse(dataJsonString) : dataJsonString;
+            let count = 0;
+            for (const docId in backup) {
+                await setDoc(doc(db, collectionName, docId), backup[docId]);
+                count++;
+            }
+            return { success: true, message: `Restored ${count} documents to ${collectionName}` };
+        } catch (e) { return { error: e.message }; }
+    }
+
+    async function adminGetSystemSettings() {
+        try {
+            const snap = await getDoc(doc(db, "settings", "global"));
+            return snap.exists() ? snap.data() : { maintenanceMode: false, siteTitle: "Phở Việt Khang", discountBanner: "" };
+        } catch (e) { return { error: e.message }; }
+    }
+
+    async function adminUpdateSystemSettings(settingsObject) {
+        try {
+            const updates = typeof settingsObject === 'string' ? JSON.parse(settingsObject) : settingsObject;
+            await setDoc(doc(db, "settings", "global"), updates, { merge: true });
+            return { success: true, message: "System settings updated." };
+        } catch (e) { return { error: e.message }; }
+    }
+
+    async function adminToggleMaintenanceMode(isEnabled) {
+        try {
+            const status = !!isEnabled;
+            await setDoc(doc(db, "settings", "global"), { maintenanceMode: status }, { merge: true });
+            return { success: true, message: `Maintenance mode is now ${status ? 'ENABLED' : 'DISABLED'}.` };
+        } catch (e) { return { error: e.message }; }
+    }
+
+    async function adminGetSystemLogs(limitCount) {
+        try {
+            const lim = parseInt(limitCount, 10) || 20;
+            const q = query(collection(db, "audit_logs"), limit(lim));
+            const qSnap = await getDocs(q);
+            const list = [];
+            qSnap.forEach(d => {
+                list.push({ id: d.id, ...d.data() });
+            });
+            return { success: true, logs: list };
+        } catch (e) { return { error: e.message }; }
+    }
+
+    async function adminClearSystemLogs() {
+        try {
+            const qSnap = await getDocs(collection(db, "audit_logs"));
+            let deletedCount = 0;
+            for (const d of qSnap.docs) {
+                await deleteDoc(d.ref);
+                deletedCount++;
+            }
+            return { success: true, message: `Purged ${deletedCount} audit log records.` };
+        } catch (e) { return { error: e.message }; }
+    }
+
+    async function adminGetRevenueReport(startDate, endDate) {
+        try {
+            const qSnap = await getDocs(collection(db, "orders"));
+            let totalRevenue = 0;
+            let orderCount = 0;
+            let codRevenue = 0;
+            let paytrailRevenue = 0;
+            const start = startDate ? new Date(startDate) : new Date(0);
+            const end = endDate ? new Date(endDate) : new Date();
+            
+            qSnap.forEach(d => {
+                const data = d.data();
+                let date = null;
+                if (data.createdAt && typeof data.createdAt.toDate === 'function') date = data.createdAt.toDate();
+                else if (data.createdAt) date = new Date(data.createdAt);
+                
+                if (date && date >= start && date <= end) {
+                    orderCount++;
+                    const price = Number(data.totalPrice) || 0;
+                    totalRevenue += price;
+                    if (data.paymentMethod === 'paytrail') paytrailRevenue += price;
+                    else codRevenue += price;
+                }
+            });
+            return { success: true, totalRevenue, orderCount, codRevenue, paytrailRevenue, period: { start: start.toISOString(), end: end.toISOString() } };
+        } catch (e) { return { error: e.message }; }
+    }
+
+    async function adminGetPopularDishesReport(limitCount) {
+        try {
+            const qSnap = await getDocs(collection(db, "orders"));
+            const frequencies = {};
+            qSnap.forEach(d => {
+                const items = d.data().items || [];
+                items.forEach(item => {
+                    frequencies[item.name] = (frequencies[item.name] || 0) + (item.qty || 1);
+                });
+            });
+            const sorted = Object.entries(frequencies)
+                .map(([name, qty]) => ({ name, qty }))
+                .sort((a, b) => b.qty - a.qty);
+            const lim = parseInt(limitCount, 10) || 10;
+            return { success: true, popularDishes: sorted.slice(0, lim) };
+        } catch (e) { return { error: e.message }; }
+    }
+
+    async function adminGetLoyaltyUsersReport(limitCount) {
+        try {
+            const qSnap = await getDocs(collection(db, "users"));
+            const users = [];
+            qSnap.forEach(d => {
+                const data = d.data();
+                users.push({ id: d.id, email: data.email||'N/A', name: data.name||'Guest', totalSpent: data.totalSpent||0, loyaltyPoints: data.loyaltyPoints||0 });
+            });
+            users.sort((a, b) => b.totalSpent - a.totalSpent);
+            const lim = parseInt(limitCount, 10) || 15;
+            return { success: true, topSpenders: users.slice(0, lim) };
+        } catch (e) { return { error: e.message }; }
+    }
+
+    async function adminGetFeedbackSummary() {
+        try {
+            const qSnap = await getDocs(collection(db, "feedback"));
+            let total = 0, readCount = 0, pendingCount = 0;
+            const recent = [];
+            qSnap.forEach(d => {
+                total++;
+                const data = d.data();
+                if (data.status === 'read') readCount++;
+                else pendingCount++;
+                if (recent.length < 5) recent.push({ id: d.id, name: data.name, email: data.email, message: data.message, status: data.status });
+            });
+            return { success: true, totalFeedbacks: total, readCount, pendingCount, recentFeedbacks: recent };
+        } catch (e) { return { error: e.message }; }
+    }
+
+    async function adminBulkUpdateUserPoints(uidOrEmailArray, pointsAmount, isRelative) {
+        try {
+            const uids = Array.isArray(uidOrEmailArray) ? uidOrEmailArray : String(uidOrEmailArray).split(',').map(s => s.trim()).filter(Boolean);
+            const amount = Number(pointsAmount) || 0;
+            let successCount = 0;
+            for (const item of uids) {
+                let uid = item;
+                if (uid.includes('@')) {
+                    const qSnap = await getDocs(query(collection(db, "users"), where("email", "==", uid.toLowerCase())));
+                    if (!qSnap.empty) uid = qSnap.docs[0].id;
+                    else continue;
+                }
+                const ref = doc(db, "users", uid);
+                const snap = await getDoc(ref);
+                if (snap.exists()) {
+                    const current = Number(snap.data().loyaltyPoints || 0);
+                    const finalPoints = isRelative ? current + amount : amount;
+                    await updateDoc(ref, { loyaltyPoints: finalPoints, updatedAt: new Date() });
+                    successCount++;
+                }
+            }
+            return { success: true, message: `Successfully updated loyalty points for ${successCount} users.` };
+        } catch (e) { return { error: e.message }; }
+    }
+
+    async function adminBulkCreateVouchers(count, prefix, discountPercent, expiryDays) {
+        try {
+            const num = parseInt(count, 10) || 5;
+            const pct = parseInt(discountPercent, 10) || 10;
+            const pre = (prefix || 'BULK').toUpperCase();
+            const createdCodes = [];
+            let expiryDate = null;
+            if (expiryDays) {
+                expiryDate = new Date();
+                expiryDate.setDate(expiryDate.getDate() + parseInt(expiryDays, 10));
+            }
+            for (let i = 0; i < num; i++) {
+                const code = `${pre}-${Math.random().toString(36).substring(2,8).toUpperCase()}`;
+                await setDoc(doc(db, "vouchers", code), {
+                    code,
+                    discountPercent: pct,
+                    email: null,
+                    used: false,
+                    allowedOrderTypes: ['takeaway', 'delivery', 'dine-in'],
+                    expiryDate,
+                    createdAt: new Date()
+                });
+                createdCodes.push(code);
+            }
+            return { success: true, message: `Generated ${num} promo codes successfully.`, codes: createdCodes };
+        } catch (e) { return { error: e.message }; }
+    }
+
+    async function adminSendCustomInboxMessage(uidOrEmail, title, messageText, voucherCode, giftSpins) {
+        try {
+            let uid = String(uidOrEmail).trim();
+            if (uid.includes('@')) {
+                const qSnap = await getDocs(query(collection(db, "users"), where("email", "==", uid.toLowerCase())));
+                if (qSnap.empty) return { error: `User with email ${uid} not found.` };
+                uid = qSnap.docs[0].id;
+            }
+            const ref = await addDoc(collection(db, "messages"), {
+                recipientId: uid,
+                title: title || "Thông báo từ quản trị viên",
+                text: messageText || "",
+                voucherCode: voucherCode || null,
+                giftSpins: giftSpins ? parseInt(giftSpins, 10) : null,
+                readBy: [],
+                createdAt: new Date()
+            });
+            return { success: true, message: `Inbox message dispatched to ${uid} (Doc ID: ${ref.id})` };
+        } catch (e) { return { error: e.message }; }
+    }
+
+    async function adminDeleteAllVouchers(onlyExpiredOrUsed) {
+        try {
+            const qSnap = await getDocs(collection(db, "vouchers"));
+            let deletedCount = 0;
+            const now = new Date();
+            for (const d of qSnap.docs) {
+                const data = d.data();
+                let isExpired = false;
+                if (data.expiryDate) {
+                    const exp = data.expiryDate.toDate ? data.expiryDate.toDate() : new Date(data.expiryDate);
+                    if (exp < now) isExpired = true;
+                }
+                if (!onlyExpiredOrUsed || data.used || isExpired) {
+                    await deleteDoc(d.ref);
+                    deletedCount++;
+                }
+            }
+            return { success: true, message: `Deleted ${deletedCount} vouchers.` };
+        } catch (e) { return { error: e.message }; }
+    }
+
+    async function adminBanUser(uidOrEmail) {
+        try {
+            let uid = String(uidOrEmail).trim();
+            if (uid.includes('@')) {
+                const qSnap = await getDocs(query(collection(db, "users"), where("email", "==", uid.toLowerCase())));
+                if (qSnap.empty) return { error: `User not found.` };
+                uid = qSnap.docs[0].id;
+            }
+            await updateDoc(doc(db, "users", uid), { banned: true, bannedAt: new Date() });
+            return { success: true, message: `User ${uid} has been banned in Firestore.` };
+        } catch (e) { return { error: e.message }; }
+    }
+
+    async function adminUnbanUser(uidOrEmail) {
+        try {
+            let uid = String(uidOrEmail).trim();
+            if (uid.includes('@')) {
+                const qSnap = await getDocs(query(collection(db, "users"), where("email", "==", uid.toLowerCase())));
+                if (qSnap.empty) return { error: `User not found.` };
+                uid = qSnap.docs[0].id;
+            }
+            await updateDoc(doc(db, "users", uid), { banned: false, unbannedAt: new Date() });
+            return { success: true, message: `User ${uid} has been unbanned.` };
+        } catch (e) { return { error: e.message }; }
+    }
+
+    async function adminBulkUpdateMenuPrices(categoryVi, percentageChange) {
+        try {
+            const qSnap = await getDocs(collection(db, "menu"));
+            const multiplier = 1 + (Number(percentageChange) / 100);
+            let updatedCount = 0;
+            for (const d of qSnap.docs) {
+                const data = d.data();
+                if ((data.categoryVi || data.category || '').toLowerCase() === String(categoryVi).toLowerCase()) {
+                    const oldPrice = Number(data.price) || 0;
+                    const newPrice = Number((oldPrice * multiplier).toFixed(2));
+                    await updateDoc(d.ref, { price: newPrice });
+                    updatedCount++;
+                }
+            }
+            if (window.loadFood) window.loadFood();
+            return { success: true, message: `Updated prices for ${updatedCount} items in category "${categoryVi}".` };
+        } catch (e) { return { error: e.message }; }
+    }
+
+    async function adminBulkToggleMenuAvailability(categoryVi, isAvailable) {
+        try {
+            const qSnap = await getDocs(collection(db, "menu"));
+            const status = !!isAvailable;
+            let updatedCount = 0;
+            for (const d of qSnap.docs) {
+                const data = d.data();
+                if ((data.categoryVi || data.category || '').toLowerCase() === String(categoryVi).toLowerCase()) {
+                    await updateDoc(d.ref, { isAvailable: status });
+                    updatedCount++;
+                }
+            }
+            if (window.loadFood) window.loadFood();
+            return { success: true, message: `Toggled availability to ${status} for ${updatedCount} items.` };
+        } catch (e) { return { error: e.message }; }
+    }
+
+    async function adminGetInventoryAlerts() {
+        try {
+            const qSnap = await getDocs(collection(db, "menu"));
+            const outOfStock = [];
+            qSnap.forEach(d => {
+                const data = d.data();
+                if (data.isAvailable === false) {
+                    outOfStock.push({ id: d.id, nameVi: data.nameVi || 'N/A', categoryVi: data.categoryVi || 'N/A' });
+                }
+            });
+            return { success: true, outOfStockCount: outOfStock.length, items: outOfStock };
+        } catch (e) { return { error: e.message }; }
+    }
+
+    async function adminAddMultipleDishes(dishesJsonArray) {
+        try {
+            const dishes = typeof dishesJsonArray === 'string' ? JSON.parse(dishesJsonArray) : dishesJsonArray;
+            if (!Array.isArray(dishes)) return { error: "Input must be an array of dishes." };
+            const ids = [];
+            for (const item of dishes) {
+                const ref = await addDoc(collection(db, "menu"), {
+                    nameVi: item.nameVi || "",
+                    nameEn: item.nameEn || "",
+                    nameFi: item.nameFi || "",
+                    price: parseFloat(item.price) || 0,
+                    categoryVi: item.categoryVi || "",
+                    categoryEn: item.categoryEn || "",
+                    categoryFi: item.categoryFi || "",
+                    descVi: item.descVi || "",
+                    descEn: item.descEn || "",
+                    descFi: item.descFi || "",
+                    image: item.imageUrl || "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=500",
+                    isAvailable: true,
+                    preparationTime: parseInt(item.preparationTime) || 15,
+                    nutrition: item.nutrition || { calories: 0, protein: 0, fat: 0, carbs: 0 },
+                    tags: item.tags || [],
+                    options: item.options || []
+                });
+                ids.push(ref.id);
+            }
+            if (window.loadFood) window.loadFood();
+            return { success: true, message: `Batch added ${dishes.length} menu items successfully.`, ids };
+        } catch (e) { return { error: e.message }; }
+    }
+
+    async function adminBulkUpdateReservationsStatus(idsArray, status) {
+        try {
+            const ids = Array.isArray(idsArray) ? idsArray : String(idsArray).split(',').map(s => s.trim()).filter(Boolean);
+            let updatedCount = 0;
+            for (const id of ids) {
+                await updateDoc(doc(db, "reservations", id), { status: status });
+                updatedCount++;
+            }
+            return { success: true, message: `Updated ${updatedCount} reservations status to "${status}".` };
+        } catch (e) { return { error: e.message }; }
+    }
+
+    async function adminGetReservationsByDate(date) {
+        try {
+            const qSnap = await getDocs(query(collection(db, "reservations"), where("date", "==", date)));
+            const list = [];
+            qSnap.forEach(d => {
+                list.push({ id: d.id, ...d.data() });
+            });
+            return { success: true, date, count: list.length, reservations: list };
+        } catch (e) { return { error: e.message }; }
+    }
+
+    async function adminSendWebhook(url, payload) {
+        try {
+            const dataObj = typeof payload === 'string' ? JSON.parse(payload) : payload;
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...dataObj, timestamp: new Date().toISOString() })
+            });
+            return { success: true, status: res.status, statusText: res.statusText };
+        } catch (e) { return { error: e.message }; }
+    }
+
     async function getHomepageConfig() {
         try {
             const snap = await getDoc(doc(db, "config", "homepage"));
@@ -973,15 +1715,17 @@ TOOLS AVAILABLE:
             return { success: true, message: "Hero background image updated." };
         } catch (e) { return { error: e.message }; }
     }
-    async function updateHomepageHeroText(titleVi, titleEn, titleFi, descVi, descEn, descFi) {
+    async function updateHomepageHeroText(titleVi, titleEn, titleFi, titleSv, descVi, descEn, descFi, descSv) {
         try {
             const u = {};
             if (titleVi !== undefined && titleVi !== null) u.heroTitleVi = titleVi;
             if (titleEn !== undefined && titleEn !== null) u.heroTitleEn = titleEn;
             if (titleFi !== undefined && titleFi !== null) u.heroTitleFi = titleFi;
+            if (titleSv !== undefined && titleSv !== null) u.heroTitleSv = titleSv;
             if (descVi !== undefined && descVi !== null) u.heroDescVi = descVi;
             if (descEn !== undefined && descEn !== null) u.heroDescEn = descEn;
             if (descFi !== undefined && descFi !== null) u.heroDescFi = descFi;
+            if (descSv !== undefined && descSv !== null) u.heroDescSv = descSv;
             await setDoc(doc(db, "config", "homepage"), u, { merge: true });
             return { success: true, message: "Hero text updated." };
         } catch (e) { return { error: e.message }; }
@@ -1000,19 +1744,40 @@ TOOLS AVAILABLE:
         try { await setDoc(doc(db, "config", "homepage"), { signatureDishIds: dishIdArray }, { merge: true }); return { success: true, message: "Signatures updated." }; }
         catch (e) { return { error: e.message }; }
     }
-    async function updateHomepageSignatureText(titleVi, titleEn, titleFi, descVi, descEn, descFi) {
+    async function updateHomepageSignatureText(titleVi, titleEn, titleFi, titleSv, descVi, descEn, descFi, descSv) {
         try {
             const u = {};
             if (titleVi !== undefined && titleVi !== null) u.signatureTitleVi = titleVi;
             if (titleEn !== undefined && titleEn !== null) u.signatureTitleEn = titleEn;
             if (titleFi !== undefined && titleFi !== null) u.signatureTitleFi = titleFi;
+            if (titleSv !== undefined && titleSv !== null) u.signatureTitleSv = titleSv;
             if (descVi !== undefined && descVi !== null) u.signatureDescVi = descVi;
             if (descEn !== undefined && descEn !== null) u.signatureDescEn = descEn;
             if (descFi !== undefined && descFi !== null) u.signatureDescFi = descFi;
+            if (descSv !== undefined && descSv !== null) u.signatureDescSv = descSv;
             await setDoc(doc(db, "config", "homepage"), u, { merge: true });
             return { success: true, message: "Signature text updated." };
         }
         catch (e) { return { error: e.message }; }
+    }
+    async function updateHomepageSignatureDishDescription(dishId, descVi, descEn, descFi, descSv) {
+        try {
+            const snap = await getDoc(doc(db, "config", "homepage"));
+            if (!snap.exists()) return { error: "Không tìm thấy config homepage." };
+            const data = snap.data();
+            const ids = Array.isArray(data.signatureDishIds) ? data.signatureDishIds : [];
+            if (!ids.includes(dishId)) return { error: "Món này không nằm trong Signature Creations." };
+            const dishSnap = await getDoc(doc(db, "menu", dishId));
+            if (!dishSnap.exists()) return { error: "Không tìm thấy món ăn." };
+            const update = {};
+            if (descVi !== undefined && descVi !== null) update.descVi = descVi;
+            if (descEn !== undefined && descEn !== null) update.descEn = descEn;
+            if (descFi !== undefined && descFi !== null) update.descFi = descFi;
+            if (descSv !== undefined && descSv !== null) update.descSv = descSv;
+            if (!Object.keys(update).length) return { error: "Thiếu nội dung mô tả cần cập nhật." };
+            await updateDoc(doc(db, "menu", dishId), update);
+            return { success: true, message: "Đã cập nhật mô tả món trong Signature Creations." };
+        } catch (e) { return { error: e.message }; }
     }
     async function updateHomepageStory(imageUrl, labelVi, titleVi, p1Vi, p2Vi) {
         try {
@@ -1033,34 +1798,40 @@ TOOLS AVAILABLE:
             return { success: true, message: "Story image updated." };
         } catch (e) { return { error: e.message }; }
     }
-    async function updateHomepageStoryText(labelVi, labelEn, labelFi, titleVi, titleEn, titleFi, p1Vi, p1En, p1Fi, p2Vi, p2En, p2Fi) {
+    async function updateHomepageStoryText(labelVi, labelEn, labelFi, labelSv, titleVi, titleEn, titleFi, titleSv, p1Vi, p1En, p1Fi, p1Sv, p2Vi, p2En, p2Fi, p2Sv) {
         try {
             const u = {};
             if (labelVi !== undefined && labelVi !== null) u.storyLabelVi = labelVi;
             if (labelEn !== undefined && labelEn !== null) u.storyLabelEn = labelEn;
             if (labelFi !== undefined && labelFi !== null) u.storyLabelFi = labelFi;
+            if (labelSv !== undefined && labelSv !== null) u.storyLabelSv = labelSv;
             if (titleVi !== undefined && titleVi !== null) u.storyTitleVi = titleVi;
             if (titleEn !== undefined && titleEn !== null) u.storyTitleEn = titleEn;
             if (titleFi !== undefined && titleFi !== null) u.storyTitleFi = titleFi;
+            if (titleSv !== undefined && titleSv !== null) u.storyTitleSv = titleSv;
             if (p1Vi !== undefined && p1Vi !== null) u.storyP1Vi = p1Vi;
             if (p1En !== undefined && p1En !== null) u.storyP1En = p1En;
             if (p1Fi !== undefined && p1Fi !== null) u.storyP1Fi = p1Fi;
+            if (p1Sv !== undefined && p1Sv !== null) u.storyP1Sv = p1Sv;
             if (p2Vi !== undefined && p2Vi !== null) u.storyP2Vi = p2Vi;
             if (p2En !== undefined && p2En !== null) u.storyP2En = p2En;
             if (p2Fi !== undefined && p2Fi !== null) u.storyP2Fi = p2Fi;
+            if (p2Sv !== undefined && p2Sv !== null) u.storyP2Sv = p2Sv;
             await setDoc(doc(db, "config", "homepage"), u, { merge: true });
             return { success: true, message: "Story text updated." };
         } catch (e) { return { error: e.message }; }
     }
-    async function updateHomepageCTA(titleVi, titleEn, titleFi, descVi, descEn, descFi) {
+    async function updateHomepageCTA(titleVi, titleEn, titleFi, titleSv, descVi, descEn, descFi, descSv) {
         try {
             const u = {};
             if (titleVi !== undefined && titleVi !== null) u.ctaTitleVi = titleVi;
             if (titleEn !== undefined && titleEn !== null) u.ctaTitleEn = titleEn;
             if (titleFi !== undefined && titleFi !== null) u.ctaTitleFi = titleFi;
+            if (titleSv !== undefined && titleSv !== null) u.ctaTitleSv = titleSv;
             if (descVi !== undefined && descVi !== null) u.ctaDescVi = descVi;
             if (descEn !== undefined && descEn !== null) u.ctaDescEn = descEn;
             if (descFi !== undefined && descFi !== null) u.ctaDescFi = descFi;
+            if (descSv !== undefined && descSv !== null) u.ctaDescSv = descSv;
             await setDoc(doc(db, "config", "homepage"), u, { merge: true });
             return { success: true, message: "CTA updated." };
         } catch (e) { return { error: e.message }; }
@@ -1090,32 +1861,34 @@ TOOLS AVAILABLE:
         getOrdersByStatus:        { fn: getOrdersByStatus, params: ['status'] },
         updateOrderStatus:        { fn: updateOrderStatus, params: ['orderId', 'newStatus'] },
         deleteOrder:              { fn: deleteOrder, params: ['orderId'] },
+        adminCreateTestOrder:     { fn: adminCreateTestOrder, params: [] },
         listAllCategories:        { fn: listAllCategories, params: [] },
         searchFoodByCategory:     { fn: searchFoodByCategory, params: ['categoryVi'] },
         getFoodItemById:          { fn: getFoodItemById, params: ['dishId'] },
         updateMenuPrice:          { fn: updateMenuPrice, params: ['dishId', 'newPrice'] },
         setOptionChoicePrice:     { fn: setOptionChoicePrice, params: ['dishId', 'optionName', 'choiceLabel', 'newPrice'] },
-        addMenuOptionGroup:       { fn: addMenuOptionGroup, params: ['dishId', 'optionNameVi', 'optionNameEn', 'optionNameFi', 'optionType', 'choices'] },
+        addMenuOptionGroup:       { fn: addMenuOptionGroup, params: ['dishId', 'optionNameVi', 'optionNameEn', 'optionNameFi', 'optionNameSv', 'optionType', 'choices'] },
         removeMenuOptionGroup:    { fn: removeMenuOptionGroup, params: ['dishId', 'optionName'] },
-        addChoiceToOptionGroup:   { fn: addChoiceToOptionGroup, params: ['dishId', 'optionName', 'choiceLabelVi', 'choiceLabelEn', 'choiceLabelFi', 'choicePrice'] },
+        addChoiceToOptionGroup:   { fn: addChoiceToOptionGroup, params: ['dishId', 'optionName', 'choiceLabelVi', 'choiceLabelEn', 'choiceLabelFi', 'choiceLabelSv', 'choicePrice'] },
         removeChoiceFromOptionGroup: { fn: removeChoiceFromOptionGroup, params: ['dishId', 'optionName', 'choiceLabel'] },
-        updateMenuOptionGroup:    { fn: updateMenuOptionGroup, params: ['dishId', 'oldOptionName', 'newOptionNameVi', 'newOptionNameEn', 'newOptionNameFi', 'newOptionType'] },
-        updateChoiceInOptionGroup:{ fn: updateChoiceInOptionGroup, params: ['dishId', 'optionName', 'oldChoiceLabel', 'newChoiceLabelVi', 'newChoiceLabelEn', 'newChoiceLabelFi', 'newChoicePrice'] },
-        updateMenuName:           { fn: updateMenuName, params: ['dishId', 'nameVi', 'nameEn', 'nameFi'] },
-        updateMenuDescription:    { fn: updateMenuDescription, params: ['dishId', 'descVi', 'descEn', 'descFi'] },
-        updateMenuCategory:       { fn: updateMenuCategory, params: ['dishId', 'categoryVi', 'categoryEn', 'categoryFi'] },
+        updateMenuOptionGroup:    { fn: updateMenuOptionGroup, params: ['dishId', 'oldOptionName', 'newOptionNameVi', 'newOptionNameEn', 'newOptionNameFi', 'newOptionNameSv', 'newOptionType'] },
+        updateChoiceInOptionGroup:{ fn: updateChoiceInOptionGroup, params: ['dishId', 'optionName', 'oldChoiceLabel', 'newChoiceLabelVi', 'newChoiceLabelEn', 'newChoiceLabelFi', 'newChoiceLabelSv', 'newChoicePrice'] },
+        updateMenuName:           { fn: updateMenuName, params: ['dishId', 'nameVi', 'nameEn', 'nameFi', 'nameSv'] },
+        updateMenuDescription:    { fn: updateMenuDescription, params: ['dishId', 'descVi', 'descEn', 'descFi', 'descSv'] },
+        updateMenuCategory:       { fn: updateMenuCategory, params: ['dishId', 'categoryVi', 'categoryEn', 'categoryFi', 'categorySv'] },
         updateMenuAvailability:   { fn: updateMenuAvailability, params: ['dishId', 'isAvailable'] },
         uploadMenuImage:          { fn: uploadMenuImage, params: ['dishId', 'imageUrl'] },
         removeMenuImage:          { fn: removeMenuImage, params: ['dishId'] },
         updateMenuPreparationTime:{ fn: updateMenuPreparationTime, params: ['dishId', 'minutes'] },
         updateMenuNutritionInfo:  { fn: updateMenuNutritionInfo, params: ['dishId', 'calories', 'protein', 'fat', 'carbs'] },
-        addMenuTag:               { fn: addMenuTag, params: ['dishId', 'tagLabelVi', 'tagLabelEn', 'tagLabelFi'] },
+        addMenuTag:               { fn: addMenuTag, params: ['dishId', 'tagLabelVi', 'tagLabelEn', 'tagLabelFi', 'tagLabelSv'] },
         removeMenuTag:            { fn: removeMenuTag, params: ['dishId', 'tagLabel'] },
         reorderMenuItems:         { fn: reorderMenuItems, params: ['orderedDishIds'] },
         duplicateMenuItem:        { fn: duplicateMenuItem, params: ['dishId'] },
         deleteMenuItem:           { fn: deleteMenuItem, params: ['dishId'] },
         updateMenuCustomFields:   { fn: updateMenuCustomFields, params: ['dishId', 'customFields'] },
-        createMenuItem:           { fn: createMenuItem, params: ['nameVi', 'nameEn', 'nameFi', 'price', 'categoryVi', 'categoryEn', 'categoryFi', 'descVi', 'descEn', 'descFi', 'imageUrl'] },
+        updateMenuCategoryOrder:  { fn: updateMenuCategoryOrder, params: ['orderedCategories'] },
+        createMenuItem:           { fn: createMenuItem, params: ['nameVi', 'nameEn', 'nameFi', 'nameSv', 'price', 'categoryVi', 'categoryEn', 'categoryFi', 'categorySv', 'descVi', 'descEn', 'descFi', 'descSv', 'imageUrl'] },
         listAllUsers:             { fn: () => listAllUsers(), params: [] },
         changeUserRole:           { fn: changeUserRole, params: ['uid', 'newRole'] },
         getUserLoyalty:           { fn: getUserLoyalty, params: ['uid'] },
@@ -1148,13 +1921,14 @@ TOOLS AVAILABLE:
         getHomepageConfig:        { fn: getHomepageConfig, params: [] },
         updateHomepageHero:       { fn: updateHomepageHero, params: ['imageUrl', 'titleVi', 'descVi'] },
         updateHomepageHeroImage:  { fn: updateHomepageHeroImage, params: ['imageUrl'] },
-        updateHomepageHeroText:   { fn: updateHomepageHeroText, params: ['titleVi', 'titleEn', 'titleFi', 'descVi', 'descEn', 'descFi'] },
+        updateHomepageHeroText:   { fn: updateHomepageHeroText, params: ['titleVi', 'titleEn', 'titleFi', 'titleSv', 'descVi', 'descEn', 'descFi', 'descSv'] },
         updateHomepageSignatures: { fn: updateHomepageSignatures, params: ['dishIdArray'] },
-        updateHomepageSignatureText: { fn: updateHomepageSignatureText, params: ['titleVi', 'titleEn', 'titleFi', 'descVi', 'descEn', 'descFi'] },
+        updateHomepageSignatureText: { fn: updateHomepageSignatureText, params: ['titleVi', 'titleEn', 'titleFi', 'titleSv', 'descVi', 'descEn', 'descFi', 'descSv'] },
+        updateHomepageSignatureDishDescription: { fn: updateHomepageSignatureDishDescription, params: ['dishId', 'descVi', 'descEn', 'descFi', 'descSv'] },
         updateHomepageStory:      { fn: updateHomepageStory, params: ['imageUrl', 'labelVi', 'titleVi', 'p1Vi', 'p2Vi'] },
         updateHomepageStoryImage: { fn: updateHomepageStoryImage, params: ['imageUrl'] },
-        updateHomepageStoryText:  { fn: updateHomepageStoryText, params: ['labelVi', 'labelEn', 'labelFi', 'titleVi', 'titleEn', 'titleFi', 'p1Vi', 'p1En', 'p1Fi', 'p2Vi', 'p2En', 'p2Fi'] },
-        updateHomepageCTA:        { fn: updateHomepageCTA, params: ['titleVi', 'titleEn', 'titleFi', 'descVi', 'descEn', 'descFi'] },
+        updateHomepageStoryText:  { fn: updateHomepageStoryText, params: ['labelVi', 'labelEn', 'labelFi', 'labelSv', 'titleVi', 'titleEn', 'titleFi', 'titleSv', 'p1Vi', 'p1En', 'p1Fi', 'p1Sv', 'p2Vi', 'p2En', 'p2Fi', 'p2Sv'] },
+        updateHomepageCTA:        { fn: updateHomepageCTA, params: ['titleVi', 'titleEn', 'titleFi', 'titleSv', 'descVi', 'descEn', 'descFi', 'descSv'] },
         getWheelGuarantee:        { fn: getWheelGuarantee, params: [] },
         updateWheelGuarantee:     { fn: updateWheelGuarantee, params: ['next20', 'next50', 'next100'] },
         updateHomepageReviews:    { fn: updateHomepageReviews, params: ['reviews'] },
@@ -1167,15 +1941,270 @@ TOOLS AVAILABLE:
         createReservation:        { fn: createReservation, params: ['name', 'phone', 'email', 'date', 'time', 'guests', 'location', 'notes'] },
         updateReservationStatus:  { fn: updateReservationStatus, params: ['id', 'status'] },
         deleteReservation:        { fn: deleteReservation, params: ['id'] },
+        adminCreateTestReservation:{ fn: adminCreateTestReservation, params: [] },
         listAllFeedbacks:         { fn: listAllFeedbacks, params: [] },
         replyToFeedback:          { fn: replyToFeedback, params: ['id', 'replyText'] },
         deleteFeedback:           { fn: deleteFeedback, params: ['id'] },
-        updateVoucher:            { fn: updateVoucher, params: ['code', 'discountPercent', 'email', 'expiryDays', 'allowedTypes'] }
+        updateVoucher:            { fn: updateVoucher, params: ['code', 'discountPercent', 'email', 'expiryDays', 'allowedTypes'] },
+        adminListAllCollections:  { fn: adminListAllCollections, params: [] },
+        adminGetCollectionStats:  { fn: adminGetCollectionStats, params: ['collectionName'] },
+        adminExecuteQuery:        { fn: adminExecuteQuery, params: ['collectionName', 'whereField', 'operator', 'value', 'limitCount'] },
+        adminCreateDocument:      { fn: adminCreateDocument, params: ['collectionName', 'data'] },
+        adminUpdateDocument:      { fn: adminUpdateDocument, params: ['collectionName', 'docId', 'data'] },
+        adminDeleteDocument:      { fn: adminDeleteDocument, params: ['collectionName', 'docId'] },
+        adminBackupCollection:    { fn: adminBackupCollection, params: ['collectionName'] },
+        adminRestoreCollection:   { fn: adminRestoreCollection, params: ['collectionName', 'dataJsonString'] },
+        adminGetSystemSettings:   { fn: adminGetSystemSettings, params: [] },
+        adminUpdateSystemSettings:{ fn: adminUpdateSystemSettings, params: ['settingsObject'] },
+        adminToggleMaintenanceMode:{ fn: adminToggleMaintenanceMode, params: ['isEnabled'] },
+        adminGetSystemLogs:       { fn: adminGetSystemLogs, params: ['limitCount'] },
+        adminClearSystemLogs:     { fn: adminClearSystemLogs, params: [] },
+        adminGetRevenueReport:    { fn: adminGetRevenueReport, params: ['startDate', 'endDate'] },
+        adminGetPopularDishesReport:{ fn: adminGetPopularDishesReport, params: ['limitCount'] },
+        adminGetLoyaltyUsersReport:{ fn: adminGetLoyaltyUsersReport, params: ['limitCount'] },
+        adminGetFeedbackSummary:  { fn: adminGetFeedbackSummary, params: [] },
+        adminBulkUpdateUserPoints:{ fn: adminBulkUpdateUserPoints, params: ['uidOrEmailArray', 'pointsAmount', 'isRelative'] },
+        adminBulkCreateVouchers:  { fn: adminBulkCreateVouchers, params: ['count', 'prefix', 'discountPercent', 'expiryDays'] },
+        adminSendCustomInboxMessage:{ fn: adminSendCustomInboxMessage, params: ['uidOrEmail', 'title', 'messageText', 'voucherCode', 'giftSpins'] },
+        adminDeleteAllVouchers:   { fn: adminDeleteAllVouchers, params: ['onlyExpiredOrUsed'] },
+        adminBanUser:             { fn: adminBanUser, params: ['uidOrEmail'] },
+        adminUnbanUser:           { fn: adminUnbanUser, params: ['uidOrEmail'] },
+        adminBulkUpdateMenuPrices:{ fn: adminBulkUpdateMenuPrices, params: ['categoryVi', 'percentageChange'] },
+        adminBulkToggleMenuAvailability:{ fn: adminBulkToggleMenuAvailability, params: ['categoryVi', 'isAvailable'] },
+        adminGetInventoryAlerts:  { fn: adminGetInventoryAlerts, params: [] },
+        adminAddMultipleDishes:   { fn: adminAddMultipleDishes, params: ['dishesJsonArray'] },
+        adminBulkUpdateReservationsStatus:{ fn: adminBulkUpdateReservationsStatus, params: ['idsArray', 'status'] },
+        adminGetReservationsByDate:{ fn: adminGetReservationsByDate, params: ['date'] },
+        adminBulkTranslateMenuToSwedish:{ fn: adminBulkTranslateMenuToSwedish, params: ['progressCallback'] }
     };
+
+    async function adminBulkTranslateMenuToSwedish(progressCallback) {
+        try {
+            const qSnap = await getDocs(collection(db, "menu"));
+            const items = [];
+            qSnap.forEach(docSnap => {
+                const data = docSnap.data();
+                items.push({ id: docSnap.id, nameVi: data.nameVi || '', nameEn: data.nameEn || '', nameFi: data.nameFi || '', descVi: data.descVi || '', descEn: data.descEn || '', descFi: data.descFi || '', categoryVi: data.categoryVi || data.category || '', options: data.options || [] });
+            });
+            if (!items.length) return { success: true, message: 'Menu trống, không cần dịch.', updated: 0 };
+            const translations = [];
+            for (let i = 0; i < items.length; i++) {
+                const it = items[i];
+                const sourceText = `nameVi: ${it.nameVi}\nnameEn: ${it.nameEn}\nnameFi: ${it.nameFi}\ndescVi: ${it.descVi}\ndescEn: ${it.descEn}\ndescFi: ${it.descFi}\ncategoryVi: ${it.categoryVi}`;
+                let svName = '', svDesc = '', svCategory = '';
+                try {
+                    const aiRes = await callOpenRouterWithFallback({
+                        model: 'gpt-oss-120b',
+                        messages: [
+                            { role: 'system', content: 'You are a professional Swedish translator for a Vietnamese restaurant menu. Translate the provided fields to natural, appetizing Swedish suitable for a restaurant menu. Reply ONLY with 3 lines in this exact format: NAME: <swedish name>\nDESC: <swedish description>\nCAT: <swedish category>' },
+                            { role: 'user', content: sourceText }
+                        ],
+                        temperature: 0.2
+                    });
+                    const content = (aiRes?.choices?.[0]?.message?.content || '').trim();
+                    const nameMatch = content.match(/NAME:\s*(.+)/i);
+                    const descMatch = content.match(/DESC:\s*(.+)/i);
+                    const catMatch = content.match(/CAT:\s*(.+)/i);
+                    svName = (nameMatch ? nameMatch[1].trim() : '') || it.nameEn || it.nameVi;
+                    svDesc = (descMatch ? descMatch[1].trim() : '') || it.descEn || it.descVi;
+                    svCategory = (catMatch ? catMatch[1].trim() : '') || it.categoryVi;
+                } catch (e) {
+                    svName = it.nameEn || it.nameVi;
+                    svDesc = it.descEn || it.descVi;
+                    svCategory = it.categoryVi;
+                }
+                const optionSv = (it.options || []).map(opt => {
+                    const optName = stripThinking(opt.name) || opt.nameVi || opt.nameEn || 'Option';
+                    let optNameSv = '';
+                    try {
+                        const oRes = callOpenRouterWithFallback({
+                            model: 'gpt-oss-120b',
+                            messages: [
+                                { role: 'system', content: 'Translate this menu option name to Swedish. Reply ONLY the Swedish translation.' },
+                                { role: 'user', content: optName }
+                            ],
+                            temperature: 0.2
+                        });
+                        optNameSv = (oRes?.choices?.[0]?.message?.content || '').trim() || optName;
+                    } catch (e) { optNameSv = optName; }
+                    return {
+                        nameSv: optNameSv,
+                        choices: (opt.choices || []).map(ch => {
+                            const chLabel = ch.label || ch.labelVi || ch.labelEn || ch.labelFi || '';
+                            let chLabelSv = '';
+                            try {
+                                const cRes = callOpenRouterWithFallback({
+                                    model: 'gpt-oss-120b',
+                                    messages: [
+                                        { role: 'system', content: 'Translate this menu choice label to Swedish. Reply ONLY the Swedish translation.' },
+                                        { role: 'user', content: chLabel }
+                                    ],
+                                    temperature: 0.2
+                                });
+                                chLabelSv = (cRes?.choices?.[0]?.message?.content || '').trim() || chLabel;
+                            } catch (e) { chLabelSv = chLabel; }
+                            return { ...ch, labelSv: chLabelSv };
+                        })
+                    };
+                });
+                const updateData = { nameSv: svName, descSv: svDesc, categorySv: svCategory };
+                if (optionSv.length) updateData.options = optionSv;
+                await updateDoc(doc(db, "menu", it.id), updateData);
+                translations.push({ id: it.id, nameSv: svName, categorySv: svCategory });
+                if (progressCallback && typeof progressCallback === 'function') {
+                    progressCallback({ done: i + 1, total: items.length });
+                }
+            }
+            if (window.loadFood) window.loadFood();
+            if (window.loadCategories) window.loadCategories();
+            return { success: true, message: `Đã dịch ${translations.length} món sang tiếng Thụy Điển.`, updated: translations.length, items: translations.slice(0, 20) };
+        } catch (e) { return { error: e.message }; }
+    }
+
+    
+    const shortCodeMap = {
+    "1A": "getOrdersSoldToday",
+    "2A": "getOrdersByStatus",
+    "3A": "updateOrderStatus",
+    "4A": "deleteOrder",
+    "5A": "adminCreateTestOrder",
+    "1B": "listAllCategories",
+    "2B": "searchFoodByCategory",
+    "3B": "getFoodItemById",
+    "1C": "updateMenuPrice",
+    "2C": "createMenuItem",
+    "3C": "setOptionChoicePrice",
+    "4C": "addMenuOptionGroup",
+    "5C": "removeMenuOptionGroup",
+    "6C": "addChoiceToOptionGroup",
+    "7C": "removeChoiceFromOptionGroup",
+    "8C": "updateMenuOptionGroup",
+    "9C": "updateChoiceInOptionGroup",
+    "10C": "updateMenuName",
+    "11C": "updateMenuDescription",
+    "12C": "updateMenuCategory",
+    "13C": "updateMenuAvailability",
+    "14C": "uploadMenuImage",
+    "15C": "removeMenuImage",
+    "16C": "updateMenuPreparationTime",
+    "17C": "updateMenuNutritionInfo",
+    "18C": "addMenuTag",
+    "19C": "removeMenuTag",
+    "20C": "reorderMenuItems",
+    "21C": "duplicateMenuItem",
+    "22C": "deleteMenuItem",
+    "23C": "updateMenuCustomFields",
+    "24C": "updateMenuCategoryOrder",
+    "1D": "listAllUsers",
+    "2D": "getUserLoyalty",
+    "3D": "addLoyaltyProgressByOrderId",
+    "4D": "changeUserRole",
+    "5D": "createUserAccount",
+    "6D": "sendPasswordReset",
+    "7D": "sendSpinsToUser",
+    "8D": "createCustomVoucher",
+    "9D": "markVoucherUsed",
+    "10D": "removeVoucher",
+    "11D": "listAllVouchers",
+    "12D": "updateUserLoyaltyPoints",
+    "13D": "updateUserRank",
+    "14D": "updateUserTotalSpent",
+    "15D": "adminListAuthUsers",
+    "16D": "adminDeleteAuthUser",
+    "17D": "adminDisableUser",
+    "18D": "adminEnableUser",
+    "19D": "adminChangeUserPassword",
+    "20D": "adminChangeUserEmail",
+    "21D": "adminVerifyUserEmail",
+    "22D": "adminSetCustomClaims",
+    "23D": "adminGetUserInfo",
+    "24D": "adminRevokeUserTokens",
+    "25D": "adminUpdateDisplayName",
+    "26D": "adminGenerateCustomToken",
+    "1E": "listAllReservations",
+    "2E": "createReservation",
+    "3E": "updateReservationStatus",
+    "4E": "deleteReservation",
+    "5E": "adminCreateTestReservation",
+    "1F": "listAllFeedbacks",
+    "2F": "replyToFeedback",
+    "3F": "deleteFeedback",
+    "1G": "updateVoucher",
+    "1H": "getHomepageConfig",
+    "2H": "updateHomepageHero",
+    "3H": "updateHomepageHeroImage",
+    "4H": "updateHomepageHeroText",
+    "5H": "updateHomepageSignatures",
+    "6H": "updateHomepageSignatureText",
+    "6I": "updateHomepageSignatureDishDescription",
+    "7H": "updateHomepageStory",
+    "8H": "updateHomepageStoryImage",
+    "9H": "updateHomepageStoryText",
+    "10H": "updateHomepageCTA",
+    "11H": "getWheelGuarantee",
+    "12H": "updateWheelGuarantee",
+    "13H": "updateHomepageReviews",
+    "14H": "updateReviewImageUrl",
+    "1I": "webSearch",
+    "2I": "browseWebUrl",
+    "3I": "sendGlobalAnnouncement",
+    "4I": "sendEmail",
+    "1S": "adminListAllCollections",
+    "2S": "adminGetCollectionStats",
+    "3S": "adminExecuteQuery",
+    "4S": "adminCreateDocument",
+    "5S": "adminUpdateDocument",
+    "6S": "adminDeleteDocument",
+    "7S": "adminBackupCollection",
+    "8S": "adminRestoreCollection",
+    "9S": "adminGetSystemSettings",
+    "10S": "adminUpdateSystemSettings",
+    "11S": "adminToggleMaintenanceMode",
+    "12S": "adminGetSystemLogs",
+    "13S": "adminClearSystemLogs",
+    "14S": "adminGetRevenueReport",
+    "15S": "adminGetPopularDishesReport",
+    "16S": "adminGetLoyaltyUsersReport",
+    "17S": "adminGetFeedbackSummary",
+    "18S": "adminBulkUpdateUserPoints",
+    "19S": "adminBulkCreateVouchers",
+    "20S": "adminSendCustomInboxMessage",
+    "21S": "adminDeleteAllVouchers",
+    "22S": "adminBanUser",
+    "23S": "adminUnbanUser",
+    "24S": "adminBulkUpdateMenuPrices",
+    "25S": "adminBulkToggleMenuAvailability",
+    "26S": "adminGetInventoryAlerts",
+    "27S": "adminAddMultipleDishes",
+    "28S": "adminBulkUpdateReservationsStatus",
+    "29S": "adminGetReservationsByDate",
+    "30S": "adminSendWebhook",
+    "31S": "adminBulkTranslateMenuToSwedish"
+};
+    Object.keys(shortCodeMap).forEach(k => toolRegistry[k] = toolRegistry[shortCodeMap[k]]);
 
     const KNOWN_TOOLS = new Set(Object.keys(toolRegistry));
 
-    function tryParseToolJson(str) { try { const o = JSON.parse(str); if (o && o.tool && typeof o.tool === 'string') return o; } catch(e) {} return null; }
+    function tryParseToolJson(str) { 
+        try { 
+            const o = JSON.parse(str); 
+            if (o && o.tool && typeof o.tool === 'string') return o; 
+        } catch(e) {
+            try {
+                let fixed = str.replace(/,\\s*([\\}\\]])/g, '$1') // remove trailing commas
+                               .replace(/'([^']*)'/g, '"$1"') // replace single quotes with double quotes
+                               .replace(/([{,]\\s*)([a-zA-Z0-9_]+)\\s*:/g, '$1"$2":'); // quote unquoted keys
+                const o2 = JSON.parse(fixed);
+                if (o2 && o2.tool && typeof o2.tool === 'string') return o2;
+            } catch(e2) {
+                try {
+                    const o3 = new Function('return ' + str)();
+                    if (o3 && o3.tool && typeof o3.tool === 'string') return o3;
+                } catch(e3) {}
+            }
+        } 
+        return null; 
+    }
 
     function findJsonObjects(text) {
         const results = [];
@@ -1250,7 +2279,7 @@ TOOLS AVAILABLE:
                         
                         const extractAttachedImageId = (str) => {
                             if (typeof str !== 'string') return null;
-                            const match = str.match(/ATTACHED_IMAGE_[0-9_]+/);
+                            const match = str.match(/ATTACHED_IMAGE_[a-zA-Z0-9_]+/);
                             return match ? match[0] : null;
                         };
 
@@ -1269,15 +2298,88 @@ TOOLS AVAILABLE:
                         if (resolvedArgs.imgUrl && !resolvedArgs.imageUrl) resolvedArgs.imageUrl = resolvedArgs.imgUrl;
                         if (resolvedArgs.storyImageUrl && !resolvedArgs.imageUrl) resolvedArgs.imageUrl = resolvedArgs.storyImageUrl;
                         if (resolvedArgs.heroBgUrl && !resolvedArgs.imageUrl) resolvedArgs.imageUrl = resolvedArgs.heroBgUrl;
+
+                        // Super admin normalizations
+                        if (resolvedArgs.collection && !resolvedArgs.collectionName) resolvedArgs.collectionName = resolvedArgs.collection;
+                        if (resolvedArgs.col && !resolvedArgs.collectionName) resolvedArgs.collectionName = resolvedArgs.col;
+                        if (resolvedArgs.field && !resolvedArgs.whereField) resolvedArgs.whereField = resolvedArgs.field;
+                        if (resolvedArgs.op && !resolvedArgs.operator) resolvedArgs.operator = resolvedArgs.op;
+                        if (resolvedArgs.val && resolvedArgs.value === undefined) resolvedArgs.value = resolvedArgs.val;
+                        if (resolvedArgs.limit && !resolvedArgs.limitCount) resolvedArgs.limitCount = resolvedArgs.limit;
+                        if (resolvedArgs.id && !resolvedArgs.docId) resolvedArgs.docId = resolvedArgs.id;
+                        if (resolvedArgs.data && !resolvedArgs.dataJsonString) resolvedArgs.dataJsonString = resolvedArgs.data;
+                        if (resolvedArgs.settings && !resolvedArgs.settingsObject) resolvedArgs.settingsObject = resolvedArgs.settings;
+                        if (resolvedArgs.updates && !resolvedArgs.settingsObject) resolvedArgs.settingsObject = resolvedArgs.updates;
+                        if (resolvedArgs.start && !resolvedArgs.startDate) resolvedArgs.startDate = resolvedArgs.start;
+                        if (resolvedArgs.end && !resolvedArgs.endDate) resolvedArgs.endDate = resolvedArgs.end;
+                        if (resolvedArgs.uids && !resolvedArgs.uidOrEmailArray) resolvedArgs.uidOrEmailArray = resolvedArgs.uids;
+                        if (resolvedArgs.emails && !resolvedArgs.uidOrEmailArray) resolvedArgs.uidOrEmailArray = resolvedArgs.emails;
+                        if (resolvedArgs.users && !resolvedArgs.uidOrEmailArray) resolvedArgs.uidOrEmailArray = resolvedArgs.users;
+                        if (resolvedArgs.percentage && !resolvedArgs.percentageChange) resolvedArgs.percentageChange = resolvedArgs.percentage;
+                        if (resolvedArgs.change && !resolvedArgs.percentageChange) resolvedArgs.percentageChange = resolvedArgs.change;
+                        if (resolvedArgs.available && !resolvedArgs.isAvailable) resolvedArgs.isAvailable = resolvedArgs.available;
+                        if (resolvedArgs.dishes && !resolvedArgs.dishesJsonArray) resolvedArgs.dishesJsonArray = resolvedArgs.dishes;
+                        if (resolvedArgs.menuItems && !resolvedArgs.dishesJsonArray) resolvedArgs.dishesJsonArray = resolvedArgs.menuItems;
+                        if (resolvedArgs.ids && !resolvedArgs.idsArray) resolvedArgs.idsArray = resolvedArgs.ids;
+                        if (resolvedArgs.reservationIds && !resolvedArgs.idsArray) resolvedArgs.idsArray = resolvedArgs.reservationIds;
+                        if (resolvedArgs.body && !resolvedArgs.payload) resolvedArgs.payload = resolvedArgs.body;
+                        if (resolvedArgs.data && !resolvedArgs.payload) resolvedArgs.payload = resolvedArgs.data;
                         // Handle alternative arg names the AI might use
                         if (resolvedArgs.dishIds && !resolvedArgs.dishIdArray) resolvedArgs.dishIdArray = resolvedArgs.dishIds;
                         if (resolvedArgs.dishIdList && !resolvedArgs.dishIdArray) resolvedArgs.dishIdArray = resolvedArgs.dishIdList;
                         if (resolvedArgs.dishes && !resolvedArgs.dishIdArray) resolvedArgs.dishIdArray = resolvedArgs.dishes;
+
+                        // Auto-resolve dishId if AI passes a name instead of an ID
+                        if (resolvedArgs.dishId) {
+                            try {
+                                const checkSnap = await getDoc(doc(db, "menu", resolvedArgs.dishId));
+                                if (!checkSnap.exists()) {
+                                    const allDocs = await getDocs(collection(db, "menu"));
+                                    const found = allDocs.docs.find(d => {
+                                        const data = d.data();
+                                        const q = String(resolvedArgs.dishId).trim().toLowerCase();
+                                        return (data.nameVi && data.nameVi.toLowerCase() === q) || 
+                                               (data.nameEn && data.nameEn.toLowerCase() === q) ||
+                                               (data.nameFi && data.nameFi.toLowerCase() === q);
+                                    });
+                                    if (found) {
+                                        resolvedArgs.dishId = found.id;
+                                    }
+                                }
+                            } catch(e) { console.warn("Auto-resolve dishId failed", e); }
+                        }
+
                         if (resolvedArgs.categoryId && !resolvedArgs.categoryVi) resolvedArgs.categoryVi = resolvedArgs.categoryId;
                         if (resolvedArgs.newCategoryId && !resolvedArgs.categoryVi) resolvedArgs.categoryVi = resolvedArgs.newCategoryId;
                         if (resolvedArgs.name && !resolvedArgs.nameVi) resolvedArgs.nameVi = resolvedArgs.name;
                         if (resolvedArgs.category && !resolvedArgs.categoryVi) resolvedArgs.categoryVi = resolvedArgs.category;
                         if (resolvedArgs.customFieldsObject && !resolvedArgs.customFields) resolvedArgs.customFields = resolvedArgs.customFieldsObject;
+                        
+                        // Flatten option group structures if AI sends a nested object
+                        if (resolvedArgs.groupData && typeof resolvedArgs.groupData === 'object') {
+                            Object.assign(resolvedArgs, resolvedArgs.groupData);
+                        }
+                        if (resolvedArgs.optionData && typeof resolvedArgs.optionData === 'object') {
+                            Object.assign(resolvedArgs, resolvedArgs.optionData);
+                        }
+
+                        // Robust Option mappings
+                        if (resolvedArgs.groupId && !resolvedArgs.optionName) resolvedArgs.optionName = resolvedArgs.groupId;
+                        if (resolvedArgs.groupNameVi && !resolvedArgs.optionNameVi) resolvedArgs.optionNameVi = resolvedArgs.groupNameVi;
+                        if (resolvedArgs.groupNameEn && !resolvedArgs.optionNameEn) resolvedArgs.optionNameEn = resolvedArgs.groupNameEn;
+                        if (resolvedArgs.groupNameFi && !resolvedArgs.optionNameFi) resolvedArgs.optionNameFi = resolvedArgs.groupNameFi;
+                        if (resolvedArgs.groupName && !resolvedArgs.optionNameVi) resolvedArgs.optionNameVi = resolvedArgs.groupName;
+                        if (resolvedArgs.name && !resolvedArgs.optionNameVi) resolvedArgs.optionNameVi = resolvedArgs.name;
+                        
+                        if (resolvedArgs.oldGroupName && !resolvedArgs.oldOptionName) resolvedArgs.oldOptionName = resolvedArgs.oldGroupName;
+                        if (resolvedArgs.newGroupNameVi && !resolvedArgs.newOptionNameVi) resolvedArgs.newOptionNameVi = resolvedArgs.newGroupNameVi;
+                        
+                        if (resolvedArgs.choiceNameVi && !resolvedArgs.choiceLabelVi) resolvedArgs.choiceLabelVi = resolvedArgs.choiceNameVi;
+                        if (resolvedArgs.choiceName && !resolvedArgs.choiceLabelVi) resolvedArgs.choiceLabelVi = resolvedArgs.choiceName;
+                        if (resolvedArgs.label && !resolvedArgs.choiceLabelVi) resolvedArgs.choiceLabelVi = resolvedArgs.label;
+                        if (resolvedArgs.price && resolvedArgs.choicePrice === undefined) resolvedArgs.choicePrice = resolvedArgs.price;
+                        if (resolvedArgs.price && resolvedArgs.newChoicePrice === undefined) resolvedArgs.newChoicePrice = resolvedArgs.price;
+
                         if (resolvedArgs.optionName && !resolvedArgs.optionNameVi) resolvedArgs.optionNameVi = resolvedArgs.optionName;
                         if (resolvedArgs.choiceLabel && !resolvedArgs.choiceLabelVi) resolvedArgs.choiceLabelVi = resolvedArgs.choiceLabel;
                         if ((resolvedArgs.uid || resolvedArgs.email) && !resolvedArgs.uidOrEmail) resolvedArgs.uidOrEmail = resolvedArgs.uid || resolvedArgs.email;
@@ -1286,35 +2388,7 @@ TOOLS AVAILABLE:
                         if (resolvedArgs.rank && !resolvedArgs.targetRank) resolvedArgs.targetRank = resolvedArgs.rank;
                         if (resolvedArgs.tier && !resolvedArgs.targetRank) resolvedArgs.targetRank = resolvedArgs.tier;
                         if (resolvedArgs.totalSpent && !resolvedArgs.totalSpentAmount) resolvedArgs.totalSpentAmount = resolvedArgs.totalSpent;
-                        if (resolvedArgs.spent && !resolvedArgs.totalSpentAmount) resolvedArgs.totalSpentAmount = resolvedArgs.spent;
-                        if (resolvedArgs.spent_amount && !resolvedArgs.totalSpentAmount) resolvedArgs.totalSpentAmount = resolvedArgs.spent_amount;
-                        if (resolvedArgs.totalSpentAmount && !resolvedArgs.totalSpentAmount) resolvedArgs.totalSpentAmount = resolvedArgs.totalSpentAmount;
-                        if (resolvedArgs.title && !resolvedArgs.titleVi) resolvedArgs.titleVi = resolvedArgs.title;
-                        if (resolvedArgs.desc && !resolvedArgs.descVi) resolvedArgs.descVi = resolvedArgs.desc;
-                        if (resolvedArgs.description && !resolvedArgs.descVi) resolvedArgs.descVi = resolvedArgs.description;
-                        if (resolvedArgs.descriptionVi && !resolvedArgs.descVi) resolvedArgs.descVi = resolvedArgs.descriptionVi;
-                        if (resolvedArgs.descriptionEn && !resolvedArgs.descEn) resolvedArgs.descEn = resolvedArgs.descriptionEn;
-                        if (resolvedArgs.descriptionFi && !resolvedArgs.descFi) resolvedArgs.descFi = resolvedArgs.descriptionFi;
-                        
-                        // Normalizations for trilingual inputs (snake_case/alternative to camelCase)
-                        if (resolvedArgs.title_vi && !resolvedArgs.titleVi) resolvedArgs.titleVi = resolvedArgs.title_vi;
-                        if (resolvedArgs.title_en && !resolvedArgs.titleEn) resolvedArgs.titleEn = resolvedArgs.title_en;
                         if (resolvedArgs.title_fi && !resolvedArgs.titleFi) resolvedArgs.titleFi = resolvedArgs.title_fi;
-                        if (resolvedArgs.desc_vi && !resolvedArgs.descVi) resolvedArgs.descVi = resolvedArgs.desc_vi;
-                        if (resolvedArgs.desc_en && !resolvedArgs.descEn) resolvedArgs.descEn = resolvedArgs.desc_en;
-                        if (resolvedArgs.desc_fi && !resolvedArgs.descFi) resolvedArgs.descFi = resolvedArgs.desc_fi;
-                        if (resolvedArgs.description_vi && !resolvedArgs.descVi) resolvedArgs.descVi = resolvedArgs.description_vi;
-                        if (resolvedArgs.description_en && !resolvedArgs.descEn) resolvedArgs.descEn = resolvedArgs.description_en;
-                        if (resolvedArgs.description_fi && !resolvedArgs.descFi) resolvedArgs.descFi = resolvedArgs.description_fi;
-                        
-                        if (resolvedArgs.label_vi && !resolvedArgs.labelVi) resolvedArgs.labelVi = resolvedArgs.label_vi;
-                        if (resolvedArgs.label_en && !resolvedArgs.labelEn) resolvedArgs.labelEn = resolvedArgs.label_en;
-                        if (resolvedArgs.label_fi && !resolvedArgs.labelFi) resolvedArgs.labelFi = resolvedArgs.label_fi;
-                        if (resolvedArgs.p1_vi && !resolvedArgs.p1Vi) resolvedArgs.p1Vi = resolvedArgs.p1_vi;
-                        if (resolvedArgs.p1_en && !resolvedArgs.p1En) resolvedArgs.p1En = resolvedArgs.p1_en;
-                        if (resolvedArgs.p1_fi && !resolvedArgs.p1Fi) resolvedArgs.p1Fi = resolvedArgs.p1_fi;
-                        if (resolvedArgs.p2_vi && !resolvedArgs.p2Vi) resolvedArgs.p2Vi = resolvedArgs.p2_vi;
-                        if (resolvedArgs.p2_en && !resolvedArgs.p2En) resolvedArgs.p2En = resolvedArgs.p2_en;
                         if (resolvedArgs.p2_fi && !resolvedArgs.p2Fi) resolvedArgs.p2Fi = resolvedArgs.p2_fi;
                         // Dispatch with correct positional args based on param list
                         const orderedArgs = entry.params.map(p => resolvedArgs[p]);
@@ -1366,6 +2440,7 @@ TOOLS AVAILABLE:
     async function fetchAiResponse() {
         try {
             let data;
+            let provider = 'unknown';
             try {
                 const keys = getApiKeysCached();
                 const response = await fetch('https://api.cerebras.ai/v1/chat/completions', {
@@ -1375,6 +2450,7 @@ TOOLS AVAILABLE:
                 });
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 data = await response.json();
+                provider = 'cerebras-primary';
             } catch (primaryErr) {
                 try {
                     const keys = getApiKeysCached();
@@ -1385,28 +2461,46 @@ TOOLS AVAILABLE:
                     });
                     if (!response.ok) throw new Error(`HTTP ${response.status}`);
                     data = await response.json();
+                    provider = 'cerebras-backup';
                 } catch (cerebrasBackupErr) {
                     try {
+                        provider = 'gemini-attempt';
                         console.log('[AI Chat] Cerebras failed. Trying Google Gemini...');
-                        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', {
-                            method: 'POST',
-                            headers: { 'Authorization': 'Bearer AQ.Ab8RN6I93QG9VviMo41jUgFhmXI0MWkk_FYMcOhdlXpPR-yVfg', 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ model: 'gemini-2.5-flash-lite', messages: chatMessages })
-                        });
-                        if (!response.ok) throw new Error(`Gemini HTTP ${response.status}`);
-                        data = await response.json();
-                        console.log('[AI Chat] Google Gemini success.');
+                        const geminiModels = ['gemini-2.5-flash-lite', 'gemini-2.5-flash', 'gemini-3.1-flash-lite', 'gemini-3-flash', 'gemma-4-31b'];
+                        let geminiOk = false;
+                        for (const m of geminiModels) {
+                            try {
+                                const response = await fetch('https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', {
+                                    method: 'POST',
+                                    headers: { 'Authorization': 'Bearer AQ.Ab8RN6I93QG9VviMo41jUgFhmXI0MWkk_FYMcOhdlXpPR-yVfg', 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ model: m, messages: chatMessages })
+                                });
+                                if (!response.ok) throw new Error(`Gemini HTTP ${response.status}`);
+                                data = await response.json();
+                                geminiOk = true;
+                                provider = `gemini:${m}`;
+                                console.log(`[AI Chat] Google Gemini success with ${m}.`);
+                                break;
+                            } catch (e) {
+                                console.warn(`[AI Chat] Gemini ${m} failed:`, e.message);
+                            }
+                        }
+                        if (!geminiOk) throw new Error('All Gemini models failed');
                     } catch (geminiErr) {
+                        provider = 'openrouter-fallback';
                         console.warn('[AI Chat] Gemini failed. Falling back to OpenRouter...', geminiErr.message);
                         const payload = { model: 'nex-agi/nex-n2-pro:free', messages: chatMessages };
                         data = await callOpenRouterWithFallback(payload);
                     }
                 }
             }
-            const responseText = data.choices[0].message.content;
+            const responseText = (data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) ? data.choices[0].message.content : '';
+            console.log('[AI Chat] Provider:', provider, 'Response length:', responseText.length);
+            if (!responseText) throw new Error('AI response is empty');
             chatMessages.push({ role: 'assistant', content: responseText });
             await handleAgentResponse(responseText);
         } catch (err) {
+            console.error('[AI Chat] fetchAiResponse failed:', err);
             removeLoadingBubble();
             appendBubble(`Lỗi kết nối AI: ${err.message}`, 'ai');
         }

@@ -96,7 +96,7 @@ document.addEventListener('click', async (e) => {
 // 3. Auth State Listener & UI Update / Route Protection
 onAuthStateChanged(auth, async (user) => {
     const currentPath = window.location.pathname.toLowerCase();
-    const isLoginOrRegister = currentPath.endsWith('login.html') || currentPath.endsWith('register.html');
+    const isLoginOrRegister = currentPath.endsWith('login.html') || currentPath.endsWith('register.html') || currentPath.endsWith('/login') || currentPath.endsWith('/register') || currentPath === 'login' || currentPath === 'register';
 
     window.currentUserUid = user ? user.uid : null;
 
@@ -126,7 +126,7 @@ onAuthStateChanged(auth, async (user) => {
 
         // Update navigation UI on client pages
         const registerBtns = document.querySelectorAll('[data-i18n="nav-register"]');
-        const userIcons = document.querySelectorAll('a[href="login.html"]');
+        const userIcons = document.querySelectorAll('a[href="login.html"], a[href="/login"], a[href="login"]');
 
         registerBtns.forEach(btn => {
             // Hide Register button when logged in (avatar serves as profile link)
@@ -135,7 +135,7 @@ onAuthStateChanged(auth, async (user) => {
 
         userIcons.forEach(icon => {
             const prefix = (currentPath.includes('/admin/') || currentPath.includes('/kitchen/') || currentPath.includes('/host/')) ? '../' : '';
-            icon.href = prefix + "profile.html";
+            icon.href = prefix + "profile";
             const iconSpan = icon.querySelector('.material-symbols-outlined');
             if (iconSpan) {
                 const initial = (user.displayName || user.email || 'U').charAt(0).toUpperCase();
@@ -182,6 +182,8 @@ onAuthStateChanged(auth, async (user) => {
 
             if (userDoc.exists()) {
                 role = userDoc.data().role || 'customer';
+                window.userProfileDocData = userDoc.data();
+                if (window.refreshChatGreeting) window.refreshChatGreeting();
                 sessionStorage.removeItem('pendingWelcomeSpin');
             } else {
                 isNewUser = sessionStorage.getItem('pendingWelcomeSpin') === 'true';
@@ -191,27 +193,27 @@ onAuthStateChanged(auth, async (user) => {
             const prefix = (currentPath.includes('/admin/') || currentPath.includes('/kitchen/') || currentPath.includes('/host/')) ? '../' : '';
 
             if (currentPath.includes('/admin/') && role !== 'admin') {
-                window.location.href = prefix + "index.html"; // Kick out
+                window.location.href = prefix || "/"; // Kick out
                 return;
             }
             if (currentPath.includes('/kitchen/') && role !== 'admin' && role !== 'kitchen') {
-                window.location.href = prefix + "index.html"; // Kick out
+                window.location.href = prefix || "/"; // Kick out
                 return;
             }
             if (currentPath.includes('/host/') && role !== 'admin' && role !== 'host') {
-                window.location.href = prefix + "index.html"; // Kick out
+                window.location.href = prefix || "/"; // Kick out
                 return;
             }
 
-            // Login Redirect
+            // Route Redirect on Login Page
             if (isLoginOrRegister) {
                 if (isNewUser) {
                     showWelcomeSpinModal(user.email, role);
                 } else {
-                    if (role === 'admin') window.location.href = "admin/index.html";
-                    else if (role === 'kitchen') window.location.href = "kitchen/index.html";
-                    else if (role === 'host') window.location.href = "host/index.html";
-                    else window.location.href = "index.html";
+                    if (role === 'admin') window.location.href = "admin/";
+                    else if (role === 'kitchen') window.location.href = "kitchen/";
+                    else if (role === 'host') window.location.href = "host/";
+                    else window.location.href = "/";
                 }
             }
 
@@ -221,14 +223,14 @@ onAuthStateChanged(auth, async (user) => {
 
     } else {
         // User is signed out
-        const protectedPages = ['profile.html', 'order-history.html'];
-        const isProtectedClientPage = protectedPages.some(page => currentPath.endsWith(page));
+        const protectedPages = ['profile.html', 'order-history.html', '/profile', '/order-history', 'profile', 'order-history'];
+        const isProtectedClientPage = protectedPages.some(page => currentPath.endsWith(page) || currentPath === page);
         const isAppPage = currentPath.includes('/admin/') || currentPath.includes('/kitchen/') || currentPath.includes('/host/');
 
         const prefix = isAppPage ? '../' : '';
 
         if (isProtectedClientPage || isAppPage) {
-            window.location.href = prefix + "login.html";
+            window.location.href = prefix + "login";
         }
     }
 });
@@ -236,16 +238,16 @@ onAuthStateChanged(auth, async (user) => {
 // 4. Logout
 export function getLoyaltyTier(totalSpent) {
     const s = Number(totalSpent) || 0;
-    if (s >= 1000000) return 'diamond';
-    if (s >= 500000) return 'platinum';
-    if (s >= 200000) return 'gold';
-    if (s >= 100000) return 'silver';
+    if (s >= 500) return 'diamond';
+    if (s >= 150) return 'platinum';
+    if (s >= 85) return 'gold';
+    if (s >= 35) return 'silver';
     return 'bronze';
 }
 
 export function getLoyaltyRate(totalSpent) {
     const tier = getLoyaltyTier(totalSpent);
-    const rates = { bronze: 0.01, silver: 0.015, gold: 0.025, platinum: 0.04, diamond: 0.05 };
+    const rates = { bronze: 0, silver: 0.02, gold: 0.05, platinum: 0.10, diamond: 0.15 };
     return rates[tier] || rates.bronze;
 }
 
@@ -257,7 +259,7 @@ export async function logoutUser() {
         const currentPath = window.location.pathname.toLowerCase();
         const prefix = (currentPath.includes('/admin/') || currentPath.includes('/kitchen/') || currentPath.includes('/host/')) ? '../' : '';
         await signOut(auth);
-        window.location.href = prefix + "index.html";
+        window.location.href = prefix || "/";
     } catch (error) {
         console.error("Logout Error", error);
     }
@@ -365,20 +367,20 @@ function showWelcomeSpinModal(userEmail, role) {
             console.error("Failed to write welcome message:", err);
         }
 
-        if (role === 'admin') window.location.href = "admin/index.html";
-        else if (role === 'kitchen') window.location.href = "kitchen/index.html";
-        else if (role === 'host') window.location.href = "host/index.html";
-        else window.location.href = "profile.html#wheel";
+        if (role === 'admin') window.location.href = "admin/";
+        else if (role === 'kitchen') window.location.href = "kitchen/";
+        else if (role === 'host') window.location.href = "host/";
+        else window.location.href = "profile#wheel";
     });
 }
 // Intercept inbox link click if not logged in
 document.addEventListener('click', (e) => {
-    const inboxLink = e.target.closest('a[href*="inbox.html"]');
+    const inboxLink = e.target.closest('a[href*="inbox.html"], a[href*="/inbox"], a[href="inbox"]');
     if (inboxLink) {
         if (!auth.currentUser) {
             e.preventDefault();
             e.stopPropagation();
-            window.location.href = 'login.html';
+            window.location.href = 'login';
         }
     }
 }, true);

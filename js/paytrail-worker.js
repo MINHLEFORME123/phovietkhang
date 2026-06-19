@@ -5,63 +5,47 @@
  * 1. Go to https://dash.cloudflare.com/ → Workers & Pages → Create Application → Create Worker
  * 2. Name it: pvk-admin
  * 3. Paste this entire file content
- * 4. Go to Worker Settings → Variables → Add the 2 Paytrail secrets below
+ * 4. Go to Worker Settings → Variables & Secrets → Add ALL of the following:
+ *    - FIREBASE_PRIVATE_KEY         (full PEM string from service account JSON)
+ *    - FIREBASE_PRIVATE_KEY_ID      (from service account JSON)
+ *    - FIREBASE_SERVICE_ACCOUNT_EMAIL (from service account JSON)
+ *    - ADMIN_SECRET                 (strong random string, 32+ chars)
+ *    - RESEND_API_KEY               (your Resend API key)
+ *    - PAYTRAIL_MERCHANT_ID         (e.g. 375917)
+ *    - PAYTRAIL_SECRET              (your Paytrail secret key)
  * 5. Click Save and Deploy
  * 6. Copy the Worker URL (e.g. https://pvk-admin.YOUR_NAME.workers.dev)
- * 7. IMPORTANT: Set workerSecret in Firestore doc "config/apiKeys" to "pvk-firebase-admin-2024"
+ * 7. IMPORTANT: Set workerSecret in Firestore doc "config/apiKeys" to match ADMIN_SECRET
  *
- * REQUIRED Environment Variables / Secrets:
- *   - PAYTRAIL_MERCHANT_ID  (e.g. 123456)
- *   - PAYTRAIL_SECRET       (e.g. your_paytrail_secret_key)
+ * IMPORTANT: NEVER hardcode secrets in this file. Always use Environment Variables.
  */
 
-// ─── Service Account Credentials ──────────────────────────────────────────────
+// ─── Firebase Project Config (non-secret, safe to hardcode) ───────────────────
 const FIREBASE_PROJECT_ID = 'phovietkhang';
-const SERVICE_ACCOUNT_EMAIL = 'firebase-adminsdk-fbsvc@phovietkhang.iam.gserviceaccount.com';
-const PRIVATE_KEY_ID = '27970ca00571f7002ec246ceef1d79f9699284d4';
-const PRIVATE_KEY_PEM = `-----BEGIN PRIVATE KEY-----
-MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDHHi9he1IPYnAf
-e/qOs8f3rZm28sZRUv/FSUexslLInaY+gXZwMt4QuIKTCh1A5G2WBw7aWwVvMZZb
-Xn3NG2n5yRA5YHpAJ6Pe6cCXn2xFlKZDiNS6bS4xfpNxfIlcxa+lgatX3J7dEIes
-RAa17te25+KPjfQWKdKk0HhCEe9tH8JzEPNbwCW0cJWN9NYHyufXn8jtBjnaOOnQ
-gKgx3wT956OIl0Hgj7J9j9SeEGibzVWNRjuI/Lc3C2ica3lBmol/mN+l0d6aqpp/
-oBhrYkb2kelXLxoxBJn24TlBn7dGuTq2PTlTu3cG1izzT19o3Zi4s/R9PIX6psS9
-Q2NmtXDDAgMBAAECggEALsSPOmU9u/FSBoMXMadWY3056neRTw6glpUEqt8IhKhK
-oMnFqMq5z9GWkbTBdDly59cWjQDuANTzzNgf0ioLNSkdj2xyqljlK3lZzAMc6ibk
-+l3MIVF9lRB2zyQCG3EvNT+EoCloguHcDAEaVmcX8ZT7aN5do0sFd8KjTFlsFAQE
-jSvyoKFWwYw37bw5Inl+SDKnxn9qQ9rT3SQbVmaJORAJ2BiBB0BLs8nphZgiJDC7
-aWRW0+U5ByG61LOo8CIm6dJhm3UKlcY42SjEWCyd+v0ScgG1K65d354aVfo/4ux0
-NEMJqkyL7isRKRnnlMAcHrM5cX37DYnzj2KwbrGp2QKBgQDoMnR9jXg3jGLRkude
-zNqeQtn8tPR5USf5vdQDdHwSwPJd94fFlgK/GnhFHhaaobG4SGXaUtRKVWnJes+f
-ocSRFlJusJ2VTbUYTSGNpJ4s4w85zzsFjzOhMtyXjd0aBiVbJ8OiVmJK7CkxlEbf
-Q4NI6QJePERa/PVpT9qF+/r/pQKBgQDbh6IzgVjJowX5bur1bkjVpusEqXBz3MBh
-2H/3AS0igf0fg0jG6xVoiLN0Krb4IYq7c78hfpn3S3VAOl01FND69MmE5qhz5UBv
-7h1CZkpk44NCsmjgcBBxW1wpOfIMRwqZcfttwYX44rqybNX25YMCg40yMK5AQNk0
-BelCPnBCRwKBgCK8SYjuvOkyayYG3+3in2HFhm6zc08iwOQvbaQGrPjxPFCqUvlP
-86E7CHrugVsojTmQOwxqD6//DxBA+wZaYNmDiVldunU3Zrv37ekOk0sLvJ9dTOsL
-/SFERpO1eToHaVc1n6KNYa7rnU35bJDBvMYPdXc7dM5XwS6772jTxTyxAoGAd8TQ
-5n68HQ4XFVXBVHN9wyqU7+8tTdjzEK7Yab83i6sVmRq8GuJoxKZIGamwN0G9ebWV
-YkW65GNDre3pqisYNMJWK27YGprJhAeJ6Q77qX1CwKGrfD9HiUDJ0Cgv+SjNDJhW
-DzRUzkuMhgnA1jmzNyzkXKyYdK+skKhk8WI1RsMCgYA++QYAj2a7Ed9VzTxa80mI
-DHmofsWtFJVtAgAboQIGJbStZzkdlC57zxFBT50LsemtUvh4dn+eOpOy5aFcnu+E
-30T88050p2v8QufPwzQB897NNlcrGNHZ1yRWL0Ewc3IKwN5ZyABFs+MoSevTLWDo
-jx7tG9a928eULH35q5t9Ig==
------END PRIVATE KEY-----`;
 
-// ─── Shared Secret (must match workerSecret in Firestore config/apiKeys) ──────
-const ADMIN_SECRET = 'pvk-firebase-admin-2024';
+// ─── Allowed Origins (CORS whitelist) ─────────────────────────────────────────
+const ALLOWED_ORIGINS = [
+    'https://phovietkhang.com',
+    'https://www.phovietkhang.com',
+    'https://phovietkhang.web.app',
+    'https://phovietkhang.firebaseapp.com',
+];
 
-// ─── CORS ─────────────────────────────────────────────────────────────────────
-const CORS = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, X-Admin-Secret',
-};
+function getCorsHeaders(request) {
+    const origin = request.headers.get('Origin') || '';
+    const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+    return {
+        'Access-Control-Allow-Origin': allowedOrigin,
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, X-Admin-Secret',
+    };
+}
 
-function json(data, status = 200) {
+function json(data, status = 200, request = null) {
+    const cors = request ? getCorsHeaders(request) : { 'Access-Control-Allow-Origin': ALLOWED_ORIGINS[0] };
     return new Response(JSON.stringify(data), {
         status,
-        headers: { ...CORS, 'Content-Type': 'application/json' },
+        headers: { ...cors, 'Content-Type': 'application/json' },
     });
 }
 
@@ -70,9 +54,9 @@ function json(data, status = 200) {
 // =============================================================================
 
 const PAYTRAIL_GROUPS = {
-  online_banking_fi: ['bank'],    // Finnish online banking
-  mobilepay: ['mobile'],          // MobilePay
-  bank_card: ['creditcard'],      // Credit/Debit cards
+  online_banking_fi: ['bank'],
+  mobilepay: ['mobile'],
+  bank_card: ['creditcard'],
 };
 
 function uuidv4() {
@@ -95,10 +79,14 @@ async function paytrailSignature(secret, params, body) {
   return hmacSha256(secret, signing);
 }
 
-async function handlePaytrailPayment(orderData) {
-  // Test credentials (override with PAYTRAIL_MERCHANT_ID / PAYTRAIL_SECRET env vars for production)
-  const merchantId = typeof PAYTRAIL_MERCHANT_ID !== 'undefined' ? PAYTRAIL_MERCHANT_ID : '375917';
-  const secret = typeof PAYTRAIL_SECRET !== 'undefined' ? PAYTRAIL_SECRET : 'SAIPPUAKAUPPIAS';
+async function handlePaytrailPayment(env, orderData) {
+  const merchantId = env.PAYTRAIL_MERCHANT_ID;
+  const secret = env.PAYTRAIL_SECRET;
+
+  if (!merchantId || !secret) {
+    throw new Error('Paytrail credentials not configured. Set PAYTRAIL_MERCHANT_ID and PAYTRAIL_SECRET in Worker Settings.');
+  }
+
   const baseUrl = 'https://phovietkhang.onrender.com';
 
   const stamp = `${orderData.id}_${Date.now()}`;
@@ -147,8 +135,8 @@ async function handlePaytrailPayment(orderData) {
       phone: orderData.customerPhone || '',
     },
     redirectUrls: {
-      success: `${baseUrl}/order-tracking.html?orderId=${orderData.id}`,  /* Paytrail appends &checkout-transaction-id=UUID */
-      cancel: `${baseUrl}/cart.html`,
+      success: `${baseUrl}/order-tracking?orderId=${orderData.id}`,
+      cancel: `${baseUrl}/cart`,
     },
     callbackUrls: {
       success: `${baseUrl}/api/paytrail-callback`,
@@ -216,13 +204,21 @@ async function importPKCS8(pem) {
 }
 
 let _token = null, _tokenExp = 0;
-async function getAccessToken() {
+async function getAccessToken(env) {
     if (_token && Date.now() < _tokenExp) return _token;
 
+    const serviceAccountEmail = env.FIREBASE_SERVICE_ACCOUNT_EMAIL;
+    const privateKeyId = env.FIREBASE_PRIVATE_KEY_ID;
+    const privateKeyPem = env.FIREBASE_PRIVATE_KEY;
+
+    if (!serviceAccountEmail || !privateKeyPem) {
+        throw new Error('Missing Firebase service account environment variables.');
+    }
+
     const now = Math.floor(Date.now() / 1000);
-    const header = { alg: 'RS256', typ: 'JWT', kid: PRIVATE_KEY_ID };
+    const header = { alg: 'RS256', typ: 'JWT', kid: privateKeyId };
     const payload = {
-        iss: SERVICE_ACCOUNT_EMAIL,
+        iss: serviceAccountEmail,
         scope: 'https://www.googleapis.com/auth/firebase https://www.googleapis.com/auth/identitytoolkit https://www.googleapis.com/auth/cloud-platform',
         aud: 'https://oauth2.googleapis.com/token',
         iat: now, exp: now + 3600,
@@ -231,7 +227,7 @@ async function getAccessToken() {
     const h = b64url(JSON.stringify(header));
     const p = b64url(JSON.stringify(payload));
     const msg = `${h}.${p}`;
-    const key = await importPKCS8(PRIVATE_KEY_PEM);
+    const key = await importPKCS8(privateKeyPem);
     const sig = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', key, new TextEncoder().encode(msg));
     const jwt = `${msg}.${b64url(sig)}`;
 
@@ -254,8 +250,8 @@ async function getAccessToken() {
 
 const IT = `https://identitytoolkit.googleapis.com/v1`;
 
-async function itPost(path, body) {
-    const tok = await getAccessToken();
+async function itPost(env, path, body) {
+    const tok = await getAccessToken(env);
     const url = path.startsWith('http') ? path : `${IT}${path}`;
     const r = await fetch(url, {
         method: 'POST',
@@ -272,12 +268,12 @@ async function itPost(path, body) {
 // ADMIN ACTIONS
 // =============================================================================
 
-async function listAuthUsers() {
+async function listAuthUsers(env) {
     let all = [], nextPageToken = '';
     do {
         const body = { maxResults: 1000 };
         if (nextPageToken) body.nextPageToken = nextPageToken;
-        const res = await itPost(`/projects/${FIREBASE_PROJECT_ID}/accounts:batchGet`, body);
+        const res = await itPost(env, `/projects/${FIREBASE_PROJECT_ID}/accounts:batchGet`, body);
         if (res.users) {
             all = all.concat(res.users.map(u => ({
                 uid: u.localId,
@@ -294,41 +290,41 @@ async function listAuthUsers() {
     return all;
 }
 
-async function deleteAuthUser(uid) {
-    await itPost('/accounts:delete', { localId: uid });
+async function deleteAuthUser(env, uid) {
+    await itPost(env, '/accounts:delete', { localId: uid });
     return { success: true, message: `Đã xoá hoàn toàn tài khoản Firebase Auth: ${uid}` };
 }
 
-async function disableUser(uid) {
-    await itPost('/accounts:update', { localId: uid, disableUser: true });
+async function disableUser(env, uid) {
+    await itPost(env, '/accounts:update', { localId: uid, disableUser: true });
     return { success: true, message: `Đã vô hiệu hoá tài khoản: ${uid}` };
 }
 
-async function enableUser(uid) {
-    await itPost('/accounts:update', { localId: uid, disableUser: false });
+async function enableUser(env, uid) {
+    await itPost(env, '/accounts:update', { localId: uid, disableUser: false });
     return { success: true, message: `Đã kích hoạt lại tài khoản: ${uid}` };
 }
 
-async function changeUserPassword(uid, newPassword) {
+async function changeUserPassword(env, uid, newPassword) {
     if (!newPassword || newPassword.length < 6) throw new Error('Mật khẩu phải có ít nhất 6 ký tự.');
-    await itPost('/accounts:update', { localId: uid, password: newPassword });
+    await itPost(env, '/accounts:update', { localId: uid, password: newPassword });
     return { success: true, message: `Đã đổi mật khẩu cho tài khoản: ${uid}` };
 }
 
-async function changeUserEmail(uid, newEmail) {
-    await itPost('/accounts:update', { localId: uid, email: newEmail });
+async function changeUserEmail(env, uid, newEmail) {
+    await itPost(env, '/accounts:update', { localId: uid, email: newEmail });
     return { success: true, message: `Đã đổi email của ${uid} thành ${newEmail}` };
 }
 
-async function verifyUserEmail(uid) {
-    await itPost('/accounts:update', { localId: uid, emailVerified: true });
+async function verifyUserEmail(env, uid) {
+    await itPost(env, '/accounts:update', { localId: uid, emailVerified: true });
     return { success: true, message: `Đã xác thực email cho tài khoản: ${uid}` };
 }
 
-async function getUserInfo(uid, email) {
+async function getUserInfo(env, uid, email) {
     const body = uid ? { localId: [uid] } : email ? { email: [email] } : null;
     if (!body) throw new Error('Cần uid hoặc email.');
-    const res = await itPost('/accounts:lookup', body);
+    const res = await itPost(env, '/accounts:lookup', body);
     const u = res.users?.[0];
     if (!u) throw new Error('Không tìm thấy user.');
     return {
@@ -339,14 +335,14 @@ async function getUserInfo(uid, email) {
     };
 }
 
-async function updateDisplayName(uid, displayName) {
-    await itPost('/accounts:update', { localId: uid, displayName });
+async function updateDisplayName(env, uid, displayName) {
+    await itPost(env, '/accounts:update', { localId: uid, displayName });
     return { success: true, message: `Đã cập nhật tên hiển thị của ${uid} thành "${displayName}"` };
 }
 
-async function revokeUserTokens(uid) {
+async function revokeUserTokens(env, uid) {
     const validSince = String(Math.floor(Date.now() / 1000));
-    await itPost('/accounts:update', { localId: uid, validSince });
+    await itPost(env, '/accounts:update', { localId: uid, validSince });
     return { success: true, message: `Đã thu hồi tất cả session (buộc đăng xuất) của: ${uid}` };
 }
 
@@ -427,9 +423,13 @@ async function browseWebUrl(url) {
     return { url: targetUrl, content: text };
 }
 
-async function sendEmailNotification(to, subject, html, customApiKey = null) {
+async function sendEmailNotification(env, to, subject, html) {
     if (!to || !subject || !html) throw new Error("Missing parameters: to, subject, or html");
-    let key = customApiKey || 're_AmwxgrXs_217ywFo3uCjBc21UTt7QMBo9';
+    
+    const key = env.RESEND_API_KEY;
+    if (!key) {
+        throw new Error('RESEND_API_KEY environment variable is not set.');
+    }
 
     const response = await fetch('https://api.resend.com/emails', {
         method: 'POST',
@@ -454,56 +454,62 @@ async function sendEmailNotification(to, subject, html, customApiKey = null) {
 // MAIN REQUEST HANDLER
 // =============================================================================
 
-async function handleRequest(request) {
+async function handleRequest(request, env) {
     // CORS preflight
     if (request.method === 'OPTIONS') {
-        return new Response(null, { status: 204, headers: CORS });
+        return new Response(null, { status: 204, headers: getCorsHeaders(request) });
     }
     if (request.method !== 'POST') {
-        return json({ error: 'Only POST allowed' }, 405);
+        return json({ error: 'Only POST allowed' }, 405, request);
     }
 
-    // Authenticate
+    // Authenticate using environment variable secret
     const secret = request.headers.get('X-Admin-Secret');
-    if (secret !== ADMIN_SECRET) {
-        return json({ error: 'Unauthorized - Invalid admin secret' }, 401);
+    const expectedSecret = env.ADMIN_SECRET;
+    if (!expectedSecret) {
+        return json({ error: 'Server misconfigured: ADMIN_SECRET env var not set' }, 500, request);
+    }
+    if (secret !== expectedSecret) {
+        return json({ error: 'Unauthorized - Invalid admin secret' }, 401, request);
     }
 
     let body;
     try { body = await request.json(); }
-    catch (e) { return json({ error: 'Invalid JSON body' }, 400); }
+    catch (e) { return json({ error: 'Invalid JSON body' }, 400, request); }
 
     const { action, args = {} } = body;
 
     try {
         let result;
         switch (action) {
-            case 'listAuthUsers':       result = await listAuthUsers(); break;
-            case 'deleteAuthUser':      result = await deleteAuthUser(args.uid); break;
-            case 'disableUser':         result = await disableUser(args.uid); break;
-            case 'enableUser':          result = await enableUser(args.uid); break;
-            case 'changeUserPassword':  result = await changeUserPassword(args.uid, args.newPassword); break;
-            case 'changeUserEmail':     result = await changeUserEmail(args.uid, args.newEmail); break;
-            case 'verifyUserEmail':     result = await verifyUserEmail(args.uid); break;
-            case 'getUserInfo':         result = await getUserInfo(args.uid, args.email); break;
-            case 'updateDisplayName':   result = await updateDisplayName(args.uid, args.displayName); break;
-            case 'revokeUserTokens':    result = await revokeUserTokens(args.uid); break;
+            case 'listAuthUsers':       result = await listAuthUsers(env); break;
+            case 'deleteAuthUser':      result = await deleteAuthUser(env, args.uid); break;
+            case 'disableUser':         result = await disableUser(env, args.uid); break;
+            case 'enableUser':          result = await enableUser(env, args.uid); break;
+            case 'changeUserPassword':  result = await changeUserPassword(env, args.uid, args.newPassword); break;
+            case 'changeUserEmail':     result = await changeUserEmail(env, args.uid, args.newEmail); break;
+            case 'verifyUserEmail':     result = await verifyUserEmail(env, args.uid); break;
+            case 'getUserInfo':         result = await getUserInfo(env, args.uid, args.email); break;
+            case 'updateDisplayName':   result = await updateDisplayName(env, args.uid, args.displayName); break;
+            case 'revokeUserTokens':    result = await revokeUserTokens(env, args.uid); break;
             case 'setCustomClaims':     result = await setCustomClaims(args.uid, args.claims); break;
             case 'webSearch':           result = await webSearch(args.query); break;
             case 'browseWebUrl':        result = await browseWebUrl(args.url); break;
-            case 'sendEmail':           result = await sendEmailNotification(args.to, args.subject, args.html, args.apiKey); break;
+            case 'sendEmail':           result = await sendEmailNotification(env, args.to, args.subject, args.html); break;
             case 'createPaytrailPayment':
-                result = await handlePaytrailPayment(args.orderData);
+                result = await handlePaytrailPayment(env, args.orderData);
                 break;
             default:
-                return json({ error: 'Unknown action: ' + action }, 400);
+                return json({ error: 'Unknown action: ' + action }, 400, request);
         }
-        return json(result);
+        return json(result, 200, request);
     } catch (err) {
-        return json({ error: err.message }, 500);
+        return json({ error: err.message }, 500, request);
     }
 }
 
-addEventListener('fetch', function(event) {
-    event.respondWith(handleRequest(event.request));
-});
+export default {
+    async fetch(request, env, ctx) {
+        return handleRequest(request, env);
+    }
+};

@@ -2,8 +2,143 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // ── Helper functions ──────────────────────────────────────────────
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    function isAdmin() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isStaff() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'host', 'kitchen'];
+    }
+
+    // ── Users ─────────────────────────────────────────────────────────
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+      allow create: if isOwner(uid);
+      allow update: if isOwner(uid) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ── Menu (public read, admin write) ───────────────────────────────
+    match /menu/{itemId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ── Categories (public read, admin write) ─────────────────────────
+    match /categories/{catId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ── Orders ────────────────────────────────────────────────────────
+    match /orders/{orderId} {
+      // Anyone can create an order (guest checkout support)
+      allow create: if true;
+      // Only the order owner or staff can read
+      allow read: if isStaff()
+        || (isSignedIn() && resource.data.userId == request.auth.uid);
+      // Only staff can update (change status, etc.)
+      allow update: if isStaff();
+      allow delete: if isAdmin();
+    }
+
+    // ── Vouchers ──────────────────────────────────────────────────────
+    match /vouchers/{code} {
+      // Anyone can read (needed for checkout promo validation)
+      allow read: if true;
+      // Only admin can create/delete
+      allow create, delete: if isAdmin();
+      // Allow update for marking as used during checkout, or admin edits
+      allow update: if isAdmin()
+        || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['used', 'usedAt', 'orderId']));
+    }
+
+    // ── Feedback / Contact Messages ───────────────────────────────────
+    match /feedback/{docId} {
+      // Anyone can create (public contact form)
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // ── Inbox Messages ────────────────────────────────────────────────
+    match /messages/{msgId} {
+      // Admin can do anything
+      allow read, write: if isAdmin();
+      // Recipients can read their own messages
+      allow read: if isSignedIn()
+        && (resource.data.recipientId == request.auth.uid
+            || resource.data.recipientId == 'all');
+      // Recipients can mark messages as read
+      allow update: if isSignedIn()
+        && (resource.data.recipientId == request.auth.uid
+            || resource.data.recipientId == 'all')
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read', 'readBy']);
+      // Authenticated users can create messages (e.g., welcome messages from auth.js)
+      allow create: if isSignedIn();
+    }
+
+    // ── Reservations ──────────────────────────────────────────────────
+    match /reservations/{resId} {
+      // Anyone can create a reservation
+      allow create: if true;
+      allow read, update, delete: if isStaff();
+      // Reservation owner can read their own
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    // ── Config (API keys, site settings — admin only) ─────────────────
+    match /config/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // ── Homepage Config ───────────────────────────────────────────────
+    match /homepageConfig/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ── Point Transactions ────────────────────────────────────────────
+    match /pointTransactions/{txId} {
+      allow read: if isSignedIn()
+        && resource.data.userId == request.auth.uid;
+      allow read, write: if isAdmin();
+      allow create: if isSignedIn();
+    }
+
+    // ── System Logs ───────────────────────────────────────────────────
+    match /systemLogs/{logId} {
+      allow read, write: if isAdmin();
+    }
+
+    // ── Site Settings ─────────────────────────────────────────────────
+    match /siteSettings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ── Backups ───────────────────────────────────────────────────────
+    match /backups/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    // ── Default: Deny everything else ─────────────────────────────────
     match /{document=**} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
   }
 }

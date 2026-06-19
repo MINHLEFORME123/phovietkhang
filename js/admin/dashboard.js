@@ -2,6 +2,13 @@ import { db } from "../firebase-config.js";
 import { collection, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { formatOrderDate, getOrderTimeAlert } from "./utils.js";
 
+const escapeHtml = (value) => String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+
 let revenueChartInstance = null;
 let typeChartInstance = null;
 
@@ -9,13 +16,6 @@ const dashboardContainer = document.getElementById('dashboard-container');
 if (!dashboardContainer) {
     // Not on dashboard page - skip
 } else {
-    const escapeHtml = (value) => String(value ?? '')
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#039;');
-
     initDashboard();
     const sidebarToggle = document.getElementById('sidebar-toggle');
     const sidebarOverlay = document.getElementById('sidebar-overlay');

@@ -88,8 +88,9 @@ function normalizeOptions(options) {
                 nameVi: opt,
                 nameEn: opt,
                 nameFi: opt,
+                nameSv: opt,
                 type: "toggle",
-                choices: [{ label: opt, labelVi: opt, labelEn: opt, labelFi: opt, price: 0 }]
+                choices: [{ label: opt, labelVi: opt, labelEn: opt, labelFi: opt, labelSv: opt, price: 0 }]
             };
         }
 
@@ -97,6 +98,7 @@ function normalizeOptions(options) {
         const nameVi = opt.nameVi || name;
         const nameEn = opt.nameEn || name;
         const nameFi = opt.nameFi || name;
+        const nameSv = opt.nameSv || name;
 
         const choices = Array.isArray(opt.choices) ? opt.choices.map(c => {
             const label = c.label || '';
@@ -105,6 +107,7 @@ function normalizeOptions(options) {
                 labelVi: c.labelVi || label,
                 labelEn: c.labelEn || label,
                 labelFi: c.labelFi || label,
+                labelSv: c.labelSv || label,
                 price: parseFloat(c.price) || 0
             };
         }) : [];
@@ -114,6 +117,7 @@ function normalizeOptions(options) {
             nameVi,
             nameEn,
             nameFi,
+            nameSv,
             type: opt.type || 'toggle',
             choices
         };
@@ -410,10 +414,10 @@ async function callOpenRouterWithFallback(payload, apiKeys = OPENROUTER_API_KEYS
 // --- LOYALTY TIER COMPUTATION (module scope) ---
 function computeLoyaltyTier(totalSpent) {
     const spent = Number(totalSpent) || 0;
-    if (spent >= 40) return { key: 'kim_cuong', labelVi: 'Kim Cương', color: '#7c3aed', icon: 'diamond', discountPercent: 15 };
-    if (spent >= 20) return { key: 'kim', labelVi: 'Vàng', color: '#eab308', icon: 'workspace_premium', discountPercent: 10 };
-    if (spent >= 8) return { key: 'bac', labelVi: 'Bạc', color: '#9ca3af', icon: 'shield', discountPercent: 5 };
-    if (spent >= 4) return { key: 'vang', labelVi: 'Đồng', color: '#9a3412', icon: 'monetization_on', discountPercent: 0 };
+    if (spent >= 500) return { key: 'kim_cuong', labelVi: 'Kim Cương', color: '#7c3aed', icon: 'diamond', discountPercent: 15 };
+    if (spent >= 150) return { key: 'bach_kim', labelVi: 'Bạch Kim', color: '#94a3b8', icon: 'military_tech', discountPercent: 10 };
+    if (spent >= 85) return { key: 'vang', labelVi: 'Vàng', color: '#eab308', icon: 'workspace_premium', discountPercent: 5 };
+    if (spent >= 35) return { key: 'bac', labelVi: 'Bạc', color: '#9ca3af', icon: 'shield', discountPercent: 2 };
     return { key: 'dong', labelVi: 'Đồng', color: '#78350f', icon: 'stars', discountPercent: 0 };
 }
 
@@ -475,7 +479,7 @@ if (userTableBody) {
                         </select>
                     </td>
                     <td class="py-3 px-4 text-secondary text-sm">
-                        ${totalSpent.toLocaleString('vi-VN')} Ä'
+                        ${totalSpent} €
                     </td>
                     <td class="py-3 px-4">
                         <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold" style="background:${tier.color}22; color:${tier.color}; border:1px solid ${tier.color}44;">
@@ -1799,14 +1803,14 @@ if (foodTableBody) {
                 <td class="py-3 px-4">€${(item.price || 0).toFixed(2)}</td>
                 <td class="py-3 px-4">${optCount || '<span class="text-xs text-secondary/50">None</span>'}</td>
                 ${window.location.pathname.includes('/host/') ? '' : `
-                <td class="py-3 px-4 flex gap-2">
+                <td class="py-3 px-4"><div class="flex gap-2">
                     <button class="btn-edit text-blue-400 hover:text-blue-300 transition-colors" data-id="${id}">
                         <span class="material-symbols-outlined">edit</span>
                     </button>
                     <button class="btn-delete text-red-400 hover:text-red-300 transition-colors" data-id="${id}">
                         <span class="material-symbols-outlined">delete</span>
                     </button>
-                </td>
+                </div></td>
                 `}
             `;
 
@@ -3120,7 +3124,10 @@ Rules:
             );
             if (exists) return { error: `Nhóm option "${nameVi}" đã tồn tại.` };
 
+            const groupId = "opt_" + Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+
             options.push({
+                id: groupId,
                 name: nameEn,
                 nameVi: nameVi,
                 nameEn: nameEn,
@@ -3142,7 +3149,7 @@ Rules:
 
             await updateDoc(docRef, { options });
             if (typeof window.loadFood === 'function') window.loadFood();
-            return { success: true, message: `Đã thêm nhóm option "${nameVi}" thành công.` };
+            return { success: true, message: `Đã thêm nhóm option "${nameVi}" thành công với ID: ${groupId}. BẠN CÓ THỂ SỬ DỤNG ID NÀY (thay vì tên) để thêm lựa chọn (lệnh 6C).`, groupId: groupId };
         } catch (e) {
             console.error(e);
             return { error: e.message };
@@ -3162,7 +3169,8 @@ Rules:
             const options = normalizeOptions(targetDoc.options || []);
             const originalLength = options.length;
             const updatedOptions = options.filter(opt => {
-                const matchesOpt = (opt.name || '').toLowerCase() === optionName.toLowerCase() ||
+                const matchesOpt = (opt.id || '').toLowerCase() === optionName.toLowerCase() ||
+                                   (opt.name || '').toLowerCase() === optionName.toLowerCase() ||
                                    (opt.nameVi || '').toLowerCase() === optionName.toLowerCase() ||
                                    (opt.nameEn || '').toLowerCase() === optionName.toLowerCase() ||
                                    (opt.nameFi || '').toLowerCase() === optionName.toLowerCase();
@@ -3194,11 +3202,13 @@ Rules:
 
             let updated = false;
             const options = normalizeOptions(targetDoc.options || []).map(opt => {
-                const matchesOpt = (opt.name || '').toLowerCase() === optionName.toLowerCase() ||
+                const matchesOpt = (opt.id || '').toLowerCase() === optionName.toLowerCase() ||
+                                   (opt.name || '').toLowerCase() === optionName.toLowerCase() ||
                                    (opt.nameVi || '').toLowerCase() === optionName.toLowerCase() ||
                                    (opt.nameEn || '').toLowerCase() === optionName.toLowerCase() ||
                                    (opt.nameFi || '').toLowerCase() === optionName.toLowerCase();
                 if (matchesOpt) {
+                    if (!opt.choices) opt.choices = [];
                     const lVi = choiceLabelVi || '';
                     const lEn = choiceLabelEn || lVi;
                     const lFi = choiceLabelFi || lVi;
@@ -3245,11 +3255,13 @@ Rules:
 
             let updated = false;
             const options = normalizeOptions(targetDoc.options || []).map(opt => {
-                const matchesOpt = (opt.name || '').toLowerCase() === optionName.toLowerCase() ||
+                const matchesOpt = (opt.id || '').toLowerCase() === optionName.toLowerCase() ||
+                                   (opt.name || '').toLowerCase() === optionName.toLowerCase() ||
                                    (opt.nameVi || '').toLowerCase() === optionName.toLowerCase() ||
                                    (opt.nameEn || '').toLowerCase() === optionName.toLowerCase() ||
                                    (opt.nameFi || '').toLowerCase() === optionName.toLowerCase();
                 if (matchesOpt) {
+                    if (!opt.choices) opt.choices = [];
                     const originalLength = opt.choices.length;
                     opt.choices = opt.choices.filter(c => {
                         const matchesChoice = (c.label || '').toLowerCase() === choiceLabel.toLowerCase() ||
@@ -3288,7 +3300,8 @@ Rules:
 
             let updated = false;
             const options = normalizeOptions(targetDoc.options || []).map(opt => {
-                const matchesOpt = (opt.name || '').toLowerCase() === oldOptionName.toLowerCase() ||
+                const matchesOpt = (opt.id || '').toLowerCase() === oldOptionName.toLowerCase() ||
+                                   (opt.name || '').toLowerCase() === oldOptionName.toLowerCase() ||
                                    (opt.nameVi || '').toLowerCase() === oldOptionName.toLowerCase() ||
                                    (opt.nameEn || '').toLowerCase() === oldOptionName.toLowerCase() ||
                                    (opt.nameFi || '').toLowerCase() === oldOptionName.toLowerCase();
@@ -3328,11 +3341,13 @@ Rules:
 
             let updated = false;
             const options = normalizeOptions(targetDoc.options || []).map(opt => {
-                const matchesOpt = (opt.name || '').toLowerCase() === optionName.toLowerCase() ||
+                const matchesOpt = (opt.id || '').toLowerCase() === optionName.toLowerCase() ||
+                                   (opt.name || '').toLowerCase() === optionName.toLowerCase() ||
                                    (opt.nameVi || '').toLowerCase() === optionName.toLowerCase() ||
                                    (opt.nameEn || '').toLowerCase() === optionName.toLowerCase() ||
                                    (opt.nameFi || '').toLowerCase() === optionName.toLowerCase();
                 if (matchesOpt) {
+                    if (!opt.choices) opt.choices = [];
                     opt.choices = opt.choices.map(c => {
                         const matchesChoice = (c.label || '').toLowerCase() === oldChoiceLabel.toLowerCase() ||
                                               (c.labelVi || '').toLowerCase() === oldChoiceLabel.toLowerCase() ||
@@ -3665,13 +3680,13 @@ Rules:
     }
 
     function computeLoyaltyTier(totalSpent) {
-        const spent = Number(totalSpent) || 0;
-        if (spent >= 40) return { key: 'kim_cuong', labelVi: 'Kim Cương', color: '#7c3aed', icon: 'diamond', discountPercent: 15 };
-        if (spent >= 20) return { key: 'kim', labelVi: 'Vàng', color: '#eab308', icon: 'workspace_premium', discountPercent: 10 };
-        if (spent >= 8) return { key: 'bac', labelVi: 'Bạc', color: '#9ca3af', icon: 'shield', discountPercent: 5 };
-        if (spent >= 4) return { key: 'vang', labelVi: 'Đồng', color: '#9a3412', icon: 'monetization_on', discountPercent: 0 };
-        return { key: 'dong', labelVi: 'Đồng', color: '#78350f', icon: 'stars', discountPercent: 0 };
-    }
+    const spent = Number(totalSpent) || 0;
+    if (spent >= 500) return { key: 'kim_cuong', labelVi: 'Kim Cương', color: '#7c3aed', icon: 'diamond', discountPercent: 15 };
+    if (spent >= 150) return { key: 'bach_kim', labelVi: 'Bạch Kim', color: '#94a3b8', icon: 'military_tech', discountPercent: 10 };
+    if (spent >= 85) return { key: 'vang', labelVi: 'Vàng', color: '#eab308', icon: 'workspace_premium', discountPercent: 5 };
+    if (spent >= 35) return { key: 'bac', labelVi: 'Bạc', color: '#9ca3af', icon: 'shield', discountPercent: 2 };
+    return { key: 'dong', labelVi: 'Đồng', color: '#78350f', icon: 'stars', discountPercent: 0 };
+}
 
     async function changeUserRole(uid, newRole) {
         try {

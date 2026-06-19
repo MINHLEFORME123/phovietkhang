@@ -28,8 +28,8 @@ function createPaymentPayload(order) {
       phone: order.customerPhone,
     },
     redirectUrls: {
-      success: `${globalThis.location?.origin || 'http://localhost:5000'}/order-tracking.html?orderId=${order.id}`,
-      cancel: `${globalThis.location?.origin || 'http://localhost:5000'}/cart.html`,
+      success: `${globalThis.location?.origin || 'http://localhost:5000'}/order-tracking?orderId=${order.id}`,
+      cancel: `${globalThis.location?.origin || 'http://localhost:5000'}/cart`,
     },
   };
 }
@@ -150,8 +150,8 @@ describe('Paytrail Gateway Integration', () => {
 
     it('should include redirect URLs', () => {
       const payload = createPaymentPayload(sampleOrder);
-      assert.ok(payload.redirectUrls.success.includes('order-tracking.html'));
-      assert.ok(payload.redirectUrls.cancel.includes('cart.html'));
+      assert.ok(payload.redirectUrls.success.includes('order-tracking'));
+      assert.ok(payload.redirectUrls.cancel.includes('cart'));
       assert.ok(payload.redirectUrls.success.includes(sampleOrder.id));
     });
 

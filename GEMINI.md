@@ -2,6 +2,97 @@
 
 ## Modifications
 
+### [2026-06-19] Implemented Generative Engine Optimization (GEO) & Local Keyword Mapping
+- **Changes**:
+  - Refactored `scratch/update_seo_meta.py` to inject rich `VietnameseRestaurant` JSON-LD schemas (containing precise geo-coordinates, cuisine specs, and social media/TripAdvisor links) and `<meta name="keywords">` tags across all 21 user-facing HTML pages (including `index.html`).
+  - Updated `llms.txt` with high-density terms targeting search patterns like "phở ngon helsinki" and "phở ngon sornainen", explicitly outlining direct answers for LLM web-search scrapers.
+  - Updated client-side translations dictionary in `js/client.js` to label the Pengerkatu branch as "Sörnäinen" and map local neighborhood terms (Sörnäinen, Sornainen, Kallio) across all supported languages (vi, en, fi, sv).
+  - Synchronized changes to the GitHub workspace and deployed to Firebase Hosting.
+
+### [2026-06-19] Replaced Reviews Marquee with Google Maps Trustindex Widget
+- **Changes**:
+  - Replaced the local reviews marquee rows on the homepage (`index.html`) with the Google Maps Trustindex reviews widget.
+  - Deleted the marquee CSS keyframes and class selectors from the `<style>` block in `index.html`.
+  - Decommissioned the local marquee Firestore loader function `loadFeedbackMarquee()` and its DOMContentLoaded call from `js/homepage.js`, optimizing database read footprint.
+  - Synchronized and updated both the local Desktop and GitHub workspaces, and rebuilt SEO headers.
+
+### [2026-06-19] Implemented Clean URLs, Dynamic Routing Protection, and Bento Grid pre-rendering for SEO & Usability
+- **Changes**:
+  - Configured `firebase.json` to enable `cleanUrls: true` and clean rewrite targets.
+  - Corrected `scratch/sync_seo_footers.py` to strip `.html` from canonical and `hreflang` alternates, ensuring search engines index the clean URL paths.
+  - Rewrote internal hyperlinks in all HTML pages to use clean paths (e.g., `href="/menu"` instead of `href="menu.html"`, `href="/"` instead of `href="index.html"`).
+  - Modified client-side scripts `js/auth.js`, `js/client.js`, and `js/checkout.js` to perform authentication, routing checks, and page redirections based on clean pathnames (no `.html` suffix).
+  - Cleaned up redirection endpoints inside `js/paytrail-worker.js` and `js/paytrail-gateway.test.js` to point to clean URLs `/order-tracking` and `/cart`.
+  - Statically pre-rendered the 5 signature creations as a beautiful, SEO-crawlable bento grid in `index.html` to reduce FCP/LCP times.
+  - Updated `js/homepage.js` to check for pre-rendered cards and prevent clear-container layout shifts.
+  - Excluded transactional, user-specific pages from `sitemap.xml` while ensuring all indexable pages use clean URLs.
+  - Synchronized both workspaces and deployed to Firebase Hosting.
+
+### [2026-06-19] Synchronized and Optimized SEO & GEO tags and Footers across all User-Facing Pages
+- **Changes**:
+  - Unified the footer across all 20 user-facing HTML files in both Desktop and GitHub workspaces to use the premium 4-column layout including branches, contact details, quick links, and 6 social platform links (Facebook, Instagram, X/Twitter, YouTube, LinkedIn, TripAdvisor).
+  - Injected Google Analytics (gtag.js) and Facebook Pixel tracking code to all user-facing HTML pages (addressing "Add Google Analytics" and "Facebook Pixel" audit warnings).
+  - Implemented page-specific `<link rel="canonical">` and `hreflang` alternate link tags for `vi`, `en`, `fi`, `sv`, and `x-default` on all pages to ensure proper search engine indexing and multilingual routing.
+  - Resolved tracking pixel alt compliance warnings by setting `alt="Facebook Pixel"` in the noscript tracking element.
+  - Optimized metadata and index status for `404.html` by injecting custom meta description, canonical, GA, and FB pixel tags.
+  - Obfuscated plain text email addresses (using client-side dynamic reconstruction mapping in `js/client.js`) to protect privacy and prevent spam bots from scraping them.
+  - Upgraded branch details in the unified footer to use HTML5 `<address>` tags and added the `Finland` country suffix to ensure correct Local SEO address detection.
+  - Expanded `sitemap.xml` to list all crawlable content pages (`about.html`, `careers.html`, `press.html`, `privacy.html`, `terms.html`, `reservations.html`, `rewards-store.html`), while intentionally excluding transactional user-specific pages.
+  - Successfully committed changes to GitHub and deployed the optimized web assets to Firebase Hosting.
+
+### [2026-06-19] Reverted Homepage Word Count Expansion, Updated Client Translations, and Optimized Local SEO & GEO
+- **Changes**:
+  - Reverted the homepage layout back to the original ~250-word story phrasing on `index.html` in both the Desktop and GitHub repositories.
+  - Updated `js/client.js` in both workspaces to use the elegant, minimalist `story-p1` and `story-p2` phrasing for Vietnamese, English, and Finnish, and translated Swedish to follow the matching ~250-word pattern.
+  - Removed `story-p3` from the translation files in all languages (`vi`, `en`, `fi`, `sv`).
+  - Redesigned the footer across all root-level HTML files to feature a beautiful 4-column layout presenting contact details (Phone, Email), branch addresses (Pengerkatu, Easton Helsinki), quick links, and 6 active social media profile icons (adding X/Twitter, YouTube, and LinkedIn).
+  - Injected multicharacter `hreflang` alternate link tags in `<head>` across all root-level HTML pages for `vi`, `en`, `fi`, `sv`, and `x-default`, and enabled dynamic language switcher loading from URL query parameters (`?lang=...`).
+  - Added a structured `llms.txt` file at the root of the site to optimize Generative Engine Optimization (GEO) and ensure LLMs can parse the menu, story, and locations.
+  - Synced and pushed all changes to the remote GitHub repository.
+
+### [2026-06-13] Fixed Undefined Errors in Menu Option Tools
+- **Changes**:
+  - Fixed `Cannot read properties of undefined (reading 'toLowerCase')` in `updateMenuOptionGroup`, `removeMenuOptionGroup`, `addChoiceToOptionGroup`, `removeChoiceFromOptionGroup`, and `setOptionChoicePrice` by casting potentially missing LLM arguments: `String(optionName||'').toLowerCase()`.
+  - Fixed `Function updateDoc() called with invalid data. Unsupported field value: undefined` in `addMenuOptionGroup` and `addChoiceToOptionGroup` by supplying fallback values (`|| ""`) so undefined properties are never pushed to the `options` array in Firestore.
+  - Fixed option names falling back to "Tùy chọn" by implementing robust argument mapping in the AI chat controller, automatically flattening `groupData`/`optionData` objects and redirecting `groupId`, `groupName`, `name`, and `choiceName` inputs into the expected variables (`optionNameVi`, `choiceLabelVi`, etc.).
+
+### [2026-06-13] Upgraded Admin Tools to Support Bulk Execution
+- **Changes**:
+  - Modified `updateOrderStatus`, `deleteOrder`, `updateMenuPrice`, `updateMenuAvailability`, `deleteMenuItem`, `changeUserRole`, `adminDeleteAuthUser`, `adminDisableUser`, `adminEnableUser`, `deleteReservation`, `deleteFeedback`, and `removeVoucher` in [ai-chat.js](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/js/admin/ai-chat.js).
+  - These tools now accept either a single string, a comma-separated string, or an array of IDs/UIDs, allowing the AI to execute bulk actions in a single tool call without exhausting context tokens or API requests.
+
+### [2026-06-13] Optimized Tool Return Payloads for Token Efficiency
+- **Changes**:
+  - Optimized `getOrdersByStatus`, `listAllVouchers`, `listAllReservations`, and `listAllFeedbacks` in [ai-chat.js](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/js/admin/ai-chat.js).
+  - Optimized `getOrdersSoldToday` in `ai-chat.js` to truncate the returned items array to the top 20 most recent to save LLM context tokens.
+  - Optimized `listAllUsers` in [utils.js](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/js/admin/utils.js) to sort by `createdAt` descending and return only the top 30 most recent users.
+  - Added a safety `limit(50)` fallback to `adminExecuteQuery` in `ai-chat.js` to prevent massive token payloads if the AI forgets to provide a limit parameter.
+  - Truncated unnecessary fields, sorted results by date/importance, and sliced lists to return only the top 20-30 most recent items to the LLM context.
+  - Replaced full collection scans in `getOrdersByStatus` with direct targeted Firestore `where` status queries.
+
+### [2026-06-13] Optimized Menu Option Management Tools
+- **Changes**:
+  - Refactored `setOptionChoicePrice`, `addMenuOptionGroup`, `removeMenuOptionGroup`, `addChoiceToOptionGroup`, `removeChoiceFromOptionGroup`, `updateMenuOptionGroup`, and `updateChoiceInOptionGroup` inside [ai-chat.js](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/js/admin/ai-chat.js).
+  - Switched from querying the entire menu collection to fetching specific dishes by ID using `getDoc` for improved performance.
+  - Added robust handling and automatic fallback parsing for stringified JSON and comma-separated choices arrays.
+
+### [2026-06-13] Temporarily Bypassed Lounas Time Restriction
+- **Changes**:
+  - Modified [menu.js](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/js/menu.js) to force `isLounasTime = true` and bypass the Helsinki time check.
+  - This allows testing lunch (lounas) item ordering and pricing behavior at any time.
+
+### [2026-06-13] Added 30 High-Privilege Super-Admin Tools to AI Admin Assistant
+- **Changes**:
+  - Implemented 30 new advanced tools inside [ai-chat.js](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/js/admin/ai-chat.js) giving the AI assistant direct database-level and system-wide capabilities that exceed the standard admin UI.
+  - Added support for collection CRUD operations (`adminListAllCollections`, `adminGetCollectionStats`, `adminExecuteQuery`, `adminCreateDocument`, `adminUpdateDocument`, `adminDeleteDocument`).
+  - Added system backups, site settings management, and maintenance mode toggling (`adminBackupCollection`, `adminRestoreCollection`, `adminGetSystemSettings`, `adminUpdateSystemSettings`, `adminToggleMaintenanceMode`).
+  - Added auditing utilities (`adminGetSystemLogs`, `adminClearSystemLogs`).
+  - Integrated powerful revenue and business reporting analytics (`adminGetRevenueReport`, `adminGetPopularDishesReport`, `adminGetLoyaltyUsersReport`, `adminGetFeedbackSummary`).
+  - Implemented bulk user/loyalty management, promo code generation, suspended account status handling, and inbox alert notifications (`adminBulkUpdateUserPoints`, `adminBulkCreateVouchers`, `adminSendCustomInboxMessage`, `adminDeleteAllVouchers`, `adminBanUser`, `adminUnbanUser`).
+  - Added menu management and reservations tools (`adminBulkUpdateMenuPrices`, `adminBulkToggleMenuAvailability`, `adminGetInventoryAlerts`, `adminAddMultipleDishes`, `adminBulkUpdateReservationsStatus`, `adminGetReservationsByDate`).
+  - Added external webhook support (`adminSendWebhook`).
+  - Registered all 30 tools in the registry, configured parameter normalizations, and documented details in the AI's system prompt instructions.
+
 ### [2026-06-13] Implemented Reactive Multi-Language Support for User Ranks & Loyalty Points
 - **Changes**:
   - Implemented event listeners for `languageChanged` in [profile.html](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/profile.html) and [rewards-store.html](file:///c:/Users/minhb/OneDrive/Desktop/phovietkhang/rewards-store.html).

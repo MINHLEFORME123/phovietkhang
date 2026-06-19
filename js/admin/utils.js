@@ -100,23 +100,24 @@ export function normalizeOptions(options) {
     return options.map(opt => {
         if (typeof opt === 'string') {
             return {
-                name: opt, nameVi: opt, nameEn: opt, nameFi: opt,
+                name: opt, nameVi: opt, nameEn: opt, nameFi: opt, nameSv: opt,
                 type: "toggle",
-                choices: [{ label: opt, labelVi: opt, labelEn: opt, labelFi: opt, price: 0 }]
+                choices: [{ label: opt, labelVi: opt, labelEn: opt, labelFi: opt, labelSv: opt, price: 0 }]
             };
         }
         const name = opt.name || '';
         const nameVi = opt.nameVi || name;
         const nameEn = opt.nameEn || name;
         const nameFi = opt.nameFi || name;
+        const nameSv = opt.nameSv || name;
         const choices = Array.isArray(opt.choices) ? opt.choices.map(c => {
             const label = c.label || '';
             return {
-                label, labelVi: c.labelVi || label, labelEn: c.labelEn || label, labelFi: c.labelFi || label,
+                label, labelVi: c.labelVi || label, labelEn: c.labelEn || label, labelFi: c.labelFi || label, labelSv: c.labelSv || label,
                 price: parseFloat(c.price) || 0
             };
         }) : [];
-        return { name, nameVi, nameEn, nameFi, type: opt.type || 'toggle', choices };
+        return { name, nameVi, nameEn, nameFi, nameSv, type: opt.type || 'toggle', choices };
     });
 }
 
@@ -160,10 +161,10 @@ export function getOrderTimeAlert(createdAt, completedAt, status) {
 // ─── LOYALTY TIER ────────────────────────────────────────────────────────────
 export function computeLoyaltyTier(totalSpent) {
     const spent = Number(totalSpent) || 0;
-    if (spent >= 40) return { key: 'kim_cuong', labelVi: 'Kim Cương', color: '#7c3aed', icon: 'diamond', discountPercent: 15 };
-    if (spent >= 20) return { key: 'kim', labelVi: 'Vàng', color: '#eab308', icon: 'workspace_premium', discountPercent: 10 };
-    if (spent >= 8) return { key: 'bac', labelVi: 'Bạc', color: '#9ca3af', icon: 'shield', discountPercent: 5 };
-    if (spent >= 4) return { key: 'vang', labelVi: 'Đồng', color: '#9a3412', icon: 'monetization_on', discountPercent: 0 };
+    if (spent >= 500) return { key: 'kim_cuong', labelVi: 'Kim Cương', color: '#7c3aed', icon: 'diamond', discountPercent: 0 };
+    if (spent >= 150) return { key: 'bach_kim', labelVi: 'Bạch Kim', color: '#94a3b8', icon: 'military_tech', discountPercent: 0 };
+    if (spent >= 85) return { key: 'vang', labelVi: 'Vàng', color: '#eab308', icon: 'workspace_premium', discountPercent: 0 };
+    if (spent >= 35) return { key: 'bac', labelVi: 'Bạc', color: '#9ca3af', icon: 'shield', discountPercent: 0 };
     return { key: 'dong', labelVi: 'Đồng', color: '#78350f', icon: 'stars', discountPercent: 0 };
 }
 
@@ -175,9 +176,10 @@ export async function listAllUsers() {
         qSnap.forEach(d => {
             const data = d.data();
             const totalSpent = data.totalSpent || 0;
-            users.push({ uid: d.id, email: data.email, name: data.name, role: data.role, totalSpent, loyaltyTier: computeLoyaltyTier(totalSpent).key });
+            users.push({ uid: d.id, email: data.email, name: data.name, role: data.role, totalSpent, loyaltyTier: computeLoyaltyTier(totalSpent).key, createdAt: data.createdAt ? (data.createdAt.toDate ? data.createdAt.toDate().toISOString() : new Date(data.createdAt).toISOString()) : null });
         });
-        return users;
+        users.sort((a, b) => (new Date(b.createdAt || 0)) - (new Date(a.createdAt || 0)));
+        return users.slice(0, 30);
     } catch (e) {
         return { error: e.message };
     }

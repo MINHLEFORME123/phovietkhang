@@ -60,24 +60,26 @@ if (!foodTableBody) {
                     ${item.allergenWarning ? '<span class="inline-flex items-center gap-1 bg-red-900/30 text-red-400 text-xs px-2 py-0.5 rounded-md font-semibold border border-red-800/50 ml-2" title="Chứa thành phần dễ gây dị ứng"><span class="material-symbols-outlined text-[14px]">warning</span> Dị ứng</span>' : ''}
                     <br>
                     <span class="text-xs text-secondary">EN: ${escapeHtml(item.nameEn || '')}</span><br>
-                    <span class="text-xs text-secondary">FI: ${escapeHtml(item.nameFi || '')}</span>
+                    <span class="text-xs text-secondary">FI: ${escapeHtml(item.nameFi || '')}</span><br>
+                    <span class="text-xs text-secondary">SV: ${escapeHtml(item.nameSv || '')}</span>
                 </td>
                 <td class="py-3 px-4">
                     <span class="font-bold text-white">VI: ${escapeHtml(item.categoryVi || item.category || '')}</span><br>
                     <span class="text-xs text-secondary">EN: ${escapeHtml(item.categoryEn || '')}</span><br>
-                    <span class="text-xs text-secondary">FI: ${escapeHtml(item.categoryFi || '')}</span>
+                    <span class="text-xs text-secondary">FI: ${escapeHtml(item.categoryFi || '')}</span><br>
+                    <span class="text-xs text-secondary">SV: ${escapeHtml(item.categorySv || '')}</span>
                 </td>
                 <td class="py-3 px-4">€${(item.price || 0).toFixed(2)}</td>
                 <td class="py-3 px-4">${optCount || '<span class="text-xs text-secondary/50">None</span>'}</td>
                 ${window.location.pathname.includes('/host/') ? '' : `
-                <td class="py-3 px-4 flex gap-2">
+                <td class="py-3 px-4"><div class="flex gap-2">
                     <button class="btn-edit text-blue-400 hover:text-blue-300 transition-colors" data-id="${id}">
                         <span class="material-symbols-outlined">edit</span>
                     </button>
                     <button class="btn-delete text-red-400 hover:text-red-300 transition-colors" data-id="${id}">
                         <span class="material-symbols-outlined">delete</span>
                     </button>
-                </td>
+                </div></td>
                 `}
             `;
 
@@ -98,7 +100,7 @@ if (!foodTableBody) {
             const all = window.__adminFoodItems || [];
             if (!q) { renderFoodRows(all); return; }
             const filtered = all.filter((item) => {
-                const text = [item.nameVi, item.nameEn, item.nameFi, item.categoryVi, item.categoryEn, item.categoryFi, item.descVi, item.descEn, item.descFi, (item.tags || []).join(' ')].join(' ').toLowerCase();
+                const text = [item.nameVi, item.nameEn, item.nameFi, item.nameSv, item.categoryVi, item.categoryEn, item.categoryFi, item.categorySv, item.descVi, item.descEn, item.descFi, item.descSv, (item.tags || []).join(' ')].join(' ').toLowerCase();
                 return text.indexOf(q) !== -1;
             });
             renderFoodRows(filtered);
@@ -170,12 +172,15 @@ if (foodTableBody2) {
         document.getElementById('edit-name-vi').value = item.nameVi || '';
         document.getElementById('edit-name-en').value = item.nameEn || '';
         document.getElementById('edit-name-fi').value = item.nameFi || '';
+        document.getElementById('edit-name-sv').value = item.nameSv || '';
         document.getElementById('edit-desc-vi').value = item.descVi || '';
         document.getElementById('edit-desc-en').value = item.descEn || '';
         document.getElementById('edit-desc-fi').value = item.descFi || '';
+        document.getElementById('edit-desc-sv').value = item.descSv || '';
         document.getElementById('edit-category-vi').value = item.categoryVi || item.category || '';
         document.getElementById('edit-category-en').value = item.categoryEn || '';
         document.getElementById('edit-category-fi').value = item.categoryFi || '';
+        document.getElementById('edit-category-sv').value = item.categorySv || '';
         document.getElementById('edit-price').value = item.price || 0;
 
         const editAllergenCb = document.getElementById('edit-allergen');
@@ -205,7 +210,7 @@ if (foodTableBody2) {
             const row = document.createElement('div');
             row.className = 'flex items-center justify-between bg-surface-highlight p-1 rounded text-xs text-white';
             row.innerHTML = `
-                <span>${ch.labelVi} / ${ch.labelEn} / ${ch.labelFi} (${ch.price > 0 ? '+' + ch.price.toFixed(2) + '€' : 'Free'})</span>
+                <span>${ch.labelVi} / ${ch.labelEn} / ${ch.labelFi} / ${ch.labelSv || ch.labelEn} (${ch.price > 0 ? '+' + ch.price.toFixed(2) + '€' : 'Free'})</span>
                 <button type="button" class="text-red-400 hover:text-red-300 px-1 font-bold" data-idx="${idx}">&times;</button>`;
             row.querySelector('button').addEventListener('click', () => {
                 editAddingChoices.splice(idx, 1);
@@ -220,15 +225,18 @@ if (foodTableBody2) {
             const labelVi = document.getElementById('edit-new-choice-label-vi').value.trim();
             const labelEn = document.getElementById('edit-new-choice-label-en').value.trim();
             const labelFi = document.getElementById('edit-new-choice-label-fi').value.trim();
+            const labelSv = document.getElementById('edit-new-choice-label-sv').value.trim();
             const priceVal = parseFloat(editChoicePriceInput.value) || 0;
-            if (!labelVi && !labelEn && !labelFi) { window.showNotification('Please enter a choice label in at least one language.', 'info'); return; }
-            const safeVi = labelVi || labelEn || labelFi;
+            if (!labelVi && !labelEn && !labelFi && !labelSv) { window.showNotification('Please enter a choice label in at least one language.', 'info'); return; }
+            const safeVi = labelVi || labelEn || labelFi || labelSv;
             const safeEn = labelEn || safeVi;
             const safeFi = labelFi || safeVi;
-            editAddingChoices.push({ label: safeEn, labelVi: safeVi, labelEn: safeEn, labelFi: safeFi, price: priceVal });
+            const safeSv = labelSv || safeVi;
+            editAddingChoices.push({ label: safeEn, labelVi: safeVi, labelEn: safeEn, labelFi: safeFi, labelSv: safeSv, price: priceVal });
             document.getElementById('edit-new-choice-label-vi').value = '';
             document.getElementById('edit-new-choice-label-en').value = '';
             document.getElementById('edit-new-choice-label-fi').value = '';
+            document.getElementById('edit-new-choice-label-sv').value = '';
             editChoicePriceInput.value = '';
             renderEditAddingChoices();
         });
@@ -247,7 +255,7 @@ if (foodTableBody2) {
             const choicesHtml = opt.choices.map(c =>
                 `<span class="inline-block bg-gray-800 text-secondary text-[10px] px-1.5 py-0.5 rounded mr-1">${c.labelVi || c.label} (${c.price > 0 ? '+' + c.price.toFixed(2) + '€' : 'Free'})</span>`
             ).join('');
-            const displayTitle = `${opt.nameVi || opt.name} / ${opt.nameEn || opt.name} / ${opt.nameFi || opt.name}`;
+            const displayTitle = `${opt.nameVi || opt.name} / ${opt.nameEn || opt.name} / ${opt.nameFi || opt.name} / ${opt.nameSv || opt.nameEn || opt.name}`;
             div.innerHTML = `
                 <div class="flex justify-between items-center pr-6">
                     <span class="font-bold text-white text-xs">${displayTitle}</span>
@@ -267,16 +275,19 @@ if (foodTableBody2) {
             const nameVi = document.getElementById('edit-new-opt-name-vi').value.trim();
             const nameEn = document.getElementById('edit-new-opt-name-en').value.trim();
             const nameFi = document.getElementById('edit-new-opt-name-fi').value.trim();
+            const nameSv = document.getElementById('edit-new-opt-name-sv').value.trim();
             const type = editOptTypeSelect.value;
-            if (!nameVi && !nameEn && !nameFi) { window.showNotification('Please enter an option group name in at least one language.', 'info'); return; }
+            if (!nameVi && !nameEn && !nameFi && !nameSv) { window.showNotification('Please enter an option group name in at least one language.', 'info'); return; }
             if (editAddingChoices.length === 0) { window.showNotification('Please add at least one choice to this option group.', 'info'); return; }
-            const safeVi = nameVi || nameEn || nameFi;
+            const safeVi = nameVi || nameEn || nameFi || nameSv;
             const safeEn = nameEn || safeVi;
             const safeFi = nameFi || safeVi;
-            editOptions.push({ name: safeEn, nameVi: safeVi, nameEn: safeEn, nameFi: safeFi, type, choices: [...editAddingChoices] });
+            const safeSv = nameSv || safeVi;
+            editOptions.push({ name: safeEn, nameVi: safeVi, nameEn: safeEn, nameFi: safeFi, nameSv: safeSv, type, choices: [...editAddingChoices] });
             document.getElementById('edit-new-opt-name-vi').value = '';
             document.getElementById('edit-new-opt-name-en').value = '';
             document.getElementById('edit-new-opt-name-fi').value = '';
+            document.getElementById('edit-new-opt-name-sv').value = '';
             editAddingChoices = [];
             renderEditAddingChoices();
             renderEditOptions();
@@ -317,15 +328,18 @@ if (foodTableBody2) {
                 const categoryVi = document.getElementById('edit-category-vi').value.trim();
                 const categoryEn = document.getElementById('edit-category-en').value.trim();
                 const categoryFi = document.getElementById('edit-category-fi').value.trim();
+                const categorySv = document.getElementById('edit-category-sv').value.trim();
                 const updateData = {
                     nameVi: document.getElementById('edit-name-vi').value,
                     nameEn: document.getElementById('edit-name-en').value,
                     nameFi: document.getElementById('edit-name-fi').value,
+                    nameSv: document.getElementById('edit-name-sv').value,
                     descVi: document.getElementById('edit-desc-vi').value,
                     descEn: document.getElementById('edit-desc-en').value,
                     descFi: document.getElementById('edit-desc-fi').value,
+                    descSv: document.getElementById('edit-desc-sv').value,
                     category: categoryVi, categoryVi,
-                    categoryEn: categoryEn || categoryVi, categoryFi: categoryFi || categoryVi,
+                    categoryEn: categoryEn || categoryVi, categoryFi: categoryFi || categoryVi, categorySv: categorySv || categoryVi,
                     price: parseFloat(document.getElementById('edit-price').value) || 0,
                     options: [...editOptions],
                     allergenWarning: document.getElementById('edit-allergen')?.checked || false

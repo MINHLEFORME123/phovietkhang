@@ -124,22 +124,26 @@ function getPaymentMethodLabel(method, lang = 'en') {
         online_banking_fi: {
             vi: 'Online banking (Finland)',
             en: 'Online banking (Finland)',
-            fi: 'Verkkopankki (Suomi)'
+            fi: 'Verkkopankki (Suomi)',
+            sv: 'Online banking (Finland)'
         },
         mobilepay: {
             vi: 'MobilePay',
             en: 'MobilePay',
-            fi: 'MobilePay'
+            fi: 'MobilePay',
+            sv: 'MobilePay'
         },
         bank_card: {
             vi: 'Thẻ ngân hàng',
             en: 'Bank Card',
-            fi: 'Pankkikortti'
+            fi: 'Pankkikortti',
+            sv: 'Bankkort'
         },
         cod: {
             vi: 'Cash or Card (trực tiếp)',
             en: 'Cash or Card (on-site)',
-            fi: 'Cash or Card (paikalla)'
+            fi: 'Cash or Card (paikalla)',
+            sv: 'Kontant eller kort (på plats)'
         }
     };
 
@@ -371,6 +375,9 @@ if (checkoutForm) {
                             promoStatus.textContent = `❌ Mã giảm giá này chỉ áp dụng cho: ${data.allowedOrderTypes.map(t => typeLabels[t] || t).join(', ')}.`;
                         } else if (currentLang === 'fi') {
                             promoStatus.textContent = `❌ Tämä koodi koskee vain: ${data.allowedOrderTypes.map(t => t === 'dine-in' ? 'Syö paikan päällä' : t === 'delivery' ? 'Kotiinkuljetus' : 'Mukaan').join(', ')}.`;
+                        } else if (currentLang === 'sv') {
+                            const svLabels = { 'dine-in': 'Ät på plats', 'takeaway': 'Takeaway', 'delivery': 'Hemleverans' };
+                            promoStatus.textContent = `❌ Denna kampanjkod gäller endast för: ${data.allowedOrderTypes.map(t => svLabels[t] || t).join(', ')}.`;
                         } else {
                             promoStatus.textContent = `❌ This promo code only applies to: ${data.allowedOrderTypes.join(', ')}.`;
                         }
@@ -561,7 +568,7 @@ if (checkoutForm) {
             const orderLang = currentLang || 'vi';
             const orderTotal = total.toFixed(2);
             const orderItemsSummary = (cart || []).map(i => `${i.qty}x ${i.name}`).join(', ');
-            const orderTypeLabel = orderType === 'dine-in' ? 'Dine-in' : orderType === 'takeaway' ? 'Takeaway' : 'Delivery';
+            const orderTypeLabel = orderType === 'dine-in' ? 'Dine-in' : orderType === 'takeaway' ? 'Takeaway' : (orderType === 'delivery' ? 'Hemleverans' : 'Delivery');
             const orderDetail = orderType === 'dine-in' ? `Table: ${tableNumber || 'N/A'}` : (orderType === 'delivery' || orderType === 'takeaway') ? address : '';
 
             const customerTranslations = {
@@ -603,6 +610,19 @@ if (checkoutForm) {
                     paymentLabel: 'Maksu',
                     note: notes ? `Huomautus: ${notes}` : '',
                     footer: 'Ilmoitamme sinulle kun tilauksesi on valmis. Kiitos!<br>Phở Việt Khang © 2026.'
+                },
+                sv: {
+                    subject: `[Phở Việt Khang] Beställning bekräftad #${orderIdShort}`,
+                    title: 'BESTÄLLNING BEKRÄFTAD',
+                    greeting: `Hej ${customerName || 'Kund'},`,
+                    intro: 'Tack för din beställning på Phở Việt Khang. Din beställning har tagits emot och behandlas.',
+                    summaryHeader: 'Beställningsdetaljer:',
+                    totalLabel: 'Totalt',
+                    orderTypeLabel: 'Servicetyp',
+                    orderIdLabel: 'Beställnings-ID',
+                    paymentLabel: 'Betalning',
+                    note: notes ? `Anteckning: ${notes}` : '',
+                    footer: 'Vi meddelar dig när din beställning är klar. Tack!<br>Phở Việt Khang © 2026.'
                 }
             };
             const t = customerTranslations[orderLang] || customerTranslations['en'];
@@ -666,6 +686,20 @@ if (checkoutForm) {
                     orderIdLabel: 'Tilaustunnus',
                     paymentLabel: 'Maksu',
                     footer: 'Tarkista järjestelmä tilauksen käsittelyä varten.<br>Phở Việt Khang © 2026.'
+                },
+                sv: {
+                    subject: `[Phở Việt Khang] Ny beställning #${orderIdShort}`,
+                    title: 'NY BESTÄLLNING',
+                    greeting: `Kund: ${customerName || 'Guest'}`,
+                    phone: `Telefon: ${customerPhone || 'N/A'}`,
+                    email: `E-post: ${customerEmail || 'N/A'}`,
+                    intro: 'En ny beställning har just lagts i systemet.',
+                    summaryHeader: 'Beställningsdetaljer:',
+                    totalLabel: 'Totalt',
+                    orderTypeLabel: 'Servicetyp',
+                    orderIdLabel: 'Beställnings-ID',
+                    paymentLabel: 'Betalning',
+                    footer: 'Vänligen kontrollera systemet för att behandla beställningen.<br>Phở Việt Khang © 2026.'
                 }
             };
             const tr = restaurantTranslations[orderLang] || restaurantTranslations['en'];
@@ -726,7 +760,7 @@ if (checkoutForm) {
 
                 if (paymentMethod === 'cod') {
                     window.showNotification('Đặt hàng thành công! Vui lòng chuẩn bị tiền mặt hoặc thẻ khi nhận hàng.', 'success');
-                    window.location.href = `order-tracking.html?orderId=${encodeURIComponent(docRef.id)}`;
+                    window.location.href = `order-tracking?orderId=${encodeURIComponent(docRef.id)}`;
                     return;
                 }
 
@@ -746,3 +780,4 @@ if (checkoutForm) {
         }
     });
 }
+

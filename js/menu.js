@@ -1,4 +1,4 @@
-import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+﻿import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { db } from "./firebase-config.js";
 
 const menuContainer = document.getElementById('menu-container');
@@ -13,8 +13,9 @@ function normalizeOptions(options) {
                 nameVi: opt,
                 nameEn: opt,
                 nameFi: opt,
+                nameSv: opt,
                 type: "toggle",
-                choices: [{ label: opt, labelVi: opt, labelEn: opt, labelFi: opt, price: 0 }]
+                choices: [{ label: opt, labelVi: opt, labelEn: opt, labelFi: opt, labelSv: opt, price: 0 }]
             };
         }
         
@@ -22,6 +23,7 @@ function normalizeOptions(options) {
         const nameVi = opt.nameVi || name;
         const nameEn = opt.nameEn || name;
         const nameFi = opt.nameFi || name;
+        const nameSv = opt.nameSv || name;
         
         const choices = Array.isArray(opt.choices) ? opt.choices.map(c => {
             const label = c.label || '';
@@ -30,6 +32,7 @@ function normalizeOptions(options) {
                 labelVi: c.labelVi || label,
                 labelEn: c.labelEn || label,
                 labelFi: c.labelFi || label,
+                labelSv: c.labelSv || label,
                 price: parseFloat(c.price) || 0
             };
         }) : [];
@@ -39,6 +42,7 @@ function normalizeOptions(options) {
             nameVi,
             nameEn,
             nameFi,
+            nameSv,
             type: opt.type || 'toggle',
             choices
         };
@@ -47,16 +51,64 @@ function normalizeOptions(options) {
 
 // --- DYNAMIC CATEGORY TRANSLATIONS MAP ---
 const categoryTranslations = {
-    "khai vị": { vi: "Khai vị", en: "Appetizers", fi: "Alkupalat" },
-    "mains": { vi: "Món chính", en: "Main Courses", fi: "Pääruoat" },
-    "món chính": { vi: "Món chính", en: "Main Courses", fi: "Pääruoat" },
-    "đồ uống": { vi: "Đồ uống", en: "Beverages", fi: "Juomat" },
-    "tráng miệng": { vi: "Tráng miệng", en: "Desserts", fi: "Jälkiruoat" },
-    "phở": { vi: "Phở", en: "Pho", fi: "Pho" },
-    "bún": { vi: "Bún", en: "Rice Noodle", fi: "Riisinuudeli" },
-    "cơm": { vi: "Cơm", en: "Rice Dishes", fi: "Riisit" },
-    "món xào": { vi: "Món xào", en: "Stir-fried", fi: "Wokit" }
+    "khai vị": { vi: "Khai vị", en: "Appetizers", fi: "Alkupalat", sv: "Förrätter" },
+    "mains": { vi: "Món chính", en: "Main Courses", fi: "Pääruoat", sv: "Huvudrätter" },
+    "món chính": { vi: "Món chính", en: "Main Courses", fi: "Pääruoat", sv: "Huvudrätter" },
+    "đồ uống": { vi: "Đồ uống", en: "Beverages", fi: "Juomat", sv: "Drycker" },
+    "tráng miệng": { vi: "Tráng miệng", en: "Desserts", fi: "Jälkiruoat", sv: "Desserter" },
+    "phở": { vi: "Phở", en: "Pho", fi: "Pho", sv: "Pho" },
+    "bún": { vi: "Bún", en: "Rice Noodle", fi: "Riisinuudeli", sv: "Risnudlar" },
+    "cơm": { vi: "Cơm", en: "Rice Dishes", fi: "Riisit", sv: "Risrätter" },
+    "món xào": { vi: "Món xào", en: "Stir-fried", fi: "Wokit", sv: "Wok" }
 };
+
+const SWEDISH_DEFAULT = {
+    name: {
+        'Phở Bò Đặc Biệt': 'Pho Bo Dac Biet',
+        'Bún Bò Huế': 'Buffalo Meat Noodle Soup (Hue)',
+        'Cơm Tấm Sườn Bì': 'Garlic Pork Chop Rice',
+        'Bánh Mì Thịt Nướng': 'Grilled Meat Sandwich',
+        'Gỏi Cuốn': 'Summer Rolls',
+        'Chả Giò': 'Spring Rolls',
+        'Cà Phê Sữa Đá': 'Iced Milk Coffee'
+    },
+    category: {
+        'Phở': 'Pho',
+        'Bún': 'Risnudlar',
+        'Cơm': 'Risrätter',
+        'Bánh Mì': 'Sandwich',
+        'Khai vị': 'Förrätter',
+        'Đồ uống': 'Drycker'
+    }
+};
+
+function getItemNameSv(item) {
+    const key = Object.keys(SWEDISH_DEFAULT.name).find(k => item.nameVi && item.nameVi.toLowerCase().includes(k.toLowerCase()));
+    if (key) return SWEDISH_DEFAULT.name[key];
+    return item.nameEn || item.nameVi || '';
+}
+
+function getCategorySv(catVi) {
+    const key = Object.keys(SWEDISH_DEFAULT.category).find(k => catVi && catVi.toLowerCase().includes(k.toLowerCase()));
+    if (key) return SWEDISH_DEFAULT.category[key];
+    const t = categoryTranslations[catVi] || {};
+    return t.sv || categoryTranslations[catVi.toLowerCase()]?.sv || catVi || '';
+}
+
+function applySwedishDefaults(item) {
+    const updates = {};
+    if (!item.nameSv) {
+        const sv = getItemNameSv(item);
+        if (sv) updates.nameSv = sv;
+    }
+    if (!item.categorySv && item.categoryVi) {
+        updates.categorySv = getCategorySv(item.categoryVi);
+    }
+    if (!item.descSv && item.descEn) {
+        updates.descSv = item.descEn;
+    }
+    return updates;
+}
 
 function getCategoryTitle(catName, lang) {
     const key = catName.toLowerCase().trim();
@@ -70,15 +122,15 @@ function getCategoryTitle(catName, lang) {
 function showOptionsPopup(item, lang) {
     if (document.getElementById('options-modal-wrapper')) return;
 
-    const nameKey = lang === 'vi' ? 'nameVi' : (lang === 'fi' ? 'nameFi' : 'nameEn');
-    const displayName = item[nameKey] || item.nameVi || item.nameEn || 'Unknown';
+    const nameKey = lang === 'vi' ? 'nameVi' : (lang === 'fi' ? 'nameFi' : (lang === 'sv' ? 'nameSv' : 'nameEn'));
+    const displayName = item[nameKey] || item.nameVi || item.nameEn || item.nameSv || 'Unknown';
 
     const normalizedOptions = normalizeOptions(item.options);
 
     const optionsHTML = normalizedOptions.map((group, groupIdx) => {
-        const title = lang === 'vi' ? group.nameVi : (lang === 'fi' ? group.nameFi : group.nameEn);
+        const title = lang === 'vi' ? group.nameVi : (lang === 'fi' ? group.nameFi : (lang === 'sv' ? group.nameSv : group.nameEn));
         const choicesHtml = group.choices.map((choice, choiceIdx) => {
-            const label = lang === 'vi' ? choice.labelVi : (lang === 'fi' ? choice.labelFi : choice.labelEn);
+            const label = lang === 'vi' ? choice.labelVi : (lang === 'fi' ? choice.labelFi : (lang === 'sv' ? choice.labelSv : choice.labelEn));
             const priceText = choice.price > 0 ? ` (+&euro;${choice.price.toFixed(2)})` : '';
             const id = `opt-${groupIdx}-${choiceIdx}`;
             
@@ -109,9 +161,9 @@ function showOptionsPopup(item, lang) {
         `;
     }).join('');
 
-    const addBtnText = lang === 'vi' ? 'Thêm vào giỏ hàng' : (lang === 'fi' ? 'Lisää ostoskoriin' : 'Add to Cart');
-    const cancelText = lang === 'vi' ? 'Hủy' : (lang === 'fi' ? 'Peruuta' : 'Cancel');
-    const titleText = lang === 'vi' ? 'Tùy chọn' : (lang === 'fi' ? 'Vaihtoehdot' : 'Customize');
+    const addBtnText = lang === 'vi' ? 'Thêm vào giỏ hàng' : (lang === 'fi' ? 'Lisää ostoskoriin' : (lang === 'sv' ? 'Lägg till i varukorgen' : 'Add to Cart'));
+    const cancelText = lang === 'vi' ? 'Hủy' : (lang === 'fi' ? 'Peruuta' : (lang === 'sv' ? 'Avbryt' : 'Cancel'));
+    const titleText = lang === 'vi' ? 'Tùy chọn' : (lang === 'fi' ? 'Vaihtoehdot' : (lang === 'sv' ? 'Anpassa' : 'Customize'));
 
     const fallbackImg = 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=500';
     const imgSrc = item.image || fallbackImg;
@@ -291,11 +343,12 @@ async function loadMenu() {
             const catVi = data.categoryVi || data.category || 'Món chính';
             const catEn = data.categoryEn || getCategoryTitle(catVi, 'en');
             const catFi = data.categoryFi || getCategoryTitle(catVi, 'fi');
+            const catSv = data.categorySv || getCategoryTitle(catVi, 'sv');
             
             const groupingKey = catVi.toLowerCase().trim();
             if (!categories[groupingKey]) {
                 categories[groupingKey] = {
-                    title: { vi: catVi, en: catEn, fi: catFi },
+                    title: { vi: catVi, en: catEn, fi: catFi, sv: catSv },
                     items: []
                 };
             }
@@ -352,7 +405,8 @@ function renderMenu(categories) {
 
             const isLounas = /lounas|lunch/i.test(item.categoryVi || '') || 
                              /lounas|lunch/i.test(item.categoryEn || '') || 
-                             /lounas|lunch/i.test(item.categoryFi || '');
+                             /lounas|lunch/i.test(item.categoryFi || '') ||
+                             /lounas|lunch/i.test(item.categorySv || '');
             let isLounasTime = false;
             try {
                 const helsinkiTime = new Date().toLocaleString("en-US", { timeZone: "Europe/Helsinki" });
@@ -369,11 +423,11 @@ function renderMenu(categories) {
             if (isLounas) item.price = 13.7;
             const lounasDimClass = (isLounas && !isLounasTime) ? 'opacity-60 grayscale' : '';
 
-            const nameKey = lang === 'vi' ? 'nameVi' : (lang === 'fi' ? 'nameFi' : 'nameEn');
-            const descKey = lang === 'vi' ? 'descVi' : (lang === 'fi' ? 'descFi' : 'descEn');
-            const displayName = item[nameKey] || item.nameVi || item.nameEn || 'Unknown';
-            const displayDesc = item[descKey] || item.descVi || item.descEn || '';
-            const addText = lang === 'vi' ? 'Thêm vào giỏ' : (lang === 'fi' ? 'Lisää ostoskoriin' : 'Add to Cart');
+            const nameKey = lang === 'vi' ? 'nameVi' : (lang === 'fi' ? 'nameFi' : (lang === 'sv' ? 'nameSv' : 'nameEn'));
+            const descKey = lang === 'vi' ? 'descVi' : (lang === 'fi' ? 'descFi' : (lang === 'sv' ? 'descSv' : 'descEn'));
+            const displayName = item[nameKey] || item.nameVi || item.nameEn || item.nameSv || 'Unknown';
+            const displayDesc = item[descKey] || item.descVi || item.descEn || item.descSv || '';
+            const addText = lang === 'vi' ? 'Thêm vào giỏ' : (lang === 'fi' ? 'Lisää ostoskoriin' : (lang === 'sv' ? 'Lägg till i varukorg' : 'Add to Cart'));
 
             const normalized = normalizeOptions(item.options);
             const hasOptions = normalized.length > 0;
@@ -391,7 +445,7 @@ function renderMenu(categories) {
                     <div class="absolute bottom-4 left-4 right-4 flex justify-between items-end">
                         <div>
                             <h3 class="text-2xl font-bold font-['EB_Garamond'] text-white drop-shadow-md dynamic-name" 
-                                data-vi="${item.nameVi || ''}" data-en="${item.nameEn || ''}" data-fi="${item.nameFi || ''}">
+                                data-vi="${item.nameVi || ''}" data-en="${item.nameEn || ''}" data-fi="${item.nameFi || ''}" data-sv="${item.nameSv || ''}">
                                 ${displayName}
                                 ${item.allergenWarning ? '<span class="inline-flex items-center gap-1 bg-red-100 text-red-600 text-[10px] px-1.5 py-0.5 rounded border border-red-200 ml-1 align-middle" title="Chứa thành phần dễ gây dị ứng"><span class="material-symbols-outlined text-[12px]">warning</span></span>' : ''}
                             </h3>
@@ -402,7 +456,7 @@ function renderMenu(categories) {
                 </div>
                 <div class="p-6 flex-1 flex flex-col justify-between">
                     <p class="text-secondary text-sm leading-relaxed mb-6 dynamic-desc"
-                       data-vi="${item.descVi || ''}" data-en="${item.descEn || ''}" data-fi="${item.descFi || ''}">
+                       data-vi="${item.descVi || ''}" data-en="${item.descEn || ''}" data-fi="${item.descFi || ''}" data-sv="${item.descSv || ''}">
                          ${displayDesc}
                     </p>
                     
@@ -416,10 +470,17 @@ function renderMenu(categories) {
 
             card.querySelector('.btn-add-to-cart').addEventListener('click', (e) => {
                 if (isLounas && !isLounasTime) {
+                    const lounasMsgs = {
+                        vi: 'Món ăn này chỉ phục vụ vào giờ Lounas (11:00 - 14:30, Thứ 2 - Thứ 6).',
+                        en: 'This dish is only served during Lounas hours (11:00 - 14:30, Mon - Fri).',
+                        fi: 'Tämä annos on saatavilla vain lounasaikaan (11:00 - 14:30, Ma - Pe).',
+                        sv: 'Denna rätt serveras endast under Lounas-tid (11:00-14:30, mån-fre).'
+                    };
+                    const msg = lounasMsgs[lang] || lounasMsgs.en;
                     if (window.showNotification) {
-                        window.showNotification('Món ăn này chỉ phục vụ vào giờ Lounas (11:00 - 14:30, Thứ 2 - Thứ 6).', 'error');
+                        window.showNotification(msg, 'error');
                     } else {
-                        alert('Món ăn này chỉ phục vụ vào giờ Lounas (11:00 - 14:30, Thứ 2 - Thứ 6).');
+                        alert(msg);
                     }
                     return;
                 }
@@ -431,7 +492,7 @@ function renderMenu(categories) {
                     if (typeof window.flyToCart === 'function') {
                         window.flyToCart(card);
                     }
-                    const safeName = (item.nameEn || item.nameVi || 'Unknown');
+                    const safeName = (item.nameSv || item.nameEn || item.nameVi || 'Unknown');
                     if (typeof window.addToCart === 'function') {
                         window.addToCart(item.id, safeName, item.price || 0, item.image || '', []);
                     }
@@ -460,9 +521,9 @@ function applyMenuFilter(query) {
     for (const [catKey, catData] of Object.entries(allCategories)) {
         const matchedItems = catData.items.filter(item => {
             const searchFields = [
-                item.nameVi, item.nameEn, item.nameFi,
-                item.descVi, item.descEn, item.descFi,
-                item.categoryVi, item.categoryEn, item.categoryFi,
+                item.nameVi, item.nameEn, item.nameFi, item.nameSv,
+                item.descVi, item.descEn, item.descFi, item.descSv,
+                item.categoryVi, item.categoryEn, item.categoryFi, item.categorySv,
                 ...(item.tags || [])
             ].join(' ').toLowerCase();
             return searchFields.includes(q);
@@ -480,8 +541,8 @@ function showFilterBanner(query) {
     if (existing) existing.remove();
     if (!query) return;
     const lang = localStorage.getItem('selectedLanguage') || 'en';
-    const labels = { vi: 'Kết quả cho:', en: 'Results for:', fi: 'Hakutulokset:' };
-    const clearText = { vi: 'Xoá lọc', en: 'Clear filter', fi: 'Tyhjennä suodatin' };
+    const labels = { vi: 'Kết quả cho:', en: 'Results for:', fi: 'Hakutulokset:', sv: 'Resultat för:' };
+    const clearText = { vi: 'Xoá lọc', en: 'Clear filter', fi: 'Tyhjennä suodatin', sv: 'Rensa filter' };
     const banner = document.createElement('div');
     banner.id = 'menu-filter-banner';
     banner.className = 'col-span-full mt-8 mb-4 flex items-center justify-between bg-primary/10 border border-primary/30 rounded-xl px-5 py-3';
@@ -518,7 +579,7 @@ function applyMenuTranslations() {
         if (text) el.textContent = text;
     });
 
-    const btnText = lang === 'vi' ? 'Thêm vào giỏ' : (lang === 'fi' ? 'Lisää ostoskoriin' : 'Add to Cart');
+    const btnText = lang === 'vi' ? 'Thêm vào giỏ' : (lang === 'fi' ? 'Lisää ostoskoriin' : (lang === 'sv' ? 'Lägg till i varukorg' : 'Add to Cart'));
     document.querySelectorAll('.btn-text').forEach(el => {
         el.textContent = btnText;
     });
@@ -533,3 +594,4 @@ if (document.readyState === 'loading') {
 } else {
     loadMenu();
 }
+

@@ -86,7 +86,7 @@ function renderCurrentAddingChoices() {
     currentAddingChoices.forEach((ch, idx) => {
         const row = document.createElement('div');
         row.className = 'flex items-center justify-between bg-surface-highlight p-1.5 rounded text-xs text-white';
-        row.innerHTML = `<span>${ch.labelVi} / ${ch.labelEn} / ${ch.labelFi} (${ch.price > 0 ? '+' + ch.price.toFixed(2) + '€' : 'Free'})</span>
+        row.innerHTML = `<span>${ch.labelVi} / ${ch.labelEn} / ${ch.labelFi} / ${ch.labelSv || ch.labelEn} (${ch.price > 0 ? '+' + ch.price.toFixed(2) + '€' : 'Free'})</span>
             <button type="button" class="text-red-400 hover:text-red-300 px-1 font-bold text-sm" data-idx="${idx}">&times;</button>`;
         row.querySelector('button').addEventListener('click', () => {
             currentAddingChoices.splice(idx, 1);
@@ -101,18 +101,21 @@ if (btnAddChoice) {
         const labelVi = document.getElementById('new-choice-label-vi').value.trim();
         const labelEn = document.getElementById('new-choice-label-en').value.trim();
         const labelFi = document.getElementById('new-choice-label-fi').value.trim();
+        const labelSv = document.getElementById('new-choice-label-sv').value.trim();
         const priceVal = parseFloat(choicePriceInput.value) || 0;
-        if (!labelVi && !labelEn && !labelFi) {
+        if (!labelVi && !labelEn && !labelFi && !labelSv) {
             window.showNotification('Please enter a choice label in at least one language.', 'info');
             return;
         }
-        const safeVi = labelVi || labelEn || labelFi;
+        const safeVi = labelVi || labelEn || labelFi || labelSv;
         const safeEn = labelEn || safeVi;
         const safeFi = labelFi || safeVi;
-        currentAddingChoices.push({ label: safeEn, labelVi: safeVi, labelEn: safeEn, labelFi: safeFi, price: priceVal });
+        const safeSv = labelSv || safeVi;
+        currentAddingChoices.push({ label: safeEn, labelVi: safeVi, labelEn: safeEn, labelFi: safeFi, labelSv: safeSv, price: priceVal });
         document.getElementById('new-choice-label-vi').value = '';
         document.getElementById('new-choice-label-en').value = '';
         document.getElementById('new-choice-label-fi').value = '';
+        document.getElementById('new-choice-label-sv').value = '';
         choicePriceInput.value = '';
         renderCurrentAddingChoices();
     });
@@ -131,7 +134,7 @@ function renderOptions() {
         const choicesHtml = opt.choices.map(c =>
             `<span class="inline-block bg-gray-800 text-secondary text-[11px] px-2 py-0.5 rounded mr-1">${c.labelVi || c.label} (${c.price > 0 ? '+' + c.price.toFixed(2) + '€' : 'Free'})</span>`
         ).join('');
-        const displayTitle = `${opt.nameVi} / ${opt.nameEn} / ${opt.nameFi}`;
+        const displayTitle = `${opt.nameVi} / ${opt.nameEn} / ${opt.nameFi} / ${opt.nameSv || opt.nameEn}`;
         div.innerHTML = `
             <div class="flex justify-between items-center pr-8">
                 <span class="font-bold text-white text-sm">${displayTitle}</span>
@@ -151,16 +154,19 @@ if (btnAddOption) {
         const nameVi = document.getElementById('new-opt-name-vi').value.trim();
         const nameEn = document.getElementById('new-opt-name-en').value.trim();
         const nameFi = document.getElementById('new-opt-name-fi').value.trim();
+        const nameSv = document.getElementById('new-opt-name-sv').value.trim();
         const type = optTypeSelect.value;
-        if (!nameVi && !nameEn && !nameFi) { window.showNotification('Please enter an option group name in at least one language.', 'info'); return; }
+        if (!nameVi && !nameEn && !nameFi && !nameSv) { window.showNotification('Please enter an option group name in at least one language.', 'info'); return; }
         if (currentAddingChoices.length === 0) { window.showNotification('Please add at least one choice to this option group.', 'info'); return; }
-        const safeVi = nameVi || nameEn || nameFi;
+        const safeVi = nameVi || nameEn || nameFi || nameSv;
         const safeEn = nameEn || safeVi;
         const safeFi = nameFi || safeVi;
-        foodOptions.push({ name: safeEn, nameVi: safeVi, nameEn: safeEn, nameFi: safeFi, type, choices: [...currentAddingChoices] });
+        const safeSv = nameSv || safeVi;
+        foodOptions.push({ name: safeEn, nameVi: safeVi, nameEn: safeEn, nameFi: safeFi, nameSv: safeSv, type, choices: [...currentAddingChoices] });
         document.getElementById('new-opt-name-vi').value = '';
         document.getElementById('new-opt-name-en').value = '';
         document.getElementById('new-opt-name-fi').value = '';
+        document.getElementById('new-opt-name-sv').value = '';
         currentAddingChoices = [];
         renderCurrentAddingChoices();
         renderOptions();
@@ -224,13 +230,13 @@ if (btnAiScan) {
 For each dish:
 1. Translate name/description to Vietnamese, English, Finnish.
 2. Auto-generate high-quality Vietnamese description if missing, then translate.
-3. Categorize in three languages (e.g. categoryVi: "Phở", categoryEn: "Pho", categoryFi: "Pho"). DO NOT use "Món chính".
+ 3. Categorize in four languages (e.g. categoryVi: "Phở", categoryEn: "Pho", categoryFi: "Pho", categorySv: "Pho"). DO NOT use "Món chính".
 4. Infer options:
    - ONLY add PAID options (price > 0) IF they are EXPLICITLY written. Do NOT hallucinate.
    - You CAN and SHOULD auto-generate common FREE exclusion options (price = 0) based on the dish type. For example, for "Phở" or "Bún", add multiple "toggle" options like "Không hành" (No onions), "Không rau mùi" (No cilantro), "Không mì chính" (No MSG). For dishes with peanuts, add "Không lạc" (No peanuts).
 You MUST return ONLY a JSON object with a single key "items" containing the array of dishes. No markdown blocks.
 JSON Structure:
-{ "items": [ { "nameVi": "Tên món", "descVi": "Mô tả hấp dẫn", "nameEn": "English name", "descEn": "English desc", "nameFi": "Finnish name", "descFi": "Finnish desc", "price": 12.50, "categoryVi": "Phở", "categoryEn": "Pho", "categoryFi": "Pho", "options": [ { "nameVi": "Cấp độ cay", "nameEn": "Spicy Level", "nameFi": "Tulisuusaste", "type": "single-select", "choices": [ { "labelVi": "Không cay", "labelEn": "Not Spicy", "labelFi": "Ei tulinen", "price": 0 }, { "labelVi": "Cay", "labelEn": "Spicy", "labelFi": "Tulinen", "price": 0 } ] } ] } ] }`;
+{ "items": [ { "nameVi": "Tên món", "descVi": "Mô tả hấp dẫn", "nameEn": "English name", "descEn": "English desc", "nameFi": "Finnish name", "descFi": "Finnish desc", "nameSv": "Swedish name", "descSv": "Swedish desc", "price": 12.50, "categoryVi": "Phở", "categoryEn": "Pho", "categoryFi": "Pho", "categorySv": "Pho", "options": [ { "nameVi": "Cấp độ cay", "nameEn": "Spicy Level", "nameFi": "Tulisuusaste", "nameSv": "Krydningsgrad", "type": "single-select", "choices": [ { "labelVi": "Không cay", "labelEn": "Not Spicy", "labelFi": "Ei tulinen", "labelSv": "Inte stark", "price": 0 }, { "labelVi": "Cay", "labelEn": "Spicy", "labelFi": "Tulinen", "labelSv": "Stark", "price": 0 } ] } ] } ] }`;
 
             const reasonerData = await (async () => {
                 try {
@@ -263,8 +269,8 @@ JSON Structure:
                 const catVi = item.categoryVi || item.category || 'Phở';
                 await addDoc(collection(db, "menu"), {
                     nameVi: item.nameVi || 'Unknown', descVi: item.descVi || '', nameEn: item.nameEn || '', descEn: item.descEn || '',
-                    nameFi: item.nameFi || '', descFi: item.descFi || '', category: catVi, categoryVi: catVi,
-                    categoryEn: item.categoryEn || catVi, categoryFi: item.categoryFi || catVi,
+                    nameFi: item.nameFi || '', descFi: item.descFi || '', nameSv: item.nameSv || '', descSv: item.descSv || '', category: catVi, categoryVi: catVi,
+                    categoryEn: item.categoryEn || catVi, categoryFi: item.categoryFi || catVi, categorySv: item.categorySv || catVi,
                     price: parseFloat(item.price) || 0,
                     image: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=500',
                     options: Array.isArray(item.options) ? item.options : [], createdAt: new Date()
@@ -305,14 +311,14 @@ if (btnAiExtract) {
             const keys = getApiKeysCached();
 
             const systemPrompt = `You are an expert data parser. Extract ALL food items from the CSV data.
-1. Translate missing names/descriptions to VI, EN, FI.
+1. Translate missing names/descriptions to VI, EN, FI, SV.
 2. Auto-generate appetizing Vietnamese description if missing, then translate.
-3. Categorize in three languages (e.g. categoryVi: "Phở", categoryEn: "Pho", categoryFi: "Pho"). DO NOT use "Món chính".
+ 3. Categorize in four languages (e.g. categoryVi: "Phở", categoryEn: "Pho", categoryFi: "Pho", categorySv: "Pho"). DO NOT use "Món chính".
 4. Infer options:
    - ONLY add PAID options (price > 0) IF they are EXPLICITLY present in the CSV. Do NOT hallucinate paid options.
    - You CAN and SHOULD auto-generate common FREE exclusion options (price = 0). For example, for "Phở" or "Bún", add multiple "toggle" options like "Không hành" (No onions), "Không rau mùi" (No cilantro), "Không mì chính" (No MSG).
 You MUST return ONLY a JSON object with a single key "items" containing the array of dishes. No markdown blocks.
-JSON Structure: { "items": [ { "nameVi": "Tên món", "descVi": "Mô tả hấp dẫn", "nameEn": "English name", "descEn": "English desc", "nameFi": "Finnish name", "descFi": "Finnish desc", "price": 12.50, "categoryVi": "Phở", "categoryEn": "Pho", "categoryFi": "Pho", "options": [] } ] }`;
+JSON Structure: { "items": [ { "nameVi": "Tên món", "descVi": "Mô tả hấp dẫn", "nameEn": "English name", "descEn": "English desc", "nameFi": "Finnish name", "descFi": "Finnish desc", "nameSv": "Swedish name", "descSv": "Swedish desc", "price": 12.50, "categoryVi": "Phở", "categoryEn": "Pho", "categoryFi": "Pho", "categorySv": "Pho", "options": [] } ] }`;
 
             const responseData = await (async () => {
                 try {
@@ -345,8 +351,8 @@ JSON Structure: { "items": [ { "nameVi": "Tên món", "descVi": "Mô tả hấp 
                 const catVi = item.categoryVi || item.category || 'Phở';
                 await addDoc(collection(db, "menu"), {
                     nameVi: item.nameVi || 'Unknown', descVi: item.descVi || '', nameEn: item.nameEn || '', descEn: item.descEn || '',
-                    nameFi: item.nameFi || '', descFi: item.descFi || '', category: catVi, categoryVi: catVi,
-                    categoryEn: item.categoryEn || catVi, categoryFi: item.categoryFi || catVi,
+                    nameFi: item.nameFi || '', descFi: item.descFi || '', nameSv: item.nameSv || '', descSv: item.descSv || '', category: catVi, categoryVi: catVi,
+                    categoryEn: item.categoryEn || catVi, categoryFi: item.categoryFi || catVi, categorySv: item.categorySv || catVi,
                     price: parseFloat(item.price) || 0,
                     image: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=500',
                     options: Array.isArray(item.options) ? item.options : [], createdAt: new Date()
@@ -380,7 +386,7 @@ if (btnTranslate) {
             const keys = getApiKeysCached();
             const payload = {
                 messages: [
-                    { role: 'system', content: 'You are an expert translator. Translate the given Vietnamese food name and description into English and Finnish. Return ONLY a raw JSON object with these keys: nameEn, descEn, nameFi, descFi. No markdown.' },
+                    { role: 'system', content: 'You are an expert translator. Translate the given Vietnamese food name and description into English, Finnish, and Swedish. Return ONLY a raw JSON object with these keys: nameEn, descEn, nameFi, descFi, nameSv, descSv. No markdown.' },
                     { role: 'user', content: `Name (VI): ${nameVi}\nDescription (VI): ${descVi || ''}` }
                 ]
             };
@@ -390,6 +396,8 @@ if (btnTranslate) {
             document.getElementById('food-desc-en').value = translated.descEn || '';
             document.getElementById('food-name-fi').value = translated.nameFi || '';
             document.getElementById('food-desc-fi').value = translated.descFi || '';
+            document.getElementById('food-name-sv').value = translated.nameSv || '';
+            document.getElementById('food-desc-sv').value = translated.descSv || '';
         } catch (error) {
             console.error('Translation Error:', error);
             window.showNotification('AI Translation failed. Please try again.', 'error');
@@ -437,6 +445,7 @@ if (foodAddForm) {
         const categoryVi = document.getElementById('food-category-vi').value;
         const categoryEn = document.getElementById('food-category-en').value;
         const categoryFi = document.getElementById('food-category-fi').value;
+        const categorySv = document.getElementById('food-category-sv').value;
         const price = parseFloat(document.getElementById('food-price').value);
         const nameVi = document.getElementById('food-name-vi').value;
         const descVi = document.getElementById('food-desc-vi').value;
@@ -444,6 +453,8 @@ if (foodAddForm) {
         const descEn = document.getElementById('food-desc-en').value;
         const nameFi = document.getElementById('food-name-fi').value;
         const descFi = document.getElementById('food-desc-fi').value;
+        const nameSv = document.getElementById('food-name-sv').value;
+        const descSv = document.getElementById('food-desc-sv').value;
 
         const loadingIndicator = document.getElementById('ai-loading');
         loadingIndicator.innerHTML = '<span class="material-symbols-outlined animate-spin align-middle mr-2">sync</span> Saving to Database...';
@@ -456,9 +467,9 @@ if (foodAddForm) {
             const allergenWarning = document.getElementById('food-allergen')?.checked || false;
 
             await addDoc(collection(db, "menu"), {
-                nameVi, descVi, nameEn, descEn, nameFi, descFi,
+                nameVi, descVi, nameEn, descEn, nameFi, descFi, nameSv, descSv,
                 category: categoryVi, categoryVi,
-                categoryEn: categoryEn || categoryVi, categoryFi: categoryFi || categoryVi,
+                categoryEn: categoryEn || categoryVi, categoryFi: categoryFi || categoryVi, categorySv: categorySv || categoryVi,
                 price, image: finalImage, options: foodOptions.length > 0 ? [...foodOptions] : [],
                 allergenWarning, createdAt: new Date()
             });

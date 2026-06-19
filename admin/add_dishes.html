@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
+<link rel="icon" type="image/png" sizes="48x48" href="../images/favicon-48x48.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="../images/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="../images/apple-touch-icon.png">
+<title>Thêm Món Ăn Tự Động</title>
+</head>
+<body style="font-family: Arial, sans-serif; padding: 20px;">
+    <h2>Đang tiến hành thêm 3 món: Cơm rang, Mì xào, Phở xào vào hệ thống...</h2>
+    <p id="status">Đang khởi tạo kết nối Firebase...</p>
+
+    <script type="module">
+        import { db } from "../js/firebase-config.js";
+        import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const statusEl = document.getElementById("status");
+
+        const dishes = [
+            { nameVi: "Cơm rang", nameEn: "Fried Rice", nameFi: "Paistettu riisi" },
+            { nameVi: "Mì xào", nameEn: "Fried Noodles", nameFi: "Paistetut nuudelit" },
+            { nameVi: "Phở xào", nameEn: "Stir-fried Pho", nameFi: "Paistettu Pho" }
+        ];
+
+        async function addDishes() {
+            try {
+                for (const d of dishes) {
+                    statusEl.innerText = "Đang thêm món: " + d.nameVi + "...";
+                    await addDoc(collection(db, "menu"), {
+                        nameVi: d.nameVi,
+                        nameEn: d.nameEn,
+                        nameFi: d.nameFi,
+                        price: 14.9, // Giá mặc định
+                        categoryVi: "Món Chính",
+                        categoryEn: "Main Courses",
+                        categoryFi: "Pääruoat",
+                        descVi: d.nameVi + " thơm ngon với lựa chọn đồ ăn kèm (không tính thêm phí).",
+                        descEn: "Delicious " + d.nameEn + " with your choice of protein.",
+                        descFi: "Herkullinen " + d.nameFi + " valitsemallasi proteiinilla.",
+                        imageUrl: "",
+                        isAvailable: true,
+                        options: [
+                            {
+                                nameVi: "Chọn đồ ăn kèm",
+                                nameEn: "Choose a side",
+                                nameFi: "Valitse lisuke",
+                                type: "single",
+                                choices: [
+                                    { labelVi: "Gà", labelEn: "Chicken", labelFi: "Kana", price: 0 },
+                                    { labelVi: "Gà tẩm bột", labelEn: "Crispy Chicken", labelFi: "Rapea kana", price: 0 },
+                                    { labelVi: "Đậu phụ", labelEn: "Tofu", labelFi: "Tofu", price: 0 },
+                                    { labelVi: "Xá xíu", labelEn: "Char Siu", labelFi: "Char Siu", price: 0 },
+                                    { labelVi: "Thịt bò", labelEn: "Beef", labelFi: "Nauta", price: 0 }
+                                ]
+                            }
+                        ]
+                    });
+                }
+                statusEl.innerText = "✅ THÀNH CÔNG! Đã thêm Cơm rang, Mì xào, Phở xào vào menu.";
+                statusEl.style.color = "green";
+                statusEl.style.fontWeight = "bold";
+                alert("Thêm món thành công! Bạn có thể quay lại trang Quản lý Food để kiểm tra.");
+            } catch (error) {
+                console.error("Lỗi:", error);
+                statusEl.innerText = "❌ LỖI: " + error.message;
+                statusEl.style.color = "red";
+            }
+        }
+
+        addDishes();
+    </script>
+</body>
+</html>

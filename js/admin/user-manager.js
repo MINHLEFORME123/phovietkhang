@@ -37,7 +37,7 @@ if (userTableBody) {
                             <option value="host" ${user.role === 'host' ? 'selected' : ''}>Host</option>
                         </select>
                     </td>
-                    <td class="py-3 px-4 text-secondary text-sm">${totalSpent.toLocaleString('vi-VN')} đ</td>
+                    <td class="py-3 px-4 text-secondary text-sm">${totalSpent} €</td>
                     <td class="py-3 px-4">
                         <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold" style="background:${tier.color}22; color:${tier.color}; border:1px solid ${tier.color}44;">
                             <span class="material-symbols-outlined text-[14px]" style="color:${tier.color}">${tier.icon}</span>

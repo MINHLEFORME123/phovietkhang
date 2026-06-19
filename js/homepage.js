@@ -17,46 +17,101 @@ async function loadHomepage() {
                 localStorage.setItem('cachedHeroBg', config.heroBgUrl);
                 const heroBg = document.getElementById('hero-bg');
                 if (heroBg) heroBg.src = config.heroBgUrl;
+            } else {
+                localStorage.removeItem('cachedHeroBg');
             }
+
             if (config.heroTitleVi) localStorage.setItem('cachedHeroTitle_vi', config.heroTitleVi);
+            else localStorage.removeItem('cachedHeroTitle_vi');
             if (config.heroTitleEn) localStorage.setItem('cachedHeroTitle_en', config.heroTitleEn);
+            else localStorage.removeItem('cachedHeroTitle_en');
             if (config.heroTitleFi) localStorage.setItem('cachedHeroTitle_fi', config.heroTitleFi);
+            else localStorage.removeItem('cachedHeroTitle_fi');
+            if (config.heroTitleSv) localStorage.setItem('cachedHeroTitle_sv', config.heroTitleSv);
+            else localStorage.removeItem('cachedHeroTitle_sv');
+
             if (config.heroDescVi) localStorage.setItem('cachedHeroDesc_vi', config.heroDescVi);
+            else localStorage.removeItem('cachedHeroDesc_vi');
             if (config.heroDescEn) localStorage.setItem('cachedHeroDesc_en', config.heroDescEn);
+            else localStorage.removeItem('cachedHeroDesc_en');
             if (config.heroDescFi) localStorage.setItem('cachedHeroDesc_fi', config.heroDescFi);
+            else localStorage.removeItem('cachedHeroDesc_fi');
+            if (config.heroDescSv) localStorage.setItem('cachedHeroDesc_sv', config.heroDescSv);
+            else localStorage.removeItem('cachedHeroDesc_sv');
 
             const updateHeroText = () => {
                 const lang = localStorage.getItem('selectedLanguage') || 'en';
                 const langCap = lang.charAt(0).toUpperCase() + lang.slice(1);
-                const title = config['heroTitle' + langCap] || config.heroTitleVi;
-                const desc = config['heroDesc' + langCap] || config.heroDescVi;
-
+                
+                let title = config['heroTitle' + langCap];
+                if (lang === 'vi' && title === "Tinh Hoa Ẩm Thực Việt Tại Helsinki") title = null;
                 const titleElem = document.getElementById('hero-title');
-                if (titleElem && title) titleElem.textContent = title;
+                if (titleElem) {
+                    if (title) {
+                        titleElem.textContent = title;
+                    } else if (typeof translations !== 'undefined' && translations[lang] && translations[lang]['hero-title']) {
+                        titleElem.textContent = translations[lang]['hero-title'];
+                    }
+                }
+                
+                let desc = config['heroDesc' + langCap];
+                if (lang === 'vi' && desc === "Mê món Việt? Ghé ngay Phở Việt Khang nhé! Tụi mình nấu Phở hầm xương thơm lừng và các món ăn mang đậm chất đường phố Việt Nam ngay tại trung tâm Helsinki.") desc = null;
                 const descElem = document.getElementById('hero-desc');
-                if (descElem && desc) descElem.textContent = desc;
+                if (descElem) {
+                    if (desc) {
+                        descElem.textContent = desc;
+                    } else if (typeof translations !== 'undefined' && translations[lang] && translations[lang]['hero-desc']) {
+                        descElem.textContent = translations[lang]['hero-desc'];
+                    }
+                }
             };
             updateHeroText();
             window.addEventListener('languageChanged', updateHeroText);
 
-            // Apply config to Signatures (Trilingual Support)
+            // Apply config to Signatures (Trilingual Support -> 4 languages)
             if (config.signatureTitleVi) localStorage.setItem('cachedSignatureTitle_vi', config.signatureTitleVi);
+            else localStorage.removeItem('cachedSignatureTitle_vi');
             if (config.signatureTitleEn) localStorage.setItem('cachedSignatureTitle_en', config.signatureTitleEn);
+            else localStorage.removeItem('cachedSignatureTitle_en');
             if (config.signatureTitleFi) localStorage.setItem('cachedSignatureTitle_fi', config.signatureTitleFi);
+            else localStorage.removeItem('cachedSignatureTitle_fi');
+            if (config.signatureTitleSv) localStorage.setItem('cachedSignatureTitle_sv', config.signatureTitleSv);
+            else localStorage.removeItem('cachedSignatureTitle_sv');
+
             if (config.signatureDescVi) localStorage.setItem('cachedSignatureDesc_vi', config.signatureDescVi);
+            else localStorage.removeItem('cachedSignatureDesc_vi');
             if (config.signatureDescEn) localStorage.setItem('cachedSignatureDesc_en', config.signatureDescEn);
+            else localStorage.removeItem('cachedSignatureDesc_en');
             if (config.signatureDescFi) localStorage.setItem('cachedSignatureDesc_fi', config.signatureDescFi);
+            else localStorage.removeItem('cachedSignatureDesc_fi');
+            if (config.signatureDescSv) localStorage.setItem('cachedSignatureDesc_sv', config.signatureDescSv);
+            else localStorage.removeItem('cachedSignatureDesc_sv');
 
             const updateSignatureText = () => {
                 const lang = localStorage.getItem('selectedLanguage') || 'en';
                 const langCap = lang.charAt(0).toUpperCase() + lang.slice(1);
-                const title = config['signatureTitle' + langCap] || config.signatureTitleVi;
-                const desc = config['signatureDesc' + langCap] || config.signatureDescVi;
                 
+                let title = config['signatureTitle' + langCap];
+                if (lang === 'vi' && title === "Món Đặc Sản") title = null;
                 const sigTitleElem = document.getElementById('signature-title');
-                if (sigTitleElem && title) sigTitleElem.textContent = title;
+                if (sigTitleElem) {
+                    if (title) {
+                        sigTitleElem.textContent = title;
+                    } else if (typeof translations !== 'undefined' && translations[lang] && translations[lang]['sig-title']) {
+                        sigTitleElem.textContent = translations[lang]['sig-title'];
+                    }
+                }
+                
+                let desc = config['signatureDesc' + langCap];
+                if (lang === 'vi' && desc === "Khám phá các món đặc sản trứ danh như Phở, Bún Bò Huế và Bún Thịt Nướng.") desc = null;
                 const sigDescElem = document.getElementById('signature-desc');
-                if (sigDescElem && desc) sigDescElem.textContent = desc;
+                if (sigDescElem) {
+                    if (desc) {
+                        sigDescElem.textContent = desc;
+                    } else if (typeof translations !== 'undefined' && translations[lang] && translations[lang]['sig-desc']) {
+                        sigDescElem.textContent = translations[lang]['sig-desc'];
+                    }
+                }
             };
 
             updateSignatureText();
@@ -67,69 +122,146 @@ async function loadHomepage() {
                 localStorage.setItem('cachedStoryImg', config.storyImg);
                 const storyImgElem = document.getElementById('story-img');
                 if (storyImgElem) storyImgElem.src = config.storyImg;
+            } else {
+                localStorage.removeItem('cachedStoryImg');
             }
+
             if (config.storyLabelVi) localStorage.setItem('cachedStoryLabel_vi', config.storyLabelVi);
+            else localStorage.removeItem('cachedStoryLabel_vi');
             if (config.storyLabelEn) localStorage.setItem('cachedStoryLabel_en', config.storyLabelEn);
+            else localStorage.removeItem('cachedStoryLabel_en');
             if (config.storyLabelFi) localStorage.setItem('cachedStoryLabel_fi', config.storyLabelFi);
+            else localStorage.removeItem('cachedStoryLabel_fi');
+            if (config.storyLabelSv) localStorage.setItem('cachedStoryLabel_sv', config.storyLabelSv);
+            else localStorage.removeItem('cachedStoryLabel_sv');
+
             if (config.storyTitleVi) localStorage.setItem('cachedStoryTitle_vi', config.storyTitleVi);
+            else localStorage.removeItem('cachedStoryTitle_vi');
             if (config.storyTitleEn) localStorage.setItem('cachedStoryTitle_en', config.storyTitleEn);
+            else localStorage.removeItem('cachedStoryTitle_en');
             if (config.storyTitleFi) localStorage.setItem('cachedStoryTitle_fi', config.storyTitleFi);
+            else localStorage.removeItem('cachedStoryTitle_fi');
+            if (config.storyTitleSv) localStorage.setItem('cachedStoryTitle_sv', config.storyTitleSv);
+            else localStorage.removeItem('cachedStoryTitle_sv');
+
             if (config.storyP1Vi) localStorage.setItem('cachedStoryP1_vi', config.storyP1Vi);
+            else localStorage.removeItem('cachedStoryP1_vi');
             if (config.storyP1En) localStorage.setItem('cachedStoryP1_en', config.storyP1En);
+            else localStorage.removeItem('cachedStoryP1_en');
             if (config.storyP1Fi) localStorage.setItem('cachedStoryP1_fi', config.storyP1Fi);
+            else localStorage.removeItem('cachedStoryP1_fi');
+            if (config.storyP1Sv) localStorage.setItem('cachedStoryP1_sv', config.storyP1Sv);
+            else localStorage.removeItem('cachedStoryP1_sv');
+
             if (config.storyP2Vi) localStorage.setItem('cachedStoryP2_vi', config.storyP2Vi);
+            else localStorage.removeItem('cachedStoryP2_vi');
             if (config.storyP2En) localStorage.setItem('cachedStoryP2_en', config.storyP2En);
+            else localStorage.removeItem('cachedStoryP2_en');
             if (config.storyP2Fi) localStorage.setItem('cachedStoryP2_fi', config.storyP2Fi);
+            else localStorage.removeItem('cachedStoryP2_fi');
+            if (config.storyP2Sv) localStorage.setItem('cachedStoryP2_sv', config.storyP2Sv);
+            else localStorage.removeItem('cachedStoryP2_sv');
 
             const updateStoryText = () => {
                 const lang = localStorage.getItem('selectedLanguage') || 'en';
                 const langCap = lang.charAt(0).toUpperCase() + lang.slice(1);
                 
-                const label = config['storyLabel' + langCap] || config.storyLabelVi;
-                const title = config['storyTitle' + langCap] || config.storyTitleVi;
-                const p1 = config['storyP1' + langCap] || config.storyP1Vi;
-                const p2 = config['storyP2' + langCap] || config.storyP2Vi;
-
+                const label = config['storyLabel' + langCap];
                 const storyLabelElem = document.getElementById('story-label');
-                if (storyLabelElem && label) storyLabelElem.textContent = label;
+                if (storyLabelElem) {
+                    if (label) {
+                        storyLabelElem.textContent = label;
+                    } else if (typeof translations !== 'undefined' && translations[lang] && translations[lang]['story-label']) {
+                        storyLabelElem.textContent = translations[lang]['story-label'];
+                    }
+                }
+                
+                const title = config['storyTitle' + langCap];
                 const storyTitleElem = document.getElementById('story-title');
-                if (storyTitleElem && title) storyTitleElem.textContent = title;
+                if (storyTitleElem) {
+                    if (title) {
+                        storyTitleElem.textContent = title;
+                    } else if (typeof translations !== 'undefined' && translations[lang] && translations[lang]['story-title']) {
+                        storyTitleElem.textContent = translations[lang]['story-title'];
+                    }
+                }
+                
+                const p1 = config['storyP1' + langCap];
                 const storyP1Elem = document.getElementById('story-p1');
-                if (storyP1Elem && p1) storyP1Elem.textContent = p1;
+                if (storyP1Elem) {
+                    if (p1) {
+                        storyP1Elem.textContent = p1;
+                    } else if (typeof translations !== 'undefined' && translations[lang] && translations[lang]['story-p1']) {
+                        storyP1Elem.textContent = translations[lang]['story-p1'];
+                    }
+                }
+                
+                const p2 = config['storyP2' + langCap];
                 const storyP2Elem = document.getElementById('story-p2');
-                if (storyP2Elem && p2) storyP2Elem.textContent = p2;
+                if (storyP2Elem) {
+                    if (p2) {
+                        storyP2Elem.textContent = p2;
+                    } else if (typeof translations !== 'undefined' && translations[lang] && translations[lang]['story-p2']) {
+                        storyP2Elem.textContent = translations[lang]['story-p2'];
+                    }
+                }
             };
             updateStoryText();
             window.addEventListener('languageChanged', updateStoryText);
 
             // Apply config to CTA
             if (config.ctaTitleVi) localStorage.setItem('cachedCtaTitle_vi', config.ctaTitleVi);
+            else localStorage.removeItem('cachedCtaTitle_vi');
             if (config.ctaTitleEn) localStorage.setItem('cachedCtaTitle_en', config.ctaTitleEn);
+            else localStorage.removeItem('cachedCtaTitle_en');
             if (config.ctaTitleFi) localStorage.setItem('cachedCtaTitle_fi', config.ctaTitleFi);
+            else localStorage.removeItem('cachedCtaTitle_fi');
+            if (config.ctaTitleSv) localStorage.setItem('cachedCtaTitle_sv', config.ctaTitleSv);
+            else localStorage.removeItem('cachedCtaTitle_sv');
+
             if (config.ctaDescVi) localStorage.setItem('cachedCtaDesc_vi', config.ctaDescVi);
+            else localStorage.removeItem('cachedCtaDesc_vi');
             if (config.ctaDescEn) localStorage.setItem('cachedCtaDesc_en', config.ctaDescEn);
+            else localStorage.removeItem('cachedCtaDesc_en');
             if (config.ctaDescFi) localStorage.setItem('cachedCtaDesc_fi', config.ctaDescFi);
+            else localStorage.removeItem('cachedCtaDesc_fi');
+            if (config.ctaDescSv) localStorage.setItem('cachedCtaDesc_sv', config.ctaDescSv);
+            else localStorage.removeItem('cachedCtaDesc_sv');
 
             const updateCtaText = () => {
                 const lang = localStorage.getItem('selectedLanguage') || 'en';
                 const langCap = lang.charAt(0).toUpperCase() + lang.slice(1);
 
-                const title = config['ctaTitle' + langCap] || config.ctaTitleVi;
-                const desc = config['ctaDesc' + langCap] || config.ctaDescVi;
-
+                const title = config['ctaTitle' + langCap];
                 const ctaTitleElem = document.getElementById('cta-title');
-                if (ctaTitleElem && title) ctaTitleElem.textContent = title;
+                if (ctaTitleElem) {
+                    if (title) {
+                        ctaTitleElem.textContent = title;
+                    } else if (typeof translations !== 'undefined' && translations[lang] && translations[lang]['cta-title']) {
+                        ctaTitleElem.textContent = translations[lang]['cta-title'];
+                    }
+                }
+                
+                const desc = config['ctaDesc' + langCap];
                 const ctaDescElem = document.getElementById('cta-desc');
-                if (ctaDescElem && desc) ctaDescElem.textContent = desc;
+                if (ctaDescElem) {
+                    if (desc) {
+                        ctaDescElem.textContent = desc;
+                    } else if (typeof translations !== 'undefined' && translations[lang] && translations[lang]['cta-desc']) {
+                        ctaDescElem.textContent = translations[lang]['cta-desc'];
+                    }
+                }
             };
             updateCtaText();
             window.addEventListener('languageChanged', updateCtaText);
         }
 
-        // Apply config to Signatures
         const sigContainer = document.getElementById('signature-container');
         if (sigContainer && config && config.signatureDishIds && config.signatureDishIds.length > 0) {
-            sigContainer.innerHTML = '<div class="col-span-full text-center py-10"><span class="material-symbols-outlined animate-spin text-4xl">sync</span></div>';
+            const hasPreRendered = sigContainer.children.length > 0 && !sigContainer.querySelector('.animate-spin') && !sigContainer.innerHTML.includes('<!-- Dynamic signature dishes');
+            if (!hasPreRendered) {
+                sigContainer.innerHTML = '<div class="col-span-full text-center py-10"><span class="material-symbols-outlined animate-spin text-4xl">sync</span></div>';
+            }
             
             // Fetch the specific dishes
             const dishes = [];
@@ -148,8 +280,8 @@ async function loadHomepage() {
                     const langCap = lang.charAt(0).toUpperCase() + lang.slice(1);
                     let html = '';
                     dishes.forEach((dish, index) => {
-                        const name = dish['name' + langCap] || dish.nameVi || dish.name || '';
-                        const desc = dish['description' + langCap] || dish.descriptionVi || dish.descVi || dish.description || '';
+                        const name = dish['name' + langCap] || dish.nameEn || dish.nameVi || dish.name || '';
+                        const desc = dish['description' + langCap] || dish['desc' + langCap] || dish.descriptionEn || dish.descEn || dish.descriptionVi || dish.descVi || dish.description || '';
                         const img = dish.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800';
                         
                         if (index === 0) {
@@ -200,82 +332,6 @@ async function loadHomepage() {
     }
 }
 
-async function loadFeedbackMarquee() {
-    const r1Container = document.getElementById('marquee-row-1');
-    const r2Container = document.getElementById('marquee-row-2');
-    if (!r1Container || !r2Container) return;
-
-    try {
-        const q = query(collection(db, "feedback"), orderBy("createdAt", "desc"), limit(100));
-        const querySnapshot = await getDocs(q);
-        
-        let feedbacks = [];
-        querySnapshot.forEach(docSnap => {
-            const data = docSnap.data();
-            feedbacks.push({
-                name: data.name || "Anonymous",
-                message: data.message || "",
-                loc: /Easton/i.test(data.message) ? "Easton Helsinki" : "Pengerkatu",
-                rating: 5
-            });
-        });
-
-        if (feedbacks.length === 0) {
-            feedbacks = [
-                { name: "Minh Anh", loc: "Pengerkatu", message: "Phở tái lăn ở đây chuẩn vị Hà Nội, nước dùng đậm đà thơm nức mũi tỏi. Ăn một lần là nghiền luôn!", rating: 5 },
-                { name: "Mikko S.", loc: "Easton Helsinki", message: "Helsingin paras pho-keitto! Pengerkadun viihtyisä tunnelma on ihana ja ystävällinen palvelu.", rating: 5 }
-            ];
-        }
-
-        function makeCard(r, idx) {
-            // Use index to ensure a completely unique portrait for each card
-            const gender = (idx % 2 === 0) ? 'men' : 'women';
-            const imgId = (idx % 99) + 1;
-            const avatarUrl = r.avatar || `https://randomuser.me/api/portraits/${gender}/${imgId}.jpg`;
-            const stars = "★".repeat(r.rating) + "☆".repeat(5 - r.rating);
-            return `
-                <div class="w-[350px] shrink-0 bg-surface/40 backdrop-blur-md border border-white/10 p-6 rounded-2xl flex flex-col justify-between shadow-xl transition-all duration-300 hover:border-primary-container/40">
-                    <div>
-                        <div class="flex items-center gap-3 mb-4">
-                            <img src="${avatarUrl}" alt="${r.name}" class="w-10 h-10 rounded-full object-cover border border-white/10" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&h=100&q=80'">
-                            <div>
-                                <h4 class="font-bold text-white text-sm">${r.name}</h4>
-                                <span class="text-xs text-secondary">${r.loc}</span>
-                            </div>
-                        </div>
-                        <div class="text-yellow-400 text-sm mb-3">${stars}</div>
-                        <p class="text-gray-300 text-sm italic leading-relaxed">"${r.message}"</p>
-                    </div>
-                </div>
-            `;
-        }
-
-        let row1HTML = "";
-        let row2HTML = "";
-        
-        const half = Math.ceil(feedbacks.length / 2);
-        const row1Source = feedbacks.slice(0, half);
-        const row2Source = feedbacks.slice(half);
-
-        // Repeat 3 times to make it long enough for seamless infinite scroll
-        for (let i = 0; i < 3; i++) {
-            row1Source.forEach((r, idx) => {
-                row1HTML += makeCard(r, idx + (i * row1Source.length));
-            });
-            row2Source.forEach((r, idx) => {
-                row2HTML += makeCard(r, idx + (i * row2Source.length) + 100);
-            });
-        }
-
-        r1Container.innerHTML = row1HTML;
-        r2Container.innerHTML = row2HTML;
-
-    } catch (e) {
-        console.error("Error loading feedback marquee:", e);
-    }
-}
-
 document.addEventListener('DOMContentLoaded', () => {
     loadHomepage();
-    loadFeedbackMarquee();
 });

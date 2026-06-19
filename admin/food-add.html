@@ -5,7 +5,12 @@
     <link rel="stylesheet" href="../css/client.css">
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Admin Dashboard | Add Food</title>
+    <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
+<link rel="icon" type="image/png" sizes="48x48" href="../images/favicon-48x48.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="../images/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="../images/apple-touch-icon.png">
+<title>Admin Dashboard | Add Food</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
@@ -144,10 +149,12 @@
                                 <input type="text" id="food-category-en" required placeholder="Category (EN)..." class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-3">
                                 <label class="block text-sm font-medium text-secondary mt-2 mb-1">Category (FI)</label>
                                 <input type="text" id="food-category-fi" required placeholder="Kategoria (FI)..." class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-3">
+                                <label class="block text-sm font-medium text-secondary mt-2 mb-1">Category (SV)</label>
+                                <input type="text" id="food-category-sv" required placeholder="Kategori (SV)..." class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-3">
                                 <datalist id="category-datalist">
                                     <!-- Populated dynamically from Firestore -->
                                 </datalist>
-                                <p class="text-xs text-secondary mt-1">Provide category in all 3 languages.</p>
+                                <p class="text-xs text-secondary mt-1">Provide category in all 4 languages.</p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-secondary mb-1">Price (€)</label>
@@ -184,6 +191,16 @@
                                 <label class="block text-sm font-medium text-secondary mb-1">Description (FI)</label>
                                 <textarea id="food-desc-fi" class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-3 h-24"></textarea>
                             </div>
+                        <div class="space-y-4">
+                            <h3 class="font-bold text-gray-300 border-b border-gray-800 pb-2">Swedish Translation</h3>
+                            <div>
+                                <label class="block text-sm font-medium text-secondary mb-1">Name (SV)</label>
+                                <input type="text" id="food-name-sv" required class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-3">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-secondary mb-1">Description (SV)</label>
+                                <textarea id="food-desc-sv" class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-3 h-24"></textarea>
+                            </div>
                         </div>
                     </div>
 
@@ -214,6 +231,10 @@
                                         <label class="block text-xs text-secondary mb-1">Option Group Name (FI)</label>
                                         <input type="text" id="new-opt-name-fi" placeholder="e.g. Tulisuusaste" class="w-full bg-[#121824] border border-gray-600 rounded-lg text-white p-2 text-sm">
                                     </div>
+                                    <div>
+                                        <label class="block text-xs text-secondary mb-1">Option Group Name (SV)</label>
+                                        <input type="text" id="new-opt-name-sv" placeholder="e.g. Krydningsgrad" class="w-full bg-[#121824] border border-gray-600 rounded-lg text-white p-2 text-sm">
+                                    </div>
                                 </div>
                                 <div>
                                     <label class="block text-xs text-secondary mb-1">Type</label>
@@ -228,10 +249,11 @@
                             <div id="new-opt-choices-area" class="space-y-2">
                                 <label class="block text-xs text-secondary">Choices</label>
                                 <div id="new-opt-choices" class="space-y-2 mb-2"></div>
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                                <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
                                     <input type="text" id="new-choice-label-vi" placeholder="Label (VI)..." class="bg-[#121824] border border-gray-600 rounded-lg text-white p-2 text-sm">
                                     <input type="text" id="new-choice-label-en" placeholder="Label (EN)..." class="bg-[#121824] border border-gray-600 rounded-lg text-white p-2 text-sm">
                                     <input type="text" id="new-choice-label-fi" placeholder="Label (FI)..." class="bg-[#121824] border border-gray-600 rounded-lg text-white p-2 text-sm">
+                                    <input type="text" id="new-choice-label-sv" placeholder="Label (SV)..." class="bg-[#121824] border border-gray-600 rounded-lg text-white p-2 text-sm">
                                 </div>
                                 <div class="flex gap-2">
                                     <input type="number" step="0.01" id="new-choice-price" placeholder="Price (0=free)" class="flex-1 bg-[#121824] border border-gray-600 rounded-lg text-white p-2 text-sm">

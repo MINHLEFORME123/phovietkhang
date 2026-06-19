@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /host/
+Disallow: /kitchen/
+Disallow: /scratch/
+Disallow: /functions/
+Disallow: /cloudflare-worker/
+Disallow: /index_test.html
+Disallow: /*.py$
+
+Sitemap: https://phovietkhang.com/sitemap.xml
