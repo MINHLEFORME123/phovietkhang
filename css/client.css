@@ -34,7 +34,7 @@
    ═══════════════════════════════════════════════════════════════════ */
 
 /* Kill Tailwind space-x-8 (adds margin between children – must reset) */
-nav .hidden.md\:flex.items-center.space-x-8 {
+nav .hidden.lg\:flex.items-center.space-x-8 {
     display: flex !important;
     gap: 2.25rem !important;          /* 36px – generous spread */
     flex-shrink: 0 !important;        /* Do NOT shrink – force spacing */
@@ -42,7 +42,7 @@ nav .hidden.md\:flex.items-center.space-x-8 {
     align-items: center;
 }
 /* Override Tailwind space-x-8 margins on direct children */
-nav .hidden.md\:flex.items-center.space-x-8 > a {
+nav .hidden.lg\:flex.items-center.space-x-8 > a {
     margin-left: 0 !important;
     margin-right: 0 !important;
     white-space: nowrap !important;
@@ -79,19 +79,6 @@ nav a#nav-inbox-link {
     font-size: 0.875rem !important;
     padding: 0.4rem 1rem !important;
 }
-/* Inbox link text color on white navbar */
-nav.fixed a#nav-inbox-link,
-nav.fixed a#nav-inbox-link span[data-i18n] {
-    color: #5f5e5e !important;
-}
-nav.fixed a#nav-inbox-link:hover,
-nav.fixed a#nav-inbox-link:hover span[data-i18n] {
-    color: #001736 !important;
-}
-/* Unread badge */
-nav.fixed #inbox-badge-nav {
-    background-color: #ef4444 !important;
-}
 
 /* Language flags */
 nav img[style*="border-radius"] {
@@ -101,13 +88,13 @@ nav img[style*="border-radius"] {
 }
 
 /* Hamburger button */
-nav button.md\:hidden {
+nav button.lg\:hidden {
     padding: 0.375rem !important;
 }
 
 /* User icon */
-nav a[href="login.html"] .material-symbols-outlined,
-nav a[href="profile.html"] .material-symbols-outlined {
+nav a[href="/login"] .material-symbols-outlined,
+nav a[href="/profile"] .material-symbols-outlined {
     font-size: 24px !important;
 }
 
@@ -139,7 +126,7 @@ nav.fixed #inbox-badge-nav { background-color: #ef4444 !important; }
 .nav-cart-btn,
 a.nav-cart-btn,
 a.nav-cart-btn.text-white,
-a[href="cart.html"].nav-cart-btn {
+a[href="/cart"].nav-cart-btn {
     display: inline-flex !important;
     align-items: center;
     justify-content: center;
@@ -166,7 +153,7 @@ a[href="cart.html"].nav-cart-btn {
 .nav-cart-btn:hover,
 a.nav-cart-btn:hover,
 a.nav-cart-btn.text-white:hover,
-a[href="cart.html"].nav-cart-btn:hover {
+a[href="/cart"].nav-cart-btn:hover {
     background: linear-gradient(145deg, #2a2a4e 0%, #15152a 50%, #2a2a4e 100%) !important;
     border-color: rgba(255, 255, 255, 0.35) !important;
     color: #ffffff !important;
