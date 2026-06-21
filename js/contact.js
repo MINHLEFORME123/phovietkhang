@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     createdAt: new Date()
                 });
                 
-                document.getElementById('form-success').classList.remove('hidden');
+                document.getElementById('form-success')?.classList.remove('hidden');
                 contactForm.reset();
             } catch (err) {
                 console.error("Error sending message: ", err);

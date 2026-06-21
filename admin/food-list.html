@@ -20,6 +20,10 @@
       theme: { extend: { colors: { surface: "#121824", "surface-highlight": "#1e293b", primary: "#3b82f6", secondary: "#9ca3af", "on-surface": "#f3f4f6" } } }
     }
     </script>
+
+    <!-- Fallback Security Headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: https: blob:; font-src 'self' https: data:; connect-src 'self' https:;">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
 </head>
 <body class="bg-[#0b0f19] text-on-surface font-['Inter'] flex h-screen overflow-hidden">
     <button id="sidebar-toggle" class="md:hidden fixed top-4 left-4 z-50 bg-surface-highlight border border-gray-700 text-white p-2 rounded-lg shadow">
@@ -131,7 +135,7 @@
                     <span class="material-symbols-outlined">close</span>
                 </button>
             </div>
-            <form id="edit-food-form" class="p-5 space-y-4">
+            <form onsubmit="return false;" method="POST" id="edit-food-form" class="p-5 space-y-4">
                 <input type="hidden" id="edit-food-id">
                 <div class="grid grid-cols-4 gap-3">
                     <div>

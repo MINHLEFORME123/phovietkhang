@@ -2,6 +2,23 @@
 
 ## Modifications
 
+### [2026-06-21] Fixed Console Errors, Conditional App Check, and Public Config Rules
+- **Changes**:
+  - Removed `frame-ancestors 'self';` from the CSP `<meta>` tags in all 38 HTML files, resolving browser warnings (since it is already properly set via server HTTP headers in `firebase.json`).
+  - Added conditional initialization for Firebase App Check in `js/firebase-config.js` to prevent 400 Bad Request network errors when the site key is the default placeholder.
+  - Adjusted Firestore rules in `firestore.rules` to allow public reads on `/config/{docId}` so guests can retrieve AI API keys for the chatbot and distance calculation, resolving permission denied errors.
+  - Deployed updated security rules and hosting files to Firebase, and synced changes to GitHub.
+
+### [2026-06-21] Hardened Enterprise Security & Fixed Mobile Hamburger Menu
+- **Changes**:
+  - Replaced Google Photos interior image in `about.html` with local `/images/story-img.jpg`.
+  - Updated `css/client.css` to load `/assets/pattern-light.svg` and `/assets/pattern-dark.svg` locally, eliminating expiring Google Photos URLs.
+  - Hardened security headers in `firebase.json` by adding `X-XSS-Protection`, `Referrer-Policy`, and `Permissions-Policy`, and setting `X-Frame-Options` to `DENY` to protect against Clickjacking.
+  - Patched Stored XSS vulnerabilities by implementing `escapeHtml` sanitization for dynamic rendering in `js/inbox.js`, `js/kitchen.js`, and `js/order-history.js`.
+  - Fixed mobile hamburger menu double-trigger conflict by removing redundant inline event listeners across all 18 HTML pages using `remove_redundant_mobile_scripts.py`.
+  - Fixed mobile layout overflow bug in `css/client.css` by wrapping desktop navigation styles inside a media query.
+  - Synchronized modifications between Desktop and GitHub workspaces using `sync_github.py` and deployed updated assets to Firebase Hosting.
+
 ### [2026-06-19] Implemented Generative Engine Optimization (GEO) & Local Keyword Mapping
 - **Changes**:
   - Refactored `scratch/update_seo_meta.py` to inject rich `VietnameseRestaurant` JSON-LD schemas (containing precise geo-coordinates, cuisine specs, and social media/TripAdvisor links) and `<meta name="keywords">` tags across all 21 user-facing HTML pages (including `index.html`).

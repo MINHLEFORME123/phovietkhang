@@ -4,6 +4,17 @@ import { collection, onSnapshot, doc, getDoc } from "https://www.gstatic.com/fir
 
 const container = document.getElementById('orders-tracking-container');
 
+// HTML Escaping Utility
+function escapeHtml(value) {
+    if (value === null || value === undefined) return '';
+    return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+}
+
 function formatTime(dateObj) {
     if (!dateObj) return 'N/A';
     const d = new Date(dateObj);
@@ -127,7 +138,7 @@ function renderTrackingCards(orders) {
         // Items summary list
         const itemsHtml = (order.items || []).map(i => `
             <div class="flex justify-between items-center text-sm py-1">
-                <span class="text-white/80"><span class="font-semibold text-primary mr-1">${i.qty}x</span> ${i.name}</span>
+                <span class="text-white/80"><span class="font-semibold text-primary mr-1">${escapeHtml(i.qty)}x</span> ${escapeHtml(i.name)}</span>
                 <span class="text-secondary font-medium">€${(i.price * i.qty).toFixed(2)}</span>
             </div>
         `).join('');
@@ -197,13 +208,13 @@ function renderTrackingCards(orders) {
                 <div>
                     <h3 class="text-lg font-bold text-white flex items-center gap-2">
                         <span class="material-symbols-outlined text-primary">receipt_long</span>
-                        <span>Mã đơn: #${order.id.substring(0, 8).toUpperCase()}</span>
+                        <span>Mã đơn: #${escapeHtml(order.id.substring(0, 8).toUpperCase())}</span>
                     </h3>
                     <p class="text-xs text-secondary mt-1">${dateStr}</p>
                 </div>
                 <div class="flex items-center gap-3">
                     <span class="capitalize text-xs px-3 py-1 rounded-full bg-white/5 border border-white/10 font-semibold text-white/90">
-                        ${order.orderType === 'dine-in' ? `Ăn tại bàn (Bàn ${order.tableNumber})` : order.orderType === 'delivery' ? 'Giao hàng' : 'Mang về'}
+                        ${order.orderType === 'dine-in' ? `Ăn tại bàn (Bàn ${escapeHtml(order.tableNumber)})` : order.orderType === 'delivery' ? 'Giao hàng' : 'Mang về'}
                     </span>
                     <span class="text-xl font-bold text-primary">€${order.totalPrice.toFixed(2)}</span>
                 </div>
@@ -220,7 +231,7 @@ function renderTrackingCards(orders) {
             <!-- Notes -->
             ${order.notes ? `
                 <div class="bg-yellow-500/5 border border-yellow-500/20 text-yellow-200/90 text-xs rounded-xl p-4 italic">
-                    <strong>Ghi chú:</strong> ${order.notes}
+                    <strong>Ghi chú:</strong> ${escapeHtml(order.notes)}
                 </div>
             ` : ''}
         `;

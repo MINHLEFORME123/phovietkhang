@@ -93,7 +93,7 @@ const translations = {
     "dessert3-title": "Coconut Ice Cream", "dessert3-desc": "Coconut ice cream served in a young coconut shell.",
     "seo-title": "Phở Việt Khang | Best Pho in Sörnäinen & Helsinki - Authentic Vietnamese",
     "seo-desc": "Looking for the best pho in Sörnäinen (Sornainen) or Helsinki? Visit Phở Việt Khang at Pengerkatu 29 (Sörnäinen) or Easton for authentic 24h slow-simmered bone broth pho and street food!",
-    "hero-title": "Phở Việt Khang | Best Pho in Sörnäinen & Helsinki",
+    "hero-title": "Phở Việt Khang | Authentic Beef Noodles & Vermicelli in Helsinki",
     "hero-desc": "More than just pho, Phở Việt Khang brings the full flavor of Vietnam to Helsinki: Hue beef vermicelli, Hanoi grilled pork noodles, crispy banh xeo, fresh goi cuon spring rolls, wonton soup, salted coffee, and authentic Vietnamese street food. Visit us at Sörnäinen (Pengerkatu 29) or Easton Helsinki today!",
     "hero-reserve": "Reserve Now",
     "story-label": "Our Heritage",
@@ -1478,3 +1478,46 @@ Rules:
         if (e.key === 'Enter') sendMessage();
     });
 })();
+
+// Intersection Observer for scroll animations
+document.addEventListener('DOMContentLoaded', () => {
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.15
+    };
+
+    const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target); // Only animate once
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.animate-on-scroll').forEach(el => {
+        observer.observe(el);
+    });
+});
+
+
+// --- GDPR Cookie Consent Banner ---
+document.addEventListener('DOMContentLoaded', () => {
+    if (!localStorage.getItem('cookie_consent_accepted')) {
+        const banner = document.createElement('div');
+        banner.id = 'gdpr-cookie-banner';
+        banner.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:rgba(20,20,20,0.95);color:#fff;padding:15px;text-align:center;z-index:99999;font-family:sans-serif;display:flex;justify-content:center;align-items:center;gap:20px;flex-wrap:wrap;border-top:1px solid #333;backdrop-filter:blur(10px);';
+        banner.innerHTML = `
+            <p style="margin:0;font-size:14px;color:#ddd;max-width:800px;">We use cookies to ensure you get the best experience on our website, personalize content, and analyze our traffic. By clicking "Accept All", you consent to our use of cookies.</p>
+            <button id="accept-cookies-btn" style="background:#fff;color:#1a1a1a;border:none;padding:8px 24px;border-radius:20px;cursor:pointer;font-weight:bold;font-size:14px;transition:background 0.3s;">Accept All</button>
+        `;
+        document.body.appendChild(banner);
+        
+        document.getElementById('accept-cookies-btn').addEventListener('click', () => {
+            localStorage.setItem('cookie_consent_accepted', 'true');
+            banner.style.opacity = '0';
+            setTimeout(() => banner.remove(), 300);
+        });
+    }
+});

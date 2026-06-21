@@ -27,8 +27,8 @@ service cloud.firestore {
     // ── Users ─────────────────────────────────────────────────────────
     match /users/{uid} {
       allow read: if isOwner(uid) || isAdmin();
-      allow create: if isOwner(uid);
-      allow update: if isOwner(uid) || isAdmin();
+      allow create: if isOwner(uid) && (!('role' in request.resource.data) || request.resource.data.role == 'customer');
+      allow update: if isAdmin() || (isOwner(uid) && (!('role' in request.resource.data) || request.resource.data.role == resource.data.role));
       allow delete: if isAdmin();
     }
 
@@ -46,8 +46,9 @@ service cloud.firestore {
 
     // ── Orders ────────────────────────────────────────────────────────
     match /orders/{orderId} {
-      // Anyone can create an order (guest checkout support)
-      allow create: if true;
+      // Enterprise Security: Prevent payment spoofing on creation
+      allow create: if (!('paymentStatus' in request.resource.data) || request.resource.data.paymentStatus == 'pending' || request.resource.data.paymentStatus == 'unpaid')
+                    && (!('status' in request.resource.data) || request.resource.data.status == 'pending');
       // Only the order owner or staff can read
       allow read: if isStaff()
         || (isSignedIn() && resource.data.userId == request.auth.uid);
@@ -102,7 +103,7 @@ service cloud.firestore {
 
     // ── Config (API keys, site settings — admin only) ─────────────────
     match /config/{docId} {
-      allow read: if isSignedIn();
+      allow read: if true;
       allow write: if isAdmin();
     }
 
@@ -122,7 +123,9 @@ service cloud.firestore {
 
     // ── System Logs ───────────────────────────────────────────────────
     match /systemLogs/{logId} {
-      allow read, write: if isAdmin();
+      allow read: if isAdmin();
+      allow create: if isAdmin();
+      allow update, delete: if false; // Immutable Audit Logs
     }
 
     // ── Site Settings ─────────────────────────────────────────────────

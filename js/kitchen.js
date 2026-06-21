@@ -5,6 +5,17 @@ const apiKeys = await getApiKeys();
 const CLOUDFLARE_WORKER_URL = 'https://pvk-admin.minhbeo993.workers.dev';
 const WORKER_SECRET = apiKeys.workerSecret;
 
+// HTML Escaping Utility
+function escapeHtml(value) {
+    if (value === null || value === undefined) return '';
+    return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+}
+
 async function sendOrderReadyEmail(orderId, order) {
     if (!order.customerEmail) return;
     const orderLang = order.language || 'en';
@@ -140,8 +151,8 @@ if (orderBoard) {
             
             let itemsHtml = order.items.map(i => `
                 <div class="flex justify-between border-b border-gray-700 py-2">
-                    <span class="font-bold">${i.qty}x</span> 
-                    <span>${i.name}</span>
+                    <span class="font-bold">${escapeHtml(i.qty)}x</span> 
+                    <span>${escapeHtml(i.name)}</span>
                 </div>
             `).join('');
 
@@ -163,11 +174,11 @@ if (orderBoard) {
 
             card.innerHTML = `
                 <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-2">
-                    <span class="text-xl font-bold">Order #${order.id.substring(0,5).toUpperCase()}</span>
-                    <span class="text-sm bg-gray-800 px-2 py-1 rounded text-${statusColor}-400 uppercase font-bold">${order.status}</span>
+                    <span class="text-xl font-bold">Order #${escapeHtml(order.id.substring(0,5).toUpperCase())}</span>
+                    <span class="text-sm bg-gray-800 px-2 py-1 rounded text-${statusColor}-400 uppercase font-bold">${escapeHtml(order.status)}</span>
                 </div>
                 <div class="mb-4 text-lg">${itemsHtml}</div>
-                ${order.notes ? `<div class="mb-4 text-sm text-gray-400 italic">Notes: ${order.notes}</div>` : ''}
+                ${order.notes ? `<div class="mb-4 text-sm text-gray-400 italic">Notes: ${escapeHtml(order.notes)}</div>` : ''}
                 <div class="flex gap-2">
                     ${buttonsHtml}
                 </div>

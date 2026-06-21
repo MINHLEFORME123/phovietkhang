@@ -22,17 +22,8 @@
       fbq('init', 'FACEBOOK_PIXEL_ID_PLACEHOLDER');
       fbq('track', 'PageView');
     </script>
-    <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=FACEBOOK_PIXEL_ID_PLACEHOLDER&ev=PageView&noscript=1" alt="Facebook Pixel" /></noscript>
+    <noscript><img loading="lazy" decoding="async" height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=FACEBOOK_PIXEL_ID_PLACEHOLDER&ev=PageView&noscript=1" alt="Facebook Pixel" /></noscript>
     <!-- End Facebook Pixel Code -->
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     
     
@@ -51,311 +42,110 @@
   }
 </script>
 
-            <meta charset="utf-8"/>
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/client.css">
+    <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-            <link rel="stylesheet" href="/css/global.css">
-    <link rel="stylesheet" href="/css/client.css">
-    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico">
-    <link rel="icon" type="image/png" sizes="48x48" href="/images/favicon-48x48.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
-    <title>Order History | Phở Việt Khang - Track Your Vietnamese Food Orders</title>
-<!-- Google Fonts -->
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<!-- Material Symbols -->
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<!-- Tailwind CSS -->
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<!-- Tailwind Config -->
-<script id="tailwind-config">
-        tailwind.config = {
-          darkMode: "class",
-          theme: {
-            extend: {
-              "colors": {
-                      "inverse-primary": "#a9c7ff",
-                      "surface-dim": "#d8dadc",
-                      "outline-variant": "#c4c6d0",
-                      "on-surface": "#191c1e",
-                      "outline": "#747780",
-                      "secondary-fixed-dim": "#c8c6c5",
-                      "on-error-container": "#93000a",
-                      "surface-container-highest": "#e0e3e5",
-                      "tertiary-fixed-dim": "#b7c8e1",
-                      "background": "#f7f9fb",
-                      "surface-tint": "#405f91",
-                      "on-secondary-fixed": "#1c1b1b",
-                      "on-primary-fixed": "#001b3d",
-                      "on-tertiary-fixed": "#0b1c30",
-                      "secondary-container": "#e2dfde",
-                      "on-secondary-container": "#636262",
-                      "surface-bright": "#f7f9fb",
-                      "on-primary-fixed-variant": "#264778",
-                      "error-container": "#ffdad6",
-                      "primary-container": "#002b5b",
-                      "on-secondary-fixed-variant": "#474746",
-                      "surface": "#f7f9fb",
-                      "on-error": "#ffffff",
-                      "tertiary-container": "#1d2d41",
-                      "inverse-on-surface": "#eff1f3",
-                      "secondary": "#5f5e5e",
-                      "tertiary-fixed": "#d3e4fe",
-                      "on-tertiary-container": "#8495ad",
-                      "primary-fixed-dim": "#a9c7ff",
-                      "surface-variant": "#e0e3e5",
-                      "on-primary-container": "#7594ca",
-                      "on-primary": "#ffffff",
-                      "surface-container-high": "#e6e8ea",
-                      "surface-container-low": "#f2f4f6",
-                      "on-surface-variant": "#43474f",
-                      "error": "#ba1a1a",
-                      "primary": "#001736",
-                      "on-tertiary-fixed-variant": "#38485d",
-                      "primary-fixed": "#d6e3ff",
-                      "on-tertiary": "#ffffff",
-                      "inverse-surface": "#2d3133",
-                      "surface-container": "#eceef0",
-                      "secondary-fixed": "#e5e2e1",
-                      "surface-container-lowest": "#ffffff",
-                      "tertiary": "#07182b",
-                      "on-background": "#191c1e",
-                      "on-secondary": "#ffffff"
-              },
-              "borderRadius": {
-                      "DEFAULT": "0.125rem",
-                      "lg": "0.25rem",
-                      "xl": "0.5rem",
-                      "full": "0.75rem"
-              },
-              "spacing": {
-                      "gutter": "28px",
-                      "max-width": "1284px",
-                      "margin-mobile": "20px",
-                      "margin-desktop": "68px",
-                      "unit": "12px"
-              },
-              "fontFamily": {
-                      "body-sm": ["Inter"],
-                       "display-lg-mobile": ["EB Garamond"],
-                       "title-lg": ["Inter"],
-                       "label-caps": ["Inter"],
-                       "display-lg": ["EB Garamond"],
-                       "headline-sm": ["EB Garamond"],
-                       "body-lg": ["Inter"],
-                       "headline-md": ["EB Garamond"],
-                       "body-md": ["Inter"]
-               },
-               "fontSize": {
-                       "body-sm": ["18px", {"lineHeight": "24px", "fontWeight": "400"}],
-                       "display-lg-mobile": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
-                       "title-lg": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
-                       "label-caps": ["16px", {"lineHeight": "20px", "letterSpacing": "0.08em", "fontWeight": "700"}],
-                       "display-lg": ["52px", {"lineHeight": "60px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
-                       "headline-sm": ["28px", {"lineHeight": "36px", "fontWeight": "500"}],
-                       "body-lg": ["22px", {"lineHeight": "32px", "fontWeight": "400"}],
-                       "headline-md": ["36px", {"lineHeight": "44px", "fontWeight": "500"}],
-                       "body-md": ["20px", {"lineHeight": "28px", "fontWeight": "400"}]
-               }
-       },
-           },
-         }
-     </script>
-<style>
-        body {
-            font-family: 'Inter', sans-serif;
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+<link rel="icon" type="image/png" sizes="48x48" href="images/favicon-48x48.png">
+<link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+<title>PHO VIET KHANG | Order History</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "primary-container": "#3b82f6",
+            "on-surface": "#f3f4f6",
+            "secondary": "#9ca3af",
+            "surface": "#121824",
+            "outline-variant": "rgba(255, 255, 255, 0.1)",
+          },
+          "fontFamily": {
+            "body-sm": ["Inter"], "display-lg-mobile": ["EB Garamond"], "title-lg": ["Inter"],
+            "label-caps": ["Inter"], "display-lg": ["EB Garamond"], "headline-sm": ["EB Garamond"],
+            "body-lg": ["Inter"], "headline-md": ["EB Garamond"], "body-md": ["Inter"]
+          }
         }
-        h1, h2, h3, h4, h5, h6 { font-family: 'EB Garamond', serif; }
-        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-    </style>
-
-<meta name="description" content="View your Phở Việt Khang order history and track active orders. Authentic Vietnamese pho, bun bo Hue, banh xeo, grilled pork noodles and spring rolls in Helsinki.">
+      }
+    }
+    </script>
 
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-    <meta name="keywords" content="phở ngon helsinki, phở ngon sornainen, best pho helsinki, best pho sornainen, phở việt khang sörnäinen, phở sornainen, phở helsinki, vietnamese restaurant helsinki, sörnäinen pho, sornainen pho, paras pho helsinki, paras pho sörnäinen, Kallio pho, Kallio, Easton pho, Itäkeskus pho" />
+<meta name="description" content="Experience authentic Vietnamese cuisine at Phở Việt Khang in Helsinki. Delicious pho, fresh spring rolls, and traditional dishes. Book your table now!" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://phovietkhang.com/order-history">
-    <meta property="og:title" content="Order History | Phở Việt Khang - Track Your Vietnamese Food Orders">
-    <meta property="og:description" content="View your Phở Việt Khang order history and track active orders. Authentic Vietnamese pho, bun bo Hue, banh xeo, grilled pork noodles and spring rolls in Helsinki.">
-    <meta property="og:image" content="https://phovietkhang.com/images/logo.png">
+    <meta property="og:url" content="https://phovietkhang.com/order-history.html">
+    <meta property="og:title" content="PHO VIET KHANG | Order History">
+    <meta property="og:description" content="Experience authentic Vietnamese cuisine at Phở Việt Khang in Helsinki. Delicious pho, fresh spring rolls, and traditional dishes. Book your table now!">
+    <meta property="og:image" content="https://phovietkhang.com/images/logo.webp">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="https://phovietkhang.com/order-history">
-    <meta name="twitter:title" content="Order History | Phở Việt Khang - Track Your Vietnamese Food Orders">
-    <meta name="twitter:description" content="View your Phở Việt Khang order history and track active orders. Authentic Vietnamese pho, bun bo Hue, banh xeo, grilled pork noodles and spring rolls in Helsinki.">
-    <meta name="twitter:image" content="https://phovietkhang.com/images/logo.png">
+    <meta name="twitter:url" content="https://phovietkhang.com/order-history.html">
+    <meta name="twitter:title" content="PHO VIET KHANG | Order History">
+    <meta name="twitter:description" content="Experience authentic Vietnamese cuisine at Phở Việt Khang in Helsinki. Delicious pho, fresh spring rolls, and traditional dishes. Book your table now!">
+    <meta name="twitter:image" content="https://phovietkhang.com/images/logo.webp">
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <link rel="canonical" href="https://phovietkhang.com/order-history.html" />
+    <link rel="alternate" hreflang="vi" href="https://phovietkhang.com/order-history.html?lang=vi" />
+    <link rel="alternate" hreflang="en" href="https://phovietkhang.com/order-history.html?lang=en" />
+    <link rel="alternate" hreflang="fi" href="https://phovietkhang.com/order-history.html?lang=fi" />
+    <link rel="alternate" hreflang="sv" href="https://phovietkhang.com/order-history.html?lang=sv" />
+    <link rel="alternate" hreflang="x-default" href="https://phovietkhang.com/order-history.html" />
 
-<script type="application/ld+json">
-[
-  {
-    "@context": "https://schema.org",
-    "@type": "VietnameseRestaurant",
-    "name": "Phở Việt Khang - Sörnäinen (Pengerkatu)",
-    "alternateName": [
-      "Pho Viet Khang Sornainen",
-      "Pho Viet Khang Sörnäinen",
-      "Pho Viet Khang Kallio",
-      "Phở ngon Sörnäinen",
-      "Phở ngon Sornainen",
-      "Phở ngon Helsinki",
-      "Paras Pho Helsinki",
-      "Paras Pho Sörnäinen"
-    ],
-    "image": "https://phovietkhang.com/images/hero-bg.jpg",
-    "telephone": "+358 44 978 9995",
-    "url": "https://phovietkhang.com/",
-    "menu": "https://phovietkhang.com/menu",
-    "priceRange": "$$",
-    "servesCuisine": ["Vietnamese", "Pho", "Noodle Soup"],
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": "Pengerkatu 29",
-      "addressLocality": "Helsinki",
-      "addressRegion": "Sörnäinen / Kallio",
-      "postalCode": "00500",
-      "addressCountry": "FI"
-    },
-    "geo": {
-      "@type": "GeoCoordinates",
-      "latitude": 60.1872,
-      "longitude": 24.9602
-    },
-    "openingHoursSpecification": {
-      "@type": "OpeningHoursSpecification",
-      "dayOfWeek": ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-      "opens": "11:00",
-      "closes": "20:30"
-    },
-    "sameAs": [
-      "https://www.facebook.com/phovietkhang",
-      "https://www.instagram.com/phovietkhang",
-      "https://www.tripadvisor.com"
-    ]
-  },
-  {
-    "@context": "https://schema.org",
-    "@type": "VietnameseRestaurant",
-    "name": "Phở Việt Khang - Easton Helsinki",
-    "alternateName": [
-      "Pho Viet Khang Easton",
-      "Pho Viet Khang Itäkeskus",
-      "Phở ngon Itäkeskus",
-      "Phở ngon Helsinki",
-      "Paras Pho Itäkeskus"
-    ],
-    "image": "https://phovietkhang.com/images/hero-bg.jpg",
-    "telephone": "+358 44 978 9995",
-    "url": "https://phovietkhang.com/locations",
-    "menu": "https://phovietkhang.com/menu",
-    "priceRange": "$$",
-    "servesCuisine": ["Vietnamese", "Pho", "Noodle Soup"],
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": "Kauppakartanonkatu 3",
-      "addressLocality": "Helsinki",
-      "addressRegion": "Itäkeskus / Easton",
-      "postalCode": "00930",
-      "addressCountry": "FI"
-    },
-    "geo": {
-      "@type": "GeoCoordinates",
-      "latitude": 60.2098,
-      "longitude": 25.0855
-    },
-    "openingHoursSpecification": {
-      "@type": "OpeningHoursSpecification",
-      "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-      "opens": "11:00",
-      "closes": "21:00"
-    },
-    "sameAs": [
-      "https://www.facebook.com/phovietkhang",
-      "https://www.instagram.com/phovietkhang",
-      "https://www.tripadvisor.com"
-    ]
-  }
-]
-</script>
-    <link rel="canonical" href="https://phovietkhang.com/order-history" />
-    <link rel="alternate" hreflang="vi" href="https://phovietkhang.com/order-history?lang=vi" />
-    <link rel="alternate" hreflang="en" href="https://phovietkhang.com/order-history?lang=en" />
-    <link rel="alternate" hreflang="fi" href="https://phovietkhang.com/order-history?lang=fi" />
-    <link rel="alternate" hreflang="sv" href="https://phovietkhang.com/order-history?lang=sv" />
-    <link rel="alternate" hreflang="x-default" href="https://phovietkhang.com/order-history" />
+    <!-- Fallback Security Headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: https: blob:; font-src 'self' https: data:; connect-src 'self' https:;">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
 </head>
 <body class="text-on-surface antialiased flex flex-col min-h-screen bg-pattern-dark">
     <!-- TopNavBar Component -->
     <nav aria-label="Main Navigation" class="fixed top-0 w-full z-50 bg-[#0a1019]/95 backdrop-blur-md border-b border-white/5">
         <div class="flex justify-between items-center max-w-7xl mx-auto px-4 md:px-16 h-20">
-            <a class="flex items-center gap-2.5 shrink-0" href="/">
-                <img src="/images/logo.png" alt="Phở Việt Khang Logo" class="w-10 h-10 object-contain rounded-full bg-white">
+            <a class="flex items-center gap-2.5 shrink-0" href="index.html">
+                <img loading="lazy" decoding="async" src="images/logo.webp" alt="Ph? Vi?t Khang Logo" class="w-10 h-10 object-contain rounded-full bg-white">
                 <span class="text-white font-bold text-xl tracking-wide" style="font-family:'EB Garamond',serif;">PHỞ VIỆT KHANG</span>
             </a>
             <div class="hidden lg:flex items-center space-x-8 font-medium text-[15px] tracking-wide">
-                <a class="text-gray-400 hover:text-white transition-colors duration-200" href="/" data-i18n="nav-home">Home</a>
-                <a class="text-gray-400 hover:text-white transition-colors duration-200" href="/menu" data-i18n="nav-menu">Menu</a>
-                <a class="text-gray-400 hover:text-white transition-colors duration-200" href="/locations" data-i18n="nav-locations">Locations</a>
-                <a class="text-gray-400 hover:text-white transition-colors duration-200" href="/contact" data-i18n="nav-contact">Contact</a>
-                <a class="text-gray-400 hover:text-white transition-colors duration-200 relative flex items-center gap-1.5" href="/inbox" id="nav-inbox-link">
+                <a class="text-gray-400 hover:text-white transition-colors duration-200" href="index.html" data-i18n="nav-home">Home</a>
+                <a class="text-gray-400 hover:text-white transition-colors duration-200" href="menu.html" data-i18n="nav-menu">Menu</a>
+                <a class="text-gray-400 hover:text-white transition-colors duration-200" href="locations.html" data-i18n="nav-locations">Locations</a>
+                <a class="text-gray-400 hover:text-white transition-colors duration-200" href="contact.html" data-i18n="nav-contact">Contact</a>
+                <a class="text-gray-400 hover:text-white transition-colors duration-200 relative flex items-center gap-1.5" href="inbox.html" id="nav-inbox-link">
                     <span data-i18n="nav-inbox">Inbox</span>
                     <span id="inbox-badge-nav" class="hidden w-2 h-2 bg-red-500 rounded-full animate-ping"></span>
                 </a>
@@ -363,25 +153,25 @@
             <div class="flex items-center gap-3">
                 <div class="hidden lg:flex items-center gap-1.5">
                     <button class="w-8 h-8 flex items-center justify-center rounded-full overflow-hidden hover:opacity-80 transition-all duration-200 ring-2 ring-transparent hover:ring-white/30" aria-label="Tiếng Việt" onclick="changeLanguage('vi')">
-                        <img id="lang-vi" src="https://hatscripts.github.io/circle-flags/flags/vn.svg" alt="VN" class="w-full h-full object-cover">
+                        <img loading="lazy" decoding="async" id="lang-vi" src="https://hatscripts.github.io/circle-flags/flags/vn.svg" alt="VN" class="w-full h-full object-cover">
                     </button>
                     <button class="w-8 h-8 flex items-center justify-center rounded-full overflow-hidden hover:opacity-80 transition-all duration-200 ring-2 ring-transparent hover:ring-white/30" aria-label="English" onclick="changeLanguage('en')">
-                        <img id="lang-en" src="https://hatscripts.github.io/circle-flags/flags/gb.svg" alt="UK" class="w-full h-full object-cover">
+                        <img loading="lazy" decoding="async" id="lang-en" src="https://hatscripts.github.io/circle-flags/flags/gb.svg" alt="UK" class="w-full h-full object-cover">
                     </button>
                     <button class="w-8 h-8 flex items-center justify-center rounded-full overflow-hidden hover:opacity-80 transition-all duration-200 ring-2 ring-transparent hover:ring-white/30" aria-label="Suomi" onclick="changeLanguage('fi')">
-                        <img id="lang-fi" src="https://hatscripts.github.io/circle-flags/flags/fi.svg" alt="FI" class="w-full h-full object-cover">
+                        <img loading="lazy" decoding="async" id="lang-fi" src="https://hatscripts.github.io/circle-flags/flags/fi.svg" alt="FI" class="w-full h-full object-cover">
                     </button>
                     <button class="w-8 h-8 flex items-center justify-center rounded-full overflow-hidden hover:opacity-80 transition-all duration-200 ring-2 ring-transparent hover:ring-white/30" aria-label="Svenska" onclick="changeLanguage('sv')">
-                        <img id="lang-sv" src="https://hatscripts.github.io/circle-flags/flags/se.svg" alt="SV" class="w-full h-full object-cover">
+                        <img loading="lazy" decoding="async" id="lang-sv" src="https://hatscripts.github.io/circle-flags/flags/se.svg" alt="SV" class="w-full h-full object-cover">
                     </button>
                 </div>
-                <a id="nav-register-btn" class="hidden lg:inline-flex border-2 border-white/20 text-white text-sm font-semibold px-5 py-2 rounded-xl hover:bg-white hover:text-black transition-all duration-200" href="/register" data-i18n="nav-register">Register</a>
-                <a class="hidden lg:inline-flex bg-white text-black text-sm font-semibold px-5 py-2 rounded-xl hover:bg-gray-100 transition-all duration-200" href="/reservations" data-i18n="nav-reservations">Reservations</a>
-                <a href="/cart" class="nav-cart-btn relative text-white hover:text-gray-300 transition-colors p-1" aria-label="Shopping Cart" title="View Cart">
+                <a id="nav-register-btn" class="hidden lg:inline-flex border-2 border-white/20 text-white text-sm font-semibold px-5 py-2 rounded-xl hover:bg-white hover:text-black transition-all duration-200" href="register.html" data-i18n="nav-register">Register</a>
+                <a class="hidden lg:inline-flex bg-white text-black text-sm font-semibold px-5 py-2 rounded-xl hover:bg-gray-100 transition-all duration-200" href="reservations.html" data-i18n="nav-reservations">Reservations</a>
+                <a href="cart.html" class="nav-cart-btn relative text-white hover:text-gray-300 transition-colors p-1" aria-label="Shopping Cart" title="View Cart">
                     <span class="material-symbols-outlined text-[22px]">shopping_cart</span>
                     <span id="cart-count" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">0</span>
                 </a>
-                <a id="nav-user-btn" href="/login" aria-label="User Profile and Login" class="text-white hover:text-gray-300 transition-colors">
+                <a id="nav-user-btn" href="login.html" aria-label="User Profile and Login" class="text-white hover:text-gray-300 transition-colors">
                     <span class="material-symbols-outlined text-[22px]">account_circle</span>
                 </a>
                 <button class="lg:hidden text-white p-2 rounded-lg hover:bg-white/10 transition-colors" onclick="toggleMobileMenu()" aria-label="Toggle Menu" aria-expanded="false">
@@ -390,31 +180,31 @@
             </div>
         </div>
         <div id="mobile-menu" class="hidden lg:hidden bg-[#0a1019] border-t border-white/5 px-4 py-4 space-y-1 font-medium text-sm max-h-[80vh] overflow-y-auto">
-            <a class="block text-gray-300 hover:text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors" href="/" data-i18n="nav-home">Home</a>
-            <a class="block text-gray-300 hover:text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors" href="/menu" data-i18n="nav-menu">Menu</a>
-            <a class="block text-gray-300 hover:text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors" href="/locations" data-i18n="nav-locations">Locations</a>
-            <a class="block text-gray-300 hover:text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors" href="/contact" data-i18n="nav-contact">Contact</a>
-            <a class="block text-gray-300 hover:text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors flex items-center gap-2" href="/inbox">
+            <a class="block text-gray-300 hover:text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors" href="index.html" data-i18n="nav-home">Home</a>
+            <a class="block text-gray-300 hover:text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors" href="menu.html" data-i18n="nav-menu">Menu</a>
+            <a class="block text-gray-300 hover:text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors" href="locations.html" data-i18n="nav-locations">Locations</a>
+            <a class="block text-gray-300 hover:text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors" href="contact.html" data-i18n="nav-contact">Contact</a>
+            <a class="block text-gray-300 hover:text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors flex items-center gap-2" href="inbox.html">
                 <span data-i18n="nav-inbox">Inbox</span>
                 <span id="inbox-badge-nav-mobile" class="hidden w-2 h-2 bg-red-500 rounded-full animate-ping"></span>
             </a>
             <div class="flex items-center gap-2 px-4 py-3 border-t border-white/5 mt-2">
                 <button class="w-8 h-8 flex items-center justify-center rounded-full overflow-hidden hover:opacity-80 transition-all ring-2 ring-transparent hover:ring-white/30" aria-label="Tiếng Việt" onclick="changeLanguage('vi')">
-                    <img id="lang-vi-mobile" src="https://hatscripts.github.io/circle-flags/flags/vn.svg" alt="VN" class="w-full h-full object-cover">
+                    <img loading="lazy" decoding="async" id="lang-vi-mobile" src="https://hatscripts.github.io/circle-flags/flags/vn.svg" alt="VN" class="w-full h-full object-cover">
                 </button>
                 <button class="w-8 h-8 flex items-center justify-center rounded-full overflow-hidden hover:opacity-80 transition-all ring-2 ring-transparent hover:ring-white/30" aria-label="English" onclick="changeLanguage('en')">
-                    <img id="lang-en-mobile" src="https://hatscripts.github.io/circle-flags/flags/gb.svg" alt="UK" class="w-full h-full object-cover">
+                    <img loading="lazy" decoding="async" id="lang-en-mobile" src="https://hatscripts.github.io/circle-flags/flags/gb.svg" alt="UK" class="w-full h-full object-cover">
                 </button>
                 <button class="w-8 h-8 flex items-center justify-center rounded-full overflow-hidden hover:opacity-80 transition-all ring-2 ring-transparent hover:ring-white/30" aria-label="Suomi" onclick="changeLanguage('fi')">
-                    <img id="lang-fi-mobile" src="https://hatscripts.github.io/circle-flags/flags/fi.svg" alt="FI" class="w-full h-full object-cover">
+                    <img loading="lazy" decoding="async" id="lang-fi-mobile" src="https://hatscripts.github.io/circle-flags/flags/fi.svg" alt="FI" class="w-full h-full object-cover">
                 </button>
                 <button class="w-8 h-8 flex items-center justify-center rounded-full overflow-hidden hover:opacity-80 transition-all ring-2 ring-transparent hover:ring-white/30" aria-label="Svenska" onclick="changeLanguage('sv')">
-                    <img id="lang-sv-mobile" src="https://hatscripts.github.io/circle-flags/flags/se.svg" alt="SV" class="w-full h-full object-cover">
+                    <img loading="lazy" decoding="async" id="lang-sv-mobile" src="https://hatscripts.github.io/circle-flags/flags/se.svg" alt="SV" class="w-full h-full object-cover">
                 </button>
             </div>
             <div class="flex flex-col gap-2 px-4 pt-3 border-t border-white/5">
-                <a id="nav-register-btn-mobile" class="w-full text-center border-2 border-white/20 text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-white hover:text-black transition-all" href="/register" data-i18n="nav-register-mobile">Create Account</a>
-                <a class="w-full text-center bg-white text-black text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-gray-100 transition-all" href="/reservations" data-i18n="nav-reservations-mobile">Book Table</a>
+                <a id="nav-register-btn-mobile" class="w-full text-center border-2 border-white/20 text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-white hover:text-black transition-all" href="register.html" data-i18n="nav-register-mobile">Create Account</a>
+                <a class="w-full text-center bg-white text-black text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-gray-100 transition-all" href="reservations.html" data-i18n="nav-reservations-mobile">Book Table</a>
             </div>
         </div>
     </nav>

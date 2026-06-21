@@ -332,7 +332,7 @@ function showWelcomeSpinModal(userEmail, role) {
         }
     }, 50);
 
-    document.getElementById('btn-go-spin').addEventListener('click', async () => {
+    document.getElementById('btn-go-spin')?.addEventListener('click', async () => {
         const btn = document.getElementById('btn-go-spin');
         btn.disabled = true;
         btn.innerHTML = `<span class="material-symbols-outlined animate-spin align-middle mr-1">sync</span> ${t.loading}`;

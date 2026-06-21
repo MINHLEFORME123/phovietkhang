@@ -22,6 +22,10 @@
       theme: { extend: { colors: { surface: "#121824", "surface-highlight": "#1e293b", primary: "#3b82f6", secondary: "#9ca3af", "on-surface": "#f3f4f6" } } }
     }
     </script>
+
+    <!-- Fallback Security Headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: https: blob:; font-src 'self' https: data:; connect-src 'self' https:;">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
 </head>
 <body class="bg-[#0b0f19] text-on-surface font-['Inter'] flex h-screen overflow-hidden">
     <!-- Sidebar -->
@@ -87,7 +91,7 @@
                 <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
                     <span class="material-symbols-outlined text-primary">edit_document</span> Soạn tin nhắn mới
                 </h3>
-                <form id="message-compose-form" class="space-y-6">
+                <form onsubmit="return false;" method="POST" id="message-compose-form" class="space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Left Fields -->
                         <div class="space-y-4">

@@ -40,11 +40,23 @@
           },
           {
             "key": "X-Frame-Options",
-            "value": "SAMEORIGIN"
+            "value": "DENY"
           },
           {
             "key": "X-Content-Type-Options",
             "value": "nosniff"
+          },
+          {
+            "key": "X-XSS-Protection",
+            "value": "1; mode=block"
+          },
+          {
+            "key": "Referrer-Policy",
+            "value": "strict-origin-when-cross-origin"
+          },
+          {
+            "key": "Permissions-Policy",
+            "value": "geolocation=(), microphone=(), camera=()"
           },
           {
             "key": "Cross-Origin-Opener-Policy",
@@ -52,16 +64,25 @@
           },
           {
             "key": "Content-Security-Policy",
-            "value": "default-src 'self' https: 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: https: blob:; font-src 'self' https: data:; connect-src 'self' https:; frame-ancestors 'self'; require-trusted-types-for 'script';"
+            "value": "default-src 'self' https: 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: https: blob:; font-src 'self' https: data:; connect-src 'self' https:; frame-ancestors 'self';"
           }
         ]
       },
       {
-        "source": "**/*.@(css|js|png|jpg|jpeg|gif|svg|ico|webp|woff|woff2)",
+        "source": "**/*.@(png|jpg|jpeg|gif|svg|ico|webp|woff|woff2)",
         "headers": [
           {
             "key": "Cache-Control",
             "value": "max-age=31536000, immutable"
+          }
+        ]
+      },
+      {
+        "source": "**/*.@(css|js)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=3600, must-revalidate"
           }
         ]
       },

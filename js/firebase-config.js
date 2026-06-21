@@ -1,4 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app-check.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { getDatabase } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
@@ -17,6 +18,22 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
+// Initialize Firebase App Check (Enterprise Security)
+// LƯU Ý: Thay 'YOUR_RECAPTCHA_ENTERPRISE_SITE_KEY' bằng mã Site Key từ Firebase Console
+const recaptchaSiteKey = 'YOUR_RECAPTCHA_ENTERPRISE_SITE_KEY';
+if (recaptchaSiteKey && recaptchaSiteKey !== 'YOUR_RECAPTCHA_ENTERPRISE_SITE_KEY') {
+    try {
+        const appCheck = initializeAppCheck(app, {
+            provider: new ReCaptchaEnterpriseProvider(recaptchaSiteKey),
+            isTokenAutoRefreshEnabled: true
+        });
+    } catch (e) {
+        console.warn("App Check failed to initialize:", e);
+    }
+} else {
+    console.log("App Check skipped: Site key is not configured.");
+}
 
 // Initialize Firebase services
 export const auth = getAuth(app);

@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     createdAt: new Date()
                 });
                 
-                document.getElementById('res-success').classList.remove('hidden');
+                document.getElementById('res-success')?.classList.remove('hidden');
                 resForm.reset();
             } catch (err) {
                 console.error("Error adding reservation: ", err);

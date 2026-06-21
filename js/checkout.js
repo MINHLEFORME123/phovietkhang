@@ -161,7 +161,7 @@ window.renderCartPage = function() {
         emptyMsg.classList.remove('hidden');
         cartTotal.textContent = '\u20AC0.00';
         document.getElementById('cart-subtotal').textContent = '\u20AC0.00';
-        document.getElementById('delivery-fee-container').classList.add('hidden');
+        document.getElementById('delivery-fee-container')?.classList.add('hidden');
         btnSubmit.disabled = true;
         btnSubmit.classList.add('opacity-50', 'cursor-not-allowed');
         return;
@@ -233,19 +233,19 @@ window.renderCartPage = function() {
     if (orderType === 'delivery') {
         const distance = document.getElementById('cust-distance')?.value || '0';
         deliveryFee = calculateDeliveryFee(distance);
-        document.getElementById('delivery-fee-container').classList.remove('hidden');
+        document.getElementById('delivery-fee-container')?.classList.remove('hidden');
         document.getElementById('cart-delivery-fee').textContent = `\u20AC${deliveryFee.toFixed(2)}`;
     } else {
-        document.getElementById('delivery-fee-container').classList.add('hidden');
+        document.getElementById('delivery-fee-container')?.classList.add('hidden');
     }
 
     let discountAmount = 0;
     if (appliedPromo) {
         discountAmount = subtotal * (appliedPromo.discountPercent / 100);
-        document.getElementById('discount-container').classList.remove('hidden');
+        document.getElementById('discount-container')?.classList.remove('hidden');
         document.getElementById('cart-discount').textContent = `-€${discountAmount.toFixed(2)}`;
     } else {
-        document.getElementById('discount-container').classList.add('hidden');
+        document.getElementById('discount-container')?.classList.add('hidden');
     }
 
     const total = subtotal + deliveryFee - discountAmount;

@@ -1,5 +1,10 @@
 {
   "dependencies": {
     "firebase": "^12.14.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/container-queries": "^0.1.1",
+    "@tailwindcss/forms": "^0.5.11",
+    "tailwindcss": "^4.3.1"
   }
 }

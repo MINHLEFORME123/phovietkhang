@@ -19,6 +19,17 @@ const inboxBadgeNav = document.getElementById('inbox-badge-nav');
 let activeUser = null;
 let currentMessages = [];
 
+// HTML Escaping Utility
+function escapeHtml(value) {
+    if (value === null || value === undefined) return '';
+    return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+}
+
 // Format Date Utility
 function formatMsgDate(timestamp) {
     if (!timestamp) return '';
@@ -83,10 +94,10 @@ function renderMessageList(uid) {
         
         card.innerHTML = `
             <div class="flex justify-between items-start gap-2">
-                <h3 class="text-sm text-white line-clamp-1">${msg.title}</h3>
+                <h3 class="text-sm text-white line-clamp-1">${escapeHtml(msg.title)}</h3>
                 ${!read ? '<span class="w-2 h-2 bg-red-500 rounded-full flex-shrink-0 mt-1.5"></span>' : ''}
             </div>
-            <p class="text-xs text-secondary line-clamp-2">${msg.text}</p>
+            <p class="text-xs text-secondary line-clamp-2">${escapeHtml(msg.text)}</p>
             <span class="text-[10px] text-secondary/60 mt-1">${formatMsgDate(msg.createdAt)}</span>
         `;
 
@@ -115,7 +126,7 @@ function renderMessageDetails(msg) {
     if (msg.imageUrl) {
         mediaHtml = `
             <div class="relative w-full h-48 rounded-xl overflow-hidden mb-4 border border-white/10">
-                <img src="${msg.imageUrl}" class="w-full h-full object-cover">
+                <img src="${escapeHtml(msg.imageUrl)}" class="w-full h-full object-cover">
             </div>
         `;
     }
@@ -126,8 +137,8 @@ function renderMessageDetails(msg) {
         const codes = msg.voucherCode.split(',').map(c => c.trim()).filter(Boolean);
         const codesListHtml = codes.map(code => `
             <div class="flex items-center justify-between gap-4 bg-background border border-primary/20 p-3 rounded-xl select-all font-mono text-primary font-bold text-lg">
-                <span>${code}</span>
-                <button onclick="window.copyVoucherToClipboard('${code}', this)" class="bg-primary/20 hover:bg-primary/30 border border-primary/30 text-xs px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 text-primary">
+                <span>${escapeHtml(code)}</span>
+                <button onclick="window.copyVoucherToClipboard('${escapeHtml(code)}', this)" class="bg-primary/20 hover:bg-primary/30 border border-primary/30 text-xs px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 text-primary">
                     <span class="material-symbols-outlined text-[14px]">content_copy</span>Sao chép
                 </button>
             </div>
@@ -153,14 +164,14 @@ function renderMessageDetails(msg) {
                 <!-- Header -->
                 <div class="border-b border-white/10 pb-4 mb-6">
                     <span class="text-xs text-secondary">${formatMsgDate(msg.createdAt)}</span>
-                    <h2 class="text-2xl font-bold text-white font-['EB_Garamond'] mt-1">${msg.title}</h2>
+                    <h2 class="text-2xl font-bold text-white font-['EB_Garamond'] mt-1">${escapeHtml(msg.title)}</h2>
                 </div>
 
                 <!-- Media -->
                 ${mediaHtml}
 
                 <!-- Body Text -->
-                <p class="text-sm text-secondary/90 leading-relaxed whitespace-pre-wrap">${msg.text}</p>
+                <p class="text-sm text-secondary/90 leading-relaxed whitespace-pre-wrap">${escapeHtml(msg.text)}</p>
 
                 <!-- Voucher -->
                 ${voucherHtml}

@@ -21,17 +21,8 @@
       fbq('init', 'FACEBOOK_PIXEL_ID_PLACEHOLDER');
       fbq('track', 'PageView');
     </script>
-    <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=FACEBOOK_PIXEL_ID_PLACEHOLDER&ev=PageView&noscript=1" alt="Facebook Pixel" /></noscript>
+    <noscript><img loading="lazy" decoding="async" height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=FACEBOOK_PIXEL_ID_PLACEHOLDER&ev=PageView&noscript=1" alt="Facebook Pixel" /></noscript>
     <!-- End Facebook Pixel Code -->
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     
     
@@ -49,31 +40,6 @@
     });
   }
 </script>
-<style id="critical-shared-css">
-  /*! Critical CSS Builder: first <style> moved to shared compile target */
-  .bg-pattern-dark {
-        background-image: linear-gradient(rgba(7, 24, 43, 0.85), rgba(7, 24, 43, 0.85)), url('assets/pattern-dark.svg') !important;
-        background-repeat: repeat;
-        background-size: 80px 40px;
-        background-attachment: fixed;
-        background-color: #07182b !important;
-    }
-    .footer-pattern {
-        position: relative;
-    }
-    .footer-pattern::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background-image: url('assets/pattern-dark.svg');
-        background-repeat: repeat;
-        background-size: 80px 40px;
-        background-attachment: fixed;
-        opacity: 0.25;
-        pointer-events: none;
-        z-index: 0;
-    }
-</style>
 <style>
     .bg-pattern-dark {
         background-image: linear-gradient(rgba(7, 24, 43, 0.85), rgba(7, 24, 43, 0.85)), url('assets/pattern-dark.svg') !important;
@@ -102,310 +68,164 @@
 </style>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-        <link rel="stylesheet" href="/css/global.css">
-    <link rel="stylesheet" href="/css/client.css">
-    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico">
-    <link rel="icon" type="image/png" sizes="48x48" href="/images/favicon-48x48.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
-    <title>Reservations | Phở Việt Khang - Book a Table in Helsinki</title>
-<!-- Google Fonts -->
+<link rel="icon" type="image/x-icon" href="images/favicon.ico">
+<link rel="icon" type="image/png" sizes="48x48" href="images/favicon-48x48.png">
+<link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+<title>PHO VIET KHANG | Reservations</title>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<!-- Material Symbols -->
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<!-- Tailwind Config -->
 <script id="tailwind-config">
-        tailwind.config = {
-          darkMode: "class",
-          theme: {
-            extend: {
-              "colors": {
-                      "inverse-primary": "#a9c7ff",
-                      "surface-dim": "#d8dadc",
-                      "outline-variant": "#c4c6d0",
-                      "on-surface": "#191c1e",
-                      "outline": "#747780",
-                      "secondary-fixed-dim": "#c8c6c5",
-                      "on-error-container": "#93000a",
-                      "surface-container-highest": "#e0e3e5",
-                      "tertiary-fixed-dim": "#b7c8e1",
-                      "background": "#f7f9fb",
-                      "surface-tint": "#405f91",
-                      "on-secondary-fixed": "#1c1b1b",
-                      "on-primary-fixed": "#001b3d",
-                      "on-tertiary-fixed": "#0b1c30",
-                      "secondary-container": "#e2dfde",
-                      "on-secondary-container": "#636262",
-                      "surface-bright": "#f7f9fb",
-                      "on-primary-fixed-variant": "#264778",
-                      "error-container": "#ffdad6",
-                      "primary-container": "#002b5b",
-                      "on-secondary-fixed-variant": "#474746",
-                      "surface": "#f7f9fb",
-                      "on-error": "#ffffff",
-                      "tertiary-container": "#1d2d41",
-                      "inverse-on-surface": "#eff1f3",
-                      "secondary": "#5f5e5e",
-                      "tertiary-fixed": "#d3e4fe",
-                      "on-tertiary-container": "#8495ad",
-                      "primary-fixed-dim": "#a9c7ff",
-                      "surface-variant": "#e0e3e5",
-                      "on-primary-container": "#7594ca",
-                      "on-primary": "#ffffff",
-                      "surface-container-high": "#e6e8ea",
-                      "surface-container-low": "#f2f4f6",
-                      "on-surface-variant": "#43474f",
-                      "error": "#ba1a1a",
-                      "primary": "#001736",
-                      "on-tertiary-fixed-variant": "#38485d",
-                      "primary-fixed": "#d6e3ff",
-                      "on-tertiary": "#ffffff",
-                      "inverse-surface": "#2d3133",
-                      "surface-container": "#eceef0",
-                      "secondary-fixed": "#e5e2e1",
-                      "surface-container-lowest": "#ffffff",
-                      "tertiary": "#07182b",
-                      "on-background": "#191c1e",
-                      "on-secondary": "#ffffff"
-              },
-              "borderRadius": {
-                      "DEFAULT": "0.125rem",
-                      "lg": "0.25rem",
-                      "xl": "0.5rem",
-                      "full": "0.75rem"
-              },
-              "spacing": {
-                      "gutter": "28px",
-                      "max-width": "1284px",
-                      "margin-mobile": "20px",
-                      "margin-desktop": "68px",
-                      "unit": "12px"
-              },
-              "fontFamily": {
-                      "body-sm": ["Inter"],
-                       "display-lg-mobile": ["EB Garamond"],
-                       "title-lg": ["Inter"],
-                       "label-caps": ["Inter"],
-                       "display-lg": ["EB Garamond"],
-                       "headline-sm": ["EB Garamond"],
-                       "body-lg": ["Inter"],
-                       "headline-md": ["EB Garamond"],
-                       "body-md": ["Inter"]
-               },
-               "fontSize": {
-                       "body-sm": ["18px", {"lineHeight": "24px", "fontWeight": "400"}],
-                       "display-lg-mobile": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
-                       "title-lg": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
-                       "label-caps": ["16px", {"lineHeight": "20px", "letterSpacing": "0.08em", "fontWeight": "700"}],
-                       "display-lg": ["52px", {"lineHeight": "60px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
-                       "headline-sm": ["28px", {"lineHeight": "36px", "fontWeight": "500"}],
-                       "body-lg": ["22px", {"lineHeight": "32px", "fontWeight": "400"}],
-                       "headline-md": ["36px", {"lineHeight": "44px", "fontWeight": "500"}],
-                       "body-md": ["20px", {"lineHeight": "28px", "fontWeight": "400"}]
-               }
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+                  "inverse-primary": "#a9c7ff",
+                  "surface-dim": "#111318",
+                  "outline-variant": "rgba(255, 255, 255, 0.1)",
+                  "on-surface": "#f3f4f6",
+                  "outline": "#8d9199",
+                  "secondary-fixed-dim": "#c8c6c5",
+                  "on-error-container": "#ffdad6",
+                  "surface-container-highest": "#1c2434",
+                  "tertiary-fixed-dim": "#b7c8e1",
+                  "background": "#07182b",
+                  "surface-tint": "#a9c7ff",
+                  "on-secondary-fixed": "#1c1b1b",
+                  "on-primary-fixed": "#003062",
+                  "on-tertiary-fixed": "#0b1c30",
+                  "secondary-container": "#1f2937",
+                  "on-secondary-container": "#c8c6c5",
+                  "surface-bright": "#222a3a",
+                  "on-primary-fixed-variant": "#264778",
+                  "error-container": "#8c1d18",
+                  "primary-container": "#3b82f6",
+                  "on-secondary-fixed-variant": "#474746",
+                  "surface": "#121824",
+                  "on-error": "#601410",
+                  "tertiary-container": "#1d2d41",
+                  "inverse-on-surface": "#111318",
+                  "secondary": "#9ca3af",
+                  "tertiary-fixed": "#d3e4fe",
+                  "on-tertiary-container": "#8495ad",
+                  "primary-fixed-dim": "#a9c7ff",
+                  "surface-variant": "#43474e",
+                  "on-primary-container": "#ffffff",
+                  "on-primary": "#003062",
+                  "surface-container-high": "#1b2333",
+                  "surface-container-low": "#18202d",
+                  "on-surface-variant": "#c3c6cf",
+                  "error": "#ffb4ab",
+                  "primary": "#ffffff",
+                  "on-tertiary-fixed-variant": "#38485d",
+                  "primary-fixed": "#d6e3ff",
+                  "on-tertiary": "#ffffff",
+                  "inverse-surface": "#e2e2e9",
+                  "surface-container": "#172030",
+                  "secondary-fixed": "#e5e2e1",
+                  "surface-container-lowest": "#070a10",
+                  "tertiary": "#090d16",
+                  "on-background": "#f3f4f6",
+                  "on-secondary": "#ffffff"
+          },
+          "borderRadius": {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          "spacing": {"gutter": "32px", "max-width": "1288px", "margin-mobile": "24px", "margin-desktop": "72px", "unit": "16px"},
+          "fontFamily": {
+                  "body-sm": ["Inter"], "display-lg-mobile": ["EB Garamond"], "title-lg": ["Inter"],
+                  "label-caps": ["Inter"], "display-lg": ["EB Garamond"], "headline-sm": ["EB Garamond"],
+                  "body-lg": ["Inter"], "headline-md": ["EB Garamond"], "body-md": ["Inter"]
+           },
+           "fontSize": {
+                   "body-sm": ["22px", {"lineHeight": "28px", "fontWeight": "400"}],
+                   "display-lg-mobile": ["44px", {"lineHeight": "52px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                   "title-lg": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                   "label-caps": ["20px", {"lineHeight": "24px", "letterSpacing": "0.08em", "fontWeight": "700"}],
+                   "display-lg": ["56px", {"lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                   "headline-sm": ["32px", {"lineHeight": "40px", "fontWeight": "500"}],
+                   "body-lg": ["26px", {"lineHeight": "36px", "fontWeight": "400"}],
+                   "headline-md": ["40px", {"lineHeight": "48px", "fontWeight": "500"}],
+                   "body-md": ["24px", {"lineHeight": "32px", "fontWeight": "400"}]
+           }
        },
            },
          }
-     </script>
+</script>
 <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        h1, h2, h3, h4, h5, h6 { font-family: 'EB Garamond', serif; }
-        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-    </style>
-
-<meta name="description" content="Book your table at Phở Việt Khang in Helsinki. Authentic Vietnamese pho, bun bo Hue, and grilled pork noodles at Pengerkatu or Easton. Reserve online for dine-in or takeaway.">
+    body { font-family: 'Inter', sans-serif; color-scheme: dark; }
+    h1, h2, h3, h4, h5, h6 { font-family: 'EB Garamond', serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+</style>
 
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-    <meta name="keywords" content="phở ngon helsinki, phở ngon sornainen, best pho helsinki, best pho sornainen, phở việt khang sörnäinen, phở sornainen, phở helsinki, vietnamese restaurant helsinki, sörnäinen pho, sornainen pho, paras pho helsinki, paras pho sörnäinen, Kallio pho, Kallio, Easton pho, Itäkeskus pho" />
+<meta name="description" content="Experience authentic Vietnamese cuisine at Phở Việt Khang in Helsinki. Delicious pho, fresh spring rolls, and traditional dishes. Book your table now!" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://phovietkhang.com/reservations">
-    <meta property="og:title" content="Reservations | Phở Việt Khang - Book a Table in Helsinki">
-    <meta property="og:description" content="Book your table at Phở Việt Khang in Helsinki. Authentic Vietnamese pho, bun bo Hue, and grilled pork noodles at Pengerkatu or Easton. Reserve online for dine-in or takeaway.">
-    <meta property="og:image" content="https://phovietkhang.com/images/logo.png">
+    <meta property="og:url" content="https://phovietkhang.com/reservations.html">
+    <meta property="og:title" content="PHO VIET KHANG | Reservations">
+    <meta property="og:description" content="Experience authentic Vietnamese cuisine at Phở Việt Khang in Helsinki. Delicious pho, fresh spring rolls, and traditional dishes. Book your table now!">
+    <meta property="og:image" content="https://phovietkhang.com/images/logo.webp">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="https://phovietkhang.com/reservations">
-    <meta name="twitter:title" content="Reservations | Phở Việt Khang - Book a Table in Helsinki">
-    <meta name="twitter:description" content="Book your table at Phở Việt Khang in Helsinki. Authentic Vietnamese pho, bun bo Hue, and grilled pork noodles at Pengerkatu or Easton. Reserve online for dine-in or takeaway.">
-    <meta name="twitter:image" content="https://phovietkhang.com/images/logo.png">
+    <meta name="twitter:url" content="https://phovietkhang.com/reservations.html">
+    <meta name="twitter:title" content="PHO VIET KHANG | Reservations">
+    <meta name="twitter:description" content="Experience authentic Vietnamese cuisine at Phở Việt Khang in Helsinki. Delicious pho, fresh spring rolls, and traditional dishes. Book your table now!">
+    <meta name="twitter:image" content="https://phovietkhang.com/images/logo.webp">
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <link rel="canonical" href="https://phovietkhang.com/reservations.html" />
+    <link rel="alternate" hreflang="vi" href="https://phovietkhang.com/reservations.html?lang=vi" />
+    <link rel="alternate" hreflang="en" href="https://phovietkhang.com/reservations.html?lang=en" />
+    <link rel="alternate" hreflang="fi" href="https://phovietkhang.com/reservations.html?lang=fi" />
+    <link rel="alternate" hreflang="sv" href="https://phovietkhang.com/reservations.html?lang=sv" />
+    <link rel="alternate" hreflang="x-default" href="https://phovietkhang.com/reservations.html" />
 
-<script type="application/ld+json">
-[
-  {
-    "@context": "https://schema.org",
-    "@type": "VietnameseRestaurant",
-    "name": "Phở Việt Khang - Sörnäinen (Pengerkatu)",
-    "alternateName": [
-      "Pho Viet Khang Sornainen",
-      "Pho Viet Khang Sörnäinen",
-      "Pho Viet Khang Kallio",
-      "Phở ngon Sörnäinen",
-      "Phở ngon Sornainen",
-      "Phở ngon Helsinki",
-      "Paras Pho Helsinki",
-      "Paras Pho Sörnäinen"
-    ],
-    "image": "https://phovietkhang.com/images/hero-bg.jpg",
-    "telephone": "+358 44 978 9995",
-    "url": "https://phovietkhang.com/",
-    "menu": "https://phovietkhang.com/menu",
-    "priceRange": "$$",
-    "servesCuisine": ["Vietnamese", "Pho", "Noodle Soup"],
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": "Pengerkatu 29",
-      "addressLocality": "Helsinki",
-      "addressRegion": "Sörnäinen / Kallio",
-      "postalCode": "00500",
-      "addressCountry": "FI"
-    },
-    "geo": {
-      "@type": "GeoCoordinates",
-      "latitude": 60.1872,
-      "longitude": 24.9602
-    },
-    "openingHoursSpecification": {
-      "@type": "OpeningHoursSpecification",
-      "dayOfWeek": ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-      "opens": "11:00",
-      "closes": "20:30"
-    },
-    "sameAs": [
-      "https://www.facebook.com/phovietkhang",
-      "https://www.instagram.com/phovietkhang",
-      "https://www.tripadvisor.com"
-    ]
-  },
-  {
-    "@context": "https://schema.org",
-    "@type": "VietnameseRestaurant",
-    "name": "Phở Việt Khang - Easton Helsinki",
-    "alternateName": [
-      "Pho Viet Khang Easton",
-      "Pho Viet Khang Itäkeskus",
-      "Phở ngon Itäkeskus",
-      "Phở ngon Helsinki",
-      "Paras Pho Itäkeskus"
-    ],
-    "image": "https://phovietkhang.com/images/hero-bg.jpg",
-    "telephone": "+358 44 978 9995",
-    "url": "https://phovietkhang.com/locations",
-    "menu": "https://phovietkhang.com/menu",
-    "priceRange": "$$",
-    "servesCuisine": ["Vietnamese", "Pho", "Noodle Soup"],
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": "Kauppakartanonkatu 3",
-      "addressLocality": "Helsinki",
-      "addressRegion": "Itäkeskus / Easton",
-      "postalCode": "00930",
-      "addressCountry": "FI"
-    },
-    "geo": {
-      "@type": "GeoCoordinates",
-      "latitude": 60.2098,
-      "longitude": 25.0855
-    },
-    "openingHoursSpecification": {
-      "@type": "OpeningHoursSpecification",
-      "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-      "opens": "11:00",
-      "closes": "21:00"
-    },
-    "sameAs": [
-      "https://www.facebook.com/phovietkhang",
-      "https://www.instagram.com/phovietkhang",
-      "https://www.tripadvisor.com"
-    ]
-  }
-]
-</script>
-    <link rel="canonical" href="https://phovietkhang.com/reservations" />
-    <link rel="alternate" hreflang="vi" href="https://phovietkhang.com/reservations?lang=vi" />
-    <link rel="alternate" hreflang="en" href="https://phovietkhang.com/reservations?lang=en" />
-    <link rel="alternate" hreflang="fi" href="https://phovietkhang.com/reservations?lang=fi" />
-    <link rel="alternate" hreflang="sv" href="https://phovietkhang.com/reservations?lang=sv" />
-    <link rel="alternate" hreflang="x-default" href="https://phovietkhang.com/reservations" />
+    <!-- Fallback Security Headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: https: blob:; font-src 'self' https: data:; connect-src 'self' https:;">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
 </head>
 <body class="text-on-surface antialiased flex flex-col min-h-screen bg-pattern-dark">
 <!-- TopNavBar -->
 <!-- TopNavBar Component -->
     <nav aria-label="Main Navigation" class="fixed top-0 w-full z-50 bg-[#0a1019]/95 backdrop-blur-md border-b border-white/5">
         <div class="flex justify-between items-center max-w-7xl mx-auto px-4 md:px-16 h-20">
-            <a class="flex items-center gap-2.5 shrink-0" href="/">
-                <img src="/images/logo.png" alt="Phở Việt Khang Logo" class="w-10 h-10 object-contain rounded-full bg-white">
+            <a class="flex items-center gap-2.5 shrink-0" href="index.html">
+                <img loading="lazy" decoding="async" src="images/logo.webp" alt="Ph? Vi?t Khang Logo" class="w-10 h-10 object-contain rounded-full bg-white">
                 <span class="text-white font-bold text-xl tracking-wide" style="font-family:'EB Garamond',serif;">PHỞ VIỆT KHANG</span>
             </a>
             <div class="hidden lg:flex items-center space-x-8 font-medium text-[15px] tracking-wide">
-                <a class="text-gray-400 hover:text-white transition-colors duration-200" href="/" data-i18n="nav-home">Home</a>
-                <a class="text-gray-400 hover:text-white transition-colors duration-200" href="/menu" data-i18n="nav-menu">Menu</a>
-                <a class="text-gray-400 hover:text-white transition-colors duration-200" href="/locations" data-i18n="nav-locations">Locations</a>
-                <a class="text-gray-400 hover:text-white transition-colors duration-200" href="/contact" data-i18n="nav-contact">Contact</a>
-                <a class="text-gray-400 hover:text-white transition-colors duration-200 relative flex items-center gap-1.5" href="/inbox" id="nav-inbox-link">
+                <a class="text-gray-400 hover:text-white transition-colors duration-200" href="index.html" data-i18n="nav-home">Home</a>
+                <a class="text-gray-400 hover:text-white transition-colors duration-200" href="menu.html" data-i18n="nav-menu">Menu</a>
+                <a class="text-gray-400 hover:text-white transition-colors duration-200" href="locations.html" data-i18n="nav-locations">Locations</a>
+                <a class="text-gray-400 hover:text-white transition-colors duration-200" href="contact.html" data-i18n="nav-contact">Contact</a>
+                <a class="text-gray-400 hover:text-white transition-colors duration-200 relative flex items-center gap-1.5" href="inbox.html" id="nav-inbox-link">
                     <span data-i18n="nav-inbox">Inbox</span>
                     <span id="inbox-badge-nav" class="hidden w-2 h-2 bg-red-500 rounded-full animate-ping"></span>
                 </a>
@@ -413,25 +233,25 @@
             <div class="flex items-center gap-3">
                 <div class="hidden lg:flex items-center gap-1.5">
                     <button class="w-8 h-8 flex items-center justify-center rounded-full overflow-hidden hover:opacity-80 transition-all duration-200 ring-2 ring-transparent hover:ring-white/30" aria-label="Tiếng Việt" onclick="changeLanguage('vi')">
-                        <img id="lang-vi" src="https://hatscripts.github.io/circle-flags/flags/vn.svg" alt="VN" class="w-full h-full object-cover">
+                        <img loading="lazy" decoding="async" id="lang-vi" src="https://hatscripts.github.io/circle-flags/flags/vn.svg" alt="VN" class="w-full h-full object-cover">
                     </button>
                     <button class="w-8 h-8 flex items-center justify-center rounded-full overflow-hidden hover:opacity-80 transition-all duration-200 ring-2 ring-transparent hover:ring-white/30" aria-label="English" onclick="changeLanguage('en')">
-                        <img id="lang-en" src="https://hatscripts.github.io/circle-flags/flags/gb.svg" alt="UK" class="w-full h-full object-cover">
+                        <img loading="lazy" decoding="async" id="lang-en" src="https://hatscripts.github.io/circle-flags/flags/gb.svg" alt="UK" class="w-full h-full object-cover">
                     </button>
                     <button class="w-8 h-8 flex items-center justify-center rounded-full overflow-hidden hover:opacity-80 transition-all duration-200 ring-2 ring-transparent hover:ring-white/30" aria-label="Suomi" onclick="changeLanguage('fi')">
-                        <img id="lang-fi" src="https://hatscripts.github.io/circle-flags/flags/fi.svg" alt="FI" class="w-full h-full object-cover">
+                        <img loading="lazy" decoding="async" id="lang-fi" src="https://hatscripts.github.io/circle-flags/flags/fi.svg" alt="FI" class="w-full h-full object-cover">
                     </button>
                     <button class="w-8 h-8 flex items-center justify-center rounded-full overflow-hidden hover:opacity-80 transition-all duration-200 ring-2 ring-transparent hover:ring-white/30" aria-label="Svenska" onclick="changeLanguage('sv')">
-                        <img id="lang-sv" src="https://hatscripts.github.io/circle-flags/flags/se.svg" alt="SV" class="w-full h-full object-cover">
+                        <img loading="lazy" decoding="async" id="lang-sv" src="https://hatscripts.github.io/circle-flags/flags/se.svg" alt="SV" class="w-full h-full object-cover">
                     </button>
                 </div>
-                <a id="nav-register-btn" class="hidden lg:inline-flex border-2 border-white/20 text-white text-sm font-semibold px-5 py-2 rounded-xl hover:bg-white hover:text-black transition-all duration-200" href="/register" data-i18n="nav-register">Register</a>
-                <a class="hidden lg:inline-flex bg-white text-black text-sm font-semibold px-5 py-2 rounded-xl hover:bg-gray-100 transition-all duration-200" href="/reservations" data-i18n="nav-reservations">Reservations</a>
-                <a href="/cart" class="nav-cart-btn relative text-white hover:text-gray-300 transition-colors p-1" aria-label="Shopping Cart" title="View Cart">
+                <a id="nav-register-btn" class="hidden lg:inline-flex border-2 border-white/20 text-white text-sm font-semibold px-5 py-2 rounded-xl hover:bg-white hover:text-black transition-all duration-200" href="register.html" data-i18n="nav-register">Register</a>
+                <a class="hidden lg:inline-flex bg-white text-black text-sm font-semibold px-5 py-2 rounded-xl hover:bg-gray-100 transition-all duration-200" href="reservations.html" data-i18n="nav-reservations">Reservations</a>
+                <a href="cart.html" class="nav-cart-btn relative text-white hover:text-gray-300 transition-colors p-1" aria-label="Shopping Cart" title="View Cart">
                     <span class="material-symbols-outlined text-[22px]">shopping_cart</span>
                     <span id="cart-count" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">0</span>
                 </a>
-                <a id="nav-user-btn" href="/login" aria-label="User Profile and Login" class="text-white hover:text-gray-300 transition-colors">
+                <a id="nav-user-btn" href="login.html" aria-label="User Profile and Login" class="text-white hover:text-gray-300 transition-colors">
                     <span class="material-symbols-outlined text-[22px]">account_circle</span>
                 </a>
                 <button class="lg:hidden text-white p-2 rounded-lg hover:bg-white/10 transition-colors" onclick="toggleMobileMenu()" aria-label="Toggle Menu" aria-expanded="false">
@@ -440,31 +260,31 @@
             </div>
         </div>
         <div id="mobile-menu" class="hidden lg:hidden bg-[#0a1019] border-t border-white/5 px-4 py-4 space-y-1 font-medium text-sm max-h-[80vh] overflow-y-auto">
-            <a class="block text-gray-300 hover:text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors" href="/" data-i18n="nav-home">Home</a>
-            <a class="block text-gray-300 hover:text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors" href="/menu" data-i18n="nav-menu">Menu</a>
-            <a class="block text-gray-300 hover:text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors" href="/locations" data-i18n="nav-locations">Locations</a>
-            <a class="block text-gray-300 hover:text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors" href="/contact" data-i18n="nav-contact">Contact</a>
-            <a class="block text-gray-300 hover:text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors flex items-center gap-2" href="/inbox">
+            <a class="block text-gray-300 hover:text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors" href="index.html" data-i18n="nav-home">Home</a>
+            <a class="block text-gray-300 hover:text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors" href="menu.html" data-i18n="nav-menu">Menu</a>
+            <a class="block text-gray-300 hover:text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors" href="locations.html" data-i18n="nav-locations">Locations</a>
+            <a class="block text-gray-300 hover:text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors" href="contact.html" data-i18n="nav-contact">Contact</a>
+            <a class="block text-gray-300 hover:text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors flex items-center gap-2" href="inbox.html">
                 <span data-i18n="nav-inbox">Inbox</span>
                 <span id="inbox-badge-nav-mobile" class="hidden w-2 h-2 bg-red-500 rounded-full animate-ping"></span>
             </a>
             <div class="flex items-center gap-2 px-4 py-3 border-t border-white/5 mt-2">
                 <button class="w-8 h-8 flex items-center justify-center rounded-full overflow-hidden hover:opacity-80 transition-all ring-2 ring-transparent hover:ring-white/30" aria-label="Tiếng Việt" onclick="changeLanguage('vi')">
-                    <img id="lang-vi-mobile" src="https://hatscripts.github.io/circle-flags/flags/vn.svg" alt="VN" class="w-full h-full object-cover">
+                    <img loading="lazy" decoding="async" id="lang-vi-mobile" src="https://hatscripts.github.io/circle-flags/flags/vn.svg" alt="VN" class="w-full h-full object-cover">
                 </button>
                 <button class="w-8 h-8 flex items-center justify-center rounded-full overflow-hidden hover:opacity-80 transition-all ring-2 ring-transparent hover:ring-white/30" aria-label="English" onclick="changeLanguage('en')">
-                    <img id="lang-en-mobile" src="https://hatscripts.github.io/circle-flags/flags/gb.svg" alt="UK" class="w-full h-full object-cover">
+                    <img loading="lazy" decoding="async" id="lang-en-mobile" src="https://hatscripts.github.io/circle-flags/flags/gb.svg" alt="UK" class="w-full h-full object-cover">
                 </button>
                 <button class="w-8 h-8 flex items-center justify-center rounded-full overflow-hidden hover:opacity-80 transition-all ring-2 ring-transparent hover:ring-white/30" aria-label="Suomi" onclick="changeLanguage('fi')">
-                    <img id="lang-fi-mobile" src="https://hatscripts.github.io/circle-flags/flags/fi.svg" alt="FI" class="w-full h-full object-cover">
+                    <img loading="lazy" decoding="async" id="lang-fi-mobile" src="https://hatscripts.github.io/circle-flags/flags/fi.svg" alt="FI" class="w-full h-full object-cover">
                 </button>
                 <button class="w-8 h-8 flex items-center justify-center rounded-full overflow-hidden hover:opacity-80 transition-all ring-2 ring-transparent hover:ring-white/30" aria-label="Svenska" onclick="changeLanguage('sv')">
-                    <img id="lang-sv-mobile" src="https://hatscripts.github.io/circle-flags/flags/se.svg" alt="SV" class="w-full h-full object-cover">
+                    <img loading="lazy" decoding="async" id="lang-sv-mobile" src="https://hatscripts.github.io/circle-flags/flags/se.svg" alt="SV" class="w-full h-full object-cover">
                 </button>
             </div>
             <div class="flex flex-col gap-2 px-4 pt-3 border-t border-white/5">
-                <a id="nav-register-btn-mobile" class="w-full text-center border-2 border-white/20 text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-white hover:text-black transition-all" href="/register" data-i18n="nav-register-mobile">Create Account</a>
-                <a class="w-full text-center bg-white text-black text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-gray-100 transition-all" href="/reservations" data-i18n="nav-reservations-mobile">Book Table</a>
+                <a id="nav-register-btn-mobile" class="w-full text-center border-2 border-white/20 text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-white hover:text-black transition-all" href="register.html" data-i18n="nav-register-mobile">Create Account</a>
+                <a class="w-full text-center bg-white text-black text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-gray-100 transition-all" href="reservations.html" data-i18n="nav-reservations-mobile">Book Table</a>
             </div>
         </div>
     </nav>
@@ -483,7 +303,7 @@
 <section class="pb-24 bg-transparent">
 <div class="max-w-3xl mx-auto px-margin-mobile md:px-margin-desktop">
 <div class="bg-surface/90 backdrop-blur-sm rounded-DEFAULT border border-outline-variant overflow-hidden p-8 md:p-10">
-<form id="reservation-form" class="space-y-6">
+<form onsubmit="return false;" method="POST" id="reservation-form" class="space-y-6">
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 <div>
 <label class="block font-body-sm text-body-sm text-secondary mb-2" for="res-name" data-i18n="res-form-name">Full Name</label>
@@ -565,27 +385,80 @@
 </section>
 </main>
 <!-- Footer -->
-<footer class="w-full pt-20 pb-10 bg-tertiary/90 footer-pattern">
-<div class="relative z-10 max-w-max-width mx-auto px-margin-desktop grid grid-cols-1 md:grid-cols-4 gap-gutter">
-<!-- Brand -->
-<div class="md:col-span-1 mb-10 md:mb-0">
-<a class="font-headline-md text-headline-md text-white flex items-center gap-2 mb-4 drop-shadow-md" href="/">
-    <img src="/images/logo.png" alt="Phở Việt Khang Logo" class="w-14 h-14 object-contain rounded-full bg-white">
-    <span>PHO VIET KHANG</span>
-</a>
-<p class="font-body-sm text-body-sm text-tertiary-fixed-dim drop-shadow-sm" data-i18n="footer-desc">
-                    The Art of Asian Gastronomy.
-                </p>
+<footer role="contentinfo" class="w-full pt-20 pb-10 bg-tertiary/90 footer-pattern">
+<div class="relative z-10 max-w-max-width mx-auto px-margin-desktop grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+  <!-- Brand & Socials -->
+  <div class="flex flex-col mb-8 md:mb-0">
+    <a class="font-headline-md text-headline-md text-white flex items-center gap-2 mb-4 drop-shadow-md" href="index.html">
+        <img loading="lazy" decoding="async" src="images/logo.webp" alt="Phở Việt Khang Logo" class="w-14 h-14 object-contain rounded-full bg-white">
+        <span>PHO VIET KHANG</span>
+    </a>
+    <p class="font-body-sm text-body-sm text-tertiary-fixed-dim drop-shadow-sm mb-6" data-i18n="footer-desc">
+        The Art of Asian Gastronomy.
+    </p>
+    <div class="flex flex-wrap gap-4 items-center">
+      <a href="https://facebook.com/phovietkhang" target="_blank" rel="noopener noreferrer" class="text-tertiary-fixed-dim hover:text-white transition-colors duration-300" aria-label="Facebook">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z"/></svg>
+      </a>
+      <a href="https://instagram.com/phovietkhang" target="_blank" rel="noopener noreferrer" class="text-tertiary-fixed-dim hover:text-white transition-colors duration-300" aria-label="Instagram">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+      </a>
+      <a href="https://twitter.com/phovietkhang" target="_blank" rel="noopener noreferrer" class="text-tertiary-fixed-dim hover:text-white transition-colors duration-300" aria-label="X (Twitter)">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      </a>
+      <a href="https://www.youtube.com/@phovietkhang" target="_blank" rel="noopener noreferrer" class="text-tertiary-fixed-dim hover:text-white transition-colors duration-300" aria-label="YouTube">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.11C19.52 3.545 12 3.545 12 3.545s-7.52 0-9.388.508a3.003 3.003 0 0 0-2.11 2.11C0 8.033 0 12 0 12s0 3.967.502 5.837a3.003 3.003 0 0 0 2.11 2.11C4.48 20.455 12 20.455 12 20.455s7.52 0 9.388-.508a3.003 3.003 0 0 0 2.11-2.11C24 15.967 24 12 24 12s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+      </a>
+      <a href="https://linkedin.com/company/phovietkhang" target="_blank" rel="noopener noreferrer" class="text-tertiary-fixed-dim hover:text-white transition-colors duration-300" aria-label="LinkedIn">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+      </a>
+      <a href="https://www.tripadvisor.com" target="_blank" rel="noopener noreferrer" class="text-tertiary-fixed-dim hover:text-white transition-colors duration-300" aria-label="TripAdvisor">
+        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M22.84 10.87c-1.37-3.92-4.47-7-8.39-8.38A11.75 11.75 0 0 0 12 2a11.75 11.75 0 0 0-2.45.26 12.02 12.02 0 0 0-8.38 8.38A11.75 11.75 0 0 0 2 12c0 2.18.6 4.22 1.64 5.95l-1.35 1.35a1 1 0 0 0 .7 1.71h3.08A11.86 11.86 0 0 0 12 22a11.75 11.75 0 0 0 2.45-.26 12.02 12.02 0 0 0 8.38-8.38c.18-.78.26-1.6.26-2.45s-.08-1.67-.25-2.04zM12 4c3.08 0 5.86 1.74 7.23 4.41l-2.04.85C16.14 7.28 14.18 6 12 6s-4.14 1.28-5.19 3.26l-2.04-.85C6.14 5.74 8.92 4 12 4zm-4.5 9c-1.38 0-2.5-1.12-2.5-2.5S6.12 8 7.5 8s2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5zm9 0c-1.38 0-2.5-1.12-2.5-2.5S15.12 8 16.5 8s2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5zM12 14c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+      </a>
+    </div>
+  </div>
+  
+  <!-- Quick Links -->
+  <div class="flex flex-col mb-8 md:mb-0 font-body-sm text-body-sm text-tertiary-fixed-dim">
+    <h4 class="text-white font-semibold mb-4" data-i18n="footer-links-title">Quick Links</h4>
+    <ul class="space-y-2">
+      <li><a class="hover:text-white transition-colors duration-300" href="privacy.html" data-i18n="footer-privacy">Privacy Policy</a></li>
+      <li><a class="hover:text-white transition-colors duration-300" href="terms.html" data-i18n="footer-terms">Terms of Service</a></li>
+      <li><a class="hover:text-white transition-colors duration-300" href="careers.html" data-i18n="footer-careers">Careers</a></li>
+      <li><a class="hover:text-white transition-colors duration-300" href="press.html" data-i18n="footer-press">Press Kit</a></li>
+    </ul>
+  </div>
+
+  <!-- Contact Us -->
+  <div class="flex flex-col mb-8 md:mb-0 font-body-sm text-body-sm text-tertiary-fixed-dim">
+    <h4 class="text-white font-semibold mb-4" data-i18n="footer-contact-title">Contact Us</h4>
+    <p class="mb-2">
+      <span class="font-semibold text-white" data-i18n="footer-phone-label">Phone:</span>
+      <a href="tel:+358449789995" class="hover:text-white transition-colors duration-300">+358 44 978 9995</a>
+    </p>
+    <p class="mb-2">
+      <span class="font-semibold text-white" data-i18n="footer-email-label">Email:</span>
+      <a href="#" class="email-obfuscated hover:text-white transition-colors duration-300" data-user="contact" data-domain="phovietkhang.com">contact [at] phovietkhang [dot] com</a>
+    </p>
+  </div>
+ 
+  <!-- Our Branches -->
+  <div class="flex flex-col font-body-sm text-body-sm text-tertiary-fixed-dim">
+    <h4 class="text-white font-semibold mb-4" data-i18n="footer-branches-title">Our Branches</h4>
+    <address class="not-italic space-y-3">
+      <p>
+        <strong class="text-white">Pengerkatu:</strong><br>
+        Pengerkatu 29, 00500 Helsinki, Finland
+      </p>
+      <p>
+        <strong class="text-white">Easton Helsinki:</strong><br>
+        Kauppakartanonkatu 3, 00930 Helsinki, Finland
+      </p>
+    </address>
+  </div>
 </div>
-<!-- Links Container (Spanning remaining cols for layout, simplified from complex structures) -->
-<div class="md:col-span-3 flex flex-wrap gap-8 md:justify-end items-start font-body-sm text-body-sm">
-<a class="text-tertiary-fixed-dim hover:text-on-tertiary transition-colors hover:underline decoration-1 underline-offset-4 duration-300 ease-in-out drop-shadow-sm" href="/privacy" data-i18n="footer-privacy">Privacy Policy</a>
-<a class="text-tertiary-fixed-dim hover:text-on-tertiary transition-colors hover:underline decoration-1 underline-offset-4 duration-300 ease-in-out drop-shadow-sm" href="/terms" data-i18n="footer-terms">Terms of Service</a>
-<a class="text-tertiary-fixed-dim hover:text-on-tertiary transition-colors hover:underline decoration-1 underline-offset-4 duration-300 ease-in-out drop-shadow-sm" href="/careers" data-i18n="footer-careers">Careers</a>
-<a class="text-tertiary-fixed-dim hover:text-on-tertiary transition-colors hover:underline decoration-1 underline-offset-4 duration-300 ease-in-out drop-shadow-sm" href="/press" data-i18n="footer-press">Press Kit</a>
-</div>
-</div>
-<!-- Copyright -->
+    
+  <!-- Copyright -->
 <div class="relative z-10 max-w-max-width mx-auto px-margin-desktop mt-16 pt-8 border-t border-outline-variant/20">
 <p class="font-body-sm text-body-sm text-tertiary-fixed-dim text-center md:text-left drop-shadow-sm">© 2026 PHO VIET KHANG. ALL RIGHTS RESERVED.</p>
 </div>

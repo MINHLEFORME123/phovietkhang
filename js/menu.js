@@ -551,7 +551,7 @@ function showFilterBanner(query) {
         <button id="clear-menu-filter" class="text-xs text-secondary hover:text-white transition-colors underline">${clearText[lang] || clearText.en}</button>
     `;
     menuContainer.prepend(banner);
-    document.getElementById('clear-menu-filter').addEventListener('click', () => {
+    document.getElementById('clear-menu-filter')?.addEventListener('click', () => {
         window.__menuSearchFilter = null;
         renderMenu(window.__menuCategories);
         showFilterBanner(null);
