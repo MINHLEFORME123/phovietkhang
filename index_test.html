@@ -420,19 +420,6 @@
             </div>
         </div>
     </nav>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const mobileBtn = document.querySelector('[aria-label="Toggle Menu"]');
-            const mobileMenu = document.getElementById('mobile-menu');
-            if(mobileBtn && mobileMenu) {
-                mobileBtn.addEventListener('click', () => {
-                    const isHidden = mobileMenu.classList.contains('hidden');
-                    mobileMenu.classList.toggle('hidden', !isHidden);
-                    mobileBtn.setAttribute('aria-expanded', isHidden.toString());
-                });
-            }
-        });
-    </script>
 <main role="main" class="flex-grow pt-20">
 <!-- Hero Section -->
 <section class="relative w-full h-[80vh] min-h-[600px] flex items-center bg-inverse-surface/90 hero-pattern">

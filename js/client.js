@@ -417,6 +417,19 @@ function decodeEmails() {
 }
 decodeEmails();
 
+// --- Mobile Menu Toggle ---
+window.toggleMobileMenu = function() {
+  const mobileMenu = document.getElementById('mobile-menu');
+  const mobileBtn = document.querySelector('[aria-label="Toggle Menu"]');
+  if (mobileMenu) {
+    const isHidden = mobileMenu.classList.contains('hidden');
+    mobileMenu.classList.toggle('hidden', !isHidden);
+    if (mobileBtn) {
+      mobileBtn.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+    }
+  }
+};
+
 // --- FIX: Append chat to <html> to avoid body animation transforms breaking position:fixed ---
 // Body animations (pageFadeIn/pageFadeOut) can create containing blocks.
 // Appending to <html> keeps chat immune to body-level transforms.
