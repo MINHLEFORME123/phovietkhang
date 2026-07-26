@@ -8,21 +8,8 @@
       gtag('js', new Date());
       gtag('config', 'G-H1DLYMFL1E');
     </script>
-    <!-- Facebook Pixel Code -->
-    <script>
-      !function(f,b,e,v,n,t,s)
-      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-      n.queue=[];t=b.createElement(e);t.async=!0;
-      t.src=v;s=b.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t,s)}(window, document,'script',
-      'https://connect.facebook.net/en_US/fbevents.js');
-      fbq('init', 'FACEBOOK_PIXEL_ID_PLACEHOLDER');
-      fbq('track', 'PageView');
-    </script>
-    <noscript><img loading="lazy" decoding="async" height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=FACEBOOK_PIXEL_ID_PLACEHOLDER&ev=PageView&noscript=1" alt="Facebook Pixel" /></noscript>
-    <!-- End Facebook Pixel Code -->
+    
+    
     
     
     
@@ -31,15 +18,6 @@
     
     
 
-<script>
-  if (window.trustedTypes && trustedTypes.createPolicy) {
-    trustedTypes.createPolicy('default', {
-      createHTML: string => string,
-      createScriptURL: string => string,
-      createScript: string => string,
-    });
-  }
-</script>
 <style>
     .bg-pattern-dark {
         background-image: linear-gradient(rgba(7, 24, 43, 0.85), rgba(7, 24, 43, 0.85)), url('assets/pattern-dark.svg') !important;
@@ -221,36 +199,43 @@
     
     
     
-    <link rel="canonical" href="https://phovietkhang.com/menu.html" />
-    <link rel="alternate" hreflang="vi" href="https://phovietkhang.com/menu.html?lang=vi" />
-    <link rel="alternate" hreflang="en" href="https://phovietkhang.com/menu.html?lang=en" />
-    <link rel="alternate" hreflang="fi" href="https://phovietkhang.com/menu.html?lang=fi" />
-    <link rel="alternate" hreflang="sv" href="https://phovietkhang.com/menu.html?lang=sv" />
-    <link rel="alternate" hreflang="x-default" href="https://phovietkhang.com/menu.html" />
+    
+    
+    
+    
+    
+    
 
     <!-- Fallback Security Headers -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: https: blob:; font-src 'self' https: data:; connect-src 'self' https:;">
     <meta name="referrer" content="strict-origin-when-cross-origin">
+    <link rel="canonical" href="https://phovietkhang.com/menu" />
+    <link rel="alternate" hreflang="vi" href="https://phovietkhang.com/menu?lang=vi" />
+    <link rel="alternate" hreflang="en" href="https://phovietkhang.com/menu?lang=en" />
+    <link rel="alternate" hreflang="fi" href="https://phovietkhang.com/menu?lang=fi" />
+    <link rel="alternate" hreflang="sv" href="https://phovietkhang.com/menu?lang=sv" />
+    <link rel="alternate" hreflang="x-default" href="https://phovietkhang.com/menu" />
+    <link rel="manifest" href="/manifest.json">
 </head>
 <body class="text-on-surface antialiased flex flex-col min-h-screen bg-pattern-dark">
     <nav aria-label="Main Navigation" class="fixed top-0 w-full z-50 bg-[#0a1019]/95 backdrop-blur-md border-b border-white/5">
         <div class="flex justify-between items-center max-w-7xl mx-auto px-4 md:px-16 h-20">
-            <a class="flex items-center gap-2.5 shrink-0" href="index.html">
+            <a class="flex items-center gap-2.5 shrink-0" href="/">
                 <img loading="lazy" decoding="async" src="images/logo.webp" alt="Ph? Vi?t Khang Logo" class="w-10 h-10 object-contain rounded-full bg-white">
                 <span class="text-white font-bold text-xl tracking-wide" style="font-family:'EB Garamond',serif;">PHỞ VIỆT KHANG</span>
             </a>
-            <div class="hidden lg:flex items-center space-x-8 font-medium text-[15px] tracking-wide">
-                <a class="text-gray-400 hover:text-white transition-colors duration-200" href="index.html" data-i18n="nav-home">Home</a>
-                <a class="text-gray-400 hover:text-white transition-colors duration-200" href="menu.html" data-i18n="nav-menu">Menu</a>
-                <a class="text-gray-400 hover:text-white transition-colors duration-200" href="locations.html" data-i18n="nav-locations">Locations</a>
-                <a class="text-gray-400 hover:text-white transition-colors duration-200" href="contact.html" data-i18n="nav-contact">Contact</a>
-                <a class="text-gray-400 hover:text-white transition-colors duration-200 relative flex items-center gap-1.5" href="inbox.html" id="nav-inbox-link">
+            <div class="hidden xl:flex items-center space-x-8 font-medium text-[15px] tracking-wide">
+                <a class="text-gray-400 hover:text-white transition-colors duration-200" href="/" data-i18n="nav-home">Home</a>
+                <a class="text-gray-400 hover:text-white transition-colors duration-200" href="/menu" data-i18n="nav-menu">Menu</a>
+                <a class="text-gray-400 hover:text-white transition-colors duration-200" href="/locations" data-i18n="nav-locations">Locations</a>
+                <a class="text-gray-400 hover:text-white transition-colors duration-200" href="/contact" data-i18n="nav-contact">Contact</a>
+                <a class="text-gray-400 hover:text-white transition-colors duration-200 relative flex items-center gap-1.5" href="/inbox" id="nav-inbox-link">
                     <span data-i18n="nav-inbox">Inbox</span>
                     <span id="inbox-badge-nav" class="hidden w-2 h-2 bg-red-500 rounded-full animate-ping"></span>
                 </a>
             </div>
             <div class="flex items-center gap-3">
-                <div class="hidden lg:flex items-center gap-1.5">
+                <div class="hidden xl:flex items-center gap-1.5">
                     <button class="w-8 h-8 flex items-center justify-center rounded-full overflow-hidden hover:opacity-80 transition-all duration-200 ring-2 ring-transparent hover:ring-white/30" aria-label="Tiếng Việt" onclick="changeLanguage('vi')">
                         <img loading="lazy" decoding="async" id="lang-vi" src="https://hatscripts.github.io/circle-flags/flags/vn.svg" alt="VN" class="w-full h-full object-cover">
                     </button>
@@ -264,26 +249,26 @@
                         <img loading="lazy" decoding="async" id="lang-sv" src="https://hatscripts.github.io/circle-flags/flags/se.svg" alt="SV" class="w-full h-full object-cover">
                     </button>
                 </div>
-                <a id="nav-register-btn" class="hidden lg:inline-flex border-2 border-white/20 text-white text-sm font-semibold px-5 py-2 rounded-xl hover:bg-white hover:text-black transition-all duration-200" href="register.html" data-i18n="nav-register">Register</a>
-                <a class="hidden lg:inline-flex bg-white text-black text-sm font-semibold px-5 py-2 rounded-xl hover:bg-gray-100 transition-all duration-200" href="reservations.html" data-i18n="nav-reservations">Reservations</a>
-                <a href="cart.html" class="nav-cart-btn relative text-white hover:text-gray-300 transition-colors p-1" aria-label="Shopping Cart" title="View Cart">
+                <a id="nav-register-btn" class="hidden xl:inline-flex border-2 border-white/20 text-white text-sm font-semibold px-5 py-2 rounded-xl hover:bg-white hover:text-black transition-all duration-200" href="/register" data-i18n="nav-register">Register</a>
+                <a class="hidden xl:inline-flex bg-white text-black text-sm font-semibold px-5 py-2 rounded-xl hover:bg-gray-100 transition-all duration-200" href="/reservations" data-i18n="nav-reservations">Reservations</a>
+                <a href="/cart" class="nav-cart-btn relative text-white hover:text-gray-300 transition-colors p-1" aria-label="Shopping Cart" title="View Cart">
                     <span class="material-symbols-outlined text-[22px]">shopping_cart</span>
                     <span id="cart-count" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">0</span>
                 </a>
-                <a id="nav-user-btn" href="login.html" aria-label="User Profile and Login" class="text-white hover:text-gray-300 transition-colors">
+                <a id="nav-user-btn" href="/login" aria-label="User Profile and Login" class="text-white hover:text-gray-300 transition-colors">
                     <span class="material-symbols-outlined text-[22px]">account_circle</span>
                 </a>
-                <button class="lg:hidden text-white p-2 rounded-lg hover:bg-white/10 transition-colors" onclick="toggleMobileMenu()" aria-label="Toggle Menu" aria-expanded="false">
+                <button class="xl:hidden text-white p-2 rounded-lg hover:bg-white/10 transition-colors" onclick="toggleMobileMenu()" aria-label="Toggle Menu" aria-expanded="false">
                     <span class="material-symbols-outlined">menu</span>
                 </button>
             </div>
         </div>
-        <div id="mobile-menu" class="hidden lg:hidden bg-[#0a1019] border-t border-white/5 px-4 py-4 space-y-1 font-medium text-sm max-h-[80vh] overflow-y-auto">
-            <a class="block text-gray-300 hover:text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors" href="index.html" data-i18n="nav-home">Home</a>
-            <a class="block text-gray-300 hover:text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors" href="menu.html" data-i18n="nav-menu">Menu</a>
-            <a class="block text-gray-300 hover:text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors" href="locations.html" data-i18n="nav-locations">Locations</a>
-            <a class="block text-gray-300 hover:text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors" href="contact.html" data-i18n="nav-contact">Contact</a>
-            <a class="block text-gray-300 hover:text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors flex items-center gap-2" href="inbox.html">
+        <div id="mobile-menu" class="hidden xl:hidden bg-[#0a1019] border-t border-white/5 px-4 py-4 space-y-1 font-medium text-sm max-h-[80vh] overflow-y-auto">
+            <a class="block text-gray-300 hover:text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors" href="/" data-i18n="nav-home">Home</a>
+            <a class="block text-gray-300 hover:text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors" href="/menu" data-i18n="nav-menu">Menu</a>
+            <a class="block text-gray-300 hover:text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors" href="/locations" data-i18n="nav-locations">Locations</a>
+            <a class="block text-gray-300 hover:text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors" href="/contact" data-i18n="nav-contact">Contact</a>
+            <a class="block text-gray-300 hover:text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors flex items-center gap-2" href="/inbox">
                 <span data-i18n="nav-inbox">Inbox</span>
                 <span id="inbox-badge-nav-mobile" class="hidden w-2 h-2 bg-red-500 rounded-full animate-ping"></span>
             </a>
@@ -302,8 +287,8 @@
                 </button>
             </div>
             <div class="flex flex-col gap-2 px-4 pt-3 border-t border-white/5">
-                <a id="nav-register-btn-mobile" class="w-full text-center border-2 border-white/20 text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-white hover:text-black transition-all" href="register.html" data-i18n="nav-register-mobile">Create Account</a>
-                <a class="w-full text-center bg-white text-black text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-gray-100 transition-all" href="reservations.html" data-i18n="nav-reservations-mobile">Book Table</a>
+                <a id="nav-register-btn-mobile" class="w-full text-center border-2 border-white/20 text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-white hover:text-black transition-all" href="/register" data-i18n="nav-register-mobile">Create Account</a>
+                <a class="w-full text-center bg-white text-black text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-gray-100 transition-all" href="/reservations" data-i18n="nav-reservations-mobile">Book Table</a>
             </div>
         </div>
     </nav>
@@ -318,9 +303,43 @@
         </div>
     </section>
 
+    <!-- Location Selector Modal -->
+    <div id="location-selector-modal" class="fixed inset-0 z-[2147483647] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+        <div class="bg-surface rounded-2xl border border-gray-800 shadow-2xl max-w-md w-full p-8">
+            <h2 class="text-2xl font-bold font-['EB_Garamond'] text-white mb-2">Select Location</h2>
+            <p class="text-secondary mb-6">Chọn cơ sở để xem thực đơn / Valitse sijainti nähdäksesi ruokalistan / Välj plats för att se menyn</p>
+            <div id="location-buttons-container" class="space-y-3 mb-6">
+                <button class="location-btn w-full py-4 px-6 rounded-xl border-2 border-white/20 text-white font-semibold hover:bg-primary hover:border-primary transition-all duration-200 flex items-center justify-between group" data-location="pengerkatu">
+                    <span>📍 Pengerkatu</span>
+                    <span class="text-sm text-secondary group-hover:text-white">Pengerkatu 29, 00500</span>
+                </button>
+                <button class="location-btn w-full py-4 px-6 rounded-xl border-2 border-white/20 text-white font-semibold hover:bg-primary hover:border-primary transition-all duration-200 flex items-center justify-between group" data-location="easton">
+                    <span>📍 Easton Helsinki</span>
+                    <span class="text-sm text-secondary group-hover:text-white">Kauppakartanonkatu 3, 00930</span>
+                </button>
+            </div>
+            <p class="text-xs text-secondary text-center">Bạn có thể thay đổi lựa chọn sau</p>
+        </div>
+    </div>
+
     <!-- Dynamic Menu Container -->
     <section class="pb-24 bg-transparent">
         <div class="max-w-7xl mx-auto px-4 md:px-16">
+            <!-- Location Info Bar -->
+            <div id="location-info-bar" class="mb-8 p-4 bg-primary/10 border border-primary/30 rounded-xl flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary">location_on</span>
+                    <div>
+                        <p class="text-sm text-secondary">Viewing menu for:</p>
+                        <p id="current-location-name" class="font-bold text-white">Pengerkatu</p>
+                    </div>
+                </div>
+                <button id="change-location-btn" class="text-sm text-primary hover:text-primary/80 transition-colors flex items-center gap-1">
+                    <span class="material-symbols-outlined text-base">edit_location</span>
+                    Change
+                </button>
+            </div>
+
             <div id="menu-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <!-- Dynamic items injected by menu.js -->
             </div>
@@ -332,7 +351,7 @@
 <div class="relative z-10 max-w-max-width mx-auto px-margin-desktop grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
   <!-- Brand & Socials -->
   <div class="flex flex-col mb-8 md:mb-0">
-    <a class="font-headline-md text-headline-md text-white flex items-center gap-2 mb-4 drop-shadow-md" href="index.html">
+    <a class="font-headline-md text-headline-md text-white flex items-center gap-2 mb-4 drop-shadow-md" href="/">
         <img loading="lazy" decoding="async" src="images/logo.webp" alt="Phở Việt Khang Logo" class="w-14 h-14 object-contain rounded-full bg-white">
         <span>PHO VIET KHANG</span>
     </a>
@@ -365,10 +384,10 @@
   <div class="flex flex-col mb-8 md:mb-0 font-body-sm text-body-sm text-tertiary-fixed-dim">
     <h4 class="text-white font-semibold mb-4" data-i18n="footer-links-title">Quick Links</h4>
     <ul class="space-y-2">
-      <li><a class="hover:text-white transition-colors duration-300" href="privacy.html" data-i18n="footer-privacy">Privacy Policy</a></li>
-      <li><a class="hover:text-white transition-colors duration-300" href="terms.html" data-i18n="footer-terms">Terms of Service</a></li>
-      <li><a class="hover:text-white transition-colors duration-300" href="careers.html" data-i18n="footer-careers">Careers</a></li>
-      <li><a class="hover:text-white transition-colors duration-300" href="press.html" data-i18n="footer-press">Press Kit</a></li>
+      <li><a class="hover:text-white transition-colors duration-300" href="/privacy" data-i18n="footer-privacy">Privacy Policy</a></li>
+      <li><a class="hover:text-white transition-colors duration-300" href="/terms" data-i18n="footer-terms">Terms of Service</a></li>
+      <li><a class="hover:text-white transition-colors duration-300" href="/careers" data-i18n="footer-careers">Careers</a></li>
+      <li><a class="hover:text-white transition-colors duration-300" href="/press" data-i18n="footer-press">Press Kit</a></li>
     </ul>
   </div>
 
@@ -381,7 +400,7 @@
     </p>
     <p class="mb-2">
       <span class="font-semibold text-white" data-i18n="footer-email-label">Email:</span>
-      <a href="#" class="email-obfuscated hover:text-white transition-colors duration-300" data-user="contact" data-domain="phovietkhang.com">contact [at] phovietkhang [dot] com</a>
+      <a href="#" class="email-obfuscated hover:text-white transition-colors duration-300" data-user="phovietkhang2024" data-domain="gmail.com">phovietkhang2024 [at] gmail [dot] com</a>
     </p>
   </div>
  
@@ -413,4 +432,4 @@
 <!-- Core Scripts -->
 <script src="js/client.js"></script>
 <script src="js/cart.js"></script>
-<script type="module" src="js/menu.js?v=8"></script>
+<script type="module" src="js/menu.js?v=9"></script>

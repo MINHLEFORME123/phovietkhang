@@ -22,7 +22,7 @@ if (!foodTableBody) {
             const querySnapshot = await getDocs(collection(db, "menu"));
             foodTableBody.innerHTML = '';
             if (querySnapshot.empty) {
-                foodTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-secondary">No food items found.</td></tr>';
+                foodTableBody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-secondary">No food items found.</td></tr>';
                 return;
             }
             const items = [];
@@ -33,7 +33,7 @@ if (!foodTableBody) {
             renderFoodRows(items);
         } catch (error) {
             console.error("Error loading menu:", error);
-            foodTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-red-500">Failed to load menu.</td></tr>';
+            foodTableBody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-red-500">Failed to load menu.</td></tr>';
         }
     }
 
@@ -41,7 +41,7 @@ if (!foodTableBody) {
         if (!foodTableBody) return;
         foodTableBody.innerHTML = '';
         if (!items.length) {
-            foodTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-secondary">No matching items.</td></tr>';
+            foodTableBody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-secondary">No matching items.</td></tr>';
             return;
         }
         items.forEach((item) => {
@@ -49,15 +49,17 @@ if (!foodTableBody) {
             const normalized = normalizeOptions(item.options);
             const optCount = normalized.length > 0 ? `<span class="text-xs bg-teal-600/20 text-teal-400 px-1.5 py-0.5 rounded-full ml-1">${normalized.length} opt groups</span>` : '';
 
+            const isHidden = item.hidden === true;
             const image = escapeHtml(item.image || 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=100');
             const fallbackImage = 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=100';
             const tr = document.createElement('tr');
-            tr.className = "border-b border-gray-800/50 hover:bg-surface-highlight transition-colors";
+            tr.className = `border-b border-gray-800/50 hover:bg-surface-highlight transition-colors ${isHidden ? 'opacity-50' : ''}`;
             tr.innerHTML = `
                 <td class="py-3 px-4"><img src="${image}" class="w-12 h-12 object-cover rounded" onerror="this.src='${fallbackImage}'"></td>
                 <td class="py-3 px-4">
                     <span class="font-bold text-white">${escapeHtml(item.nameVi || '')}</span>
                     ${item.allergenWarning ? '<span class="inline-flex items-center gap-1 bg-red-900/30 text-red-400 text-xs px-2 py-0.5 rounded-md font-semibold border border-red-800/50 ml-2" title="Chứa thành phần dễ gây dị ứng"><span class="material-symbols-outlined text-[14px]">warning</span> Dị ứng</span>' : ''}
+                    ${item.location ? `<br><span class="text-xs bg-blue-900/30 text-blue-400 px-1.5 py-0.5 rounded-md inline-block mt-1">📍 ${escapeHtml(item.location)}</span>` : '<br><span class="text-xs text-secondary/50">(no location)</span>'}
                     <br>
                     <span class="text-xs text-secondary">EN: ${escapeHtml(item.nameEn || '')}</span><br>
                     <span class="text-xs text-secondary">FI: ${escapeHtml(item.nameFi || '')}</span><br>
@@ -71,6 +73,12 @@ if (!foodTableBody) {
                 </td>
                 <td class="py-3 px-4">€${(item.price || 0).toFixed(2)}</td>
                 <td class="py-3 px-4">${optCount || '<span class="text-xs text-secondary/50">None</span>'}</td>
+                <td class="py-3 px-4">
+                    <button class="btn-toggle-hidden flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${isHidden ? 'bg-red-900/30 text-red-400 border border-red-800/50 hover:bg-red-900/50' : 'bg-emerald-900/30 text-emerald-400 border border-emerald-800/50 hover:bg-emerald-900/50'}" data-id="${id}" data-hidden="${isHidden}" title="${isHidden ? 'Món đang bị khóa — nhấn để mở khóa' : 'Món đang hiển thị — nhấn để khóa'}">
+                        <span class="material-symbols-outlined text-[16px]">${isHidden ? 'lock' : 'lock_open'}</span>
+                        ${isHidden ? 'Đã khóa' : 'Hiển thị'}
+                    </button>
+                </td>
                 ${window.location.pathname.includes('/host/') ? '' : `
                 <td class="py-3 px-4"><div class="flex gap-2">
                     <button class="btn-edit text-blue-400 hover:text-blue-300 transition-colors" data-id="${id}">
@@ -83,6 +91,9 @@ if (!foodTableBody) {
                 `}
             `;
 
+            // Lock/Unlock toggle
+            tr.querySelector('.btn-toggle-hidden').addEventListener('click', () => window.toggleFoodHidden(id, isHidden));
+
             if (!window.location.pathname.includes('/host/')) {
                 tr.querySelector('.btn-edit').addEventListener('click', () => window.openEditModal(id, item));
                 tr.querySelector('.btn-delete').addEventListener('click', () => window.deleteFood(id));
@@ -92,22 +103,60 @@ if (!foodTableBody) {
         });
     }
 
-    function setupAdminFoodSearch() {
-        const adminFoodSearch = document.getElementById('admin-food-search');
-        if (!adminFoodSearch) return;
-        adminFoodSearch.addEventListener('input', () => {
-            const q = (adminFoodSearch.value || '').toLowerCase();
-            const all = window.__adminFoodItems || [];
-            if (!q) { renderFoodRows(all); return; }
-            const filtered = all.filter((item) => {
+    function applyFilters() {
+        const searchInput = document.getElementById('admin-food-search');
+        const locationFilter = document.getElementById('admin-location-filter');
+        const q = (searchInput?.value || '').toLowerCase();
+        const location = (locationFilter?.value || '').toLowerCase();
+        const all = window.__adminFoodItems || [];
+
+        let filtered = all;
+
+        // Filter by location
+        if (location) {
+            filtered = filtered.filter(item => {
+                const itemLocation = (item.location || 'pengerkatu').toLowerCase();
+                return itemLocation === location;
+            });
+        }
+
+        // Filter by search
+        if (q) {
+            filtered = filtered.filter((item) => {
                 const text = [item.nameVi, item.nameEn, item.nameFi, item.nameSv, item.categoryVi, item.categoryEn, item.categoryFi, item.categorySv, item.descVi, item.descEn, item.descFi, item.descSv, (item.tags || []).join(' ')].join(' ').toLowerCase();
                 return text.indexOf(q) !== -1;
             });
-            renderFoodRows(filtered);
-        });
+        }
+
+        renderFoodRows(filtered);
+    }
+
+    function setupAdminFoodSearch() {
+        const adminFoodSearch = document.getElementById('admin-food-search');
+        const locationFilter = document.getElementById('admin-location-filter');
+
+        if (adminFoodSearch) {
+            adminFoodSearch.addEventListener('input', applyFilters);
+        }
+
+        if (locationFilter) {
+            locationFilter.addEventListener('change', applyFilters);
+        }
     }
 
     setupAdminFoodSearch();
+
+    window.toggleFoodHidden = async function(id, currentlyHidden) {
+        const newHidden = !currentlyHidden;
+        try {
+            await updateDoc(doc(db, "menu", id), { hidden: newHidden });
+            window.showNotification(newHidden ? 'Đã khóa món — không hiển thị cho khách.' : 'Đã mở khóa — khách có thể đặt món này.', 'success');
+            loadFood();
+        } catch (e) {
+            console.error('Toggle hidden error:', e);
+            window.showNotification('Thao tác thất bại.', 'error');
+        }
+    };
 
     window.deleteFood = async function(id) {
         if (confirm("Are you sure you want to delete this food item?")) {
@@ -182,6 +231,7 @@ if (foodTableBody2) {
         document.getElementById('edit-category-fi').value = item.categoryFi || '';
         document.getElementById('edit-category-sv').value = item.categorySv || '';
         document.getElementById('edit-price').value = item.price || 0;
+        document.getElementById('edit-location').value = item.location || 'pengerkatu';
 
         const editAllergenCb = document.getElementById('edit-allergen');
         if (editAllergenCb) editAllergenCb.checked = item.allergenWarning || false;
@@ -341,6 +391,7 @@ if (foodTableBody2) {
                     category: categoryVi, categoryVi,
                     categoryEn: categoryEn || categoryVi, categoryFi: categoryFi || categoryVi, categorySv: categorySv || categoryVi,
                     price: parseFloat(document.getElementById('edit-price').value) || 0,
+                    location: document.getElementById('edit-location').value || 'pengerkatu',
                     options: [...editOptions],
                     allergenWarning: document.getElementById('edit-allergen')?.checked || false
                 };

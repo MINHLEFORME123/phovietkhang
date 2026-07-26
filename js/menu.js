@@ -1,7 +1,56 @@
-﻿import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { db } from "./firebase-config.js";
 
 const menuContainer = document.getElementById('menu-container');
+const locationSelectorModal = document.getElementById('location-selector-modal');
+const locationButtons = document.querySelectorAll('.location-btn');
+const changeLocationBtn = document.getElementById('change-location-btn');
+const currentLocationName = document.getElementById('current-location-name');
+
+const LOCATION_NAMES = {
+    pengerkatu: '📍 Pengerkatu (Pengerkatu 29, 00500)',
+    easton: '📍 Easton Helsinki (Kauppakartanonkatu 3, 00930)'
+};
+
+let selectedLocation = null;
+
+function initLocationSelector() {
+    selectedLocation = localStorage.getItem('selectedLocation') || null;
+
+    if (!selectedLocation && locationSelectorModal) {
+        locationSelectorModal.style.display = 'flex';
+    } else if (selectedLocation && locationSelectorModal) {
+        locationSelectorModal.style.display = 'none';
+        updateLocationDisplay();
+    }
+
+    locationButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            selectedLocation = btn.getAttribute('data-location');
+            localStorage.setItem('selectedLocation', selectedLocation);
+            if (locationSelectorModal) {
+                locationSelectorModal.style.display = 'none';
+            }
+            updateLocationDisplay();
+            loadMenu();
+        });
+    });
+
+    if (changeLocationBtn) {
+        changeLocationBtn.addEventListener('click', () => {
+            if (locationSelectorModal) {
+                locationSelectorModal.style.display = 'flex';
+            }
+        });
+    }
+}
+
+function updateLocationDisplay() {
+    if (currentLocationName && selectedLocation) {
+        const displayName = LOCATION_NAMES[selectedLocation] || selectedLocation;
+        currentLocationName.textContent = displayName;
+    }
+}
 
 // --- NORMALIZATION UTILITY FOR BACKWARD COMPATIBILITY ---
 function normalizeOptions(options) {
@@ -306,15 +355,15 @@ function showOptionsPopup(item, lang) {
             selectedStrings.push(displayStr);
         });
 
-        const safeName = (item.nameEn || item.nameVi || 'Unknown');
-        
+        const safeName = displayName || item.nameEn || item.nameVi || 'Unknown';
+
         // Trigger fly to cart animation on the card
         if (typeof window.flyToCart === 'function') {
             window.flyToCart(card);
         }
         
         if (typeof window.addToCart === 'function') {
-            window.addToCart(item.id, safeName, finalPrice, item.image || '', selectedStrings);
+            window.addToCart(item.id, safeName, finalPrice, item.image || '', selectedStrings, { vi: item.nameVi, en: item.nameEn, fi: item.nameFi, sv: item.nameSv });
         }
 
         closePopup();
@@ -323,50 +372,138 @@ function showOptionsPopup(item, lang) {
 
 async function loadMenu() {
     if (!menuContainer) return;
-    
-    menuContainer.innerHTML = '<div class="col-span-full text-center py-20"><span class="material-symbols-outlined animate-spin text-4xl text-primary">sync</span><p class="mt-4 text-secondary">Loading Menu from Firebase...</p></div>';
+    if (!selectedLocation) {
+        if (locationSelectorModal) locationSelectorModal.style.display = 'flex';
+        return;
+    }
+
+    const lang = localStorage.getItem('selectedLanguage') || 'en';
+    const loadingTexts = {
+        vi: 'Đang tải thực đơn...',
+        en: 'Loading menu...',
+        fi: 'Ladataan ruokalistaa...',
+        sv: 'Laddar meny...'
+    };
+
+    let useCache = false;
+    let categories = {};
+    const cacheKey = `phoMenuCache_${selectedLocation}`;
+    const cacheTimeKey = `phoMenuCacheTime_${selectedLocation}`;
 
     try {
-        const querySnapshot = await getDocs(collection(db, "menu"));
-        
-        if (querySnapshot.empty) {
-            menuContainer.innerHTML = '<div class="col-span-full text-center py-20 text-secondary">Our menu is currently being updated. Please check back later.</div>';
-            return;
+        const cachedStr = localStorage.getItem(cacheKey);
+        const cacheTime = localStorage.getItem(cacheTimeKey);
+        // Cache for 1 hour
+        if (cachedStr && cacheTime && (Date.now() - parseInt(cacheTime) < 3600000)) {
+            const parsed = JSON.parse(cachedStr);
+            if (parsed && typeof parsed === 'object' && !Array.isArray(parsed) && Object.keys(parsed).length > 0) {
+                categories = parsed;
+                useCache = true;
+            }
+        }
+    } catch (e) {}
+
+    if (!useCache) {
+        menuContainer.innerHTML = `<div class="col-span-full text-center py-20"><span class="material-symbols-outlined animate-spin text-4xl text-primary">sync</span><p class="mt-4 text-secondary">${loadingTexts[lang] || loadingTexts.en}</p></div>`;
+    }
+
+    try {
+        if (!useCache) {
+            const querySnapshot = await getDocs(collection(db, "menu"));
+
+            if (querySnapshot.empty) {
+                menuContainer.innerHTML = '<div class="col-span-full text-center py-20 text-secondary">Our menu is currently being updated. Please check back later.</div>';
+                return;
+            }
+
+            categories = {};
+            querySnapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                data.id = docSnap.id;
+
+                // Skip hidden/locked items
+                if (data.hidden === true) return;
+
+                // Filter by location
+                const itemLocation = (data.location || 'pengerkatu').toLowerCase();
+                if (itemLocation !== selectedLocation.toLowerCase()) return;
+
+                const catVi = data.categoryVi || data.category || 'Món chính';
+                const catEn = data.categoryEn || getCategoryTitle(catVi, 'en');
+                const catFi = data.categoryFi || getCategoryTitle(catVi, 'fi');
+                const catSv = data.categorySv || getCategoryTitle(catVi, 'sv');
+
+                const groupingKey = catVi.toLowerCase().trim();
+                if (!categories[groupingKey]) {
+                    categories[groupingKey] = {
+                        title: { vi: catVi, en: catEn, fi: catFi, sv: catSv },
+                        items: []
+                    };
+                }
+                categories[groupingKey].items.push(data);
+            });
+
+            try {
+                localStorage.setItem(cacheKey, JSON.stringify(categories));
+                localStorage.setItem(cacheTimeKey, Date.now().toString());
+            } catch (e) {}
         }
 
-        const categories = {};
-
-        querySnapshot.forEach((docSnap) => {
-            const data = docSnap.data();
-            data.id = docSnap.id;
-            
-            const catVi = data.categoryVi || data.category || 'Món chính';
-            const catEn = data.categoryEn || getCategoryTitle(catVi, 'en');
-            const catFi = data.categoryFi || getCategoryTitle(catVi, 'fi');
-            const catSv = data.categorySv || getCategoryTitle(catVi, 'sv');
-            
-            const groupingKey = catVi.toLowerCase().trim();
-            if (!categories[groupingKey]) {
-                categories[groupingKey] = {
-                    title: { vi: catVi, en: catEn, fi: catFi, sv: catSv },
-                    items: []
-                };
-            }
-            categories[groupingKey].items.push(data);
-        });
-
         window.__menuCategories = categories;
-        renderMenu(categories);
+        try {
+            renderMenu(categories);
+        } catch (renderErr) {
+            console.error("Menu render failed:", renderErr);
+            // Cache có thể hỏng/định dạng cũ → xoá và tải lại từ Firestore một lần
+            try { localStorage.removeItem('phoMenuCache'); localStorage.removeItem('phoMenuCacheTime'); } catch(e) {}
+            if (useCache) { return loadMenu(); }
+            throw renderErr;
+        }
 
         const urlSearch = new URLSearchParams(window.location.search).get('search');
         if (urlSearch) {
             window.__menuSearchFilter = urlSearch;
             applyMenuFilter(urlSearch);
         }
+        
+        if (useCache) {
+            getDocs(collection(db, "menu")).then(querySnapshot => {
+                if (querySnapshot.empty) return;
+                const newCategories = {};
+                querySnapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    data.id = docSnap.id;
+                    // Skip hidden/locked items
+                    if (data.hidden === true) return;
+                    // Filter by location
+                    const itemLocation = (data.location || 'pengerkatu').toLowerCase();
+                    if (itemLocation !== selectedLocation.toLowerCase()) return;
+                    const catVi = data.categoryVi || data.category || 'Món chính';
+                    const catEn = data.categoryEn || getCategoryTitle(catVi, 'en');
+                    const catFi = data.categoryFi || getCategoryTitle(catVi, 'fi');
+                    const catSv = data.categorySv || getCategoryTitle(catVi, 'sv');
+                    const groupingKey = catVi.toLowerCase().trim();
+                    if (!newCategories[groupingKey]) {
+                        newCategories[groupingKey] = {
+                            title: { vi: catVi, en: catEn, fi: catFi, sv: catSv },
+                            items: []
+                        };
+                    }
+                    newCategories[groupingKey].items.push(data);
+                });
+                try {
+                    localStorage.setItem(cacheKey, JSON.stringify(newCategories));
+                    localStorage.setItem(cacheTimeKey, Date.now().toString());
+                } catch(e) {}
+            }).catch(e => console.error("Background menu update failed:", e));
+        }
 
     } catch (error) {
         console.error("Error loading menu:", error);
-        menuContainer.innerHTML = '<div class="col-span-full text-center py-20 text-red-500">Failed to load menu. Please refresh.</div>';
+        // Luôn hiện thông báo nếu chưa có món nào hiển thị — không để trang trắng
+        if (!menuContainer.querySelector('.btn-add-to-cart')) {
+            menuContainer.innerHTML = '<div class="col-span-full text-center py-20 text-red-500">Không tải được thực đơn. Vui lòng tải lại trang.<br>Failed to load menu. Please refresh.</div>';
+        }
     }
 }
 
@@ -395,8 +532,8 @@ function renderMenu(categories) {
 
         const header = document.createElement('div');
         header.className = 'col-span-full mt-12 mb-6';
-        header.innerHTML = `<h2 class="text-3xl font-bold font-['EB_Garamond'] text-primary border-b border-gray-800 pb-2 dynamic-cat-title" 
-            data-vi="${catData.title.vi}" data-en="${catData.title.en}" data-fi="${catData.title.fi}">
+        header.innerHTML = `<h2 class="text-3xl font-bold font-['EB_Garamond'] text-primary border-b border-gray-800 pb-2 dynamic-cat-title"
+            data-vi="${catData.title.vi}" data-en="${catData.title.en}" data-fi="${catData.title.fi}" data-sv="${catData.title.sv || catData.title.en}">
             ${catData.title[lang] || catData.title.en}</h2>`;
         menuContainer.appendChild(header);
 
@@ -492,9 +629,10 @@ function renderMenu(categories) {
                     if (typeof window.flyToCart === 'function') {
                         window.flyToCart(card);
                     }
-                    const safeName = (item.nameSv || item.nameEn || item.nameVi || 'Unknown');
+                    const cartNameKey = currentLang === 'vi' ? 'nameVi' : (currentLang === 'fi' ? 'nameFi' : (currentLang === 'sv' ? 'nameSv' : 'nameEn'));
+                    const safeName = (item[cartNameKey] || item.nameEn || item.nameVi || 'Unknown');
                     if (typeof window.addToCart === 'function') {
-                        window.addToCart(item.id, safeName, item.price || 0, item.image || '', []);
+                        window.addToCart(item.id, safeName, item.price || 0, item.image || '', [], { vi: item.nameVi, en: item.nameEn, fi: item.nameFi, sv: item.nameSv });
                     }
                 }
             });
@@ -590,8 +728,12 @@ window.addEventListener('languageChanged', () => {
 });
 
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', loadMenu);
+    document.addEventListener('DOMContentLoaded', () => {
+        initLocationSelector();
+        loadMenu();
+    });
 } else {
+    initLocationSelector();
     loadMenu();
 }
 

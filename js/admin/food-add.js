@@ -209,18 +209,11 @@ if (btnAiScan) {
         loadingIndicator.innerHTML = '<span class="material-symbols-outlined animate-spin align-middle mr-1 text-sm">sync</span> AI is scanning menu image...';
         btnAiScan.disabled = true;
         try {
-            const keys = getApiKeysCached();
             const visionPayload = {
                 model: 'gpt-oss-120b',
                 messages: [{ role: 'user', content: [{ type: "text", text: "Please read all text from this menu image perfectly. List all dishes, prices, descriptions, and any options you see." }, { type: "image_url", image_url: { url: menuImageBase64 } }] }]
             };
-            const visionResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${keys.cerebrasPrimary}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify(visionPayload)
-            });
-            if (!visionResponse.ok) throw new Error(`Vision API error: ${await visionResponse.text()}`);
-            const visionData = await visionResponse.json();
+            const visionData = await callOpenRouterWithFallback(visionPayload);
             if (!visionData || !visionData.choices || visionData.choices.length === 0) throw new Error(visionData?.error?.message || "Invalid response format from Vision AI");
             const extractedText = visionData.choices[0].message.content;
 
@@ -238,26 +231,7 @@ You MUST return ONLY a JSON object with a single key "items" containing the arra
 JSON Structure:
 { "items": [ { "nameVi": "Tên món", "descVi": "Mô tả hấp dẫn", "nameEn": "English name", "descEn": "English desc", "nameFi": "Finnish name", "descFi": "Finnish desc", "nameSv": "Swedish name", "descSv": "Swedish desc", "price": 12.50, "categoryVi": "Phở", "categoryEn": "Pho", "categoryFi": "Pho", "categorySv": "Pho", "options": [ { "nameVi": "Cấp độ cay", "nameEn": "Spicy Level", "nameFi": "Tulisuusaste", "nameSv": "Krydningsgrad", "type": "single-select", "choices": [ { "labelVi": "Không cay", "labelEn": "Not Spicy", "labelFi": "Ei tulinen", "labelSv": "Inte stark", "price": 0 }, { "labelVi": "Cay", "labelEn": "Spicy", "labelFi": "Tulinen", "labelSv": "Stark", "price": 0 } ] } ] } ] }`;
 
-            const reasonerData = await (async () => {
-                try {
-                    const r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-                        method: 'POST',
-                        headers: { 'Authorization': `Bearer ${keys.cerebrasPrimary}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ model: 'gpt-oss-120b', messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: `Here is the raw text extracted from the menu:\n\n${extractedText}\n\nPlease parse this into the exact JSON format. Return ONLY the JSON object, no markdown.` }] })
-                    });
-                    if (!r.ok) throw new Error(`OpenRouter HTTP ${r.status}`);
-                    return await r.json();
-                } catch (e) {
-                    console.warn('[OpenRouter] Reasoner primary failed:', e);
-                    const r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-                        method: 'POST',
-                        headers: { 'Authorization': `Bearer ${keys.cerebrasBackup}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ model: 'gpt-oss-120b', messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: `Here is the raw text extracted from the menu:\n\n${extractedText}\n\nPlease parse this into the exact JSON format. Return ONLY the JSON object, no markdown.` }] })
-                    });
-                    if (!r.ok) throw new Error(`OpenRouter HTTP ${r.status}`);
-                    return await r.json();
-                }
-            })();
+            const reasonerData = await callOpenRouterWithFallback({ model: 'gpt-oss-120b', messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: `Here is the raw text extracted from the menu:\n\n${extractedText}\n\nPlease parse this into the exact JSON format. Return ONLY the JSON object, no markdown.` }] });
             const rawJson = reasonerData.choices[0].message.content;
             if (!rawJson) throw new Error("All Reasoner models failed. Please try again later.");
             const items = extractJsonArray(rawJson);
@@ -272,6 +246,7 @@ JSON Structure:
                     nameFi: item.nameFi || '', descFi: item.descFi || '', nameSv: item.nameSv || '', descSv: item.descSv || '', category: catVi, categoryVi: catVi,
                     categoryEn: item.categoryEn || catVi, categoryFi: item.categoryFi || catVi, categorySv: item.categorySv || catVi,
                     price: parseFloat(item.price) || 0,
+                    location: 'pengerkatu',
                     image: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=500',
                     options: Array.isArray(item.options) ? item.options : [], createdAt: new Date()
                 });
@@ -308,7 +283,6 @@ if (btnAiExtract) {
             const firstSheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[firstSheetName];
             const csvData = XLSX.utils.sheet_to_csv(worksheet);
-            const keys = getApiKeysCached();
 
             const systemPrompt = `You are an expert data parser. Extract ALL food items from the CSV data.
 1. Translate missing names/descriptions to VI, EN, FI, SV.
@@ -320,26 +294,7 @@ if (btnAiExtract) {
 You MUST return ONLY a JSON object with a single key "items" containing the array of dishes. No markdown blocks.
 JSON Structure: { "items": [ { "nameVi": "Tên món", "descVi": "Mô tả hấp dẫn", "nameEn": "English name", "descEn": "English desc", "nameFi": "Finnish name", "descFi": "Finnish desc", "nameSv": "Swedish name", "descSv": "Swedish desc", "price": 12.50, "categoryVi": "Phở", "categoryEn": "Pho", "categoryFi": "Pho", "categorySv": "Pho", "options": [] } ] }`;
 
-            const responseData = await (async () => {
-                try {
-                    const r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-                        method: 'POST',
-                        headers: { 'Authorization': `Bearer ${keys.cerebrasPrimary}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ model: 'gpt-oss-120b', messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: `Raw Data:\n${csvData}\n\nReturn ONLY the JSON object, no markdown.` }] })
-                    });
-                    if (!r.ok) throw new Error(`OpenRouter HTTP ${r.status}`);
-                    return await r.json();
-                } catch (e) {
-                    console.warn('[OpenRouter] Extract primary failed:', e);
-                    const r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-                        method: 'POST',
-                        headers: { 'Authorization': `Bearer ${keys.cerebrasBackup}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ model: 'gpt-oss-120b', messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: `Raw Data:\n${csvData}\n\nReturn ONLY the JSON object, no markdown.` }] })
-                    });
-                    if (!r.ok) throw new Error(`OpenRouter HTTP ${r.status}`);
-                    return await r.json();
-                }
-            })();
+            const responseData = await callOpenRouterWithFallback({ model: 'gpt-oss-120b', messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: `Raw Data:\n${csvData}\n\nReturn ONLY the JSON object, no markdown.` }] });
             const rawJson = responseData.choices[0].message.content;
             if (!rawJson) throw new Error("All Extract models failed. Please try again later.");
             const items = extractJsonArray(rawJson);
@@ -354,6 +309,7 @@ JSON Structure: { "items": [ { "nameVi": "Tên món", "descVi": "Mô tả hấp 
                     nameFi: item.nameFi || '', descFi: item.descFi || '', nameSv: item.nameSv || '', descSv: item.descSv || '', category: catVi, categoryVi: catVi,
                     categoryEn: item.categoryEn || catVi, categoryFi: item.categoryFi || catVi, categorySv: item.categorySv || catVi,
                     price: parseFloat(item.price) || 0,
+                    location: 'pengerkatu',
                     image: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=500',
                     options: Array.isArray(item.options) ? item.options : [], createdAt: new Date()
                 });
@@ -383,14 +339,13 @@ if (btnTranslate) {
         loadingIndicator.classList.remove('hidden');
         btnTranslate.disabled = true;
         try {
-            const keys = getApiKeysCached();
             const payload = {
                 messages: [
                     { role: 'system', content: 'You are an expert translator. Translate the given Vietnamese food name and description into English, Finnish, and Swedish. Return ONLY a raw JSON object with these keys: nameEn, descEn, nameFi, descFi, nameSv, descSv. No markdown.' },
                     { role: 'user', content: `Name (VI): ${nameVi}\nDescription (VI): ${descVi || ''}` }
                 ]
             };
-            const data = await callOpenRouterWithFallback(payload, keys.openRouterKey2);
+            const data = await callOpenRouterWithFallback(payload);
             const translated = extractJsonObject(data.choices[0].message.content);
             document.getElementById('food-name-en').value = translated.nameEn || '';
             document.getElementById('food-desc-en').value = translated.descEn || '';
@@ -418,14 +373,13 @@ if (btnAutoDesc) {
         btnAutoDesc.innerHTML = '<span class="material-symbols-outlined animate-spin text-[14px]">sync</span> ...';
         btnAutoDesc.disabled = true;
         try {
-            const keys = getApiKeysCached();
             const payload = {
                 messages: [
                     { role: 'system', content: 'Bạn là chuyên gia viết content ẩm thực nhà hàng Việt Nam cao cấp. Nhiệm vụ của bạn là viết một đoản mô tả món ăn (Description) bằng Tiếng Việt cực kỳ hấp dẫn, kích thích vị giác, giới thiệu sơ về nguyên liệu và cách chế biến. Đoạn văn phải ngắn gọn, dài tối đa 3 câu. Chỉ trả về văn bản, không dùng ngoặc kép, không dùng markdown.' },
                     { role: 'user', content: `Tên món Ăn: ${nameVi}` }
                 ]
             };
-            const data = await callOpenRouterWithFallback(payload, keys.openRouterKey2);
+            const data = await callOpenRouterWithFallback(payload);
             document.getElementById('food-desc-vi').value = data.choices[0].message.content.trim();
         } catch (error) {
             console.error('Auto Desc Error:', error);
@@ -447,6 +401,7 @@ if (foodAddForm) {
         const categoryFi = document.getElementById('food-category-fi').value;
         const categorySv = document.getElementById('food-category-sv').value;
         const price = parseFloat(document.getElementById('food-price').value);
+        const location = document.getElementById('food-location').value || 'pengerkatu';
         const nameVi = document.getElementById('food-name-vi').value;
         const descVi = document.getElementById('food-desc-vi').value;
         const nameEn = document.getElementById('food-name-en').value;
@@ -470,7 +425,7 @@ if (foodAddForm) {
                 nameVi, descVi, nameEn, descEn, nameFi, descFi, nameSv, descSv,
                 category: categoryVi, categoryVi,
                 categoryEn: categoryEn || categoryVi, categoryFi: categoryFi || categoryVi, categorySv: categorySv || categoryVi,
-                price, image: finalImage, options: foodOptions.length > 0 ? [...foodOptions] : [],
+                price, location, image: finalImage, options: foodOptions.length > 0 ? [...foodOptions] : [],
                 allergenWarning, createdAt: new Date()
             });
             window.showNotification('Food item added successfully!', 'success');

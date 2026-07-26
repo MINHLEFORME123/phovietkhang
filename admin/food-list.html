@@ -24,6 +24,7 @@
     <!-- Fallback Security Headers -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: https: blob:; font-src 'self' https: data:; connect-src 'self' https:;">
     <meta name="referrer" content="strict-origin-when-cross-origin">
+    <link rel="manifest" href="/manifest.json">
 </head>
 <body class="bg-[#0b0f19] text-on-surface font-['Inter'] flex h-screen overflow-hidden">
     <button id="sidebar-toggle" class="md:hidden fixed top-4 left-4 z-50 bg-surface-highlight border border-gray-700 text-white p-2 rounded-lg shadow">
@@ -84,6 +85,14 @@
         <header class="h-20 bg-surface border-b border-gray-800 flex items-center justify-between px-8 flex-shrink-0">
             <h2 class="text-2xl font-semibold text-white">Food Menu Management</h2>
             <div class="flex items-center space-x-4">
+                <div class="flex items-center gap-2 bg-surface-highlight rounded-lg px-3 py-1.5 border border-gray-700">
+                    <span class="material-symbols-outlined text-primary text-sm">location_on</span>
+                    <select id="admin-location-filter" class="bg-transparent text-white text-sm font-medium outline-none cursor-pointer">
+                        <option value="">All Locations</option>
+                        <option value="pengerkatu">Pengerkatu</option>
+                        <option value="easton">Easton Helsinki</option>
+                    </select>
+                </div>
                 <button id="btn-clear-menu" class="bg-red-900/50 hover:bg-red-900 text-red-400 py-2 px-4 rounded-lg flex items-center gap-2 transition-colors">
                     <span class="material-symbols-outlined">delete_sweep</span>
                     <span>Clear Menu</span>
@@ -113,11 +122,12 @@
                             <th class="py-3 px-4 font-medium">Category</th>
                             <th class="py-3 px-4 font-medium">Price</th>
                             <th class="py-3 px-4 font-medium">Options</th>
+                            <th class="py-3 px-4 font-medium">Status</th>
                             <th class="py-3 px-4 font-medium">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="food-table-body">
-                        <tr><td colspan="6" class="p-4 text-center text-secondary">Loading menu...</td></tr>
+                        <tr><td colspan="7" class="p-4 text-center text-secondary">Loading menu...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -192,10 +202,17 @@
                         <textarea id="edit-desc-sv" class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-2.5 text-sm h-20"></textarea>
                     </div>
                 </div>
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-3 gap-3">
                     <div>
                         <label class="block text-xs text-secondary mb-1">Price (€)</label>
                         <input type="number" step="0.01" id="edit-price" class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-2.5 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-secondary mb-1">Location</label>
+                        <select id="edit-location" class="w-full bg-[#0b0f19] border border-gray-700 rounded-lg text-white p-2.5 text-sm">
+                            <option value="pengerkatu">Pengerkatu</option>
+                            <option value="easton">Easton Helsinki</option>
+                        </select>
                     </div>
                     <div>
                         <label class="block text-xs text-secondary mb-1">Image</label>
@@ -258,5 +275,16 @@
 
     <script type="module" src="../js/auth.js"></script>
     <script type="module" src="../js/admin/main.js?v=5"></script>
+
+    <!-- PWA Service Worker -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/service-worker.js')
+            .then(reg => console.log('Service Worker registered!', reg))
+            .catch(err => console.error('Service Worker registration failed', err));
+        });
+      }
+    </script>
 </body>
 </html>
