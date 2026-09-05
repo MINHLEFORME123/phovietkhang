@@ -172,9 +172,16 @@ if (orderBoard) {
                 `;
             }
 
+            const branchBadge = order.branch 
+                ? `<span class="text-[11px] px-2 py-0.5 rounded font-bold ${order.branch === 'easton' ? 'bg-purple-900/70 text-purple-200 border border-purple-500' : 'bg-blue-900/70 text-blue-200 border border-blue-500'}">📍 ${escapeHtml(order.branch === 'easton' ? 'Easton' : 'Pengerkatu')}</span>` 
+                : '';
+
             card.innerHTML = `
                 <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-2">
-                    <span class="text-xl font-bold">Order #${escapeHtml(order.id.substring(0,5).toUpperCase())}</span>
+                    <div>
+                        <span class="text-xl font-bold">Order #${escapeHtml(order.id.substring(0,5).toUpperCase())}</span>
+                        ${branchBadge ? `<div class="mt-1">${branchBadge}</div>` : ''}
+                    </div>
                     <span class="text-sm bg-gray-800 px-2 py-1 rounded text-${statusColor}-400 uppercase font-bold">${escapeHtml(order.status)}</span>
                 </div>
                 <div class="mb-4 text-lg">${itemsHtml}</div>

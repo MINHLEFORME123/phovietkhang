@@ -515,12 +515,16 @@ if (checkoutForm) {
         try {
             const currentLang = localStorage.getItem('selectedLanguage') || 'en';
             const paymentMethodLabel = getPaymentMethodLabel(paymentMethod, currentLang);
+            const branch = localStorage.getItem('selectedLocation') || 'pengerkatu';
+            const branchLabel = branch === 'easton' ? 'Easton Helsinki (Itäkeskus)' : 'Pengerkatu (Sörnäinen)';
 
             const orderData = {
                 customerName,
                 customerPhone,
                 customerEmail,
                 orderType,
+                branch,
+                branchLabel,
                 paymentMethod,
                 paymentMethodLabel: paymentMethod === 'cod' ? getPaymentMethodLabel('cod', currentLang) : paymentMethodLabel,
                 paymentStatus: paymentMethod === 'cod' ? 'cod_pending' : 'pending',

@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <!-- Google Analytics (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-H1DLYMFL1E"></script>
     <script>
@@ -87,8 +89,6 @@
         z-index: 0;
     }
 </style>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link rel="icon" type="image/x-icon" href="images/favicon.ico">
 <link rel="icon" type="image/png" sizes="48x48" href="images/favicon-48x48.png">
 <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
@@ -714,11 +714,115 @@
 </div>
 </footer>
 
+<!-- Sushi Launch Promotional Popup Modal -->
+<div id="sushi-promo-modal" class="fixed inset-0 z-[120] hidden items-center justify-center p-3 sm:p-4 md:p-6 transition-all duration-300" role="dialog" aria-modal="true" aria-labelledby="sushi-promo-title">
+    <!-- Backdrop with blur -->
+    <div id="sushi-promo-backdrop" class="absolute inset-0 bg-black/80 backdrop-blur-md transition-opacity"></div>
+
+    <!-- Modal Content Card -->
+    <div class="relative w-full max-w-xl max-h-[92vh] overflow-y-auto bg-gradient-to-b from-[#0f172a] via-[#0b1120] to-[#070b14] border border-amber-500/30 rounded-3xl shadow-2xl shadow-amber-500/10 text-white flex flex-col z-10 custom-scrollbar">
+        
+        <!-- Close Button (Top-Right) -->
+        <button id="sushi-promo-close-btn" type="button" class="absolute top-3 right-3 z-30 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/70 hover:bg-red-500/90 text-white/80 hover:text-white flex items-center justify-center backdrop-blur-md border border-white/20 transition-all hover:scale-105 active:scale-95 shadow-lg cursor-pointer" aria-label="Close popup">
+            <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+
+        <!-- Top Announcement Ribbon & Badge -->
+        <div class="p-5 sm:p-6 pb-2 text-center relative overflow-hidden">
+            <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-64 h-32 bg-amber-500/15 blur-3xl pointer-events-none rounded-full"></div>
+            
+            <div class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[11px] sm:text-xs font-bold tracking-wider uppercase bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-red-500/20 text-amber-300 border border-amber-500/30 mb-2.5 shadow-inner">
+                <span class="animate-pulse">✨</span>
+                <span data-i18n="popup-sushi-badge">🍣 MENU MỚI - KHAI TRƯƠNG SUSHI</span>
+            </div>
+
+            <h2 id="sushi-promo-title" class="text-2xl sm:text-3xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-100 to-amber-400 font-['EB_Garamond'] drop-shadow" data-i18n="popup-sushi-title">
+                GIẢM 20% TOÀN BỘ MENU SUSHI
+            </h2>
+
+            <p class="text-xs sm:text-sm font-semibold text-amber-400/90 mt-1 flex items-center justify-center gap-1.5" data-i18n="popup-sushi-sub">
+                Ưu đãi khai trương: 05.09 ▶ 20.09.2026 (Chỉ 2 tuần duy nhất!)
+            </p>
+        </div>
+
+        <!-- Featured Media Container (Tab / Viewer) -->
+        <div class="px-4 sm:px-6 py-2">
+            <!-- Active Image Display -->
+            <div class="relative w-full rounded-2xl overflow-hidden border border-white/10 bg-black/40 shadow-inner group">
+                <img id="sushi-promo-main-img" src="images/sushi-launch.jpeg" alt="Pho Viet Khang Sushi Launch Promotion -20% OFF" class="w-full h-auto max-h-[360px] object-contain mx-auto transition-transform duration-300 hover:scale-[1.02]">
+                
+                <!-- Zoom / Fullscreen icon hint -->
+                <a id="sushi-promo-zoom-btn" href="images/sushi-launch.jpeg" target="_blank" rel="noopener noreferrer" class="absolute bottom-2.5 right-2.5 px-2.5 py-1 rounded-lg bg-black/70 hover:bg-black text-[11px] font-medium text-white/90 backdrop-blur-sm border border-white/20 flex items-center gap-1 opacity-85 hover:opacity-100 transition-all shadow" title="Xem ảnh kích thước lớn">
+                    <span class="material-symbols-outlined text-[14px]">open_in_new</span>
+                    <span>Phóng to</span>
+                </a>
+            </div>
+
+            <!-- Menu Sheet Gallery Thumbnails (Allows browsing all 5 images) -->
+            <div class="mt-3">
+                <div class="flex items-center justify-between mb-1.5 px-1">
+                    <span class="text-[11px] font-medium text-gray-400 flex items-center gap-1" data-i18n="popup-sushi-cta-sheets">
+                        <span class="material-symbols-outlined text-[13px] text-amber-400">photo_library</span>
+                        Xem 4 trang menu ảnh
+                    </span>
+                    <span id="sushi-promo-page-indicator" class="text-[10px] text-amber-400/80 font-mono">1 / 5 (Poster Khai trương)</span>
+                </div>
+                <div class="grid grid-cols-5 gap-1.5 sm:gap-2">
+                    <button type="button" class="sushi-thumb-btn active p-0.5 rounded-lg border-2 border-amber-400 bg-white/5 overflow-hidden transition-all hover:scale-105" data-img="images/sushi-launch.jpeg" data-page="1 / 5 (Poster Khai trương)" title="Poster Khai trương -20%">
+                        <img src="images/sushi-launch.jpeg" class="w-full h-12 sm:h-14 object-cover rounded" alt="Poster Khai trương">
+                    </button>
+                    <button type="button" class="sushi-thumb-btn p-0.5 rounded-lg border-2 border-white/10 hover:border-amber-400/60 bg-white/5 overflow-hidden transition-all hover:scale-105 opacity-70 hover:opacity-100" data-img="images/sushi/sushi-menu-1.jpeg" data-page="2 / 5 (Sashimi & Nigiri)" title="Trang 1: Sashimi & Nigiri">
+                        <img src="images/sushi/sushi-menu-1.jpeg" class="w-full h-12 sm:h-14 object-cover rounded" alt="Sashimi & Nigiri">
+                    </button>
+                    <button type="button" class="sushi-thumb-btn p-0.5 rounded-lg border-2 border-white/10 hover:border-amber-400/60 bg-white/5 overflow-hidden transition-all hover:scale-105 opacity-70 hover:opacity-100" data-img="images/sushi/sushi-menu-2.jpeg" data-page="3 / 5 (Maki & Rolls)" title="Trang 2: Maki & Rolls">
+                        <img src="images/sushi/sushi-menu-2.jpeg" class="w-full h-12 sm:h-14 object-cover rounded" alt="Maki & Rolls">
+                    </button>
+                    <button type="button" class="sushi-thumb-btn p-0.5 rounded-lg border-2 border-white/10 hover:border-amber-400/60 bg-white/5 overflow-hidden transition-all hover:scale-105 opacity-70 hover:opacity-100" data-img="images/sushi/sushi-menu-3.jpeg" data-page="4 / 5 (Sushi Sets)" title="Trang 3: Sushi Sets">
+                        <img src="images/sushi/sushi-menu-3.jpeg" class="w-full h-12 sm:h-14 object-cover rounded" alt="Sushi Sets">
+                    </button>
+                    <button type="button" class="sushi-thumb-btn p-0.5 rounded-lg border-2 border-white/10 hover:border-amber-400/60 bg-white/5 overflow-hidden transition-all hover:scale-105 opacity-70 hover:opacity-100" data-img="images/sushi/sushi-menu-4.jpeg" data-page="5 / 5 (Special Sets)" title="Trang 4: Special Sets">
+                        <img src="images/sushi/sushi-menu-4.jpeg" class="w-full h-12 sm:h-14 object-cover rounded" alt="Special Sets">
+                    </button>
+                </div>
+            </div>
+
+            <!-- Description Text -->
+            <p class="text-xs sm:text-[13px] text-gray-300/90 text-center mt-3 leading-relaxed" data-i18n="popup-sushi-desc">
+                Phở Việt Khang hân hạnh ra mắt thực đơn Sushi tươi ngon thượng hạng: Sashimi, Nigiri, Maki & Set Sushi được chế biến tươi mới mỗi ngày. Giảm ngay 20% khi thưởng thức tại quán hoặc mang về!
+            </p>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="p-4 sm:p-6 pt-2 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 mt-1">
+            <label class="inline-flex items-center gap-2 cursor-pointer select-none text-xs text-gray-400 hover:text-gray-200">
+                <input id="sushi-promo-dont-show-checkbox" type="checkbox" class="w-4 h-4 rounded bg-white/10 border-white/20 text-amber-500 focus:ring-amber-400 accent-amber-500 cursor-pointer">
+                <span data-i18n="popup-sushi-dont-show">Không hiện lại hôm nay</span>
+            </label>
+
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+                <button id="sushi-promo-secondary-close" type="button" class="flex-1 sm:flex-none px-4 py-2.5 rounded-xl border border-white/15 hover:bg-white/10 text-xs sm:text-sm font-semibold text-gray-300 hover:text-white transition-all text-center cursor-pointer" data-i18n="popup-sushi-close">
+                    Đóng thông báo
+                </button>
+                <a href="/menu" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-bold text-xs sm:text-sm shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 transition-all hover:scale-[1.02] active:scale-95 text-center" data-i18n="popup-sushi-cta-menu">
+                    <span class="material-symbols-outlined text-[18px]">restaurant_menu</span>
+                    <span>🍣 Khám Phá Thực Đơn Ngay</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Floating Re-open Promo Badge (Bottom-Left) -->
+<button id="reopen-sushi-promo-btn" type="button" class="fixed bottom-6 left-6 z-40 hidden sm:inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 font-bold text-xs shadow-xl backdrop-blur-md border border-amber-300/40 hover:scale-105 active:scale-95 transition-all group cursor-pointer" title="Xem ưu đãi Sushi Launch -20%">
+    <span class="text-base group-hover:rotate-12 transition-transform">🍣</span>
+    <span>Sushi Launch -20%</span>
+</button>
+
 <!-- Language Switcher Script -->
 
 
 <!-- Core Scripts -->
-<script src="js/client.js"></script>
+<script charset="utf-8" src="js/client.js"></script>
 <script type="module" src="js/auth.js"></script>
 <script type="module" src="js/homepage.js"></script>
 <script src="js/cart.js"></script>

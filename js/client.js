@@ -40,6 +40,8 @@ const translations = {
     "cta-btn1": "Xem Thực Đơn",
     "cta-btn2": "Tìm Địa Điểm",
     "footer-desc": "Nghệ Thuật Ẩm Thực Châu Á.", "footer-privacy": "Chính sách bảo mật", "footer-terms": "Điều khoản dịch vụ", "footer-careers": "Tuyển dụng", "footer-press": "Tài liệu báo chí", "footer-copyright": "© 2026 PHỞ VIỆT KHANG. BẢN QUYỀN ĐÃ ĐƯỢC BẢO HỘ.", "footer-links-title": "Liên kết nhanh", "footer-contact-title": "Liên hệ", "footer-branches-title": "Chi nhánh", "footer-phone-label": "Điện thoại:", "footer-email-label": "Email:",
+    "modal-select-location-title": "Chọn cơ sở phục vụ", "modal-select-location-desc": "Vui lòng chọn chi nhánh Phở Việt Khang để xem thực đơn chính xác và đặt món.", "modal-select-location-note": "Bạn có thể thay đổi cơ sở bất kỳ lúc nào phía trên trang thực đơn.", "menu-viewing-branch": "Đang xem thực đơn tại:", "menu-change-branch": "Đổi cơ sở", "branch-pengerkatu-title": "Cơ sở 1: Pengerkatu", "branch-pengerkatu-sub": "Pengerkatu 29, 00500 Helsinki (Sörnäinen / Kallio)", "branch-easton-title": "Cơ sở 2: Easton Helsinki", "branch-easton-sub": "Kauppakartanonkatu 3, 00930 Helsinki (Itäkeskus)", "cart-branch-warning": "Bạn đang có món trong giỏ hàng từ cơ sở này. Đổi cơ sở sẽ làm mới giỏ hàng. Bạn có chắc muốn đổi không?",
+    "btn-view-pengerkatu-menu": "Xem thực đơn Pengerkatu", "btn-view-easton-menu": "Xem thực đơn Easton",
     "cart-title": "Giỏ hàng & Thanh toán", "order-items": "Món ăn đã chọn", "empty-cart": "Giỏ hàng của bạn đang trống.", "browse-menu": "Xem Thực đơn", "order-summary": "Tổng quan đơn hàng", "total-label": "Tổng cộng:", "your-name": "Tên của bạn", "phone-number": "Số điện thoại", "dine-in": "Ăn tại bàn", "takeaway": "Mang về", "delivery": "Giao hàng", "table-number": "Số bàn", "delivery-address": "Địa chỉ giao hàng", "notes": "Ghi chú cho bếp (Tùy chọn)", "place-order": "Đặt hàng ngay", "payment-method": "Phương thức thanh toán", "payment-online-banking": "Online banking (Finland)", "payment-online-banking-desc": "Thanh toán qua ngân hàng trực tuyến tại Phần Lan", "payment-mobilepay-desc": "Thanh toán nhanh bằng ứng dụng MobilePay", "payment-bank-card": "Thẻ ngân hàng", "payment-bank-card-desc": "Thanh toán bằng thẻ Visa, Mastercard hoặc debit", "payment-note": "Bạn có thể chọn trước phương thức thanh toán online phù hợp khi gửi đơn hàng.",
     "reviews-label": "Trải nghiệm thực tế", "reviews-title": "Khách hàng nói gì về chúng tôi",
     "ai-assistant": "Trợ lý Phở Việt Khang", "ai-placeholder": "Hỏi về món ăn, địa điểm...", "ai-welcome": "Xin chào! Tôi là Trợ lý ảo của Phở Việt Khang. Tôi có thể tư vấn món ăn, tìm cửa hàng gần nhất hoặc tra cứu thông tin giúp bạn. Bạn cần giúp gì?",
@@ -69,7 +71,15 @@ const translations = {
     "info-email-title": "Email liên hệ",
     "info-phone-title": "Số điện thoại",
     "info-address-title": "Địa chỉ chính (Sörnäinen)",
-    "info-address": "Pengerkatu 29, 00500 Helsinki, Phần Lan (Sörnäinen / Kallio)"
+    "info-address": "Pengerkatu 29, 00500 Helsinki, Phần Lan (Sörnäinen / Kallio)",
+    "popup-sushi-badge": "🍣 MENU MỚI - KHAI TRƯƠNG SUSHI",
+    "popup-sushi-title": "GIẢM 20% TOÀN BỘ MENU SUSHI",
+    "popup-sushi-sub": "Ưu đãi khai trương: 05.09 ▶ 20.09.2026 (Chỉ 2 tuần duy nhất!)",
+    "popup-sushi-desc": "Phở Việt Khang hân hạnh ra mắt thực đơn Sushi tươi ngon thượng hạng: Sashimi, Nigiri, Maki & Set Sushi được chế biến tươi mới mỗi ngày. Giảm ngay 20% khi thưởng thức tại quán hoặc mang về!",
+    "popup-sushi-cta-menu": "🍣 Khám Phá Thực Đơn Ngay",
+    "popup-sushi-cta-sheets": "Xem 4 trang menu ảnh",
+    "popup-sushi-close": "Đóng thông báo",
+    "popup-sushi-dont-show": "Không hiện lại hôm nay"
   },
   en: {
     "nav-home": "Home", "nav-menu": "Menu", "nav-locations": "Locations", "nav-contact": "Contact", "nav-reservations": "Reservations", "nav-reservations-mobile": "Book a Table", "nav-register": "Register", "nav-register-mobile": "Create Account", "nav-inbox": "Inbox", "inbox-title": "Your Mailbox",
@@ -112,6 +122,8 @@ const translations = {
     "cta-btn1": "View Menu",
     "cta-btn2": "Find a Location",
     "footer-desc": "The Art of Asian Gastronomy.", "footer-privacy": "Privacy Policy", "footer-terms": "Terms of Service", "footer-careers": "Careers", "footer-press": "Press Kit", "footer-copyright": "© 2026 PHO VIET KHANG. ALL RIGHTS RESERVED.", "footer-links-title": "Quick Links", "footer-contact-title": "Contact Us", "footer-branches-title": "Our Branches", "footer-phone-label": "Phone:", "footer-email-label": "Email:",
+    "modal-select-location-title": "Select Location", "modal-select-location-desc": "Please select a Phở Việt Khang branch to view the accurate menu and place your order.", "modal-select-location-note": "You can change your location at any time at the top of the menu.", "menu-viewing-branch": "Viewing menu for:", "menu-change-branch": "Change Location", "branch-pengerkatu-title": "Branch 1: Pengerkatu", "branch-pengerkatu-sub": "Pengerkatu 29, 00500 Helsinki (Sörnäinen / Kallio)", "branch-easton-title": "Branch 2: Easton Helsinki", "branch-easton-sub": "Kauppakartanonkatu 3, 00930 Helsinki (Itäkeskus)", "cart-branch-warning": "You have items in your cart from this branch. Changing location will reset your cart. Are you sure you want to proceed?",
+    "btn-view-pengerkatu-menu": "View Pengerkatu Menu", "btn-view-easton-menu": "View Easton Menu",
     "cart-title": "Your Cart & Checkout", "order-items": "Order Items", "empty-cart": "Your cart is empty.", "browse-menu": "Browse Menu", "order-summary": "Order Summary", "total-label": "Total:", "your-name": "Your Name", "phone-number": "Phone Number", "dine-in": "Dine In", "takeaway": "Takeaway", "delivery": "Delivery", "table-number": "Table Number", "delivery-address": "Delivery Address", "notes": "Notes for Kitchen (Optional)", "place-order": "Place Order Now", "payment-method": "Payment Method", "payment-online-banking": "Online banking (Finland)", "payment-online-banking-desc": "Pay using Finnish online banking", "payment-mobilepay-desc": "Fast checkout with the MobilePay app", "payment-bank-card": "Bank Card", "payment-bank-card-desc": "Pay using Visa, Mastercard or debit card", "payment-cod": "Cash or Card (on-site)", "payment-cod-desc": "Pay with cash or card at reception / Cash or Card trực tiếp", "payment-note": "Customers can choose their preferred online payment method before sending the order.",
     "reviews-label": "Guest Experiences", "reviews-title": "What Our Guests Say",
     "ai-assistant": "Pho Viet Khang Assistant", "ai-placeholder": "Ask about dishes, locations...", "ai-welcome": "Hello! I am the Phở Việt Khang Virtual Assistant. I can recommend dishes, find locations, or search for info. How can I help you?",
@@ -141,7 +153,15 @@ const translations = {
     "info-email-title": "Email",
     "info-phone-title": "Phone",
     "info-address-title": "Main Address (Sörnäinen)",
-    "info-address": "Pengerkatu 29, 00500 Helsinki, Finland (Sörnäinen / Sornainen / Kallio)"
+    "info-address": "Pengerkatu 29, 00500 Helsinki, Finland (Sörnäinen / Sornainen / Kallio)",
+    "popup-sushi-badge": "🍣 NEW MENU - SUSHI LAUNCH",
+    "popup-sushi-title": "20% OFF ALL SUSHI MENU",
+    "popup-sushi-sub": "Launch Special: 05.09 ▶ 20.09.2026 (2 Weeks Only!)",
+    "popup-sushi-desc": "Pho Viet Khang proudly launches our premium Sushi Menu: Sashimi, Nigiri, Maki & gourmet Sets prepared fresh in-house daily. Enjoy 20% OFF on all sushi items!",
+    "popup-sushi-cta-menu": "🍣 Explore Menu & Order",
+    "popup-sushi-cta-sheets": "View 4 Sushi Menu Sheets",
+    "popup-sushi-close": "Close",
+    "popup-sushi-dont-show": "Don't show again today"
   },
   fi: {
     "nav-home": "Koti", "nav-menu": "Menu", "nav-locations": "Toimipisteet", "nav-contact": "Yhteystiedot", "nav-reservations": "Varaukset", "nav-reservations-mobile": "Varaa pöytä", "nav-register": "Rekisteröidy", "nav-register-mobile": "Luo tili", "nav-inbox": "Postilaatikko", "inbox-title": "Postilaatikkosi",
@@ -184,6 +204,8 @@ const translations = {
     "cta-btn1": "Näytä Menu",
     "cta-btn2": "Etsi Toimipiste",
     "footer-desc": "Aasialaisen Gastronomian Taide.", "footer-privacy": "Tietosuojakäytäntö", "footer-terms": "Käyttöehdot", "footer-careers": "Urat", "footer-press": "Lehdistöpaketti", "footer-copyright": "© 2026 PHO VIET KHANG. KAIKKI OIKEUDET PIDÄTETÄÄN.", "footer-links-title": "Pikalinkit", "footer-contact-title": "Ota yhteyttä", "footer-branches-title": "Toimipisteemme", "footer-phone-label": "Puhelin:", "footer-email-label": "Sähköposti:",
+    "modal-select-location-title": "Valitse toimipiste", "modal-select-location-desc": "Valitse Phở Việt Khang -toimipiste nähdäksesi ajantasaisen ruokalistan ja tilataksesi.", "modal-select-location-note": "Voit vaihtaa toimipistettä milloin tahansa ruokalistasivun yläreunasta.", "menu-viewing-branch": "Ruokalista toimipisteelle:", "menu-change-branch": "Vaihda toimipistettä", "branch-pengerkatu-title": "Toimipiste 1: Pengerkatu", "branch-pengerkatu-sub": "Pengerkatu 29, 00500 Helsinki (Sörnäinen / Kallio)", "branch-easton-title": "Toimipiste 2: Easton Helsinki", "branch-easton-sub": "Kauppakartanonkatu 3, 00930 Helsinki (Itäkeskus)", "cart-branch-warning": "Ostoskorissasi on tuotteita tästä toimipisteestä. Toimipisteen vaihtaminen tyhjentää ostoskorin. Haluatko jatkaa?",
+    "btn-view-pengerkatu-menu": "Katso Pengerkadun menu", "btn-view-easton-menu": "Katso Eastonin menu",
     "cart-title": "Ostoskori & Kassa", "order-items": "Tilauksen tuotteet", "empty-cart": "Ostoskoriisi on tyhjä.", "browse-menu": "Selaa ruokalistaa", "order-summary": "Yhteenveto", "total-label": "Yhteensä:", "your-name": "Nimesi", "phone-number": "Puhelinnumero", "dine-in": "Syö paikan päällä", "takeaway": "Mukaan", "delivery": "Kotiinkuljetus", "table-number": "Pöydän numero", "delivery-address": "Toimitusosoite", "notes": "Huomautukset keittiölle (valinnainen)", "place-order": "Tilaa nyt", "payment-method": "Maksutapa", "payment-online-banking": "Verkkopankki (Suomi)", "payment-online-banking-desc": "Maksa suomalaisen verkkopankin kautta", "payment-mobilepay-desc": "Nopea maksu MobilePay-sovelluksella", "payment-bank-card": "Pankkikortti", "payment-bank-card-desc": "Maksa Visa-, Mastercard- tai debit-kortilla", "payment-note": "Asiakas voi valita sopivan verkkomaksutavan jo ennen tilauksen lähettämistä.",
     "reviews-label": "Asiakaskokemukset", "reviews-title": "Mitä asiakkaamme sanovat",
     "ai-assistant": "Pho Viet Khang Assistentti", "ai-placeholder": "Kysy ruoista, toimipisteistä...", "ai-welcome": "Hei! Olen Phở Việt Khangin virtuaaliassistentti. Voin suositella ruokia, etsiä toimipisteitä tai hakea tietoa. Kuinka voin auttaa?",
@@ -213,7 +235,15 @@ const translations = {
     "info-email-title": "Sähköposti",
     "info-phone-title": "Puhelin",
     "info-address-title": "Päätoimipiste (Sörnäinen)",
-    "info-address": "Pengerkatu 29, 00500 Helsinki, Suomi (Sörnäinen / Sornainen / Kallio)"
+    "info-address": "Pengerkatu 29, 00500 Helsinki, Suomi (Sörnäinen / Sornainen / Kallio)",
+    "popup-sushi-badge": "🍣 UUSI MENU - SUSHIN LANSEERAUS",
+    "popup-sushi-title": "-20% KAIKISTA SUSHIEISTA",
+    "popup-sushi-sub": "Avajaistarjous: 05.09 ▶ 20.09.2026 (Vain 2 viikkoa!)",
+    "popup-sushi-desc": "Pho Viet Khang esittelee ylpeänä uuden Sushimenunsa: paikan päällä käsin valmistetut Sashimit, Nigirit, Makit ja Sushisetit. Nauti 20 % alennuksesta kaikista sushiannoksista!",
+    "popup-sushi-cta-menu": "🍣 Katso Ruokalista & Tilaa",
+    "popup-sushi-cta-sheets": "Katso sushihinnaston 4 sivua",
+    "popup-sushi-close": "Sulje",
+    "popup-sushi-dont-show": "Älä näytä uudelleen tänään"
   },
   sv: {
     "nav-home": "Hem", "nav-menu": "Meny", "nav-locations": "Restauranger", "nav-contact": "Kontakt", "nav-reservations": "Boka bord", "nav-reservations-mobile": "Boka ett bord", "nav-register": "Registrera", "nav-register-mobile": "Skapa konto", "nav-inbox": "Inkorg", "inbox-title": "Din inkorg",
@@ -256,6 +286,8 @@ const translations = {
     "cta-btn1": "Visa meny",
     "cta-btn2": "Hitta restaurang",
     "footer-desc": "Den asiatiska gastronomins konst.", "footer-privacy": "Integritetspolicy", "footer-terms": "Användarvillkor", "footer-careers": "Karriär", "footer-press": "Presskit", "footer-copyright": "© 2026 PHỞ VIỆT KHANG. ALLA RÄTTIGHETER RESERVERADE.", "footer-links-title": "Snabblänkar", "footer-contact-title": "Kontakta oss", "footer-branches-title": "Våra filialer", "footer-phone-label": "Telefon:", "footer-email-label": "E-post:",
+    "modal-select-location-title": "Välj restaurang", "modal-select-location-desc": "Välj en Phở Việt Khang-restaurang för att se aktuell meny och beställa.", "modal-select-location-note": "Du kan byta restaurang när som helst längst upp på menysidan.", "menu-viewing-branch": "Visar meny för:", "menu-change-branch": "Byt restaurang", "branch-pengerkatu-title": "Restaurang 1: Pengerkatu", "branch-pengerkatu-sub": "Pengerkatu 29, 00500 Helsinki (Sörnäinen / Kallio)", "branch-easton-title": "Restaurang 2: Easton Helsinki", "branch-easton-sub": "Kauppakartanonkatu 3, 00930 Helsinki (Itäkeskus)", "cart-branch-warning": "Du har varor i varukorgen från denna restaurang. Om du byter restaurang töms varukorgen. Vill du fortsätta?",
+    "btn-view-pengerkatu-menu": "Se Pengerkatus meny", "btn-view-easton-menu": "Se Eastons meny",
     "cart-title": "Din varukorg & kassa", "order-items": "Valda rätter", "empty-cart": "Din varukorg är tom.", "browse-menu": "Bläddra i menyn", "order-summary": "Orderöversikt", "total-label": "Totalt:", "your-name": "Ditt namn", "phone-number": "Telefonnummer", "dine-in": "Ät på plats", "takeaway": "Takeaway", "delivery": "Hemleverans", "table-number": "Bordnummer", "delivery-address": "Leveransadress", "notes": "Anteckningar till köket (valfritt)", "place-order": "Beställ nu", "payment-method": "Betalningssätt", "payment-online-banking": "Online banking (Finland)", "payment-online-banking-desc": "Betala med finsk nätbank", "payment-mobilepay-desc": "Betala snabbt med MobilePay-appen", "payment-bank-card": "Bankkort", "payment-bank-card-desc": "Betala med Visa, Mastercard eller debitkort", "payment-note": "Du kan välja önskad onlinebetalningsmetod innan du skickar beställningen.",
     "reviews-label": "Gästupplevelser", "reviews-title": "Vad våra gäster säger",
     "ai-assistant": "Phở Việt Khang-assistent", "ai-placeholder": "Fråga om rätter, restauranger...", "ai-welcome": "Hej! Jag är Phở Việt Khangs virtuella assistent. Jag kan rekommendera rätter, hitta restauranger eller söka information. Hur kan jag hjälpa dig?",
@@ -285,7 +317,15 @@ const translations = {
     "info-email-title": "E-post",
     "info-phone-title": "Telefon",
     "info-address-title": "Huvudadress (Sörnäinen)",
-    "info-address": "Pengerkatu 29, 00500 Helsingfors, Finland (Sörnäinen / Sornainen / Kallio)"
+    "info-address": "Pengerkatu 29, 00500 Helsingfors, Finland (Sörnäinen / Sornainen / Kallio)",
+    "popup-sushi-badge": "🍣 NY MENY - SUSHI LANSERING",
+    "popup-sushi-title": "-20% PÅ ALL SUSHI",
+    "popup-sushi-sub": "Lanseringserbjudande: 05.09 ▶ 20.09.2026 (Endast 2 veckor!)",
+    "popup-sushi-desc": "Pho Viet Khang lanserar stolt vår nya Sushimeny: dagsfärsk Sashimi, Nigiri, Maki och lyxiga Sushiset tillagade på plats. Få 20% rabatt på alla sushirätter!",
+    "popup-sushi-cta-menu": "🍣 Se Meny & Beställ",
+    "popup-sushi-cta-sheets": "Visa 4 sidor sushiprislista",
+    "popup-sushi-close": "Stäng",
+    "popup-sushi-dont-show": "Visa inte igen idag"
   }
 };
 

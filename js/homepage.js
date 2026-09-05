@@ -332,6 +332,96 @@ async function loadHomepage() {
     }
 }
 
+
+function initSushiPromoPopup() {
+    const modal = document.getElementById('sushi-promo-modal');
+    if (!modal) return;
+
+    const closeBtn = document.getElementById('sushi-promo-close-btn');
+    const secondaryCloseBtn = document.getElementById('sushi-promo-secondary-close');
+    const backdrop = document.getElementById('sushi-promo-backdrop');
+    const reopenBtn = document.getElementById('reopen-sushi-promo-btn');
+    const dontShowCheckbox = document.getElementById('sushi-promo-dont-show-checkbox');
+    const mainImg = document.getElementById('sushi-promo-main-img');
+    const zoomBtn = document.getElementById('sushi-promo-zoom-btn');
+    const pageIndicator = document.getElementById('sushi-promo-page-indicator');
+    const thumbBtns = document.querySelectorAll('.sushi-thumb-btn');
+
+    // Check if user previously dismissed
+    const dismissedUntil = localStorage.getItem('sushi_promo_dismissed_until');
+    const dismissedSession = sessionStorage.getItem('sushi_promo_dismissed_session');
+    const now = Date.now();
+
+    const isSuppressed = (dismissedUntil && parseInt(dismissedUntil, 10) > now) || dismissedSession === 'true';
+
+    const openModal = () => {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+    };
+
+    const closeModal = () => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        document.body.style.overflow = '';
+        if (reopenBtn) reopenBtn.classList.remove('hidden');
+
+        // Record dismissal in session
+        sessionStorage.setItem('sushi_promo_dismissed_session', 'true');
+        if (dontShowCheckbox && dontShowCheckbox.checked) {
+            // Dismiss for 24 hours
+            localStorage.setItem('sushi_promo_dismissed_until', (Date.now() + 24 * 60 * 60 * 1000).toString());
+        }
+    };
+
+    if (!isSuppressed) {
+        // Smooth entrance delay
+        setTimeout(() => {
+            openModal();
+        }, 400);
+    } else {
+        if (reopenBtn) reopenBtn.classList.remove('hidden');
+    }
+
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (secondaryCloseBtn) secondaryCloseBtn.addEventListener('click', closeModal);
+    if (backdrop) backdrop.addEventListener('click', closeModal);
+    if (reopenBtn) reopenBtn.addEventListener('click', openModal);
+
+    // Escape key closes modal
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+            closeModal();
+        }
+    });
+
+    // Gallery thumbnails switching
+    if (thumbBtns.length > 0 && mainImg) {
+        thumbBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetImg = btn.getAttribute('data-img');
+                const pageText = btn.getAttribute('data-page');
+                
+                if (targetImg) {
+                    mainImg.src = targetImg;
+                    if (zoomBtn) zoomBtn.href = targetImg;
+                }
+                if (pageIndicator && pageText) {
+                    pageIndicator.textContent = pageText;
+                }
+
+                thumbBtns.forEach(b => {
+                    b.classList.remove('border-amber-400', 'active', 'opacity-100');
+                    b.classList.add('border-white/10', 'opacity-70');
+                });
+                btn.classList.remove('border-white/10', 'opacity-70');
+                btn.classList.add('border-amber-400', 'active', 'opacity-100');
+            });
+        });
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     loadHomepage();
+    initSushiPromoPopup();
 });

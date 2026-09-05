@@ -784,9 +784,23 @@ TOOLS AVAILABLE:
         } catch (e) { return { error: e.message }; }
     }
 
-    async function createMenuItem(nameVi, nameEn, nameFi, nameSv, price, categoryVi, categoryEn, categoryFi, categorySv, descVi, descEn, descFi, descSv, imageUrl) {
-        try { const ref = await addDoc(collection(db, "menu"), { nameVi: nameVi||"", nameEn: nameEn||"", nameFi: nameFi||"", nameSv: nameSv||"", price: parseFloat(price)||0, categoryVi: categoryVi||"", categoryEn: categoryEn||"", categoryFi: categoryFi||"", categorySv: categorySv||"", descVi: descVi||"", descEn: descEn||"", descFi: descFi||"", descSv: descSv||"", image: imageUrl||"", isAvailable: true, preparationTime: 15, nutrition: { calories: 0, protein: 0, fat: 0, carbs: 0 }, tags: [], options: [] }); if (window.loadFood) window.loadFood(); return { success: true, message: `Đã tạo món với ID: ${ref.id}` }; }
+    async function createMenuItem(nameVi, nameEn, nameFi, nameSv, price, categoryVi, categoryEn, categoryFi, categorySv, descVi, descEn, descFi, descSv, imageUrl, location) {
+        try {
+            const locVal = (location && ['pengerkatu', 'easton', 'both'].includes(String(location).toLowerCase())) ? String(location).toLowerCase() : 'both';
+            const ref = await addDoc(collection(db, "menu"), { nameVi: nameVi||"", nameEn: nameEn||"", nameFi: nameFi||"", nameSv: nameSv||"", price: parseFloat(price)||0, location: locVal, categoryVi: categoryVi||"", categoryEn: categoryEn||"", categoryFi: categoryFi||"", categorySv: categorySv||"", descVi: descVi||"", descEn: descEn||"", descFi: descFi||"", descSv: descSv||"", image: imageUrl||"", isAvailable: true, preparationTime: 15, nutrition: { calories: 0, protein: 0, fat: 0, carbs: 0 }, tags: [], options: [] });
+            if (window.loadFood) window.loadFood();
+            return { success: true, message: `Đã tạo món với ID: ${ref.id} tại cơ sở: ${locVal}` };
+        }
         catch (e) { return { error: e.message }; }
+    }
+
+    async function updateMenuItemLocation(dishId, location) {
+        try {
+            const locVal = (location && ['pengerkatu', 'easton', 'both'].includes(String(location).toLowerCase())) ? String(location).toLowerCase() : 'both';
+            await updateDoc(doc(db, "menu", dishId), { location: locVal });
+            if (window.loadFood) window.loadFood();
+            return { success: true, message: `Đã cập nhật cơ sở của món ${dishId} thành: ${locVal}` };
+        } catch (e) { return { error: e.message }; }
     }
 
     async function changeUserRole(uids, newRole) {
@@ -1887,8 +1901,8 @@ TOOLS AVAILABLE:
         duplicateMenuItem:        { fn: duplicateMenuItem, params: ['dishId'] },
         deleteMenuItem:           { fn: deleteMenuItem, params: ['dishId'] },
         updateMenuCustomFields:   { fn: updateMenuCustomFields, params: ['dishId', 'customFields'] },
-        updateMenuCategoryOrder:  { fn: updateMenuCategoryOrder, params: ['orderedCategories'] },
-        createMenuItem:           { fn: createMenuItem, params: ['nameVi', 'nameEn', 'nameFi', 'nameSv', 'price', 'categoryVi', 'categoryEn', 'categoryFi', 'categorySv', 'descVi', 'descEn', 'descFi', 'descSv', 'imageUrl'] },
+        createMenuItem:           { fn: createMenuItem, params: ['nameVi', 'nameEn', 'nameFi', 'nameSv', 'price', 'categoryVi', 'categoryEn', 'categoryFi', 'categorySv', 'descVi', 'descEn', 'descFi', 'descSv', 'imageUrl', 'location'] },
+        updateMenuItemLocation:   { fn: updateMenuItemLocation, params: ['dishId', 'location'] },
         listAllUsers:             { fn: () => listAllUsers(), params: [] },
         changeUserRole:           { fn: changeUserRole, params: ['uid', 'newRole'] },
         getUserLoyalty:           { fn: getUserLoyalty, params: ['uid'] },

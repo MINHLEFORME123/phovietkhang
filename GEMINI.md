@@ -2,6 +2,37 @@
 
 ## Modifications
 
+### [2026-09-05] Resolved Character Encoding (Mojibake) Across All HTML Pages
+- **Changes**:
+  - Diagnosed encoding issue where Vietnamese and Nordic characters rendered as mojibake (`Phá»Ÿ Viá»‡t Khang`, `SÃ¶rnÃ¤inen`).
+  - Identified root cause: `<meta charset="utf-8">` was placed past byte 1024 (down at line 90 behind analytics scripts and style tags), causing browsers on Windows to default to Windows-1252/ISO-8859-1 decoding.
+  - Relocated `<meta charset="utf-8"/>` and `<meta name="viewport">` to the very top of `<head>` (at byte ~51) across all 21 root HTML pages (`index.html`, `menu.html`, `locations.html`, `about.html`, etc.) in full compliance with the HTML5 charset declaration specification.
+  - Added explicit `charset="utf-8"` attribute to all `<script src="js/client.js">` tags across all pages to guarantee proper Unicode string evaluation in all browser environments.
+  - Verified via browser test that all Vietnamese diacritics, Finnish/Swedish umlauts, and emojis render crisply without mojibake.
+
+### [2026-09-05] Added Sushi Launch -20% Promotional Pop-up Modal on Website Entry
+- **Changes**:
+  - Implemented a high-impact, premium promotional pop-up modal (`#sushi-promo-modal`) on website entry (`index.html`) using the promotional launch poster and full menu sheets from `C:\Users\minhb\OneDrive\Desktop\WhatsApp Unknown 2026-09-05 at 15.30.43`.
+  - Copied and organized the assets: main launch poster into `/images/sushi-launch.jpeg` and all 5 sheets (poster + 4 menu pages for Sashimi, Nigiri, Maki, Sets, and Combos) into `/images/sushi/`.
+  - Built an interactive multi-sheet viewer right inside the popup: customers can browse the 4 detailed menu sheets with thumbnail tabs and a page indicator, or click to open high-res images.
+  - Added primary call-to-action button linking directly to `/menu` ("🍣 Xem Thực Đơn Ngay / Explore Menu") and direct close button.
+  - Implemented polite dismissal handling: remembers dismissals during current browsing session via `sessionStorage`, supports a "Không hiện lại hôm nay" checkbox saving 24h suppression in `localStorage`, and supports Escape key and backdrop clicks.
+  - Added a floating re-open pill badge ("🍣 Sushi Launch -20%") in the bottom-left corner of the homepage so users can reopen the promotion anytime.
+  - Added full 4-language translations (`vi`, `en`, `fi`, `sv`) to `js/client.js` with reactive updates when switching languages.
+
+### [2026-09-05] Implemented Separate Menus for Branches & Enforced Location Selection on Entry
+- **Changes**:
+  - Overhauled `menu.html` location selector modal into a modern, card-based modal with addresses, opening hours, and visual indicators for Pengerkatu and Easton Helsinki, fully translated into 4 languages (VI, EN, FI, SV).
+  - Enforced branch selection on entry to `/menu`: Customers must select their branch before the menu items are rendered, preventing accidental orders from the wrong branch.
+  - Implemented dynamic URL query state management (`/menu?location=pengerkatu` or `/menu?location=easton`) allowing direct links from `locations.html` and preserving choice on reload.
+  - Added cart branch protection: Warns customers before switching branches if they already have items in the cart to avoid cross-branch order mixups.
+  - Updated `js/menu.js` filtering logic to support dishes assigned to `both` (available at both branches), `pengerkatu`, or `easton`.
+  - Upgraded Admin menu management in `admin/food-add.html`, `admin/food-list.html`, `js/admin/food-add.js`, and `js/admin/food-manager.js` to support the `both` option, display visual branch badges in the food table, and filter items accurately.
+  - Added self-healing background sync in `food-manager.js` to automatically assign `both` to legacy menu items missing a location field.
+  - Updated AI Admin Assistant in `js/admin/ai-chat.js` with `location` parameter support in `createMenuItem` and added the `updateMenuItemLocation` tool.
+  - Integrated branch recording in `js/checkout.js` so orders store `branch` and `branchLabel`, and displayed branch badges in Kitchen KDS (`js/kitchen.js`) and Order Management (`js/admin/order-manager.js`).
+  - Added direct "Xem thực đơn" action buttons to both branch cards on `locations.html`.
+
 ### [2026-06-21] Fixed Console Errors, Conditional App Check, and Public Config Rules
 - **Changes**:
   - Removed `frame-ancestors 'self';` from the CSP `<meta>` tags in all 38 HTML files, resolving browser warnings (since it is already properly set via server HTTP headers in `firebase.json`).

@@ -8,28 +8,81 @@ const changeLocationBtn = document.getElementById('change-location-btn');
 const currentLocationName = document.getElementById('current-location-name');
 
 const LOCATION_NAMES = {
-    pengerkatu: '📍 Pengerkatu (Pengerkatu 29, 00500)',
-    easton: '📍 Easton Helsinki (Kauppakartanonkatu 3, 00930)'
+    pengerkatu: {
+        vi: '📍 Pengerkatu 29 (Sörnäinen / Kallio)',
+        en: '📍 Pengerkatu 29 (Sörnäinen / Kallio)',
+        fi: '📍 Pengerkatu 29 (Sörnäinen / Kallio)',
+        sv: '📍 Pengerkatu 29 (Sörnäinen / Kallio)'
+    },
+    easton: {
+        vi: '📍 Easton Helsinki (Kauppakartanonkatu 3, Itäkeskus)',
+        en: '📍 Easton Helsinki (Kauppakartanonkatu 3, Itäkeskus)',
+        fi: '📍 Easton Helsinki (Kauppakartanonkatu 3, Itäkeskus)',
+        sv: '📍 Easton Helsinki (Kauppakartanonkatu 3, Itäkeskus)'
+    }
 };
 
 let selectedLocation = null;
 
 function initLocationSelector() {
-    selectedLocation = localStorage.getItem('selectedLocation') || null;
+    const urlParams = new URLSearchParams(window.location.search);
+    const locParam = (urlParams.get('location') || urlParams.get('branch') || '').toLowerCase();
 
-    if (!selectedLocation && locationSelectorModal) {
-        locationSelectorModal.style.display = 'flex';
-    } else if (selectedLocation && locationSelectorModal) {
-        locationSelectorModal.style.display = 'none';
+    // 1. If explicit branch param in URL (?location=pengerkatu or ?location=easton)
+    if (locParam === 'pengerkatu' || locParam === 'easton') {
+        selectedLocation = locParam;
+        localStorage.setItem('selectedLocation', locParam);
+        if (locationSelectorModal) {
+            locationSelectorModal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
         updateLocationDisplay();
+    } else {
+        // Customer entered /menu without branch param -> ALWAYS prompt location selector modal
+        selectedLocation = null;
+        if (locationSelectorModal) {
+            locationSelectorModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
     }
 
     locationButtons.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            selectedLocation = btn.getAttribute('data-location');
+        btn.addEventListener('click', () => {
+            const newLocation = btn.getAttribute('data-location');
+            if (!newLocation) return;
+
+            // Warn customer if cart already contains items from a different branch
+            const existingLoc = localStorage.getItem('selectedLocation');
+            const cartUid = window.currentUserUid || 'guest';
+            let currentCart = [];
+            try {
+                currentCart = JSON.parse(localStorage.getItem('phoCart_' + cartUid) || '[]');
+            } catch(e) {}
+
+            if (existingLoc && existingLoc !== newLocation && currentCart.length > 0) {
+                const lang = localStorage.getItem('selectedLanguage') || 'en';
+                const warningMsg = (window.translations && window.translations[lang]?.['cart-branch-warning'])
+                    || 'Bạn đang có món trong giỏ hàng từ cơ sở này. Đổi cơ sở sẽ làm mới giỏ hàng. Bạn có chắc muốn tiếp tục không?';
+                if (!confirm(warningMsg)) {
+                    return;
+                }
+                localStorage.removeItem('phoCart_' + cartUid);
+                if (typeof window.reloadCart === 'function') window.reloadCart();
+            }
+
+            selectedLocation = newLocation;
             localStorage.setItem('selectedLocation', selectedLocation);
+
+            // Update URL query state cleanly without reload
+            try {
+                const url = new URL(window.location);
+                url.searchParams.set('location', newLocation);
+                window.history.replaceState({}, '', url);
+            } catch(e) {}
+
             if (locationSelectorModal) {
                 locationSelectorModal.style.display = 'none';
+                document.body.style.overflow = '';
             }
             updateLocationDisplay();
             loadMenu();
@@ -40,14 +93,30 @@ function initLocationSelector() {
         changeLocationBtn.addEventListener('click', () => {
             if (locationSelectorModal) {
                 locationSelectorModal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
             }
         });
     }
+
+    // If user clicks Menu link on navbar while on /menu page, reopen location modal
+    document.querySelectorAll('a[href="/menu"], a[href="menu.html"], a[data-i18n="nav-menu"]').forEach(link => {
+        link.addEventListener('click', (e) => {
+            if (window.location.pathname.endsWith('/menu') || window.location.pathname.endsWith('menu.html')) {
+                e.preventDefault();
+                if (locationSelectorModal) {
+                    locationSelectorModal.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                }
+            }
+        });
+    });
 }
 
 function updateLocationDisplay() {
     if (currentLocationName && selectedLocation) {
-        const displayName = LOCATION_NAMES[selectedLocation] || selectedLocation;
+        const lang = localStorage.getItem('selectedLanguage') || 'en';
+        const locObj = LOCATION_NAMES[selectedLocation];
+        const displayName = locObj ? (locObj[lang] || locObj.en) : selectedLocation;
         currentLocationName.textContent = displayName;
     }
 }
@@ -372,8 +441,20 @@ function showOptionsPopup(item, lang) {
 
 async function loadMenu() {
     if (!menuContainer) return;
+    const lang = localStorage.getItem('selectedLanguage') || 'en';
+
     if (!selectedLocation) {
-        if (locationSelectorModal) locationSelectorModal.style.display = 'flex';
+        if (locationSelectorModal) {
+            locationSelectorModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        const promptTexts = {
+            vi: 'Vui lòng chọn cơ sở bên trên để xem thực đơn.',
+            en: 'Please select a location above to view the menu.',
+            fi: 'Ole hyvä ja valitse toimipiste yltä nähdäksesi ruokalistan.',
+            sv: 'Vänligen välj en restaurang ovan för att se menyn.'
+        };
+        menuContainer.innerHTML = `<div class="col-span-full text-center py-20 text-secondary"><div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary"><span class="material-symbols-outlined text-3xl">storefront</span></div><p class="text-lg font-medium text-white">${promptTexts[lang] || promptTexts.en}</p></div>`;
         return;
     }
 
@@ -424,9 +505,9 @@ async function loadMenu() {
                 // Skip hidden/locked items
                 if (data.hidden === true) return;
 
-                // Filter by location
-                const itemLocation = (data.location || 'pengerkatu').toLowerCase();
-                if (itemLocation !== selectedLocation.toLowerCase()) return;
+                // Filter by location: support 'both', 'pengerkatu', and 'easton'
+                const itemLocation = (data.location || 'both').toLowerCase();
+                if (itemLocation !== 'both' && itemLocation !== selectedLocation.toLowerCase()) return;
 
                 const catVi = data.categoryVi || data.category || 'Món chính';
                 const catEn = data.categoryEn || getCategoryTitle(catVi, 'en');
@@ -475,9 +556,9 @@ async function loadMenu() {
                     data.id = docSnap.id;
                     // Skip hidden/locked items
                     if (data.hidden === true) return;
-                    // Filter by location
-                    const itemLocation = (data.location || 'pengerkatu').toLowerCase();
-                    if (itemLocation !== selectedLocation.toLowerCase()) return;
+                    // Filter by location: support 'both', 'pengerkatu', and 'easton'
+                    const itemLocation = (data.location || 'both').toLowerCase();
+                    if (itemLocation !== 'both' && itemLocation !== selectedLocation.toLowerCase()) return;
                     const catVi = data.categoryVi || data.category || 'Món chính';
                     const catEn = data.categoryEn || getCategoryTitle(catVi, 'en');
                     const catFi = data.categoryFi || getCategoryTitle(catVi, 'fi');
@@ -725,6 +806,7 @@ function applyMenuTranslations() {
 
 window.addEventListener('languageChanged', () => {
     applyMenuTranslations();
+    updateLocationDisplay();
 });
 
 if (document.readyState === 'loading') {

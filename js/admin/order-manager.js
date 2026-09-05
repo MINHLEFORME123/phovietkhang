@@ -244,6 +244,7 @@ if (!container) {
                     </td>
                     <td class="py-3.5 px-4">
                         <span class="capitalize font-medium">${escapeHtml(order.orderType === 'dine-in' ? `Dine-In (Table ${order.tableNumber || 'N/A'})` : order.orderType)}</span>
+                        ${order.branch ? `<br><span class="inline-block mt-1 px-2 py-0.5 rounded text-[11px] font-semibold ${order.branch === 'easton' ? 'bg-purple-900/40 text-purple-300 border border-purple-800/50' : 'bg-blue-900/40 text-blue-300 border border-blue-800/50'}">📍 ${escapeHtml(order.branch === 'easton' ? 'Easton' : 'Pengerkatu')}</span>` : ''}
                     </td>
                     <td class="py-3.5 px-4 text-green-400 font-semibold">${formatMoney(totalPrice)}</td>
                     <td class="py-3.5 px-4">${statusBadge}</td>

@@ -246,7 +246,7 @@ JSON Structure:
                     nameFi: item.nameFi || '', descFi: item.descFi || '', nameSv: item.nameSv || '', descSv: item.descSv || '', category: catVi, categoryVi: catVi,
                     categoryEn: item.categoryEn || catVi, categoryFi: item.categoryFi || catVi, categorySv: item.categorySv || catVi,
                     price: parseFloat(item.price) || 0,
-                    location: 'pengerkatu',
+                    location: item.location || 'both',
                     image: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=500',
                     options: Array.isArray(item.options) ? item.options : [], createdAt: new Date()
                 });
@@ -309,7 +309,7 @@ JSON Structure: { "items": [ { "nameVi": "Tên món", "descVi": "Mô tả hấp 
                     nameFi: item.nameFi || '', descFi: item.descFi || '', nameSv: item.nameSv || '', descSv: item.descSv || '', category: catVi, categoryVi: catVi,
                     categoryEn: item.categoryEn || catVi, categoryFi: item.categoryFi || catVi, categorySv: item.categorySv || catVi,
                     price: parseFloat(item.price) || 0,
-                    location: 'pengerkatu',
+                    location: item.location || 'both',
                     image: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=500',
                     options: Array.isArray(item.options) ? item.options : [], createdAt: new Date()
                 });
@@ -401,7 +401,7 @@ if (foodAddForm) {
         const categoryFi = document.getElementById('food-category-fi').value;
         const categorySv = document.getElementById('food-category-sv').value;
         const price = parseFloat(document.getElementById('food-price').value);
-        const location = document.getElementById('food-location').value || 'pengerkatu';
+        const location = document.getElementById('food-location')?.value || 'both';
         const nameVi = document.getElementById('food-name-vi').value;
         const descVi = document.getElementById('food-desc-vi').value;
         const nameEn = document.getElementById('food-name-en').value;

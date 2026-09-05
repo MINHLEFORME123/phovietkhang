@@ -31,6 +31,16 @@ if (!foodTableBody) {
             });
             window.__adminFoodItems = items;
             renderFoodRows(items);
+
+            // Auto-heal / sync missing location fields to 'both' in background
+            const unassigned = items.filter(it => !it.location);
+            if (unassigned.length > 0) {
+                Promise.all(unassigned.map(it => updateDoc(doc(db, "menu", it.id), { location: 'both' })))
+                    .then(() => {
+                        console.log(`Auto-synced location: 'both' for ${unassigned.length} legacy items.`);
+                    })
+                    .catch(err => console.warn('Background location sync error:', err));
+            }
         } catch (error) {
             console.error("Error loading menu:", error);
             foodTableBody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-red-500">Failed to load menu.</td></tr>';
@@ -59,7 +69,13 @@ if (!foodTableBody) {
                 <td class="py-3 px-4">
                     <span class="font-bold text-white">${escapeHtml(item.nameVi || '')}</span>
                     ${item.allergenWarning ? '<span class="inline-flex items-center gap-1 bg-red-900/30 text-red-400 text-xs px-2 py-0.5 rounded-md font-semibold border border-red-800/50 ml-2" title="Chứa thành phần dễ gây dị ứng"><span class="material-symbols-outlined text-[14px]">warning</span> Dị ứng</span>' : ''}
-                    ${item.location ? `<br><span class="text-xs bg-blue-900/30 text-blue-400 px-1.5 py-0.5 rounded-md inline-block mt-1">📍 ${escapeHtml(item.location)}</span>` : '<br><span class="text-xs text-secondary/50">(no location)</span>'}
+                    <br>
+                    ${(() => {
+                        const loc = (item.location || 'both').toLowerCase();
+                        if (loc === 'pengerkatu') return '<span class="text-xs bg-blue-900/40 text-blue-300 border border-blue-800/50 px-2 py-0.5 rounded-md inline-block mt-1 font-medium">📍 Pengerkatu</span>';
+                        if (loc === 'easton') return '<span class="text-xs bg-purple-900/40 text-purple-300 border border-purple-800/50 px-2 py-0.5 rounded-md inline-block mt-1 font-medium">📍 Easton Helsinki</span>';
+                        return '<span class="text-xs bg-emerald-900/40 text-emerald-300 border border-emerald-800/50 px-2 py-0.5 rounded-md inline-block mt-1 font-medium">📍 Cả 2 cơ sở (Both)</span>';
+                    })()}
                     <br>
                     <span class="text-xs text-secondary">EN: ${escapeHtml(item.nameEn || '')}</span><br>
                     <span class="text-xs text-secondary">FI: ${escapeHtml(item.nameFi || '')}</span><br>
@@ -115,8 +131,9 @@ if (!foodTableBody) {
         // Filter by location
         if (location) {
             filtered = filtered.filter(item => {
-                const itemLocation = (item.location || 'pengerkatu').toLowerCase();
-                return itemLocation === location;
+                const itemLocation = (item.location || 'both').toLowerCase();
+                if (location === 'both') return itemLocation === 'both';
+                return itemLocation === location || itemLocation === 'both';
             });
         }
 
@@ -231,7 +248,7 @@ if (foodTableBody2) {
         document.getElementById('edit-category-fi').value = item.categoryFi || '';
         document.getElementById('edit-category-sv').value = item.categorySv || '';
         document.getElementById('edit-price').value = item.price || 0;
-        document.getElementById('edit-location').value = item.location || 'pengerkatu';
+        document.getElementById('edit-location').value = item.location || 'both';
 
         const editAllergenCb = document.getElementById('edit-allergen');
         if (editAllergenCb) editAllergenCb.checked = item.allergenWarning || false;
@@ -391,7 +408,7 @@ if (foodTableBody2) {
                     category: categoryVi, categoryVi,
                     categoryEn: categoryEn || categoryVi, categoryFi: categoryFi || categoryVi, categorySv: categorySv || categoryVi,
                     price: parseFloat(document.getElementById('edit-price').value) || 0,
-                    location: document.getElementById('edit-location').value || 'pengerkatu',
+                    location: document.getElementById('edit-location').value || 'both',
                     options: [...editOptions],
                     allergenWarning: document.getElementById('edit-allergen')?.checked || false
                 };
