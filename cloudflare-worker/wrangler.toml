@@ -1,0 +1,9 @@
+name = "pvk-admin"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+workers_dev = true
+
+# CRITICAL: giữ nguyên các biến môi trường / secret đã set trên dashboard khi
+# deploy. Nếu thiếu dòng này, `wrangler deploy` sẽ XOÁ sạch env vars dạng
+# plaintext (đã từng gây sự cố mất TELEGRAM_BOT_TOKEN, ADMIN_SECRET...).
+keep_vars = true
